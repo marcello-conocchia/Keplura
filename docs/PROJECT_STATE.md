@@ -8,6 +8,10 @@ Historie, alle PRs bis #95 und die Prüfprotokolle (`ci/evidence/`,
 Einträgen unten beziehen sich bis einschließlich 20.11.2026 auf das Archiv;
 neue PRs zählen hier ab #1.
 
+**Stand 21.11.2026: Sicherheitsupdates Desktop, PR #8 (Klasse A).** DOMPurify 3.4.17, Vite 7.3.8, source-map-js 1.2.4 (Dependabot-Warnungen #1–#11; ersetzt Dependabot-PRs #3–#5). Neu `.github/dependabot.yml`: keine Versions-Updates mehr, Sicherheitsupdates gebündelt als ein PR je Bereich (PO: „aber nicht zu oft“). CI-Nachweis und Security-Prüfung im PR.
+
+**Stand 20.11.2026: H2-Dev-Fehler behoben, PR #7, Merge `fb18d99`.** Dev-Profil baut das Schema mit denselben Flyway-Migrationen wie prod (H2 im PostgreSQL-Modus, Hibernate validiert nur); „Wissen an Chat anhängen“, MCP und Websuche-Einstellungen laufen lokal ohne HTTP 500. Regressionstest `DevProfileSchemaTest`. `ci-local.sh` Exit 0 auf `7275b8c` (Evidence `ci/evidence/20261120-174229/`).
+
 **Stand 20.11.2026: Keplura ist öffentlich** (github.com/marcello-conocchia/Keplura,
 Apache-2.0, PO-Go „Yes, go public“). Vor dem Umschalten alle Referenzen erneut
 geprüft (5 Commits, nur Inhaber/noreply, keine Zugangsdaten). Aktiv: vertrauliche
