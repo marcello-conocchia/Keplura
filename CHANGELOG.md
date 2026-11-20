@@ -37,6 +37,15 @@ the first tagged release (planned `0.1.0`, see [docs/RELEASING.md](docs/RELEASIN
   PostgreSQL. The dev database file is now `server/target/keplura-dev-db`;
   the old `keplura-dev` file is no longer used.
 
+### Security
+
+- Desktop dependencies updated for published advisories: DOMPurify 3.4.17
+  (sanitizer bypasses, used for chat Markdown), Vite 7.3.8 (dev-server and
+  bundled launch-editor issues, build-time only) and source-map-js 1.2.4
+  (denial of service, build-time only).
+- Dependabot only opens security updates, grouped into one pull request per
+  ecosystem (`.github/dependabot.yml`).
+
 ## Pre-release history (2026-09 to 2026-11)
 
 Summary of the work on `main` before the first release, newest first. This
