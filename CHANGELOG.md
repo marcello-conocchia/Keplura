@@ -30,8 +30,9 @@ the first tagged release (planned `0.1.0`, see [docs/RELEASING.md](docs/RELEASIN
 
 ## Pre-release history (2026-09 to 2026-11)
 
-Summary of the work on `main` before the first release, newest first. Pull
-request numbers refer to the GitHub repository.
+Summary of the work on `main` before the first release, newest first. This
+work happened in an earlier, private repository; the pull request numbers
+below refer to that repository and are not publicly visible.
 
 ### Interface
 

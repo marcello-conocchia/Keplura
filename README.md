@@ -147,7 +147,9 @@ Without a configured model the chat cannot answer; point
 | Third-party licenses | [docs/legal/THIRD_PARTY_LICENSES.md](docs/legal/THIRD_PARTY_LICENSES.md) |
 
 Much of the internal engineering documentation (ADRs, task specs, review
-reports, evidence under `ci/evidence/`) is written in German.
+reports) is written in German. Development before November 2026 happened in a
+private repository: pull request numbers up to #95 and evidence paths under
+`ci/evidence/` mentioned in older documents refer to that archive.
 
 ## Known limitations
 

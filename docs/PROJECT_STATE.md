@@ -1,5 +1,14 @@
 # Keplura — PROJECT STATE (autoritative, knappe Projekt-Wahrheit)
 
+**Umzug 20.11.2026:** Dieses Repository (`marcello-conocchia/Keplura`) ist seit
+20.11.2026 das Hauptrepo mit sauberem Start (ein Commit). Die bisherige
+Historie, alle PRs bis #95 und die Prüfprotokolle (`ci/evidence/`,
+`desktop/e2e/evidence/`) liegen im privaten Archiv
+`marcello-conocchia/Keplura-intern`. PR-Nummern und Evidence-Pfade in den
+Einträgen unten beziehen sich bis einschließlich 20.11.2026 auf das Archiv;
+neue PRs zählen hier ab #1. Offen: Hermes-Host frisch klonen, dann
+Sichtbarkeit öffentlich (nur nach PO-Go), siehe `docs/OPEN_SOURCE_READINESS.md` §9.
+
 **Stand 20.11.2026: Open-Source-Vorbereitung auf main, PR #93 (OPEN-SOURCE-01), Merge `766ad7b` verifiziert.** Öffentliche Doku (README englisch mit Screenshots im Dunkelmodus, `docs/INSTALL.md`, `docs/OPERATIONS.md`, `docs/RELEASING.md`, CONTRIBUTING, SECURITY, CHANGELOG, `.env.example`, PR-Vorlage), Lizenz **Apache-2.0** (`LICENSE`, `NOTICE`, Lizenzfelder in pom/package.json/Cargo.toml), Lizenzinventar `docs/legal/THIRD_PARTY_LICENSES.md` mit Generator `scripts/third-party-licenses.cjs`, `.gitignore` für lokale Agenten-Ordner, CI-Workflow mit read-only Token. Bericht `docs/OPEN_SOURCE_READINESS.md`: Historie inkl. PR-Referenzen ohne Zugangsdaten (keine Rotation nötig), Abhängigkeiten lizenzrechtlich unkritisch; Gesamturteil **NOT READY** wegen offener PO-Punkte B2 (private E-Mail in 197 PR-Kopf-Commits, Empfehlung neues öffentliches Repo mit sauberem Start), B3 (Marke „Keplura“, Herkunft App-Icon), B4 (Sicherheitsmeldeweg beim Veröffentlichen aktivieren). Klasse B; statt vollem `ci-local.sh` Schnellprüfung (`mvn validate`, `cargo metadata --locked`, `npm ci --dry-run`) auf PO-Entscheidung — kein voller CI-Nachweis für #93. Nebenbefund: Dev-Profil (H2) „Wissen an Chat anhängen“ → HTTP 500 (`BadSqlGrammarException`), mit PostgreSQL ok; eigene Aufgabe offen. Repo bleibt privat; Sichtbarkeit nur nach ausdrücklicher PO-Freigabe.
 
 **Stand 19.11.2026: Zugang und Ersteinrichtung im Katalogstil auf main, PR #89 (UI-13) — damit alle Bereiche des UI-Inventars umgestellt.** Anmeldung, Pflicht-Passwortwechsel und Sitzungsprüfung im gemeinsamen Rahmen `AccessShell`; Offline-Hinweis mit „Erneut versuchen“, Meldungen mit role=alert; Ersteinrichtung mit Fortschritt, sichtbaren Feldbeschriftungen, Fehler am Schritt und Fokuswechsel; veraltete globale CSS-Überschreibungen entfernt (betraf auch die Team-Seite aus #87). Klasse A, alle Gates erfüllt: `ci-local.sh` als Nicht-root mit `acl` Exit 0 auf `3d3f7f2` (539 Server-Tests, 1 übersprungen; Evidence `ci/evidence/20261119-210350/`), Reviewer und Security freigegeben. Spec `docs/tasks/UI-13-access.md`, Screenshots `docs/design/ui-access-2026-11-19/` (Serverantworten simuliert). Nicht geprüft: Dunkelmodus, echter Server, OIDC-Rückkehr, Team-Seite nach dem CSS-Aufräumen.
