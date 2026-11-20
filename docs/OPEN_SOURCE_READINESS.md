@@ -303,10 +303,11 @@ Deutsch) ist in README genannt.
 
 | Schritt | Wer | Status |
 |---|---|---|
-| App-Icon ersetzen, Entscheidungen dokumentieren (PR im privaten Repo) | Claude | in Arbeit |
-| Hermes-Agenten pausieren; nach dem Umzug auf dem Hermes-Host **frisch klonen** (nicht nur Remote ändern — ein alter Klon würde beim Push die alte Historie ins neue Repo laden) | PO / Plattform | offen |
-| Privates Repo in `Keplura-intern` umbenennen | Claude nach PO-Go | offen |
-| Neues Repo `Keplura` **privat** anlegen, bereinigten Stand von `main` als ersten Commit (Autor noreply) pushen | Claude | offen |
-| Lokale Klone auf `Keplura-intern` umstellen, für neue Arbeit frisch klonen | Claude (dieser Rechner), PO (Hermes-Host) | offen |
-| Offener PR #92 aus dem Archiv ins neue Repo übertragen | Claude | offen |
+| App-Icon ersetzen, Entscheidungen dokumentieren (PR im privaten Repo) | Claude | erledigt (Archiv #95, `0c6e1c4`) |
+| Hermes-Agenten pausieren | PO | erledigt (PO-Bestätigung 20.11.2026) |
+| Privates Repo in `Keplura-intern` umbenennen | Claude nach PO-Go | erledigt 20.11.2026 |
+| Neues Repo `Keplura` **privat** anlegen, bereinigten Stand von `main` als ersten Commit pushen (Autor und Committer: Inhaber, noreply-Adresse) | Claude | erledigt: ein Commit, Inhalt und Dateirechte identisch mit Archiv-`main` ohne `ci/evidence/` und `desktop/e2e/evidence/` |
+| Lokaler Klon des Windows-Rechners auf `Keplura-intern` umgestellt; neue Arbeit in frischem Klon des neuen Repos | Claude | erledigt |
+| Hermes-Host: alten Arbeitsordner beiseitelegen und das neue Repo **frisch klonen** (nicht nur Remote ändern — ein alter Klon würde beim Push die alte Historie ins neue Repo laden); danach Agenten fortsetzen | PO / Plattform | offen |
+| Offener Archiv-PR #92 übertragen | Claude | erledigt: neuer Draft-PR #1, Archiv-#92 geschlossen |
 | Sichtbarkeit auf **öffentlich**; Private vulnerability reporting, Secret Scanning mit Push Protection, Dependabot-Warnungen, Branch-Schutz für `main` einschalten | Claude nach ausdrücklichem PO-Go | offen |
