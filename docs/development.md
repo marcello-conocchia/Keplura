@@ -48,6 +48,16 @@ double-submit CSRF header.
 
 - `application-dev.properties` — development (DEBUG logging for `com.keplura`),
   **active by default** via `spring.profiles.active=dev` in the base file.
+  Database: H2 file `server/target/keplura-dev-db` in PostgreSQL mode; the
+  schema comes from the same Flyway migrations as prod and Hibernate only
+  validates (since 20.11.2026 — before, `ddl-auto=update` left out tables that
+  exist only in migrations, e.g. chat knowledge bases, MCP, web search). An old
+  `target/keplura-dev` file from that time is no longer used.
+  Tests also run under the dev profile but keep their previous Hibernate-built
+  schema via the test-only override
+  `server/src/test/resources/config/application-dev.properties`; tests that need
+  the real schema enable Flyway explicitly (e.g. `ChatApiIntegrationTest`).
+  `DevProfileSchemaTest` guards the real dev settings.
 - `application-prod.properties` — production (INFO logging, port overridable via
   `KEPLURA_SERVER_PORT`), activated with `SPRING_PROFILES_ACTIVE=prod`.
 
@@ -507,10 +517,11 @@ Der Produktiv-Modus des Servers läuft gegen PostgreSQL 16 + pgvector
 (`pgvector/pgvector:pg16`). Das Schema gehört Flyway: `V1__baseline.sql`
 (`server/src/main/resources/db/migration`) migriert beim Boot, Hibernate
 prüft nur noch (`ddl-auto=validate`) — Schema-Drift lässt den Boot
-fehlerhaft durchlaufen statt still zu mutieren. Dev (H2-Datei,
-`ddl-auto=update`) und die Tests bleiben unverändert; CI läuft bewusst
-weiter H2-basiert (Flyway-Leg als H2-PostgreSQL-Mode-Replay, siehe
-`FlywayBaselineMigrationTest`).
+fehlerhaft durchlaufen statt still zu mutieren. Dev (H2-Datei im
+PostgreSQL-Modus) nutzt seit 20.11.2026 dieselben Flyway-Migrationen mit
+`ddl-auto=validate` (siehe „Config profiles“); die Tests bleiben auf ihrem
+bisherigen Weg; CI läuft bewusst weiter H2-basiert (Flyway-Leg als
+H2-PostgreSQL-Mode-Replay, siehe `FlywayBaselineMigrationTest`).
 
 Voraussetzung: ein Container-Runtime (docker oder podman-compose).
 

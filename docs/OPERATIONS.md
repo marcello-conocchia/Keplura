@@ -117,8 +117,8 @@ Status at version 0.1.0 (pre-release):
   time limits.
 - **Answer quality** depends on the model. Small CPU models give short and
   sometimes incomplete answers; always check the cited sources.
-- **Development profile (H2):** for local development only. Some chat context
-  features fail on H2 (`BadSqlGrammarException` when attaching a knowledge
-  base to a chat, observed 2026-11-20); use PostgreSQL for realistic testing.
+- **Development profile (H2):** for local development only; H2 has no native
+  vector search, so retrieval quality differs from PostgreSQL + pgvector. Use
+  PostgreSQL for realistic testing.
 - **Platforms:** the server is built and tested on Linux. Windows and macOS
   builds of the desktop app are a release gate, not checked on every change.

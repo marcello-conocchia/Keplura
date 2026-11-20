@@ -28,6 +28,15 @@ the first tagged release (planned `0.1.0`, see [docs/RELEASING.md](docs/RELEASIN
 - GitHub Actions workflow runs with read-only repository permissions.
 - `.gitignore` covers local agent and browser-automation folders.
 
+### Fixed
+
+- Development profile: the H2 schema is now built by the same Flyway
+  migrations as production (PostgreSQL mode, Hibernate only validates).
+  Attaching a knowledge base or file to a chat, MCP servers and web search
+  settings no longer fail with HTTP 500 when running locally without
+  PostgreSQL. The dev database file is now `server/target/keplura-dev-db`;
+  the old `keplura-dev` file is no longer used.
+
 ## Pre-release history (2026-09 to 2026-11)
 
 Summary of the work on `main` before the first release, newest first. This
