@@ -1,0 +1,614 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------< com.keplura:keplura-server >---------------------
+[INFO] Building Keplura Server 0.1.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-cli) @ keplura-server ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.keplura.server.search.ocr.PdfOcrTest
+17:45:03.152 [main] INFO com.keplura.server.search.TikaDocumentTextExtractor -- ocr: 10 pages recognised, 2 over the page limit, 0 failed
+17:45:03.515 [main] WARN org.apache.pdfbox.pdmodel.font.PDType1Font -- Using fallback font LiberationSans for base font Helvetica
+17:45:03.529 [tika-parser] WARN org.apache.pdfbox.pdmodel.font.PDType1Font -- Using fallback font LiberationSans for Helvetica
+17:45:03.550 [main] INFO com.keplura.server.search.ocr.PdfOcr -- ocr not available — scanned PDFs stay NO_TEXT_LAYER
+17:45:03.556 [main] WARN org.apache.pdfbox.pdmodel.font.PDType1Font -- Using fallback font LiberationSans for base font Helvetica
+17:45:03.567 [tika-parser] WARN org.apache.pdfbox.pdmodel.font.PDType1Font -- Using fallback font LiberationSans for Helvetica
+17:45:07.645 [main] WARN com.keplura.server.search.ocr.PdfOcr -- ocr worker still busy with an abandoned page; remaining pages skipped
+17:45:07.646 [main] WARN com.keplura.server.search.ocr.PdfOcr -- ocr worker still busy with an abandoned page; remaining pages skipped
+17:45:07.741 [main] INFO com.keplura.server.search.ocr.PdfOcr -- ocr not available — scanned PDFs stay NO_TEXT_LAYER
+[WARNING] Tests run: 13, Failures: 0, Errors: 0, Skipped: 1, Time elapsed: 5.001 s -- in com.keplura.server.search.ocr.PdfOcrTest
+[INFO] Running com.keplura.server.search.OfficeFormatsTest
+[INFO] Tests run: 17, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.749 s -- in com.keplura.server.search.OfficeFormatsTest
+[INFO] Running com.keplura.server.search.PgVectorSchemaTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.017 s -- in com.keplura.server.search.PgVectorSchemaTest
+[INFO] Running com.keplura.server.mcp.McpAuditTest
+17:45:15.904 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-audit-dd64711f-f5b9-4936-9272-60dd66dd8dd5 (H2 2.4)
+17:45:15.954 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+17:45:15.991 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+17:45:15.994 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 23 migrations (execution time 00:00.022s)
+17:45:16.000 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+17:45:16.042 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+17:45:16.052 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+17:45:16.082 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+17:45:16.094 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+17:45:16.105 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+17:45:16.119 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+17:45:16.129 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+17:45:16.143 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+17:45:16.151 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+17:45:16.163 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+17:45:16.174 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+17:45:16.186 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+17:45:16.193 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+17:45:16.218 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+17:45:16.231 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+17:45:16.241 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+17:45:16.253 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+17:45:16.259 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+17:45:16.274 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+17:45:16.281 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+17:45:16.293 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+17:45:16.300 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+17:45:16.307 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+17:45:16.316 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+17:45:16.324 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 23 migrations to schema "PUBLIC", now at version v24 (execution time 00:00.133s)
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (/home/ci/.m2/repository/net/bytebuddy/byte-buddy-agent/1.18.11/byte-buddy-agent-1.18.11.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+17:45:17.290 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-audit-866265bf-5475-4a09-8d8a-ac1b8384c6e0 (H2 2.4)
+17:45:17.328 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+17:45:17.376 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+17:45:17.380 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 23 migrations (execution time 00:00.033s)
+17:45:17.386 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+17:45:17.412 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+17:45:17.421 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+17:45:17.449 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+17:45:17.471 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+17:45:17.494 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+17:45:17.509 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+17:45:17.533 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+17:45:17.553 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+17:45:17.566 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+17:45:17.588 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+17:45:17.607 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+17:45:17.621 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+17:45:17.632 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+17:45:17.662 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+17:45:17.678 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+17:45:17.688 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+17:45:17.704 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+17:45:17.714 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+17:45:17.732 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+17:45:17.743 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+17:45:17.758 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+17:45:17.765 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+17:45:17.772 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+17:45:17.785 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+17:45:17.790 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 23 migrations to schema "PUBLIC", now at version v24 (execution time 00:00.182s)
+17:45:17.822 [main] WARN com.keplura.server.mcp.McpToolService -- mcp tool not executed: authorization/audit unavailable (BadSqlGrammarException)
+17:45:17.866 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-audit-a2646b6b-5075-4f05-9c99-8878a9b435f5 (H2 2.4)
+17:45:17.878 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+17:45:17.900 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+17:45:17.901 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 23 migrations (execution time 00:00.017s)
+17:45:17.903 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+17:45:17.911 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+17:45:17.913 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+17:45:17.920 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+17:45:17.926 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+17:45:17.932 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+17:45:17.937 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+17:45:17.943 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+17:45:17.950 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+17:45:17.956 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+17:45:17.965 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+17:45:17.973 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+17:45:17.980 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+17:45:17.985 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+17:45:18.000 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+17:45:18.014 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+17:45:18.024 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+17:45:18.032 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+17:45:18.037 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+17:45:18.048 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+17:45:18.053 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+17:45:18.062 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+17:45:18.065 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+17:45:18.068 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+17:45:18.077 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+17:45:18.079 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 23 migrations to schema "PUBLIC", now at version v24 (execution time 00:00.081s)
+17:45:18.200 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-audit-e0454992-2e20-440b-81cf-d641aeadbbcd (H2 2.4)
+17:45:18.207 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+17:45:18.217 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+17:45:18.217 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 23 migrations (execution time 00:00.007s)
+17:45:18.219 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+17:45:18.223 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+17:45:18.224 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+17:45:18.229 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+17:45:18.233 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+17:45:18.237 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+17:45:18.242 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+17:45:18.248 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+17:45:18.257 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+17:45:18.261 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+17:45:18.266 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+17:45:18.269 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+17:45:18.274 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+17:45:18.277 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+17:45:18.289 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+17:45:18.296 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+17:45:18.303 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+17:45:18.313 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+17:45:18.318 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+17:45:18.327 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+17:45:18.332 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+17:45:18.337 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+17:45:18.341 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+17:45:18.345 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+17:45:18.350 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+17:45:18.353 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 23 migrations to schema "PUBLIC", now at version v24 (execution time 00:00.060s)
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.839 s -- in com.keplura.server.mcp.McpAuditTest
+[INFO] Running com.keplura.server.mcp.McpClientTest
+17:45:18.400 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+17:45:18.602 [main] WARN com.keplura.server.admin.SsrfGuard -- SSRF guard refused a dial target (policy veto)
+17:45:18.620 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+17:45:18.798 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+17:45:18.873 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+17:45:19.035 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.683 s -- in com.keplura.server.mcp.McpClientTest
+[INFO] Running com.keplura.server.datasource.NativeLocalReaderReasonTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.036 s -- in com.keplura.server.datasource.NativeLocalReaderReasonTest
+[INFO] Running com.keplura.server.org.OrgServiceTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.507 s -- in com.keplura.server.org.OrgServiceTest
+[INFO] Running com.keplura.server.org.OrgApiIntegrationTest
+17:45:19.670 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.keplura.server.org.OrgApiIntegrationTest]: OrgApiIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+17:45:19.853 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.org.OrgApiIntegrationTest
+17:45:19.922 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.keplura.server.org.OrgApiIntegrationTest]: OrgApiIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+17:45:19.929 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.org.OrgApiIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-11-20T17:45:20.275Z  INFO 2825 --- [keplura-server] [           main] c.k.server.org.OrgApiIntegrationTest     : Starting OrgApiIntegrationTest using Java 21.0.12.1 with PID 2825 (started by ci in /w/server)
+2026-11-20T17:45:20.276Z DEBUG 2825 --- [keplura-server] [           main] c.k.server.org.OrgApiIntegrationTest     : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-20T17:45:20.276Z  INFO 2825 --- [keplura-server] [           main] c.k.server.org.OrgApiIntegrationTest     : The following 1 profile is active: "dev"
+2026-11-20T17:45:21.076Z  INFO 2825 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-20T17:45:21.192Z  INFO 2825 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 103 ms. Found 23 JPA repository interfaces.
+2026-11-20T17:45:21.885Z  INFO 2825 --- [keplura-server] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-11-20T17:45:21.898Z  INFO 2825 --- [keplura-server] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-20T17:45:21.899Z  INFO 2825 --- [keplura-server] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-11-20T17:45:21.949Z  INFO 2825 --- [keplura-server] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1659 ms
+2026-11-20T17:45:22.011Z DEBUG 2825 --- [keplura-server] [           main] c.k.server.auth.SessionLifetimeFilter    : Filter 'sessionLifetimeFilter' configured for use
+2026-11-20T17:45:22.224Z  INFO 2825 --- [keplura-server] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-20T17:45:22.308Z  INFO 2825 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-11-20T17:45:22.667Z  INFO 2825 --- [keplura-server] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-20T17:45:22.693Z  INFO 2825 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-11-20T17:45:22.706Z  INFO 2825 --- [keplura-server] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn27: url=jdbc:h2:mem:org-api-test user=SA
+2026-11-20T17:45:22.708Z  INFO 2825 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-11-20T17:45:22.760Z  INFO 2825 --- [keplura-server] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:org-api-test]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: ORG-API-TEST/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-20T17:45:23.802Z  INFO 2825 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-20T17:45:23.861Z  INFO 2825 --- [keplura-server] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-20T17:45:23.987Z  INFO 2825 --- [keplura-server] [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-11-20T17:45:24.682Z  INFO 2825 --- [keplura-server] [           main] com.keplura.server.admin.SecretCipher    : secret cipher: no KEPLURA_SECRETS_MASTER_KEY — provider secrets cannot be stored (admin surface stays usable without them)
+2026-11-20T17:45:24.692Z  INFO 2825 --- [keplura-server] [           main] c.keplura.server.SystemInfoController    : model provider state: provider=raw configured=false keyPresent=false
+2026-11-20T17:45:26.954Z  INFO 2825 --- [keplura-server] [           main] c.k.s.search.SearchStoreConfiguration    : search store: auto -> memory (pgvector probe not satisfied)
+2026-11-20T17:45:27.040Z  INFO 2825 --- [keplura-server] [           main] c.k.s.knowledge.DocumentIndexingQueue    : document indexing mode: sync
+2026-11-20T17:45:27.149Z  INFO 2825 --- [keplura-server] [           main] c.keplura.server.oidc.OidcConfiguration  : oidc: desktop handoff target fixed to http://localhost:1420/
+2026-11-20T17:45:27.337Z  WARN 2825 --- [keplura-server] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-20T17:45:28.037Z  INFO 2825 --- [keplura-server] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 44491 (http) with context path '/'
+2026-11-20T17:45:28.048Z  INFO 2825 --- [keplura-server] [           main] c.k.server.org.OrgApiIntegrationTest     : Started OrgApiIntegrationTest in 8.054 seconds (process running for 26.308)
+2026-11-20T17:45:28.303Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-20T17:45:28.303Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-11-20T17:45:28.305Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-11-20T17:45:28.324Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-1] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs -> 401 (1ms)
+2026-11-20T17:45:28.551Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (129ms)
+2026-11-20T17:45:28.577Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (19ms)
+2026-11-20T17:45:28.598Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-4] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs -> 200 (17ms)
+2026-11-20T17:45:28.628Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-6] c.k.server.RequestLoggingInterceptor     : GET /api/v1/system/info -> 200 (14ms)
+2026-11-20T17:45:28.635Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/logout -> 204 (2ms)
+2026-11-20T17:45:28.646Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-8] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs -> 401 (0ms)
+2026-11-20T17:45:28.651Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-9] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 401 (0ms)
+2026-11-20T17:45:28.657Z  INFO 2825 --- [keplura-server] [-auto-1-exec-10] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/1 -> 401 (0ms)
+2026-11-20T17:45:28.730Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (31ms)
+2026-11-20T17:45:28.812Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (49ms)
+2026-11-20T17:45:28.824Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (7ms)
+2026-11-20T17:45:28.838Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-4] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/2 -> 404 (9ms)
+2026-11-20T17:45:28.847Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-5] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/99999999 -> 404 (3ms)
+2026-11-20T17:45:28.916Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (30ms)
+2026-11-20T17:45:28.926Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 400 (6ms)
+2026-11-20T17:45:28.933Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-8] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 400 (3ms)
+2026-11-20T17:45:28.942Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-9] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 400 (4ms)
+2026-11-20T17:45:29.015Z  INFO 2825 --- [keplura-server] [-auto-1-exec-10] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (32ms)
+2026-11-20T17:45:29.027Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (8ms)
+2026-11-20T17:45:29.045Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-2] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/3 -> 200 (14ms)
+2026-11-20T17:45:29.115Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (26ms)
+2026-11-20T17:45:29.177Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (34ms)
+2026-11-20T17:45:29.187Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (6ms)
+2026-11-20T17:45:29.194Z  INFO 2825 --- [keplura-server] [o-auto-1-exec-6] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs -> 200 (3ms)
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.595 s -- in com.keplura.server.org.OrgApiIntegrationTest
+[INFO] Running com.keplura.server.org.OrgRepositoryTest
+2026-11-20T17:45:29.211Z  INFO 2825 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.org.OrgRepositoryTest]: OrgRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-20T17:45:29.224Z  INFO 2825 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.org.OrgRepositoryTest
+2026-11-20T17:45:29.225Z  INFO 2825 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.org.OrgRepositoryTest]: OrgRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-20T17:45:29.236Z  INFO 2825 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.org.OrgRepositoryTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-11-20T17:45:29.274Z  INFO 2825 --- [keplura-server] [           main] c.keplura.server.org.OrgRepositoryTest   : Starting OrgRepositoryTest using Java 21.0.12.1 with PID 2825 (started by ci in /w/server)
+2026-11-20T17:45:29.274Z DEBUG 2825 --- [keplura-server] [           main] c.keplura.server.org.OrgRepositoryTest   : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-20T17:45:29.274Z  INFO 2825 --- [keplura-server] [           main] c.keplura.server.org.OrgRepositoryTest   : The following 1 profile is active: "dev"
+2026-11-20T17:45:29.406Z  INFO 2825 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-20T17:45:29.445Z  INFO 2825 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 37 ms. Found 23 JPA repository interfaces.
+2026-11-20T17:45:29.467Z  INFO 2825 --- [keplura-server] [           main] beddedDataSourceBeanFactoryPostProcessor : Replacing 'dataSource' DataSource bean with embedded version
+2026-11-20T17:45:29.491Z  INFO 2825 --- [keplura-server] [           main] o.s.j.d.e.EmbeddedDatabaseFactory        : Starting embedded database: url='jdbc:h2:mem:de350c0f-0cd1-4e04-a5c6-cdc4b547ec29;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false', username='sa'
+2026-11-20T17:45:29.516Z  INFO 2825 --- [keplura-server] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-20T17:45:29.544Z  INFO 2825 --- [keplura-server] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-20T17:45:29.546Z  INFO 2825 --- [keplura-server] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:de350c0f-0cd1-4e04-a5c6-cdc4b547ec29]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: DE350C0F-0CD1-4E04-A5C6-CDC4B547EC29/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-20T17:45:29.797Z  INFO 2825 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: drop table if exists ai_model cascade 
+Hibernate: drop table if exists ai_provider cascade 
+Hibernate: drop table if exists app_user cascade 
+Hibernate: drop table if exists chat_conversation cascade 
+Hibernate: drop table if exists chat_message cascade 
+Hibernate: drop table if exists data_source cascade 
+Hibernate: drop table if exists data_source_file cascade 
+Hibernate: drop table if exists directory_connection cascade 
+Hibernate: drop table if exists kb_chunk cascade 
+Hibernate: drop table if exists kb_document cascade 
+Hibernate: drop table if exists kb_document_acl cascade 
+Hibernate: drop table if exists knowledge_base cascade 
+Hibernate: drop table if exists membership cascade 
+Hibernate: drop table if exists oidc_account_link cascade 
+Hibernate: drop table if exists oidc_provider cascade 
+Hibernate: drop table if exists org_invite cascade 
+Hibernate: drop table if exists organization cascade 
+Hibernate: drop table if exists prompt_template cascade 
+Hibernate: drop table if exists quality_question cascade 
+Hibernate: drop table if exists quality_result cascade 
+Hibernate: drop table if exists quality_run cascade 
+Hibernate: drop table if exists space cascade 
+Hibernate: drop table if exists user_principal cascade 
+Hibernate: create table ai_model (embedding_dim integer, enabled boolean not null, is_default boolean not null, max_output_tokens integer, temperature numeric(4,3), created_at timestamp(6) with time zone not null, default_slot bigint, id bigint generated by default as identity, provider_id bigint not null, updated_at timestamp(6) with time zone not null, model_type varchar(20) not null, name varchar(200) not null, technical_model_id varchar(300) not null, primary key (id), constraint ai_model_default_slot_key unique (model_type, default_slot))
+Hibernate: create table ai_provider (enabled boolean not null, timeout_seconds integer not null, created_at timestamp(6) with time zone not null, id bigint generated by default as identity, updated_at timestamp(6) with time zone not null, provider_type varchar(20) not null, name varchar(200) not null unique, base_url varchar(500) not null, secret_cipher varchar(1000), primary key (id))
+Hibernate: create table app_user (must_change_password boolean not null, created_at timestamp(6) with time zone not null, id bigint generated by default as identity, role varchar(20) not null, display_name varchar(200) not null, password_hash varchar(200) not null, email varchar(320) not null unique, primary key (id))
+Hibernate: create table chat_conversation (created_at timestamp(6) with time zone not null, created_by bigint not null, id bigint generated by default as identity, knowledge_base_id bigint, org_id bigint not null, space_id bigint not null, updated_at timestamp(6) with time zone not null, title varchar(200) not null, primary key (id))
+Hibernate: create table chat_message (conversation_id bigint not null, created_at timestamp(6) with time zone not null, feedback varchar(8), feedback_at timestamp(6) with time zone, id bigint generated by default as identity, role varchar(16) not null, status varchar(16) not null, model varchar(128) not null, citations_json varchar(16000) not null, content varchar(32000) not null, primary key (id))
+Hibernate: create table data_source (enabled boolean not null, files_failed integer not null, files_indexed integer not null, files_seen integer not null, interval_minutes integer not null, mirror_permissions boolean not null, created_at timestamp(6) with time zone not null, created_by bigint not null, id bigint generated by default as identity, knowledge_base_id bigint not null, last_run_finished_at timestamp(6) with time zone, last_run_started_at timestamp(6) with time zone, max_file_bytes bigint not null, org_id bigint not null, space_id bigint not null, updated_at timestamp(6) with time zone not null, kind varchar(20) not null, last_run_status varchar(20), client_id varchar(100), tenant_id varchar(100), display_name varchar(200) not null, username varchar(300), last_run_message varchar(1000), location varchar(1000) not null, include_patterns varchar(2000) not null, secret_cipher varchar(2000), exclude_patterns varchar(20000) not null, primary key (id))
+Hibernate: create table data_source_file (data_source_id bigint not null, document_id bigint, id bigint generated by default as identity, modified_at timestamp(6) with time zone not null, size_bytes bigint not null, acl_fingerprint varchar(64) not null, last_error varchar(500), relative_path varchar(2000) not null, primary key (id))
+Hibernate: create table directory_connection (allow_plain_ldap boolean not null, auto_provision boolean not null, enabled boolean not null, login_enabled boolean not null, start_tls boolean not null, created_at timestamp(6) with time zone not null, id bigint generated by default as identity, org_id bigint not null, updated_at timestamp(6) with time zone not null, kind varchar(20) not null, display_name varchar(200) not null, base_dn varchar(500) not null, bind_dn varchar(500) not null, url varchar(500) not null, user_filter varchar(500) not null, bind_secret_cipher varchar(2000), primary key (id))
+Hibernate: create table kb_chunk (chunk_idx integer not null, end_offset integer, page_number integer, start_offset integer, created_at timestamp(6) with time zone not null, document_id bigint not null, id bigint generated by default as identity, knowledge_base_id bigint not null, section_title varchar(512), chunk_text varchar(4000) not null, embedding varchar(65536) not null, primary key (id), constraint kb_chunk_document_id_chunk_idx_key unique (document_id, chunk_idx))
+Hibernate: create table kb_document (created_at timestamp(6) with time zone not null, id bigint generated by default as identity, knowledge_base_id bigint not null, size_bytes bigint not null, uploaded_by bigint not null, index_status varchar(20), sha256 varchar(64) not null, content_type varchar(200) not null, stored_path varchar(500) not null, filename varchar(255) not null, primary key (id))
+Hibernate: create table kb_document_acl (allow_read boolean not null, document_id bigint not null, id bigint generated by default as identity, principal varchar(300) not null, primary key (id))
+Hibernate: create table knowledge_base (created_at timestamp(6) with time zone not null, id bigint generated by default as identity, space_id bigint not null, name varchar(200) not null, primary key (id), constraint knowledge_base_space_id_name_key unique (space_id, name))
+Hibernate: create table membership (created_at timestamp(6) with time zone not null, org_id bigint not null, user_id bigint not null, role enum ('MEMBER','OWNER') not null, primary key (org_id, user_id))
+Hibernate: create table oidc_account_link (created_at timestamp(6) with time zone not null, id bigint generated by default as identity, provider_id bigint not null, user_id bigint not null, subject varchar(200) not null, primary key (id))
+Hibernate: create table oidc_provider (active boolean not null, timeout_seconds integer not null, active_slot bigint, created_at timestamp(6) with time zone not null, id bigint generated by default as identity, updated_at timestamp(6) with time zone not null, client_id varchar(200) not null, name varchar(200) not null unique, discovery_url varchar(500) not null, issuer varchar(500) not null, client_secret_cipher varchar(1000), primary key (id))
+Hibernate: create table org_invite (created_at timestamp(6) with time zone not null, expires_at timestamp(6) with time zone not null, id bigint generated by default as identity, inviter_id bigint not null, org_id bigint not null, used_at timestamp(6) with time zone, used_by bigint, token_hash varchar(64) not null, role enum ('MEMBER','OWNER') not null, primary key (id))
+Hibernate: create table organization (created_at timestamp(6) with time zone not null, id bigint generated by default as identity, name varchar(200) not null, primary key (id))
+Hibernate: create table prompt_template (created_at timestamp(6) with time zone not null, created_by bigint not null, id bigint generated by default as identity, org_id bigint not null, space_id bigint, updated_at timestamp(6) with time zone not null, title varchar(120) not null, body varchar(4000) not null, primary key (id))
+Hibernate: create table quality_question (created_at timestamp(6) with time zone not null, created_by bigint not null, id bigint generated by default as identity, knowledge_base_id bigint not null, org_id bigint not null, space_id bigint not null, expected_document varchar(500) not null, expected_phrase varchar(500), question varchar(2000) not null, primary key (id))
+Hibernate: create table quality_result (hit boolean not null, hit_rank integer, id bigint generated by default as identity, question_id bigint not null, run_id bigint not null, top_document varchar(500), primary key (id))
+Hibernate: create table quality_run (hits integer not null, total integer not null, finished_at timestamp(6) with time zone, id bigint generated by default as identity, knowledge_base_id bigint not null, run_by bigint not null, started_at timestamp(6) with time zone not null, primary key (id))
+Hibernate: create table space (created_at timestamp(6) with time zone not null, id bigint generated by default as identity, org_id bigint not null, name varchar(200) not null, primary key (id), constraint space_org_id_name_key unique (org_id, name))
+Hibernate: create table user_principal (id bigint generated by default as identity, refreshed_at timestamp(6) with time zone not null, user_id bigint not null, principal varchar(300) not null, primary key (id))
+Hibernate: create index chat_conversation_org_id_created_by_space_id_idx on chat_conversation (org_id, created_by, space_id)
+Hibernate: create index chat_message_conversation_id_idx on chat_message (conversation_id)
+Hibernate: create index kb_chunk_knowledge_base_id_idx on kb_chunk (knowledge_base_id)
+Hibernate: create index kb_document_knowledge_base_id_idx on kb_document (knowledge_base_id)
+2026-11-20T17:45:29.813Z  INFO 2825 --- [keplura-server] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-20T17:45:30.059Z  INFO 2825 --- [keplura-server] [           main] c.keplura.server.org.OrgRepositoryTest   : Started OrgRepositoryTest in 0.818 seconds (process running for 28.319)
+Hibernate: insert into organization (created_at,name,id) values (?,?,default)
+Hibernate: insert into app_user (created_at,display_name,email,must_change_password,password_hash,role,id) values (?,?,?,?,?,?,default)
+Hibernate: insert into organization (created_at,name,id) values (?,?,default)
+Hibernate: insert into organization (created_at,name,id) values (?,?,default)
+Hibernate: insert into membership (created_at,role,org_id,user_id) values (?,?,?,?)
+Hibernate: insert into membership (created_at,role,org_id,user_id) values (?,?,?,?)
+Hibernate: select m1_0.org_id,m1_0.user_id,m1_0.created_at,m1_0.role from membership m1_0 where m1_0.user_id=?
+Hibernate: insert into app_user (created_at,display_name,email,must_change_password,password_hash,role,id) values (?,?,?,?,?,?,default)
+Hibernate: insert into app_user (created_at,display_name,email,must_change_password,password_hash,role,id) values (?,?,?,?,?,?,default)
+Hibernate: insert into organization (created_at,name,id) values (?,?,default)
+Hibernate: insert into membership (created_at,role,org_id,user_id) values (?,?,?,?)
+Hibernate: select o1_0.id,o1_0.created_at,o1_0.name from organization o1_0 where o1_0.id=? and exists(select 1 from membership m1_0 where m1_0.org_id=? and m1_0.user_id=?)
+Hibernate: select o1_0.id,o1_0.created_at,o1_0.name from organization o1_0 where o1_0.id=? and exists(select 1 from membership m1_0 where m1_0.org_id=? and m1_0.user_id=?)
+Hibernate: select o1_0.id,o1_0.created_at,o1_0.name from organization o1_0 where o1_0.id=? and exists(select 1 from membership m1_0 where m1_0.org_id=? and m1_0.user_id=?)
+Hibernate: insert into app_user (created_at,display_name,email,must_change_password,password_hash,role,id) values (?,?,?,?,?,?,default)
+Hibernate: insert into organization (created_at,name,id) values (?,?,default)
+Hibernate: insert into membership (created_at,role,org_id,user_id) values (?,?,?,?)
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.033 s -- in com.keplura.server.org.OrgRepositoryTest
+[INFO] Running com.keplura.server.ProdProfileConfigTest
+2026-11-20T17:45:30.242Z  INFO 2825 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.ProdProfileConfigTest]: ProdProfileConfigTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-20T17:45:30.256Z  INFO 2825 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.ProdProfileConfigTest
+2026-11-20T17:45:30.258Z  INFO 2825 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.ProdProfileConfigTest]: ProdProfileConfigTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-20T17:45:30.259Z  INFO 2825 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.ProdProfileConfigTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-11-20T17:45:30.292Z  INFO 2825 --- [keplura-server] [           main] c.keplura.server.ProdProfileConfigTest   : Starting ProdProfileConfigTest using Java 21.0.12.1 with PID 2825 (started by ci in /w/server)
+2026-11-20T17:45:30.292Z  INFO 2825 --- [keplura-server] [           main] c.keplura.server.ProdProfileConfigTest   : The following 1 profile is active: "prod"
+2026-11-20T17:45:30.469Z  INFO 2825 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-20T17:45:30.511Z  INFO 2825 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 40 ms. Found 23 JPA repository interfaces.
+2026-11-20T17:45:30.601Z  INFO 2825 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-11-20T17:45:30.603Z  INFO 2825 --- [keplura-server] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection conn47: url=jdbc:h2:mem:keplura-prod-smoke user=SA
+2026-11-20T17:45:30.603Z  INFO 2825 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-11-20T17:45:30.628Z  INFO 2825 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:keplura-prod-smoke (H2 2.4)
+2026-11-20T17:45:30.635Z  WARN 2825 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-20T17:45:30.644Z  INFO 2825 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-11-20T17:45:30.645Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 23 migrations (execution time 00:00.006s)
+2026-11-20T17:45:30.646Z  INFO 2825 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2026-11-20T17:45:30.651Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": << Empty Schema >>
+2026-11-20T17:45:30.654Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "1 - baseline"
+2026-11-20T17:45:30.661Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "2 - spaces"
+2026-11-20T17:45:30.667Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "3 - knowledge"
+2026-11-20T17:45:30.672Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "4 - chunks"
+2026-11-20T17:45:30.677Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "6 - chat"
+2026-11-20T17:45:30.684Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "7 - document index status"
+2026-11-20T17:45:30.689Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "8 - org invites"
+2026-11-20T17:45:30.694Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "9 - user role"
+2026-11-20T17:45:30.703Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "10 - ai provider model"
+2026-11-20T17:45:30.709Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "11 - oidc provider"
+2026-11-20T17:45:30.715Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "12 - document index status async"
+2026-11-20T17:45:30.718Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "13 - chunk source location"
+2026-11-20T17:45:30.731Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "14 - chat message feedback"
+2026-11-20T17:45:30.735Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "15 - user must change password"
+2026-11-20T17:45:30.740Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "16 - datasources and access"
+2026-11-20T17:45:30.746Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "17 - quality questions"
+2026-11-20T17:45:30.750Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+2026-11-20T17:45:30.758Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "19 - prompt templates"
+2026-11-20T17:45:30.761Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+2026-11-20T17:45:30.766Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "21 - web search settings"
+2026-11-20T17:45:30.769Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "22 - mcp servers"
+2026-11-20T17:45:30.771Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "23 - mcp stage2"
+2026-11-20T17:45:30.776Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+2026-11-20T17:45:30.778Z  INFO 2825 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 23 migrations to schema "PUBLIC", now at version v24 (execution time 00:00.046s)
+2026-11-20T17:45:30.797Z  INFO 2825 --- [keplura-server] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-20T17:45:30.817Z  INFO 2825 --- [keplura-server] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-20T17:45:30.819Z  INFO 2825 --- [keplura-server] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:keplura-prod-smoke]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: KEPLURA-PROD-SMOKE/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-20T17:45:31.006Z  INFO 2825 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-20T17:45:31.027Z  INFO 2825 --- [keplura-server] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-20T17:45:31.066Z  INFO 2825 --- [keplura-server] [           main] com.keplura.server.admin.SecretCipher    : secret cipher: no KEPLURA_SECRETS_MASTER_KEY — provider secrets cannot be stored (admin surface stays usable without them)
+2026-11-20T17:45:31.066Z  INFO 2825 --- [keplura-server] [           main] c.keplura.server.SystemInfoController    : model provider state: provider=raw configured=false keyPresent=false
+2026-11-20T17:45:31.357Z  INFO 2825 --- [keplura-server] [           main] c.k.s.search.SearchStoreConfiguration    : search store: auto -> memory (pgvector probe not satisfied)
+2026-11-20T17:45:31.388Z  INFO 2825 --- [keplura-server] [           main] c.k.s.knowledge.DocumentIndexingQueue    : document indexing mode: sync
+2026-11-20T17:45:31.433Z  INFO 2825 --- [keplura-server] [           main] c.keplura.server.oidc.OidcConfiguration  : oidc: desktop handoff target fixed to http://localhost:1420/
+2026-11-20T17:45:31.494Z  WARN 2825 --- [keplura-server] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-20T17:45:31.639Z  INFO 2825 --- [keplura-server] [           main] c.keplura.server.ProdProfileConfigTest   : Started ProdProfileConfigTest in 1.372 seconds (process running for 29.899)
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.437 s -- in com.keplura.server.ProdProfileConfigTest
+[INFO] Running com.keplura.server.oidc.OidcLoginFlowIntegrationTest
+2026-11-20T17:45:31.682Z  INFO 2825 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.oidc.OidcLoginFlowIntegrationTest]: OidcLoginFlowIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-20T17:45:31.698Z  INFO 2825 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.oidc.OidcLoginFlowIntegrationTest
+2026-11-20T17:45:31.699Z  INFO 2825 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.oidc.OidcLoginFlowIntegrationTest]: OidcLoginFlowIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-20T17:45:31.700Z  INFO 2825 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.oidc.OidcLoginFlowIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-11-20T17:45:32.109Z  INFO 2825 --- [keplura-server] [           main] c.k.s.oidc.OidcLoginFlowIntegrationTest  : Starting OidcLoginFlowIntegrationTest using Java 21.0.12.1 with PID 2825 (started by ci in /w/server)
+2026-11-20T17:45:32.109Z DEBUG 2825 --- [keplura-server] [           main] c.k.s.oidc.OidcLoginFlowIntegrationTest  : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-20T17:45:32.109Z  INFO 2825 --- [keplura-server] [           main] c.k.s.oidc.OidcLoginFlowIntegrationTest  : The following 1 profile is active: "dev"
+2026-11-20T17:45:32.232Z  INFO 2825 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-20T17:45:32.264Z  INFO 2825 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 30 ms. Found 23 JPA repository interfaces.
+2026-11-20T17:45:32.320Z  INFO 2825 --- [keplura-server] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-11-20T17:45:32.321Z  INFO 2825 --- [keplura-server] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-20T17:45:32.322Z  INFO 2825 --- [keplura-server] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-11-20T17:45:32.359Z  INFO 2825 --- [keplura-server] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 249 ms
+2026-11-20T17:45:32.370Z DEBUG 2825 --- [keplura-server] [           main] c.k.server.auth.SessionLifetimeFilter    : Filter 'sessionLifetimeFilter' configured for use
+2026-11-20T17:45:32.416Z  INFO 2825 --- [keplura-server] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-20T17:45:32.438Z  INFO 2825 --- [keplura-server] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-20T17:45:32.439Z  INFO 2825 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Starting...
+2026-11-20T17:45:32.441Z  INFO 2825 --- [keplura-server] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-3 - Added connection conn57: url=jdbc:h2:mem:oidc-api-test user=SA
+2026-11-20T17:45:32.441Z  INFO 2825 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Start completed.
+2026-11-20T17:45:32.442Z  INFO 2825 --- [keplura-server] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:oidc-api-test]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: OIDC-API-TEST/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-20T17:45:32.629Z  INFO 2825 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-20T17:45:32.645Z  INFO 2825 --- [keplura-server] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-20T17:45:32.678Z  INFO 2825 --- [keplura-server] [           main] com.keplura.server.admin.SecretCipher    : secret cipher: master key loaded (AES-256-GCM, HKDF-derived)
+2026-11-20T17:45:32.679Z  INFO 2825 --- [keplura-server] [           main] c.keplura.server.SystemInfoController    : model provider state: provider=raw configured=false keyPresent=false
+2026-11-20T17:45:32.786Z  INFO 2825 --- [keplura-server] [           main] com.keplura.server.admin.SsrfGuard       : SSRF allow-list active with 1 operator CIDR(s)
+2026-11-20T17:45:32.891Z  INFO 2825 --- [keplura-server] [           main] c.k.s.search.SearchStoreConfiguration    : search store: auto -> memory (pgvector probe not satisfied)
+2026-11-20T17:45:32.921Z  INFO 2825 --- [keplura-server] [           main] c.k.s.knowledge.DocumentIndexingQueue    : document indexing mode: sync
+2026-11-20T17:45:32.970Z  INFO 2825 --- [keplura-server] [           main] c.keplura.server.oidc.OidcConfiguration  : oidc: desktop handoff target fixed to http://localhost:1420/
+2026-11-20T17:45:33.026Z  WARN 2825 --- [keplura-server] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-20T17:45:33.146Z  INFO 2825 --- [keplura-server] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 33977 (http) with context path '/'
+2026-11-20T17:45:33.148Z  INFO 2825 --- [keplura-server] [           main] c.k.s.oidc.OidcLoginFlowIntegrationTest  : Started OidcLoginFlowIntegrationTest in 1.054 seconds (process running for 31.408)
+2026-11-20T17:45:33.192Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-1] o.a.c.c.C.[Tomcat-1].[localhost].[/]     : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-20T17:45:33.192Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-11-20T17:45:33.193Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-11-20T17:45:33.209Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/1/begin -> 302 (14ms)
+2026-11-20T17:45:33.377Z  WARN 2825 --- [keplura-server] [o-auto-2-exec-2] c.keplura.server.oidc.OidcLoginService   : oidc token refused: iss
+2026-11-20T17:45:33.378Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/1/callback -> 302 (160ms)
+2026-11-20T17:45:33.427Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/1/begin -> 302 (46ms)
+2026-11-20T17:45:33.524Z  WARN 2825 --- [keplura-server] [o-auto-2-exec-4] c.keplura.server.oidc.OidcLoginService   : oidc token refused: nonce
+2026-11-20T17:45:33.525Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/1/callback -> 302 (94ms)
+2026-11-20T17:45:33.575Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/1/begin -> 302 (48ms)
+2026-11-20T17:45:33.676Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/1/callback -> 302 (96ms)
+2026-11-20T17:45:33.747Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/providers -> 200 (11ms)
+2026-11-20T17:45:33.757Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/2/begin -> 302 (7ms)
+2026-11-20T17:45:33.915Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-9] c.keplura.server.oidc.OidcLoginService   : oidc verified-email claim linked user=1 at provider=2
+2026-11-20T17:45:33.917Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-9] c.keplura.server.oidc.OidcLoginService   : oidc login succeeded: provider=2 user=1
+2026-11-20T17:45:33.918Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/2/callback -> 302 (157ms)
+2026-11-20T17:45:33.930Z  INFO 2825 --- [keplura-server] [-auto-2-exec-10] c.k.server.oidc.OidcLoginController      : oidc session minted for user=1
+2026-11-20T17:45:33.933Z  INFO 2825 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/oidc/exchange -> 200 (6ms)
+2026-11-20T17:45:33.943Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/me -> 200 (4ms)
+2026-11-20T17:45:33.948Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-2] c.k.server.oidc.OidcLoginController      : oidc exchange rejected (unknown/expired/consumed handoff)
+2026-11-20T17:45:33.951Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/oidc/exchange -> 401 (3ms)
+2026-11-20T17:45:33.960Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/2/begin -> 302 (5ms)
+2026-11-20T17:45:34.062Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-4] c.keplura.server.oidc.OidcLoginService   : oidc login succeeded: provider=2 user=1
+2026-11-20T17:45:34.063Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/2/callback -> 302 (99ms)
+2026-11-20T17:45:34.132Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/3/begin -> 302 (47ms)
+2026-11-20T17:45:34.184Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/3/begin -> 302 (48ms)
+2026-11-20T17:45:34.188Z  WARN 2825 --- [keplura-server] [o-auto-2-exec-7] c.keplura.server.oidc.OidcLoginService   : oidc callback refused: state (provider=3)
+2026-11-20T17:45:34.188Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/3/callback -> 302 (1ms)
+2026-11-20T17:45:34.257Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (26ms)
+2026-11-20T17:45:34.279Z  WARN 2825 --- [keplura-server] [o-auto-2-exec-9] com.keplura.server.admin.SsrfGuard       : SSRF guard refused a dial target (policy veto)
+2026-11-20T17:45:34.283Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : POST /api/v1/admin/oidc/providers -> 400 (20ms)
+2026-11-20T17:45:34.307Z  INFO 2825 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/5/begin -> 302 (4ms)
+2026-11-20T17:45:34.449Z  WARN 2825 --- [keplura-server] [o-auto-2-exec-1] c.keplura.server.oidc.OidcLoginService   : oidc login refused: unlinked subject (provider=5)
+2026-11-20T17:45:34.450Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/5/callback -> 302 (140ms)
+2026-11-20T17:45:34.489Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/5/begin -> 302 (4ms)
+2026-11-20T17:45:34.584Z  WARN 2825 --- [keplura-server] [o-auto-2-exec-3] c.keplura.server.oidc.OidcLoginService   : oidc login refused: unlinked subject (provider=5)
+2026-11-20T17:45:34.585Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/5/callback -> 302 (93ms)
+2026-11-20T17:45:34.638Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/6/begin -> 302 (4ms)
+2026-11-20T17:45:34.776Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/6/callback -> 302 (134ms)
+2026-11-20T17:45:34.827Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/6/begin -> 302 (47ms)
+2026-11-20T17:45:34.920Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/6/callback -> 302 (89ms)
+2026-11-20T17:45:34.978Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/7/begin -> 302 (6ms)
+2026-11-20T17:45:35.125Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-9] c.keplura.server.oidc.OidcLoginService   : oidc verified-email claim linked user=5 at provider=7
+2026-11-20T17:45:35.126Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-9] c.keplura.server.oidc.OidcLoginService   : oidc login succeeded: provider=7 user=5
+2026-11-20T17:45:35.127Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/7/callback -> 302 (146ms)
+2026-11-20T17:45:35.131Z  WARN 2825 --- [keplura-server] [-auto-2-exec-10] c.keplura.server.oidc.OidcLoginService   : oidc callback refused: binding (provider=7)
+2026-11-20T17:45:35.132Z  INFO 2825 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/7/callback -> 302 (2ms)
+2026-11-20T17:45:35.154Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-1] c.k.server.oidc.OidcLoginController      : oidc exchange rejected (unknown/expired/consumed handoff)
+2026-11-20T17:45:35.155Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/oidc/exchange -> 401 (1ms)
+2026-11-20T17:45:35.161Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-2] c.k.server.oidc.OidcLoginController      : oidc exchange rejected (unknown/expired/consumed handoff)
+2026-11-20T17:45:35.162Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/oidc/exchange -> 401 (1ms)
+2026-11-20T17:45:35.167Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-3] c.k.server.oidc.OidcLoginController      : oidc exchange rejected (unknown/expired/consumed handoff)
+2026-11-20T17:45:35.167Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/oidc/exchange -> 401 (1ms)
+2026-11-20T17:45:35.215Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/9/begin -> 302 (3ms)
+2026-11-20T17:45:35.358Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-5] c.keplura.server.oidc.OidcLoginService   : oidc verified-email claim linked user=6 at provider=9
+2026-11-20T17:45:35.358Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-5] c.keplura.server.oidc.OidcLoginService   : oidc login succeeded: provider=9 user=6
+2026-11-20T17:45:35.359Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/9/callback -> 302 (140ms)
+2026-11-20T17:45:35.366Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-6] c.k.server.oidc.OidcLoginController      : oidc session minted for user=6
+2026-11-20T17:45:35.367Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/oidc/exchange -> 200 (3ms)
+2026-11-20T17:45:35.372Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 403 (1ms)
+2026-11-20T17:45:35.443Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-8] com.keplura.server.auth.AuthService      : password changed (user id 6)
+2026-11-20T17:45:35.443Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/password -> 204 (65ms)
+2026-11-20T17:45:35.455Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (7ms)
+2026-11-20T17:45:35.476Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/10/begin -> 302 (5ms)
+2026-11-20T17:45:35.570Z  WARN 2825 --- [keplura-server] [o-auto-2-exec-9] c.keplura.server.oidc.OidcTokenClient    : oidc token endpoint refused (http 400)
+2026-11-20T17:45:35.571Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/10/callback -> 302 (90ms)
+2026-11-20T17:45:35.636Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/11/begin -> 302 (48ms)
+2026-11-20T17:45:35.640Z  WARN 2825 --- [keplura-server] [o-auto-2-exec-6] c.keplura.server.oidc.OidcLoginService   : oidc callback refused: state (provider=11)
+2026-11-20T17:45:35.640Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/11/callback -> 302 (2ms)
+2026-11-20T17:45:35.711Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (29ms)
+2026-11-20T17:45:35.723Z  WARN 2825 --- [keplura-server] [-auto-2-exec-10] c.k.server.oidc.OidcDiscoveryClient      : oidc discovery: issuer mismatch for provider=null
+2026-11-20T17:45:35.724Z  INFO 2825 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : POST /api/v1/admin/oidc/providers -> 400 (8ms)
+2026-11-20T17:45:35.733Z  WARN 2825 --- [keplura-server] [o-auto-2-exec-1] com.keplura.server.admin.SsrfGuard       : SSRF guard refused a dial target (policy veto)
+2026-11-20T17:45:35.734Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/admin/oidc/providers -> 400 (5ms)
+2026-11-20T17:45:35.788Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-5] c.keplura.server.oidc.OidcAdminService   : admin created oidc provider id=13 active=false
+2026-11-20T17:45:35.790Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/admin/oidc/providers -> 200 (50ms)
+2026-11-20T17:45:35.849Z  INFO 2825 --- [keplura-server] [-auto-2-exec-11] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (30ms)
+2026-11-20T17:45:35.854Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : GET /api/v1/admin/oidc/providers -> 403 (1ms)
+2026-11-20T17:45:35.904Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/14/begin -> 302 (4ms)
+2026-11-20T17:45:36.050Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-4] c.keplura.server.oidc.OidcLoginService   : oidc login succeeded: provider=14 user=9
+2026-11-20T17:45:36.050Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/14/callback -> 302 (143ms)
+2026-11-20T17:45:36.073Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/providers -> 200 (4ms)
+2026-11-20T17:45:36.078Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/15/begin -> 404 (2ms)
+2026-11-20T17:45:36.083Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/15/callback -> 404 (2ms)
+2026-11-20T17:45:36.141Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (28ms)
+2026-11-20T17:45:36.148Z  INFO 2825 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/me -> 200 (2ms)
+2026-11-20T17:45:36.164Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/999999/begin -> 404 (2ms)
+2026-11-20T17:45:36.169Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/999999/callback -> 404 (2ms)
+2026-11-20T17:45:36.177Z  INFO 2825 --- [keplura-server] [-auto-2-exec-11] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/16/begin -> 302 (4ms)
+2026-11-20T17:45:36.181Z  WARN 2825 --- [keplura-server] [o-auto-2-exec-8] c.k.server.oidc.OidcLoginController      : oidc callback: provider=16 idp_error=access_denied
+2026-11-20T17:45:36.181Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/16/callback -> 302 (1ms)
+2026-11-20T17:45:36.232Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/begin -> 302 (5ms)
+2026-11-20T17:45:36.375Z  WARN 2825 --- [keplura-server] [o-auto-2-exec-4] c.keplura.server.oidc.OidcLoginService   : oidc token refused: nbf
+2026-11-20T17:45:36.376Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/callback -> 302 (140ms)
+2026-11-20T17:45:36.427Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/begin -> 302 (48ms)
+2026-11-20T17:45:36.523Z  WARN 2825 --- [keplura-server] [o-auto-2-exec-3] c.keplura.server.oidc.OidcLoginService   : oidc token refused: nbf
+2026-11-20T17:45:36.524Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/callback -> 302 (94ms)
+2026-11-20T17:45:36.575Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/begin -> 302 (47ms)
+2026-11-20T17:45:36.671Z  WARN 2825 --- [keplura-server] [o-auto-2-exec-2] c.keplura.server.oidc.OidcLoginService   : oidc token refused: nbf
+2026-11-20T17:45:36.672Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/callback -> 302 (94ms)
+2026-11-20T17:45:36.747Z  INFO 2825 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/begin -> 302 (46ms)
+2026-11-20T17:45:36.849Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-1] c.keplura.server.oidc.OidcLoginService   : oidc verified-email claim linked user=12 at provider=17
+2026-11-20T17:45:36.849Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-1] c.keplura.server.oidc.OidcLoginService   : oidc login succeeded: provider=17 user=12
+2026-11-20T17:45:36.850Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/callback -> 302 (99ms)
+2026-11-20T17:45:36.927Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/begin -> 302 (48ms)
+2026-11-20T17:45:37.026Z  INFO 2825 --- [keplura-server] [-auto-2-exec-11] c.keplura.server.oidc.OidcLoginService   : oidc verified-email claim linked user=13 at provider=17
+2026-11-20T17:45:37.027Z  INFO 2825 --- [keplura-server] [-auto-2-exec-11] c.keplura.server.oidc.OidcLoginService   : oidc login succeeded: provider=17 user=13
+2026-11-20T17:45:37.028Z  INFO 2825 --- [keplura-server] [-auto-2-exec-11] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/callback -> 302 (98ms)
+2026-11-20T17:45:37.099Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/begin -> 302 (44ms)
+2026-11-20T17:45:37.198Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-7] c.keplura.server.oidc.OidcLoginService   : oidc verified-email claim linked user=14 at provider=17
+2026-11-20T17:45:37.199Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-7] c.keplura.server.oidc.OidcLoginService   : oidc login succeeded: provider=17 user=14
+2026-11-20T17:45:37.199Z  INFO 2825 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/callback -> 302 (97ms)
+[INFO] Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.523 s -- in com.keplura.server.oidc.OidcLoginFlowIntegrationTest
+[INFO] Running com.keplura.server.identity.PasswordHasherTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.227 s -- in com.keplura.server.identity.PasswordHasherTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 93, Failures: 0, Errors: 0, Skipped: 1
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  38.101 s
+[INFO] Finished at: 2026-11-20T17:45:38Z
+[INFO] ------------------------------------------------------------------------
