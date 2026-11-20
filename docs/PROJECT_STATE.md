@@ -6,8 +6,16 @@ Historie, alle PRs bis #95 und die Prüfprotokolle (`ci/evidence/`,
 `desktop/e2e/evidence/`) liegen im privaten Archiv
 `marcello-conocchia/Keplura-intern`. PR-Nummern und Evidence-Pfade in den
 Einträgen unten beziehen sich bis einschließlich 20.11.2026 auf das Archiv;
-neue PRs zählen hier ab #1. Offen: Hermes-Host frisch klonen, dann
-Sichtbarkeit öffentlich (nur nach PO-Go), siehe `docs/OPEN_SOURCE_READINESS.md` §9.
+neue PRs zählen hier ab #1.
+
+**Stand 20.11.2026: Keplura ist öffentlich** (github.com/marcello-conocchia/Keplura,
+Apache-2.0, PO-Go „Yes, go public“). Vor dem Umschalten alle Referenzen erneut
+geprüft (5 Commits, nur Inhaber/noreply, keine Zugangsdaten). Aktiv: vertrauliche
+Sicherheitsmeldung über GitHub, Secret Scanning mit Push-Schutz,
+Dependabot-Warnungen und -Sicherheitsupdates. Hermes-Host frisch geklont (PO).
+Archiv `Keplura-intern` bleibt privat. Offen: Branch-Schutz für `main` (PO),
+Draft-PR #1 (nachgeholte Reviews aus dem Archiv), H2-Dev-Fehler beim
+Wissen-Anhängen (eigene Aufgabe).
 
 **Stand 20.11.2026: Open-Source-Vorbereitung auf main, PR #93 (OPEN-SOURCE-01), Merge `766ad7b` verifiziert.** Öffentliche Doku (README englisch mit Screenshots im Dunkelmodus, `docs/INSTALL.md`, `docs/OPERATIONS.md`, `docs/RELEASING.md`, CONTRIBUTING, SECURITY, CHANGELOG, `.env.example`, PR-Vorlage), Lizenz **Apache-2.0** (`LICENSE`, `NOTICE`, Lizenzfelder in pom/package.json/Cargo.toml), Lizenzinventar `docs/legal/THIRD_PARTY_LICENSES.md` mit Generator `scripts/third-party-licenses.cjs`, `.gitignore` für lokale Agenten-Ordner, CI-Workflow mit read-only Token. Bericht `docs/OPEN_SOURCE_READINESS.md`: Historie inkl. PR-Referenzen ohne Zugangsdaten (keine Rotation nötig), Abhängigkeiten lizenzrechtlich unkritisch; Gesamturteil **NOT READY** wegen offener PO-Punkte B2 (private E-Mail in 197 PR-Kopf-Commits, Empfehlung neues öffentliches Repo mit sauberem Start), B3 (Marke „Keplura“, Herkunft App-Icon), B4 (Sicherheitsmeldeweg beim Veröffentlichen aktivieren). Klasse B; statt vollem `ci-local.sh` Schnellprüfung (`mvn validate`, `cargo metadata --locked`, `npm ci --dry-run`) auf PO-Entscheidung — kein voller CI-Nachweis für #93. Nebenbefund: Dev-Profil (H2) „Wissen an Chat anhängen“ → HTTP 500 (`BadSqlGrammarException`), mit PostgreSQL ok; eigene Aufgabe offen. Repo bleibt privat; Sichtbarkeit nur nach ausdrücklicher PO-Freigabe.
 
@@ -416,10 +424,9 @@ Dokument (inkl. PDF/DOCX) → RAG-Suche mit Citations → Chat mit SSE-Streaming
 
 ## BEKANNTE BLOCKER / GRENZEN
 
-- Open-Source-Veröffentlichung: alle Blocker entschieden; offen ist die
-  Umstellung laut `docs/OPEN_SOURCE_READINESS.md` §9 — zuerst Hermes-Agenten
-  pausieren und nach dem Umzug auf dem Hermes-Host frisch klonen (ein alter
-  Klon würde die alte Historie ins neue Repo pushen).
+- Öffentliches Repo: Branch-Schutz für `main` noch nicht gesetzt (PO-Einstellung,
+  `docs/OPEN_SOURCE_READINESS.md` §9). Nie aus einem Klon von `Keplura-intern`
+  in dieses Repo pushen — die alte Historie darf hier nicht landen.
 
 - Kein Produktblocker offen (Stand 10.09., verifiziert gegen offene Karten-Lane).
   Pflege-Watch-Items UI-REFRESH-1 (nicht-blockierend, aus Review t_6e87fabc +

@@ -7,7 +7,7 @@ Veröffentlichung vorbereiten. **Nichts wurde veröffentlicht**, die
 Sichtbarkeit ist unverändert privat, keine Historie umgeschrieben, kein Release,
 kein Deployment.
 
-## Abschließende Einschätzung: **NOT READY** — alle Blocker entschieden (20.11.2026), **READY nach dem Umstellungsplan in §9**
+## Abschließende Einschätzung: **READY — veröffentlicht am 20.11.2026** (ursprünglich NOT READY; alle Blocker entschieden und Umstellungsplan §9 umgesetzt, offen nur Branch-Schutz durch den PO)
 
 Der Code selbst ist veröffentlichungsfähig: Im gesamten erreichbaren
 Git-Bestand wurden **keine Zugangsdaten, Schlüssel oder Kundendaten** gefunden,
@@ -308,6 +308,7 @@ Deutsch) ist in README genannt.
 | Privates Repo in `Keplura-intern` umbenennen | Claude nach PO-Go | erledigt 20.11.2026 |
 | Neues Repo `Keplura` **privat** anlegen, bereinigten Stand von `main` als ersten Commit pushen (Autor und Committer: Inhaber, noreply-Adresse) | Claude | erledigt: ein Commit, Inhalt und Dateirechte identisch mit Archiv-`main` ohne `ci/evidence/` und `desktop/e2e/evidence/` |
 | Lokaler Klon des Windows-Rechners auf `Keplura-intern` umgestellt; neue Arbeit in frischem Klon des neuen Repos | Claude | erledigt |
-| Hermes-Host: alten Arbeitsordner beiseitelegen und das neue Repo **frisch klonen** (nicht nur Remote ändern — ein alter Klon würde beim Push die alte Historie ins neue Repo laden); danach Agenten fortsetzen | PO / Plattform | offen |
+| Hermes-Host: alten Arbeitsordner beiseitelegen und das neue Repo **frisch klonen** (nicht nur Remote ändern — ein alter Klon würde beim Push die alte Historie ins neue Repo laden); danach Agenten fortsetzen | PO / Plattform | erledigt (PO-Bestätigung 20.11.2026) |
 | Offener Archiv-PR #92 übertragen | Claude | erledigt: neuer Draft-PR #1, Archiv-#92 geschlossen |
-| Sichtbarkeit auf **öffentlich**; Private vulnerability reporting, Secret Scanning mit Push Protection, Dependabot-Warnungen, Branch-Schutz für `main` einschalten | Claude nach ausdrücklichem PO-Go | offen |
+| Sichtbarkeit auf **öffentlich**; Private vulnerability reporting, Secret Scanning mit Push Protection, Dependabot-Warnungen und -Sicherheitsupdates einschalten | Claude nach PO-Go („Yes, go public“) | erledigt 20.11.2026: vorher alle Referenzen erneut geprüft (5 Commits, nur Inhaber/noreply, keine Zugangsdaten); ohne Login erreichbar, GitHub erkennt Apache-2.0; Archiv bleibt privat |
+| Branch-Schutz für `main` | PO (AGENTS.md: Agenten schalten keinen Branch-Schutz) | offen — Empfehlung: nur per PR, kein Force-Push, kein Löschen; keine Pflicht-Freigabe (Inhaber kann eigene PRs nicht freigeben) |
