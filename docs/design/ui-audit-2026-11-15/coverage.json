@@ -1,0 +1,2270 @@
+{
+  "datum": "2026-11-15",
+  "basisCommit": "2de0a8a5203735507c00f56548daca2d2c2a05f9",
+  "phase": "1 – Inventar und Planung",
+  "erlaubteStatus": [
+    "offen",
+    "in Bearbeitung",
+    "umgesetzt",
+    "geprüft"
+  ],
+  "anzahl": 109,
+  "eintraege": [
+    {
+      "id": "F01",
+      "bereich": "Tokens / drei CSS-Dateien",
+      "ist": "Verteilte Werte und Overrides",
+      "aenderung": "Autoritative Tokens und Migrationsliste je Altregel",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "Phase 2",
+      "abnahme": "Vollständige semantische Zuordnung Hell/Dunkel; keine neue Override-Schicht",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/main.ts",
+        "desktop/src/styles/tailwind.css",
+        "desktop/src/styles/theme.css",
+        "desktop/src/styles/workspace.css",
+        "desktop/src/theme-store.ts"
+      ]
+    },
+    {
+      "id": "F02",
+      "bereich": "Button/AppButton/rohe Buttons",
+      "ist": "Zwei Familien, unterschiedliche Primärwirkung",
+      "aenderung": "Varianten, Größen, Icon-/Destruktiv-Vertrag",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "DS",
+      "abnahme": "Gleiche Variante überall gleich; Submit/Disabled/Testids erhalten",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/ui/AppButton.vue",
+        "desktop/src/components/ui/Button.vue"
+      ]
+    },
+    {
+      "id": "F03",
+      "bereich": "Input/TextField/Label/rohe Felder",
+      "ist": "Verschiedene Feldrezepte",
+      "aenderung": "Gemeinsamer Label-/Hilfe-/Fehlervertrag",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "DS",
+      "abnahme": "Zuordnung und Fehlerankündigung; Autofill und Secret-Schutz",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/ui/Input.vue",
+        "desktop/src/components/ui/Label.vue",
+        "desktop/src/components/ui/TextField.vue"
+      ]
+    },
+    {
+      "id": "F04",
+      "bereich": "Select/Checkbox/Radio/Number/Textarea",
+      "ist": "Native und lokale Varianten",
+      "aenderung": "Auswahl-, Größen- und Zustandsregeln",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "F03",
+      "abnahme": "Lange Optionen, Grenzen, Mehrzeiler, Tastatur und aktive Auswahl",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/ui/Input.vue",
+        "desktop/src/components/ui/Label.vue",
+        "desktop/src/components/ui/TextField.vue"
+      ]
+    },
+    {
+      "id": "F05",
+      "bereich": "Formulare/Validierung",
+      "ist": "Busy/Fehler/Entwürfe lokal",
+      "aenderung": "Submit-, Fehler-, Abbruch- und Entwurfsregel",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "F02,F03",
+      "abnahme": "Kein Doppelsubmit; Fehler am Feld; definierte Wiederöffnung/Cancel",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/ui/ConfirmDialog.vue",
+        "desktop/src/components/ui/Input.vue",
+        "desktop/src/components/ui/TextField.vue"
+      ]
+    },
+    {
+      "id": "F06",
+      "bereich": "AppDialog/ConfirmDialog",
+      "ist": "Ein schmales Breitenmaß",
+      "aenderung": "Größenklassen, Footer, Scroll- und Fokusvertrag",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "F05",
+      "abnahme": "Fokus hinein/zurück, Escape/Backdrop, geringe Fensterhöhe",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/ui/AppDialog.vue",
+        "desktop/src/components/ui/ConfirmDialog.vue"
+      ]
+    },
+    {
+      "id": "F07",
+      "bereich": "Reka-Menüs/Checkbox-Menüs/Portals",
+      "ist": "Gemeinsame Klasse, lokale Inhalte",
+      "aenderung": "Einheitlicher Menüvertrag",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "DS,F02",
+      "abnahme": "Pfeile/Enter/Escape, Fokus-Rückkehr und Viewport-Kollision",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/AppSidebar.vue",
+        "desktop/src/components/chat/ChatContextBar.vue",
+        "desktop/src/components/chat/TemplateMenu.vue"
+      ]
+    },
+    {
+      "id": "F08",
+      "bereich": "StatusPill/StatusRing/lokale Kreise",
+      "ist": "Unterschiedliche Statusrezepte",
+      "aenderung": "Semantische Statusfamilie",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "DS",
+      "abnahme": "Ohne Farbe verständlich; tatsächlicher Status und Folgeaktion",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/BackupPanel.vue",
+        "desktop/src/components/knowledge/StatusRing.vue",
+        "desktop/src/components/ui/StatusPill.vue"
+      ]
+    },
+    {
+      "id": "F09",
+      "bereich": "Toasts/Inline-Meldungen/Retry",
+      "ist": "Viele note/msg/toast-Varianten",
+      "aenderung": "Ort, Dauer, Priorität und Wiederholen",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "F05,F08",
+      "abnahme": "Fehler nicht als leer/Erfolg; sichtbar und zugänglich",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/BackupPanel.vue",
+        "desktop/src/components/knowledge/StatusRing.vue",
+        "desktop/src/components/ui/StatusPill.vue"
+      ]
+    },
+    {
+      "id": "F10",
+      "bereich": "Listen/Tabellen/Zeilenaktionen",
+      "ist": "Fachspezifische Grids, Hover-Aktionen",
+      "aenderung": "Wiederverwendbare Datendarstellung",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "DS,F02,F08",
+      "abnahme": "Viele/lange Werte; Tastatur/Touch; Rechteaktionen erhalten",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/AdminPanel.vue",
+        "desktop/src/components/knowledge/DocumentTable.vue",
+        "desktop/src/components/MembersPanel.vue"
+      ]
+    },
+    {
+      "id": "F11",
+      "bereich": "Icons/Marke/Typografie/Mikrotexte",
+      "ist": "Icon-Familie, lokale Hierarchien, HTML-Sprache en",
+      "aenderung": "Größen, Hit-Areas, Markenanwendung und Produktsprache",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "DS",
+      "abnahme": "Icon-Namen, lange deutsche Texte, Titel/Logo und passende Dokumentsprache",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/ui/AppIcon.vue",
+        "desktop/src/styles/theme.css",
+        "desktop/index.html",
+        "desktop/src/components/AppSidebar.vue",
+        "desktop/src/components/LoginView.vue",
+        "desktop/src-tauri/tauri.conf.json"
+      ]
+    },
+    {
+      "id": "F12",
+      "bereich": "PageContainer/PageHeader/eigene Layouts",
+      "ist": "Wrapper nur für drei Seiten",
+      "aenderung": "Gemeinsamer Seitenvertrag mit begründeten Varianten",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "DS",
+      "abnahme": "Header-Aktionen erreichbar; kein pauschales Kartenlayout",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/layout/PageContainer.vue",
+        "desktop/src/components/layout/PageHeader.vue"
+      ]
+    },
+    {
+      "id": "F13",
+      "bereich": "MarkdownAnswer/Code/Links",
+      "ist": "Sanitisiertes HTML, dynamisches Kopieren",
+      "aenderung": "Leseregeln für Listen/Tabellen/Code",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "DS,F09",
+      "abnahme": "Lokaler Overflow, Copy-Feedback; Sanitizing und Linkschutz unverändert",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/ChatView.vue",
+        "desktop/src/components/ui/MarkdownAnswer.vue"
+      ]
+    },
+    {
+      "id": "F14",
+      "bereich": "Responsive/Fokus/Bewegung/Scrolling",
+      "ist": "Verteilte Breakpoints/Ebenen",
+      "aenderung": "Gemeinsamer Layout-/Interaktionsvertrag",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "DS,F06,F07",
+      "abnahme": "A0-Matrix, reduced-motion, kein Fokus-/Scrollverlust",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/App.vue",
+        "desktop/src/styles/theme.css",
+        "desktop/src/styles/workspace.css"
+      ]
+    },
+    {
+      "id": "G01",
+      "bereich": "App/AppSidebar",
+      "ist": "Vier Bereiche, Verlauf und Kontextbaum",
+      "aenderung": "Aufgabenorientierte Hierarchie",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "DS,PV,F12",
+      "abnahme": "Alle Bereiche auffindbar; Rollen/aktive Auswahl erhalten",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/App.vue",
+        "desktop/src/components/AppSidebar.vue",
+        "desktop/src/fullscreen.ts",
+        "desktop/src/theme-store.ts"
+      ]
+    },
+    {
+      "id": "G02",
+      "bereich": "Organisationen-Menü",
+      "ist": "Auswahl und Verwaltungslink",
+      "aenderung": "Kontextwechsel und Verwaltung trennen",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "G01,F07",
+      "abnahme": "Richtige aktive Organisation und Kontextwirkung",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/App.vue",
+        "desktop/src/components/AppSidebar.vue",
+        "desktop/src/fullscreen.ts",
+        "desktop/src/theme-store.ts"
+      ]
+    },
+    {
+      "id": "G03",
+      "bereich": "Bereich-/KB-Baum",
+      "ist": "Verschachtelte Listen und doppelte Auswahlwege",
+      "aenderung": "Hierarchie und Overflow klären",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "G01,F10",
+      "abnahme": "Alle Einträge, lange Namen und leere Zweige erreichbar",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/App.vue",
+        "desktop/src/components/AppSidebar.vue",
+        "desktop/src/fullscreen.ts",
+        "desktop/src/theme-store.ts"
+      ]
+    },
+    {
+      "id": "G04",
+      "bereich": "Persönlicher Verlauf/Löschen",
+      "ist": "Zeitgruppen, direkte Löschaktion",
+      "aenderung": "Verlauf und sichere Aktionsführung",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "G01,F10",
+      "abnahme": "Aktiver Chat auffindbar; viele Chats; Delete-Erfolg/-Fehler",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/App.vue",
+        "desktop/src/components/AppSidebar.vue",
+        "desktop/src/fullscreen.ts",
+        "desktop/src/theme-store.ts"
+      ]
+    },
+    {
+      "id": "G05",
+      "bereich": "Konto/Darstellung/Vollbild/Logout",
+      "ist": "Ein Reka-Menü",
+      "aenderung": "Gruppierung und Auswahlstatus",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "F07,F14",
+      "abnahme": "Hell/Dunkel/System, F11/Escape und Logout mit Fokus-Rückkehr",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/App.vue",
+        "desktop/src/components/AppSidebar.vue",
+        "desktop/src/fullscreen.ts",
+        "desktop/src/theme-store.ts"
+      ]
+    },
+    {
+      "id": "G06",
+      "bereich": "CommandPalette",
+      "ist": "Eigene Dialog/Listbox, Fehler teils wie leer",
+      "aenderung": "Suchgruppen, Ergebnisziele und Feedback",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "F06,F09,F10",
+      "abnahme": "Vier Gruppen, kein Treffer/Fehler getrennt; Strg/⌘+K und Navigation",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/CommandPalette.vue",
+        "desktop/src/navigation.ts"
+      ]
+    },
+    {
+      "id": "G07",
+      "bereich": "Mobile Topbar/Drawer/Scrim",
+      "ist": "Eigene Fokus-/Escape-Logik",
+      "aenderung": "Mit Overlay-System vereinheitlichen",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "G01,F06,F14",
+      "abnahme": "Route/Schließen/Resize; Fokus gefangen/zurück; Hintergrund gesperrt",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/App.vue",
+        "desktop/src/components/AppSidebar.vue"
+      ]
+    },
+    {
+      "id": "G08",
+      "bereich": "Tauri/OS-Dateidialog/Download",
+      "ist": "Ein natives Hauptfenster und OS-Flächen",
+      "aenderung": "Eigene UI an native Grenzen anpassen",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "F14",
+      "abnahme": "900×640, 480×400, Vollbild, Auswahlabbruch; OS-Flächen nicht als eigene ausgeben",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/fullscreen.ts",
+        "desktop/src/transport.ts",
+        "desktop/src-tauri/tauri.conf.json",
+        "desktop/index.html"
+      ]
+    },
+    {
+      "id": "A01",
+      "bereich": "LoginView",
+      "ist": "Karte, zwei Felder, Statusfuß",
+      "aenderung": "Feld-, Fehler- und Aktionshierarchie",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "FO,F12",
+      "abnahme": "Leer/Busy/falsch/gesperrt/offline; Autofill/Passwortmanager",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/App.vue",
+        "desktop/src/components/LoginView.vue",
+        "desktop/src/oidc.ts"
+      ]
+    },
+    {
+      "id": "A02",
+      "bereich": "Firmenkonto/OIDC-Rückkehr",
+      "ist": "Bedingter Button, externer IdP",
+      "aenderung": "Übergang, Fehler und lokalen Alternativweg klären",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "A01,F09",
+      "abnahme": "Erfolg/Ablehnung/Rückkehr/Neustart; keine Umgestaltung externer IdP-Seiten",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/App.vue",
+        "desktop/src/components/LoginView.vue",
+        "desktop/src/oidc.ts"
+      ]
+    },
+    {
+      "id": "A03",
+      "bereich": "ChangePasswordView",
+      "ist": "Drei Felder und Regeln",
+      "aenderung": "Pflichtwechsel in gemeinsames Zugangsmuster",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "A01,F05",
+      "abnahme": "Regeln/Abweichung/falsches Startpasswort/Busy/Erfolg/Logout",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/ChangePasswordView.vue"
+      ]
+    },
+    {
+      "id": "A04",
+      "bereich": "Restore/Sitzungsende/Verbindung",
+      "ist": "Boot-Text, Login-/Sidebarstatus",
+      "aenderung": "Offline und Anmeldebedarf unterscheiden",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "F09,G01",
+      "abnahme": "Keine stalen/fremden Daten; Wiederholen und abgelaufene Sitzung",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/App.vue",
+        "desktop/src/auth-store.ts"
+      ]
+    },
+    {
+      "id": "A05",
+      "bereich": "Onboarding Org/Bereich/KB",
+      "ist": "Drei aktive Formschritte, erledigte Schritte",
+      "aenderung": "Schrittführung und Wiederaufnahme",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "FO,G02",
+      "abnahme": "Alle drei Schritte und Fehler separat; keine Duplikate",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/OnboardingView.vue"
+      ]
+    },
+    {
+      "id": "A06",
+      "bereich": "Onboarding Upload/Team-Folge",
+      "ist": "Zwei erklärende Folgepunkte",
+      "aenderung": "Nächste echte Aktion klar benennen",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "A05,K04,T05",
+      "abnahme": "Text und tatsächlicher Übergang stimmen überein",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/OnboardingView.vue"
+      ]
+    },
+    {
+      "id": "C01",
+      "bereich": "ChatView Einstieg/leer",
+      "ist": "Begrüßung, Vorschläge, mehrere New-Chat-Wege",
+      "aenderung": "Orientierung und Gesprächsstart zusammenführen",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "SH,F12",
+      "abnahme": "Ohne Chat, neuer leerer Chat, ohne Bereich/Basis und Vorschläge",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/ChatView.vue",
+        "desktop/src/components/ui/clipboard.ts",
+        "desktop/src/components/ui/MarkdownAnswer.vue"
+      ]
+    },
+    {
+      "id": "C02",
+      "bereich": "Nachrichten/Metadaten",
+      "ist": "Bubbles, Modell, Uhrzeit, Status",
+      "aenderung": "Lesefluss, Breite, Abstände, Metadatenrollen",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "F13,C01",
+      "abnahme": "Kurze/lange Antworten, mehrere Turns, lange Wörter",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/ChatView.vue",
+        "desktop/src/components/ui/clipboard.ts",
+        "desktop/src/components/ui/MarkdownAnswer.vue"
+      ]
+    },
+    {
+      "id": "C03",
+      "bereich": "Streaming/Stopp/Fehler/Retry",
+      "ist": "Live-Text, Stopp, Statuspillen, Hinweise",
+      "aenderung": "Prozessfeedback, Scroll- und Wiederholungsregeln",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "F08,F09,C02",
+      "abnahme": "Teilantwort bleibt; kein doppelter Turn; Fokus/Scroll stabil",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/ChatView.vue",
+        "desktop/src/components/ui/clipboard.ts",
+        "desktop/src/components/ui/MarkdownAnswer.vue"
+      ]
+    },
+    {
+      "id": "C04",
+      "bereich": "Antwort-/Codeaktionen/Feedback",
+      "ist": "Kleine Icons, dynamische Code-Kopierbuttons",
+      "aenderung": "Aktionsgruppen, Hit-Areas, Rückmeldung",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "F02,F09,F13",
+      "abnahme": "Copy erlaubt/verweigert; Daumen wechseln/löschen; Retry-Verfügbarkeit",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/ChatView.vue",
+        "desktop/src/components/ui/clipboard.ts",
+        "desktop/src/components/ui/MarkdownAnswer.vue"
+      ]
+    },
+    {
+      "id": "C05",
+      "bereich": "Exportmenü",
+      "ist": "PDF, Word, E-Mail-Kopie",
+      "aenderung": "Export und Kopieren klar unterscheiden",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "F07,C02",
+      "abnahme": "Drei Wege erhalten; eigene/fremde/User-Nachricht wie bisher; Fehler sichtbar",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/ChatView.vue",
+        "desktop/src/components/ui/clipboard.ts",
+        "desktop/src/components/ui/MarkdownAnswer.vue"
+      ]
+    },
+    {
+      "id": "C06",
+      "bereich": "Composer/Senden/Zähler/Kürzel",
+      "ist": "Schwebende Eingabe und Aktionszeile",
+      "aenderung": "Einheitlicher Schreib-/Kontextbereich",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "FO,F14",
+      "abnahme": "Enter/Shift+Enter, Länge, Disabled, Busy; Text/Aktionen bei Zoom/mobil getrennt",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/ChatView.vue",
+        "desktop/src/components/ui/clipboard.ts",
+        "desktop/src/components/ui/MarkdownAnswer.vue"
+      ]
+    },
+    {
+      "id": "C07",
+      "bereich": "Primäre Wissensbasis",
+      "ist": "Select kann neue Unterhaltung öffnen",
+      "aenderung": "Konsequenz des Kontextwechsels vermitteln",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "C06,G03",
+      "abnahme": "Auswahl/ohne Basis, Entwurf und bisheriger Verlauf bleiben korrekt",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/ChatView.vue",
+        "desktop/src/components/ui/clipboard.ts",
+        "desktop/src/components/ui/MarkdownAnswer.vue"
+      ]
+    },
+    {
+      "id": "C08",
+      "bereich": "Zusätzliche Basen/Chips",
+      "ist": "Checkbox-Menü, bis fünf zusätzliche Basen",
+      "aenderung": "Grenze und Kontextzusammenfassung",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "C07,F07",
+      "abnahme": "Hinzufügen/Entfernen/Grenze/Fremdbereich; lange Namen, Tastatur",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/chat/ChatContextBar.vue",
+        "desktop/src/components/ChatView.vue",
+        "desktop/src/components/ui/clipboard.ts",
+        "desktop/src/components/ui/MarkdownAnswer.vue"
+      ]
+    },
+    {
+      "id": "C09",
+      "bereich": "Anhänge/Picker/Chips",
+      "ist": "Lesen, gekürzt, Entfernen, Fehlermeldungen",
+      "aenderung": "Fortschritt und Extraktionsfehler führen",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "C06,F09,G08",
+      "abnahme": "Abbruch, Scan, Typ, 10MB-/Fünf-Dateien-Grenze; kein Doppeluplaod",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/chat/ChatContextBar.vue",
+        "desktop/src/components/ChatView.vue",
+        "desktop/src/components/ui/clipboard.ts",
+        "desktop/src/components/ui/MarkdownAnswer.vue"
+      ]
+    },
+    {
+      "id": "C10",
+      "bereich": "Web-Schalter",
+      "ist": "Nur bei eingerichteter Suche, Pressed-State",
+      "aenderung": "Aktive Quellenart verständlich machen",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "C06,F08",
+      "abnahme": "Verfügbar/aus/an/Providerfehler; Links/Inhalt unverändert",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/ChatView.vue",
+        "desktop/src/components/ui/clipboard.ts",
+        "desktop/src/components/ui/MarkdownAnswer.vue"
+      ]
+    },
+    {
+      "id": "C11",
+      "bereich": "Vorlagenmenü",
+      "ist": "Bereich/Organisation, Speichern/Verwalten",
+      "aenderung": "Verwenden und Pflegen klar trennen",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "F07,C06",
+      "abnahme": "Leerzustand, Scope/Rechte; Einfügen sendet nicht automatisch",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/chat/TemplateMenu.vue",
+        "desktop/src/components/ChatView.vue",
+        "desktop/src/components/ui/clipboard.ts",
+        "desktop/src/components/ui/MarkdownAnswer.vue"
+      ]
+    },
+    {
+      "id": "C12",
+      "bereich": "Vorlage speichern – Dialog",
+      "ist": "Name, Text, Radio-Scope",
+      "aenderung": "Dichte, Hilfen und Scope erklären",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "OV,FO,C11",
+      "abnahme": "Pflicht/Länge/Scope/Busy/Fehler/Abbruch",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/chat/TemplateMenu.vue",
+        "desktop/src/components/ChatView.vue",
+        "desktop/src/components/ui/clipboard.ts",
+        "desktop/src/components/ui/MarkdownAnswer.vue"
+      ]
+    },
+    {
+      "id": "C13",
+      "bereich": "Vorlagen verwalten – Dialog",
+      "ist": "Bearbeitbare Vorlagen, direktes Löschen",
+      "aenderung": "Listen- und Destruktivmuster",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "OV,F10,C11",
+      "abnahme": "Nur zulässige Einträge; leer, Löschen und Fehler",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/chat/TemplateMenu.vue",
+        "desktop/src/components/ChatView.vue",
+        "desktop/src/components/ui/clipboard.ts",
+        "desktop/src/components/ui/MarkdownAnswer.vue"
+      ]
+    },
+    {
+      "id": "K01",
+      "bereich": "KnowledgeView/Panel/KbList",
+      "ist": "Header, KB-Leiste, Sidebar-Duplikat",
+      "aenderung": "Explorer-/Kontexthierarchie und Aktionsort",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "SH,F12,G03",
+      "abnahme": "Kein Bereich/keine/eine/viele Basen, alle Auswahlwege konsistent",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/knowledge/KbList.vue",
+        "desktop/src/components/KnowledgePanel.vue",
+        "desktop/src/components/KnowledgeView.vue"
+      ]
+    },
+    {
+      "id": "K02",
+      "bereich": "DocumentTable",
+      "ist": "Statusgruppen, Größe/Datum, Aktionsicons",
+      "aenderung": "Scanbare Datenansicht und zugängliche Zeilenaktionen",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "F10,F08",
+      "abnahme": "Metadaten erhalten; Rechte/Tastatur/Touch; lange Namen",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/knowledge/DocumentTable.vue",
+        "desktop/src/components/knowledge/StatusRing.vue",
+        "desktop/src/components/KnowledgePanel.vue"
+      ]
+    },
+    {
+      "id": "K03",
+      "bereich": "Dokumentfilter/Gruppen",
+      "ist": "Filter ab mehr als acht Dateien; Collapse",
+      "aenderung": "Filterauffindbarkeit und leere Ergebnisse",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "K02,F03",
+      "abnahme": "Schwelle, kein Treffer, viele Gruppen, Filter löschen",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/knowledge/DocumentTable.vue",
+        "desktop/src/components/knowledge/StatusRing.vue",
+        "desktop/src/components/KnowledgePanel.vue"
+      ]
+    },
+    {
+      "id": "K04",
+      "bereich": "Upload/Drag&Drop/Picker",
+      "ist": "Mehrere Einstiege, sequentielle Verarbeitung",
+      "aenderung": "Einheitlicher Ablauf und Ergebnis je Datei",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "F05,F09,G08",
+      "abnahme": "Auswahl/Drop/Abbruch, mehrere Dateien, Typ-/Größenfehler, keine UI-Duplikate",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/knowledge/DocumentTable.vue",
+        "desktop/src/components/knowledge/StatusRing.vue",
+        "desktop/src/components/KnowledgePanel.vue"
+      ]
+    },
+    {
+      "id": "K05",
+      "bereich": "Verarbeitung/Reindex",
+      "ist": "Durchsuchbar/wartend/Fehler/Scan etc.",
+      "aenderung": "Fachliche Statussprache und nächste Aktion",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "K02,F08",
+      "abnahme": "Jeder bestehende Enum-Zustand, Reindex-Erfolg/-Fehler; Scan ehrlich erklärt",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/knowledge/DocumentTable.vue",
+        "desktop/src/components/knowledge/StatusRing.vue",
+        "desktop/src/components/KnowledgePanel.vue"
+      ]
+    },
+    {
+      "id": "K06",
+      "bereich": "Inhaltsuche/Treffer/Reset",
+      "ist": "Suchzeile und Quellenlisten",
+      "aenderung": "Suchmodus und Trefferstruktur",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "F10,F13,G06",
+      "abnahme": "Leer/Busy/kein Treffer/Treffer/Fehler/Reset; Rechtefilter unverändert",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/KnowledgePanel.vue"
+      ]
+    },
+    {
+      "id": "K07",
+      "bereich": "Arbeitsbereich anlegen – Dialog",
+      "ist": "Einfaches Namensformular",
+      "aenderung": "Standard einfacher Formdialog",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "OV,FO,G02",
+      "abnahme": "Elternkontext, Länge/Kollision/Busy/Erfolg/Cancel, richtige Auswahl",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/KnowledgePanel.vue"
+      ]
+    },
+    {
+      "id": "K08",
+      "bereich": "Wissensbasis anlegen – Dialog",
+      "ist": "Namensformular im aktiven Bereich",
+      "aenderung": "Gleicher Vertrag, eindeutiger Zielbereich",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "K07",
+      "abnahme": "Pflicht/Länge/Kollision/Busy/Cancel; keine Anlage im falschen Bereich",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/KnowledgePanel.vue"
+      ]
+    },
+    {
+      "id": "K09",
+      "bereich": "Basis umbenennen – Dialog",
+      "ist": "Vorbelegtes Feld",
+      "aenderung": "Änderungszustand und Footer",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "K08",
+      "abnahme": "Alt/leer/unverändert/neu/Fehler; Sidebar und Liste aktualisiert",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/KnowledgePanel.vue"
+      ]
+    },
+    {
+      "id": "K10",
+      "bereich": "KB löschen / Dokument löschen",
+      "ist": "Gemeinsamer Confirm mit dynamischem Text",
+      "aenderung": "Zwei explizite Destruktiv-Varianten",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "OV,K01,K02",
+      "abnahme": "Richtiger Name/Umfang; Cancel/Busy/Fehler/Erfolg; Datenwirkung korrekt",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/KnowledgePanel.vue"
+      ]
+    },
+    {
+      "id": "K11",
+      "bereich": "SourcePreview Desktop/Mobil",
+      "ist": "Seitenpanel bzw. modales Overlay, Markierung",
+      "aenderung": "Lesefläche und Overlay-Vertrag",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "OV,F13,K06,C02",
+      "abnahme": "Aufruf aus Chat/Suche; Seite/Absatz, vor/zurück, Highlight, Schließen",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/KnowledgePanel.vue",
+        "desktop/src/components/SourcePreview.vue",
+        "desktop/src/source-preview.ts"
+      ]
+    },
+    {
+      "id": "K12",
+      "bereich": "Vorschau-Sonderzustände/Download",
+      "ist": "Laden/Retry/fehlende Position/leer/Original-Link",
+      "aenderung": "Einschränkungen und Fehler differenzieren",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "K11,F09,G08",
+      "abnahme": "403/404/Sitzungsende, Altquelle, kein Text; Download und Fokus-Rückkehr",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/KnowledgePanel.vue",
+        "desktop/src/components/SourcePreview.vue",
+        "desktop/src/source-preview.ts"
+      ]
+    },
+    {
+      "id": "T01",
+      "bereich": "TeamView/Organisationen",
+      "ist": "Auswahl, Rollen, Aktionen",
+      "aenderung": "Organisation und Mitgliedschaft klar gliedern",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "SH,F10,G02",
+      "abnahme": "Keine/eine/viele; Owner/Member; Ladefehler/Retry und aktive Auswahl",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/MembersPanel.vue",
+        "desktop/src/components/TeamView.vue"
+      ]
+    },
+    {
+      "id": "T02",
+      "bereich": "Org anlegen/umbenennen – Dialoge",
+      "ist": "Zwei Namensformulare",
+      "aenderung": "Gemeinsamer Form-/Dialogvertrag",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "OV,FO,T01",
+      "abnahme": "Beide separat: Name/Länge/Kollision/Busy/Erfolg/Cancel",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/MembersPanel.vue",
+        "desktop/src/components/TeamView.vue"
+      ]
+    },
+    {
+      "id": "T03",
+      "bereich": "Organisation löschen – Confirm",
+      "ist": "Endgültige Löschung",
+      "aenderung": "Folgen und sichere Aktionshierarchie",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "OV,T01",
+      "abnahme": "Richtige Organisation; kein versehentlich fokussiertes Confirm; Cancel/Fehler",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/MembersPanel.vue",
+        "desktop/src/components/TeamView.vue"
+      ]
+    },
+    {
+      "id": "T04",
+      "bereich": "MembersPanel/Mitgliederliste",
+      "ist": "Avatar, Rolle, Datum, Entfernen",
+      "aenderung": "Konsistente Personenzeilen/Aktionen",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "F10,T01",
+      "abnahme": "Owner/Member/eigener Account/fremde Org; Rechte erhalten",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/MembersPanel.vue"
+      ]
+    },
+    {
+      "id": "T05",
+      "bereich": "Mitglied hinzufügen – Dialog",
+      "ist": "E-Mail/Name; bestehendes oder neues Konto",
+      "aenderung": "Beide möglichen Ergebnisse verständlich führen",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "OV,FO,T04",
+      "abnahme": "Vorhanden/neu/ungültig/doppelt/Busy/Fehler; kein Secret in Meldungen",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/MembersPanel.vue"
+      ]
+    },
+    {
+      "id": "T06",
+      "bereich": "Einmalige Startzugänge",
+      "ist": "Ergebnisbox, Kopieren, Ausblenden",
+      "aenderung": "Einmaligkeit/Weitergabe/Clipboard-Feedback",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "T05,F09",
+      "abnahme": "Nach Hide/Reload nicht wieder sichtbar; Copy-Fehler; maskierte Beweise",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/MembersPanel.vue"
+      ]
+    },
+    {
+      "id": "T07",
+      "bereich": "Mitglied entfernen – Confirm",
+      "ist": "Benennt Zugriffsverlust",
+      "aenderung": "Einheitliches Destruktivmuster",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "OV,T04",
+      "abnahme": "Richtige Person/Org; Cancel/Busy/Fehler/Erfolg; Rechtewirkung erhalten",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/MembersPanel.vue"
+      ]
+    },
+    {
+      "id": "T08",
+      "bereich": "Einladung erstellen/Code",
+      "ist": "Direkte Anlage, einmalige Codebox",
+      "aenderung": "Ergebnis und nächste Aktion strukturieren",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "T04,F09",
+      "abnahme": "Einmalig; Reload/Copy erlaubt/verweigert/Fehler; keine Codes in Beweisen",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/MembersPanel.vue"
+      ]
+    },
+    {
+      "id": "T09",
+      "bereich": "Offene Einladungen/Zurückziehen",
+      "ist": "Liste mit Ablauf, direkte Aktion",
+      "aenderung": "Status/Ablauf/Folgen vereinheitlichen",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "F10,T08",
+      "abnahme": "Leer/ausstehend/verwendet/abgelaufen/zurückgezogen; korrekter Listenstand",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/MembersPanel.vue"
+      ]
+    },
+    {
+      "id": "T10",
+      "bereich": "Einladung einlösen",
+      "ist": "Inline-Feld und Beitreten",
+      "aenderung": "Beitrittsfluss von Verwaltung unterscheiden",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "FO,F09,T01",
+      "abnahme": "Gültig/ungültig/verwendet/abgelaufen/Busy; richtige Org nach Beitritt",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/MembersPanel.vue"
+      ]
+    },
+    {
+      "id": "AD01",
+      "bereich": "AdminPanel/Navigation",
+      "ist": "Zehn Bereiche, drei Gruppen",
+      "aenderung": "Orientierung KI/Verbindungen/Betrieb",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "SH,F12",
+      "abnahme": "Alle zehn Bereiche; USER/ADMIN, 403 und Sitzungsende",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/AdminPanel.vue"
+      ]
+    },
+    {
+      "id": "AD02",
+      "bereich": "Anbieter-Liste",
+      "ist": "URL, Typ, Timeout, Secret-Maske",
+      "aenderung": "Verbindungsübersicht und Metadaten gewichten",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "DA,AD01",
+      "abnahme": "Leer/viele/lange URLs, aktiv/inaktiv; geschützte Schlüssel",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/AdminPanel.vue"
+      ]
+    },
+    {
+      "id": "AD03",
+      "bereich": "Anbieter anlegen – Inline",
+      "ist": "Ollama/vLLM/API, URL, Name, Secret, Timeout",
+      "aenderung": "Feldgruppen/Hilfe je Verbindungstyp",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "FO,AD02",
+      "abnahme": "Drei Arten; URL/SSRF/Secret-Speicherfehler; Save/Cancel/Busy",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/AdminPanel.vue"
+      ]
+    },
+    {
+      "id": "AD04",
+      "bereich": "Anbieter bearbeiten – Inline",
+      "ist": "Typ statisch, Secret behalten/ersetzen",
+      "aenderung": "Edit-Regeln und Secret-Vertrag erklären",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "AD03",
+      "abnahme": "Leer behält Secret; Replace wirkt; Cancel ohne Änderung; kein Klartext",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/AdminPanel.vue"
+      ]
+    },
+    {
+      "id": "AD05",
+      "bereich": "Anbieter testen/aktivieren",
+      "ist": "Zeilenaktionen, Testresultat",
+      "aenderung": "Laufender Test und Feedback",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "AD02,F09",
+      "abnahme": "Erfolg/Timeout/unreachable/inaktiv; kein ungeprüfter Erfolgsstatus",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/AdminPanel.vue"
+      ]
+    },
+    {
+      "id": "AD06",
+      "bereich": "Installationsvorgaben übernehmen",
+      "ist": "Seed-Angebot",
+      "aenderung": "Herkunft/Übernahme/Resultat unterscheiden",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "AD02,F09",
+      "abnahme": "Verfügbar/fehlt/Fehler/übernommen; Geheimnis bleibt verborgen",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/AdminPanel.vue"
+      ]
+    },
+    {
+      "id": "AD07",
+      "bereich": "Modelllisten Chat/Embedding",
+      "ist": "Standard/Live/Disabled/ENV-Fallback",
+      "aenderung": "Rolle und tatsächliche Nutzung erklären",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "DA,AD01",
+      "abnahme": "Beide Gruppen, keine Anbieter, lange IDs; Nutzung korrekt",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/AdminPanel.vue"
+      ]
+    },
+    {
+      "id": "AD08",
+      "bereich": "Modell anlegen/bearbeiten – Inline",
+      "ist": "Anbieter/Typ/ID, Tokens oder Dimension",
+      "aenderung": "Typabhängige Eigenschaften strukturieren",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "FO,AD07",
+      "abnahme": "Chat/Embedding, Anlage/Edit; Validierung, Save/Cancel/Fehler",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/AdminPanel.vue"
+      ]
+    },
+    {
+      "id": "AD09",
+      "bereich": "Standardmodell wechseln",
+      "ist": "Embedding warnt nativ, Chat anders",
+      "aenderung": "Einheitliche risikobasierte Bestätigung",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "OV,AD07",
+      "abnahme": "Cancel/Standardwechsel; keine automatische Neuindexierung suggerieren",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/AdminPanel.vue"
+      ]
+    },
+    {
+      "id": "AD10",
+      "bereich": "Suche & Wissen",
+      "ist": "Read-only Retrieval-/Chunk-/Rerankerwerte",
+      "aenderung": "Lesbare Betriebsinformation ohne Editierwirkung",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "DA,AD07",
+      "abnahme": "Loading/fehlt/aktiv/veraltet; nur echte Änderungswege",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/AdminPanel.vue"
+      ]
+    },
+    {
+      "id": "AD11",
+      "bereich": "Systemstatus/Neu laden",
+      "ist": "Komponentenstatus",
+      "aenderung": "Priorisierte Diagnose und nächste Aktion",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "DA,F09",
+      "abnahme": "Alle Statuswerte, Teilfehler/Offline/Retry; fehlend ist nicht bereit",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/AdminPanel.vue"
+      ]
+    },
+    {
+      "id": "D01",
+      "bereich": "Quellenliste/Status",
+      "ist": "Typ, Pfad, Ziel-KB, Laufstatus, viele Aktionen",
+      "aenderung": "Ziel/Betriebszustand/Aktion priorisieren",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "DA,AD01",
+      "abnahme": "Keine KB/keine/viele Quellen; lange Pfade; laufend/fehlgeschlagen/unterbrochen/aktuell",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/DataSourcesPanel.vue"
+      ]
+    },
+    {
+      "id": "D02",
+      "bereich": "Assistent Schritt 1 / Neu-Edit",
+      "ist": "Drei Ablagearten, LOCAL ggf. gesperrt",
+      "aenderung": "Eigener Assistentenrahmen und Auswahlführung",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "OV,PV,D01",
+      "abnahme": "SMB/LOCAL/SharePoint; gesperrt erklärt; Neu/Edit, Abbruch",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/DataSourcesPanel.vue"
+      ]
+    },
+    {
+      "id": "D03",
+      "bereich": "Schritt 2 Verbindung",
+      "ist": "SMB-Konto; lokaler Pfad; SharePoint Tenant/Client/Secret; Ziel-KB",
+      "aenderung": "Variantenbezogene Feldgruppen und Hilfen",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "D02,FO",
+      "abnahme": "Alle drei separat; Secret-Erhalt, gesperrtes Edit-Ziel, Verbindungsfehler",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/DataSourcesPanel.vue"
+      ]
+    },
+    {
+      "id": "D04",
+      "bereich": "Schritt 3 Auswahl/Probelauf",
+      "ist": "Glob-Textmuster, Größe, Dateizahlen",
+      "aenderung": "In-/Ausschluss und Probe verständlich erklären",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "D03,F09",
+      "abnahme": "Muster, Typ/Größe/Ausschluss, null Treffer/Teilerfolg; kein nicht vorhandener Ordnerbaum",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/DataSourcesPanel.vue"
+      ]
+    },
+    {
+      "id": "D05",
+      "bereich": "Schritt 4 Rechtevorschau",
+      "ist": "Mirror, Warnung, Principals, unlesbare ACL",
+      "aenderung": "Folgen und Einschränkungen hervorheben",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "D04,F08,F10",
+      "abnahme": "Mirror an/aus, keine/unlesbare Rechte, lange Gruppen; Sperr-/Filterverhalten erhalten",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/DataSourcesPanel.vue"
+      ]
+    },
+    {
+      "id": "D06",
+      "bereich": "Schritt 5 Zeitplan",
+      "ist": "Vier Intervalle und Erklärung",
+      "aenderung": "Eindeutige Zeitplan-Darstellung",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "D04,F04",
+      "abnahme": "Alle Intervalle und Zusammenfassung korrekt; keine neue Scheduler-Fähigkeit",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/DataSourcesPanel.vue"
+      ]
+    },
+    {
+      "id": "D07",
+      "bereich": "Schritt 6 Aktivierung",
+      "ist": "Name/Pfad/Zahl/Intervall/Rechte",
+      "aenderung": "Prüfansicht und endgültige Aktion trennen",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "D03,D05,D06",
+      "abnahme": "Zusammenfassung exakt; Zurück/Ändern, Busy/Fehler, keine doppelte Aktivierung",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/DataSourcesPanel.vue"
+      ]
+    },
+    {
+      "id": "D08",
+      "bereich": "Abgleichen/Pausieren/Aktivieren",
+      "ist": "Laufaktionen, teilweise disabled",
+      "aenderung": "Sichere Betriebsaktionen und Feedback",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "D01,F09",
+      "abnahme": "Laufend sperrt Konflikte; Pause/Fehler/Neustart; keine verlorenen Daten",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/DataSourcesPanel.vue"
+      ]
+    },
+    {
+      "id": "D09",
+      "bereich": "Problemdateien – Dialog",
+      "ist": "Pfad-/Fehlerliste, leerer Zustand",
+      "aenderung": "Scanbare Diagnose und lokaler Overflow",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "OV,DA,D01",
+      "abnahme": "Viele/lange Pfade, leer/Fehler/Schließen; keine Secret-Echos",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/DataSourcesPanel.vue"
+      ]
+    },
+    {
+      "id": "D10",
+      "bereich": "Quelle entfernen – Confirm",
+      "ist": "Entfernt Quelle/importierte Dokumente, nicht Originale",
+      "aenderung": "Umfang und Folgen gewichten",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "OV,D01",
+      "abnahme": "Richtige Quelle/Wirkung, Cancel/Fehler/Erfolg; Originaldateien unverändert",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/DataSourcesPanel.vue"
+      ]
+    },
+    {
+      "id": "L01",
+      "bereich": "DirectoryPanel/Liste",
+      "ist": "Art, Org, Loginstatus, Test/Lookup/Edit/Delete",
+      "aenderung": "Zugang und Verzeichnis klar gliedern",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "DA,AD01",
+      "abnahme": "Leer/viele/aktiv/inaktiv, richtige Org, lange Servernamen",
+      "status": "umgesetzt",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [
+        "docs/design/ui-connections-2026-11-15/README.md",
+        "docs/design/ui-connections-2026-11-15/results.json"
+      ],
+      "offeneBefunde": [
+        "Gezielte UI-Prüfung dokumentiert; vollständige Inventar-Abnahme, echte Integrationsfälle und unabhängige Gates weiterhin offen."
+      ],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/DirectoryPanel.vue"
+      ]
+    },
+    {
+      "id": "L02",
+      "bereich": "Verzeichnis anlegen/editieren – Dialog",
+      "ist": "AD-/LDAP-Defaults, URL, Base-/Bind-DN, Passwort",
+      "aenderung": "Zwei Varianten und Edit-Regeln strukturieren",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "OV,FO,L01",
+      "abnahme": "AD/LDAP separat, Neu/Edit, Pflicht/Secret-Erhalt/Busy/Fehler",
+      "status": "umgesetzt",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [
+        "docs/design/ui-connections-2026-11-15/README.md",
+        "docs/design/ui-connections-2026-11-15/results.json"
+      ],
+      "offeneBefunde": [
+        "Gezielte UI-Prüfung dokumentiert; vollständige Inventar-Abnahme, echte Integrationsfälle und unabhängige Gates weiterhin offen."
+      ],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/DirectoryPanel.vue"
+      ]
+    },
+    {
+      "id": "L03",
+      "bereich": "TLS/Login/Provisionierung/Erweitert",
+      "ist": "Optionen und Filter in Details",
+      "aenderung": "Sicherheitsfolgen nahe an Optionen halten",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "L02,F04",
+      "abnahme": "Defaults erhalten; StartTLS/Plain/Sperre klar; keine Lockerung durch neue UI",
+      "status": "umgesetzt",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [
+        "docs/design/ui-connections-2026-11-15/README.md",
+        "docs/design/ui-connections-2026-11-15/results.json"
+      ],
+      "offeneBefunde": [
+        "Gezielte UI-Prüfung dokumentiert; vollständige Inventar-Abnahme, echte Integrationsfälle und unabhängige Gates weiterhin offen."
+      ],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/DirectoryPanel.vue"
+      ]
+    },
+    {
+      "id": "L04",
+      "bereich": "Verbindungstest",
+      "ist": "Ergebnis je Verbindung",
+      "aenderung": "Laufende Anfrage/Ergebnis vereinheitlichen",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "L01,F09",
+      "abnahme": "Erfolg/TLS-/Bind-/Netzfehler; richtige Zeile, kein unerklärter Stillstand",
+      "status": "umgesetzt",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [
+        "docs/design/ui-connections-2026-11-15/README.md",
+        "docs/design/ui-connections-2026-11-15/results.json"
+      ],
+      "offeneBefunde": [
+        "Gezielte UI-Prüfung dokumentiert; vollständige Inventar-Abnahme, echte Integrationsfälle und unabhängige Gates weiterhin offen."
+      ],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/DirectoryPanel.vue"
+      ]
+    },
+    {
+      "id": "L05",
+      "bereich": "Benutzer nachschlagen – Dialog",
+      "ist": "Login, Ergebnis/Principals, Busy/Fehler",
+      "aenderung": "Eingabe/Ergebnis als klarer Ablauf",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "OV,L01,DA",
+      "abnahme": "Gefunden/nicht gefunden/leer/Fehler; lange Gruppen; Fokus-Rückkehr",
+      "status": "umgesetzt",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [
+        "docs/design/ui-connections-2026-11-15/README.md",
+        "docs/design/ui-connections-2026-11-15/results.json"
+      ],
+      "offeneBefunde": [
+        "Gezielte UI-Prüfung dokumentiert; vollständige Inventar-Abnahme, echte Integrationsfälle und unabhängige Gates weiterhin offen."
+      ],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/DirectoryPanel.vue"
+      ]
+    },
+    {
+      "id": "L06",
+      "bereich": "Verzeichnis entfernen – Confirm",
+      "ist": "Konten bleiben laut Ergebnis bestehen",
+      "aenderung": "Auswirkungen auf Zugang klar darstellen",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "OV,L01",
+      "abnahme": "Name/Cancel/Fehler/Erfolg; keine falsche Kontolösch-Aussage",
+      "status": "umgesetzt",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [
+        "docs/design/ui-connections-2026-11-15/README.md",
+        "docs/design/ui-connections-2026-11-15/results.json"
+      ],
+      "offeneBefunde": [
+        "Gezielte UI-Prüfung dokumentiert; vollständige Inventar-Abnahme, echte Integrationsfälle und unabhängige Gates weiterhin offen."
+      ],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/DirectoryPanel.vue"
+      ]
+    },
+    {
+      "id": "Q01",
+      "bereich": "Qualität/Lauf/Verlauf/Daumen",
+      "ist": "KB-Select, Trefferquote, Zahlen, kleiner Verlauf",
+      "aenderung": "Metriken, Zeitraum und Datenstand erläutern",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "DA,AD01,F09",
+      "abnahme": "Keine Fragen/kein Lauf/Busy/0–100%/Fehler; reale Werte und Prüfendenrechte",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/QualityPanel.vue"
+      ]
+    },
+    {
+      "id": "Q02",
+      "bereich": "Testfragenliste/Löschen",
+      "ist": "Ring, Erwartung, direkte Löschung",
+      "aenderung": "Ergebnissicht und sichere Aktionen",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "F10,Q01",
+      "abnahme": "Ungeprüft/gefunden/nicht gefunden, lang/leer, Löschfehler",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/QualityPanel.vue"
+      ]
+    },
+    {
+      "id": "Q03",
+      "bereich": "Testfrage hinzufügen – Dialog",
+      "ist": "Frage/Datei/optionale Phrase",
+      "aenderung": "Felder und Hilfen vereinheitlichen",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "OV,FO,Q02",
+      "abnahme": "Pflicht/Länge/optional/Busy/Fehler/Erfolg/Cancel",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/QualityPanel.vue"
+      ]
+    },
+    {
+      "id": "Q04",
+      "bereich": "Liste einfügen – Importdialog",
+      "ist": "Textfeld, Semikolon-/Tab-Hilfe",
+      "aenderung": "Importformat und Teilresultate führen",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "OV,FO,Q02",
+      "abnahme": "Leer/gültig/ungültig/teilweise übersprungen; keine stillen Zeilenverluste",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/QualityPanel.vue"
+      ]
+    },
+    {
+      "id": "W01",
+      "bereich": "Websuche-Anbieter/Formvarianten",
+      "ist": "Aus/SearXNG/Brave/Tavily, bedingte Felder",
+      "aenderung": "Einrichtung nach Anbieter strukturieren",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "FO,AD01",
+      "abnahme": "Alle vier, ENV-/DB-Herkunft, Änderung/Save/Fehler",
+      "status": "umgesetzt",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [
+        "docs/design/ui-connections-2026-11-15/README.md",
+        "docs/design/ui-connections-2026-11-15/results.json"
+      ],
+      "offeneBefunde": [
+        "Gezielte UI-Prüfung dokumentiert; vollständige Inventar-Abnahme, echte Integrationsfälle und unabhängige Gates weiterhin offen."
+      ],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/WebSearchPanel.vue"
+      ]
+    },
+    {
+      "id": "W02",
+      "bereich": "Suchschlüssel/Entfernen/Voraussetzung",
+      "ist": "Write-only, behalten/löschen, Speicherhinweis",
+      "aenderung": "Einheitlicher Secret-Feldvertrag",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "W01,F03",
+      "abnahme": "Gespeichert/fehlt/ohne Speicher; Leer-Erhalt/Löschen unverändert",
+      "status": "umgesetzt",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [
+        "docs/design/ui-connections-2026-11-15/README.md",
+        "docs/design/ui-connections-2026-11-15/results.json"
+      ],
+      "offeneBefunde": [
+        "Gezielte UI-Prüfung dokumentiert; vollständige Inventar-Abnahme, echte Integrationsfälle und unabhängige Gates weiterhin offen."
+      ],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/WebSearchPanel.vue"
+      ]
+    },
+    {
+      "id": "W03",
+      "bereich": "Trefferlimit/Domainsperre",
+      "ist": "Number und Textarea",
+      "aenderung": "Wertebereiche/Mehrfachwerte erklären",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "W01,F04",
+      "abnahme": "1–10, Komma/Zeilen, lange Liste; Werte unverändert gespeichert",
+      "status": "umgesetzt",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [
+        "docs/design/ui-connections-2026-11-15/README.md",
+        "docs/design/ui-connections-2026-11-15/results.json"
+      ],
+      "offeneBefunde": [
+        "Gezielte UI-Prüfung dokumentiert; vollständige Inventar-Abnahme, echte Integrationsfälle und unabhängige Gates weiterhin offen."
+      ],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/WebSearchPanel.vue"
+      ]
+    },
+    {
+      "id": "W04",
+      "bereich": "Suchtest/Ergebnis/Fehler",
+      "ist": "Button, Meldung und Trefferliste",
+      "aenderung": "Testen, Speichern und Aktivsein trennen",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "W01,DA,F09",
+      "abnahme": "Nicht eingerichtet/Busy/keine Treffer/Treffer/unreachable; keine Keys",
+      "status": "umgesetzt",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [
+        "docs/design/ui-connections-2026-11-15/README.md",
+        "docs/design/ui-connections-2026-11-15/results.json"
+      ],
+      "offeneBefunde": [
+        "Gezielte UI-Prüfung dokumentiert; vollständige Inventar-Abnahme, echte Integrationsfälle und unabhängige Gates weiterhin offen."
+      ],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/WebSearchPanel.vue"
+      ]
+    },
+    {
+      "id": "M01",
+      "bereich": "MCP-Karten/Status/Refresh",
+      "ist": "Name/URL/Aktiv/Refresh/Entfernen, Details",
+      "aenderung": "Verbindungen mit klaren Folgen und Status",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "DA,AD01",
+      "abnahme": "Keine/viele/lange Namen, Fehler, Aktiv/Refresh; ehrliche Freigabeanzeige",
+      "status": "umgesetzt",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [
+        "docs/design/ui-connections-2026-11-15/README.md",
+        "docs/design/ui-connections-2026-11-15/results.json"
+      ],
+      "offeneBefunde": [
+        "Gezielte UI-Prüfung dokumentiert; vollständige Inventar-Abnahme, echte Integrationsfälle und unabhängige Gates weiterhin offen."
+      ],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/McpPanel.vue"
+      ]
+    },
+    {
+      "id": "M02",
+      "bereich": "MCP verbinden/Hilfe",
+      "ist": "Permanentes Name-/URL-/Secret-Formular",
+      "aenderung": "Einrichtung und Resultat klar führen",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "FO,M01",
+      "abnahme": "Gültig/SSRF/unreachable/falscher Key/Busy; Key geleert, Tools zunächst gesperrt",
+      "status": "umgesetzt",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [
+        "docs/design/ui-connections-2026-11-15/README.md",
+        "docs/design/ui-connections-2026-11-15/results.json"
+      ],
+      "offeneBefunde": [
+        "Gezielte UI-Prüfung dokumentiert; vollständige Inventar-Abnahme, echte Integrationsfälle und unabhängige Gates weiterhin offen."
+      ],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/McpPanel.vue"
+      ]
+    },
+    {
+      "id": "M03",
+      "bereich": "Werkzeug-Freigaben",
+      "ist": "Externe Namen/Beschreibungen, Checkbox-Details",
+      "aenderung": "Auffindbarkeit und Auswahl bei großen Listen",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "M01,F04,F10",
+      "abnahme": "Null/viele/lange Tools; Freigaben unverändert; Schließen löscht keine Auswahl",
+      "status": "umgesetzt",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [
+        "docs/design/ui-connections-2026-11-15/README.md",
+        "docs/design/ui-connections-2026-11-15/results.json"
+      ],
+      "offeneBefunde": [
+        "Gezielte UI-Prüfung dokumentiert; vollständige Inventar-Abnahme, echte Integrationsfälle und unabhängige Gates weiterhin offen."
+      ],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/McpPanel.vue"
+      ]
+    },
+    {
+      "id": "M04",
+      "bereich": "Arbeitsbereich-Freigaben",
+      "ist": "Alle/einzeln mit Organisationsnamen",
+      "aenderung": "Geltungsbereich und Wirkung klären",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "M03,G02,F04",
+      "abnahme": "Kein/einige/alle; Reload/Refresh erhält Rechte; keine versehentliche Globalfreigabe",
+      "status": "umgesetzt",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [
+        "docs/design/ui-connections-2026-11-15/README.md",
+        "docs/design/ui-connections-2026-11-15/results.json"
+      ],
+      "offeneBefunde": [
+        "Gezielte UI-Prüfung dokumentiert; vollständige Inventar-Abnahme, echte Integrationsfälle und unabhängige Gates weiterhin offen."
+      ],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/McpPanel.vue"
+      ]
+    },
+    {
+      "id": "M05",
+      "bereich": "Aufrufjournal",
+      "ist": "Aufklappbare echte Tabelle",
+      "aenderung": "Kopf, Datenhierarchie, Status und Overflow",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "M01,F10,F08",
+      "abnahme": "Leer/viele/Erfolg/Fehler; gültige Zeiten; keine Inhalte/Secrets",
+      "status": "umgesetzt",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [
+        "docs/design/ui-connections-2026-11-15/README.md",
+        "docs/design/ui-connections-2026-11-15/results.json"
+      ],
+      "offeneBefunde": [
+        "Gezielte UI-Prüfung dokumentiert; vollständige Inventar-Abnahme, echte Integrationsfälle und unabhängige Gates weiterhin offen."
+      ],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/McpPanel.vue"
+      ]
+    },
+    {
+      "id": "M06",
+      "bereich": "MCP entfernen – native Bestätigung",
+      "ist": "window.confirm außerhalb gemeinsamer UI",
+      "aenderung": "Gemeinsamer Bestätigungsvertrag",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "OV,M01",
+      "abnahme": "Cancel ohne Delete; richtige Verbindung/Folgen; Fehler sichtbar",
+      "status": "umgesetzt",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [
+        "docs/design/ui-connections-2026-11-15/README.md",
+        "docs/design/ui-connections-2026-11-15/results.json"
+      ],
+      "offeneBefunde": [
+        "Gezielte UI-Prüfung dokumentiert; vollständige Inventar-Abnahme, echte Integrationsfälle und unabhängige Gates weiterhin offen."
+      ],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/McpPanel.vue"
+      ]
+    },
+    {
+      "id": "B01",
+      "bereich": "Sicherungsstatus",
+      "ist": "Lädt/Fehler/keine/veraltet/ungeprüft/geprüft",
+      "aenderung": "Datenstand/Warnung/Retry priorisieren",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "DA,AD01,F09",
+      "abnahme": "Alle sechs Zustände; fehlend nie als verifiziert ausgeben",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/BackupPanel.vue"
+      ]
+    },
+    {
+      "id": "B02",
+      "bereich": "Jetzt/regelmäßig sichern – Hilfe",
+      "ist": "CLI-/Cron-Anleitung",
+      "aenderung": "Aufgabenorientierte Betriebsanleitung",
+      "prioritaet": "P2",
+      "abhaengigkeiten": "B01,F13",
+      "abnahme": "Ganze Befehle les-/kopierbar; Online-/Offline-Folgen/Aufbewahrung korrekt",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/BackupPanel.vue"
+      ]
+    },
+    {
+      "id": "B03",
+      "bereich": "Wiederherstellen – Hilfe",
+      "ist": "Bewusst Server-Befehl, destruktiv",
+      "aenderung": "Voraussetzungen und Warnung ordnen",
+      "prioritaet": "P0",
+      "abhaengigkeiten": "B02,F09",
+      "abnahme": "Kein neuer UI-Restore; Wirkung klar, Anleitung vollständig",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/admin/BackupPanel.vue"
+      ]
+    },
+    {
+      "id": "Z01",
+      "bereich": "Totes Chat-Aside/lokales Label",
+      "ist": "v-if=false bzw. kein direkter Vue-Import",
+      "aenderung": "Altbestand bewusst auflösen",
+      "prioritaet": "P2",
+      "abhaengigkeiten": "F01,F03,G04",
+      "abnahme": "Keine aktive Funktion/Test-/AT-SPI-Verknüpfung entfernen; Quelltextindex erneuern",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/components/ChatView.vue",
+        "desktop/src/components/ui/Label.vue"
+      ]
+    },
+    {
+      "id": "Z02",
+      "bereich": "Historische Designtexte/Tests/Handovers",
+      "ist": "Verschiedene Systembeschreibungen",
+      "aenderung": "Eine Wahrheit und aktuelles Abnahmeregister",
+      "prioritaet": "P1",
+      "abhaengigkeiten": "Alle Pakete",
+      "abnahme": "Jede ID mit Ergebnis/Beleg; alte CI ist keine neue Designabnahme",
+      "status": "offen",
+      "grundprofil": "A0",
+      "zustandsprofile": "Vor Umsetzung anwendbare S1-S7 in konkrete Testfälle zerlegen; N/A begründen",
+      "testfaelle": [],
+      "belege": [],
+      "offeneBefunde": [],
+      "gepruefterCommit": null,
+      "quellen": [
+        "desktop/src/styles/tailwind.css",
+        "desktop/src/styles/theme.css",
+        "desktop/src/styles/workspace.css"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+# Bash scripts also run from Windows checkouts (Git Bash / Linux containers).
+*.sh text eol=lf

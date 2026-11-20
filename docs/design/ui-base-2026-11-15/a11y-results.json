@@ -1,0 +1,84 @@
+[
+  {
+    "id": "V13",
+    "name": "Kontrast Chat mit Antwort (light)",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "94 Textträger, niedrigster 4.97:1 („Alle 17 anzeigen“)"
+  },
+  {
+    "id": "V13",
+    "name": "Kontrast Quellenpanel (light)",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "12 Textträger, niedrigster 5.52:1 („Dokumentvorschau · Textansicht“)"
+  },
+  {
+    "id": "V13",
+    "name": "Kontrast Assistent Schritt 2 und ACL-Warnung (light)",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "32 Textträger, Warnung 16.17:1 (Probeelement mit Komponentenklasse)"
+  },
+  {
+    "id": "V13",
+    "name": "Kontrast Chat mit Antwort (dark)",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "94 Textträger, niedrigster 6.85:1 („15:41“)"
+  },
+  {
+    "id": "V13",
+    "name": "Kontrast Quellenpanel (dark)",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "12 Textträger, niedrigster 6.85:1 („Dokumentvorschau · Textansicht“)"
+  },
+  {
+    "id": "V13",
+    "name": "Kontrast Assistent Schritt 2 und ACL-Warnung (dark)",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "32 Textträger, Warnung 13.14:1 (Probeelement mit Komponentenklasse)"
+  },
+  {
+    "id": "V13",
+    "name": "Zielgrößen Desktop 1440 (≥24 px, WCAG 2.5.8)",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "id": "V13",
+    "name": "Zielgrößen Handy 390 Chat (≥44 px Vertrag)",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "id": "V13",
+    "name": "Zoom-Reflow 200 % von 1440×1000: Chat und Quelle ohne horizontalen Seitenüberlauf",
+    "mode": "CSS-Viewport-Äquivalent",
+    "status": "bestanden",
+    "note": "mit Quelle"
+  },
+  {
+    "id": "V13",
+    "name": "Zoom-Reflow 400 % von 1280×1024 (WCAG 1.4.10, 320 CSS px): Chat und Quelle ohne horizontalen Seitenüberlauf",
+    "mode": "CSS-Viewport-Äquivalent",
+    "status": "bestanden",
+    "note": "mit Quelle"
+  },
+  {
+    "id": "V13",
+    "name": "prefers-reduced-motion: Übergänge der Aktionen 0 ms",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "17 Elemente 0 s; ohne Einstellung 0.12s"
+  },
+  {
+    "id": "V13",
+    "name": "Tastatur: Tab-Folge bis zum Composer, jedes Ziel mit sichtbarem Fokus",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "20 unterschiedliche Ziele, Composer nach 47 Tab-Schritten"
+  }
+]

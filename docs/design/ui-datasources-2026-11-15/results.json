@@ -1,0 +1,137 @@
+[
+  {
+    "name": "Vorhandene Quellen unverändert lesen: Betrieb getrennt vom Ergebnis",
+    "mode": "echter QA-Lesezugriff",
+    "status": "bestanden"
+  },
+  {
+    "name": "Alle Betriebs-/Ergebniszustände, Regeln für Abgleichen",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Suche, Betriebsfilter, keine Treffer und Zurücksetzen",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Problem-Dialog: Ladezustand, Fehler statt leer, Wiederholen",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Menü → Einstellungen: Secret bleibt leer, Escape gibt Fokus zurück",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Abgleichen: Busy blockiert doppelte Anfragen, Rückmeldung",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Pausieren im Aktiv-Filter erhält historischen Abgleich und Fokus",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Entfernen: sicherer Fokus, Abbruch, Busy, Fehler bleibt, Wiederholen",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Assistent: Entwurf, Busy, Schritte, Teilfehler nach Aktivierung",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Listenfehler erhält bestehende Daten; initialer Fehler und leere Quelle",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Datenquellen light 1440: Katalog, Reflow, Menüs",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Assistent light 1440: ruhige Flächen und Fokus",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Datenquellen light 1030: Katalog, Reflow, Menüs",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Assistent light 1030: ruhige Flächen und Fokus",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Datenquellen light 768: Katalog, Reflow, Menüs",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Assistent light 768: ruhige Flächen und Fokus",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Datenquellen light 390: Katalog, Reflow, Menüs",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Assistent light 390: ruhige Flächen und Fokus",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Datenquellen dark 1440: Katalog, Reflow, Menüs",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Assistent dark 1440: ruhige Flächen und Fokus",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Datenquellen dark 1030: Katalog, Reflow, Menüs",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Assistent dark 1030: ruhige Flächen und Fokus",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Datenquellen dark 768: Katalog, Reflow, Menüs",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Assistent dark 768: ruhige Flächen und Fokus",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Datenquellen dark 390: Katalog, Reflow, Menüs",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Assistent dark 390: ruhige Flächen und Fokus",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Assistent bei geringer Höhe: Inhalt und Fuß erreichbar",
+    "mode": "simulierte Datenquellen/HTTP-Antworten",
+    "status": "bestanden"
+  }
+]

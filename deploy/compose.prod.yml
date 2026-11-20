@@ -1,0 +1,238 @@
+# Keplura production deployment stack (DEPLOY-BUNDLE, t_bc138a04).
+#
+# This is the DELIVERY stack: it runs the whole product -- PostgreSQL 16 +
+# pgvector (persistent), the Spring Boot server built from this repo and a
+# bundled Ollama with automatic model pull (chat + bge-m3 embeddings) -- with healthchecks, restart policies
+# and named volumes. The dev file in this directory (docker-compose.yml)
+# stays what it always was: local infrastructure for a developer-run server
+# process. This file needs NO source checkout at runtime: point
+# KEPLURA_SERVER_IMAGE at a pre-built image on machines without a repo.
+#
+# Usage:
+#   cd deploy
+#   cp .env.production.example .env.production   # fill in real values first
+#   docker compose -f compose.prod.yml --env-file .env.production up -d --build
+#   curl -fsS http://127.0.0.1:8080/api/v1/health   # {"status":"UP"}
+#
+# Readiness note: `up -d` returns once containers START; the server needs
+# Flyway + a JVM boot (tens of seconds on small boxes). `compose up` without
+# -d blocks on the healthchecks; use `compose ps` / `logs` otherwise.
+#
+# Security posture (must be read before the first real deployment):
+#   * Publish ONLY the server port, and ONLY on loopback (default below).
+#     Production TLS is terminated by a reverse proxy (Caddy/nginx/Traefik)
+#     that is NOT part of this stack -- the proxy must reach the server on
+#     the shared compose network, and it MUST exist: the session cookie is
+#     flagged Secure in the prod profile, so a plain-HTTP login silently
+#     gets no cookie (the desktop then loops back to the login form).
+#     Minimal Caddyfile (automatic HTTPS, replace the name):
+#         keplura.example.com { reverse_proxy server:8080 }
+#   * The DB has NO published port here: postgres and server talk over the
+#     internal `keplura` network only. Ollama has no published port --
+#     it has no auth surface and must never face a LAN.
+#   * Credentials come exclusively from the env file (fail-fast `:?` below);
+#     nothing in this file, and nothing real, is ever committed.
+#   * The server runs as the `keplura` user (uid 1000) inside its
+#     container (deploy/Dockerfile.server). If you bind-mount the storage
+#     volume to a host directory (the documented way backups leave the
+#     stack), that host directory must be writable by uid 1000:
+#     chown 1000:1000 <dir>
+#
+# No container runtime on the machine (or image pulls are blocked, e.g.
+# nested-rootless CI)? The component-wise equivalent -- real PostgreSQL from
+# packages, the same jar, the same scripts -- is documented in
+# deploy/README.md ("Bare-Metal-Betrieb ohne Container-Runtime").
+
+name: intracore-prod
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: keplura-pg-prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB in .env.production}
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in .env.production}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.production}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # no `ports:` on purpose -- internal network only (see header).
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  server:
+    image: ${KEPLURA_SERVER_IMAGE:-keplura-server:local}
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.server
+    container_name: keplura-server
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      # SERVER-PAKET (ADR-0010): models are pulled BEFORE the server starts,
+      # so the first upload already embeds with the real model.
+      ollama-pull:
+        condition: service_completed_successfully
+      reranker:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      # Flyway owns the schema on PostgreSQL (ADR-0006); keep `validate`
+      # unless you know exactly what you are doing.
+      KEPLURA_DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      KEPLURA_DB_USER: ${POSTGRES_USER}
+      KEPLURA_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      KEPLURA_SERVER_PORT: "8080"
+      # tenant document bytes live on a named volume, not inside the image.
+      KEPLURA_UPLOAD_DIR: /var/lib/keplura/uploads
+      KEPLURA_UPLOAD_MAX_BYTES: ${KEPLURA_UPLOAD_MAX_BYTES:-20971520}
+      # provider preset + model pins (see .env.production.example, M4c rules)
+      KEPLURA_PROVIDER: ${KEPLURA_PROVIDER:-ollama}
+      KEPLURA_GATEWAY_BASE_URL: ${KEPLURA_GATEWAY_BASE_URL:-http://ollama:11434/v1}
+      KEPLURA_GATEWAY_API_KEY: ${KEPLURA_GATEWAY_API_KEY:-}
+      KEPLURA_GATEWAY_ALLOWED_MODELS: ${KEPLURA_GATEWAY_ALLOWED_MODELS:-}
+      KEPLURA_CHAT_MODEL: ${KEPLURA_CHAT_MODEL:-qwen2.5:7b}
+      # embeddings: real multilingual model via the bundled Ollama by default
+      # (bge-m3, 1024 dims). The pgvector column follows the dimension while
+      # the index is empty (ADR-0010). `local` = hash fallback, NOT semantic.
+      KEPLURA_EMBEDDING_BACKEND: ${KEPLURA_EMBEDDING_BACKEND:-gateway}
+      KEPLURA_EMBEDDING_BASE_URL: ${KEPLURA_EMBEDDING_BASE_URL:-http://ollama:11434/v1}
+      KEPLURA_EMBEDDING_API_KEY: ${KEPLURA_EMBEDDING_API_KEY:-}
+      KEPLURA_EMBEDDING_MODEL: ${KEPLURA_EMBEDDING_MODEL:-bge-m3}
+      # non-empty defaults (an empty env value would override a numeric
+      # default with an unparseable string):
+      KEPLURA_EMBEDDING_DIM: ${KEPLURA_EMBEDDING_DIM:-1024}
+      # model loading on CPU can take a while on the first call
+      KEPLURA_EMBEDDING_TIMEOUT_SECONDS: ${KEPLURA_EMBEDDING_TIMEOUT_SECONDS:-120}
+      KEPLURA_GATEWAY_TIMEOUT_SECONDS: ${KEPLURA_GATEWAY_TIMEOUT_SECONDS:-120}
+      KEPLURA_SEARCH_STORE: ${KEPLURA_SEARCH_STORE:-auto}
+      KEPLURA_RERANKER_URL: ${KEPLURA_RERANKER_URL:-http://reranker:80/rerank}
+      KEPLURA_RERANKER_MIN_SCORE: ${KEPLURA_RERANKER_MIN_SCORE:-0.5}
+      KEPLURA_RERANKER_TIMEOUT_SECONDS: ${KEPLURA_RERANKER_TIMEOUT_SECONDS:-60}
+      # uploads return at once; parsing + embedding run in the background
+      # (status PENDING -> INDEXED/FAILED; POST .../documents/{id}/reindex)
+      KEPLURA_INDEXING_MODE: ${KEPLURA_INDEXING_MODE:-async}
+      # ADR-0012: Linux-Ordner als Datenquelle nur unterhalb dieser Wurzeln.
+      # Beispiel: NFS-Freigabe auf dem Host nach /srv/firmendaten mounten und
+      # unten unter volumes nur lesend einbinden:
+      #   - /srv/firmendaten:/mnt/quellen/firmendaten:ro
+      # dann KEPLURA_DATASOURCE_LOCAL_ROOTS=/mnt/quellen setzen.
+      KEPLURA_DATASOURCE_LOCAL_ROOTS: ${KEPLURA_DATASOURCE_LOCAL_ROOTS:-}
+      KEPLURA_INDEXING_WORKERS: ${KEPLURA_INDEXING_WORKERS:-1}
+      # ADMIN-KI (ADR-0008): AES-GCM master key for stored provider secrets.
+      # Without it the admin surface works but secret writes answer 503
+      # (ENV-only keys keep working through the gateway fallback).
+      KEPLURA_SECRETS_MASTER_KEY: ${KEPLURA_SECRETS_MASTER_KEY:-}
+      # Umbenennung (ADR-0013): Erkennung einer NICHT umgestellten
+      # .env.production. Sind diese alten Namen dort noch gesetzt, bricht der
+      # Server den Start ab, statt ohne Master-Key/mit Standardwerten zu laufen.
+      # Nach `./install.sh` sind sie leer und werden ignoriert.
+      INTRACORE_SECRETS_MASTER_KEY: ${INTRACORE_SECRETS_MASTER_KEY:-}
+      INTRACORE_SERVER_HOST_PORT: ${INTRACORE_SERVER_HOST_PORT:-}
+      INTRACORE_PROVIDER: ${INTRACORE_PROVIDER:-}
+      KEPLURA_SERVER_HOST_PORT: ${KEPLURA_SERVER_HOST_PORT:-}
+      # First-boot admin account (AdminBootstrapRunner). BOTH required,
+      # idempotent, never resets an existing password; clear after first use.
+      KEPLURA_ADMIN_BOOTSTRAP_EMAIL: ${KEPLURA_ADMIN_BOOTSTRAP_EMAIL:-}
+      KEPLURA_ADMIN_BOOTSTRAP_PASSWORD: ${KEPLURA_ADMIN_BOOTSTRAP_PASSWORD:-}
+      # Optional extra IPv4 CIDRs the SSRF guard may dial (default EMPTY =
+      # fully closed per ADR-0008; a single-machine Ollama sets 127.0.0.0/8).
+      KEPLURA_ADMIN_SSRF_ALLOW_CIDRS: ${KEPLURA_ADMIN_SSRF_ALLOW_CIDRS:-}
+    volumes:
+      - storage:/var/lib/keplura
+    ports:
+      # loopback publish by default; the reverse-proxy host reaches it via the
+      # network or an explicit KEPLURA_SERVER_HOST_PORT on a trusted box.
+      - "127.0.0.1:${KEPLURA_SERVER_HOST_PORT:-8080}:8080"
+    healthcheck:
+      # same probe as the Dockerfile HEALTHCHECK (curl is present in the
+      # image; loopback so it does not depend on the published port).
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/api/v1/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+  # Local cross-encoder: question/document pairs stay in the internal network.
+  # CPU keeps the shared GPU available for the chat and embedding models.
+  reranker:
+    image: ${KEPLURA_RERANKER_IMAGE:-ghcr.io/huggingface/text-embeddings-inference:cpu-1.9.4}
+    restart: unless-stopped
+    command:
+      - --model-id
+      - BAAI/bge-reranker-v2-m3
+      - --revision
+      - 953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e
+      - --max-client-batch-size
+      - "50"
+      - --max-batch-tokens
+      - "1024"
+      - --tokenization-workers
+      - "2"
+      - --auto-truncate
+    volumes:
+      - rerankmodels:/data
+    healthcheck:
+      test: ["CMD", "curl", "--max-time", "5", "-fsS", "http://127.0.0.1:80/health"]
+      interval: 10s
+      timeout: 6s
+      retries: 12
+      start_period: 600s
+
+  # Bundled model runtime (SERVER-PAKET, ADR-0010). Part of the default
+  # stack; internal network only -- no published port (no auth surface).
+  # Debug: docker compose -f compose.prod.yml exec ollama ollama list
+  # GPU: add `-f compose.gpu.yml` (NVIDIA Container Toolkit required).
+  ollama:
+    image: ${OLLAMA_IMAGE:-ollama/ollama:latest}
+    container_name: keplura-ollama-prod
+    restart: unless-stopped
+    volumes:
+      - ollamamodels:/root/.ollama
+    environment:
+      OLLAMA_KEEP_ALIVE: "30m"
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+      start_period: 20s
+
+  # One-shot job: pulls chat + embedding model into the ollama volume.
+  # Idempotent (already-present models only re-check the manifest); runs on
+  # every `up`, the server waits for it. Air-gapped box: pre-fill the
+  # `ollamamodels` volume and set KEPLURA_SKIP_MODEL_PULL=1.
+  ollama-pull:
+    image: ${OLLAMA_IMAGE:-ollama/ollama:latest}
+    container_name: keplura-ollama-pull
+    restart: "no"
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+      CHAT_MODEL: ${KEPLURA_CHAT_MODEL:-qwen2.5:7b}
+      EMBEDDING_MODEL: ${KEPLURA_EMBEDDING_MODEL:-bge-m3}
+      EMBEDDING_BACKEND: ${KEPLURA_EMBEDDING_BACKEND:-gateway}
+      SKIP: ${KEPLURA_SKIP_MODEL_PULL:-0}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        if [ "$$SKIP" = "1" ]; then echo "model pull skipped"; exit 0; fi
+        echo "pulling chat model $$CHAT_MODEL"; ollama pull "$$CHAT_MODEL"
+        if [ "$$EMBEDDING_BACKEND" = "gateway" ]; then
+          echo "pulling embedding model $$EMBEDDING_MODEL"; ollama pull "$$EMBEDDING_MODEL"
+        fi
+        ollama list
+
+volumes:
+  pgdata:
+  storage:
+  ollamamodels:
+  rerankmodels:

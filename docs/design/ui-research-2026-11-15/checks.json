@@ -1,0 +1,120 @@
+{
+  "zeitpunktUtc": "2026-11-15T11:08:11.579Z",
+  "vergleichsbasis": "f7490833650440e45ffe7f502346b7a860a03865",
+  "produktbasis": "2de0a8a5203735507c00f56548daca2d2c2a05f9",
+  "art": "Dokumentprüfung; keine Produkt-/CI-/A11y-Abnahme",
+  "ergebnis": "bestanden",
+  "pruefungen": [
+    {
+      "pruefung": "16 Referenzabschnitte eindeutig und mit HTTPS-Quellen",
+      "status": "bestanden",
+      "detail": {
+        "anzahl": 16
+      }
+    },
+    {
+      "pruefung": "16 Richtungsentscheidungen eindeutig",
+      "status": "bestanden",
+      "detail": {
+        "anzahl": 16
+      }
+    },
+    {
+      "pruefung": "Alle Inventar-IDs genau einmal zugeordnet",
+      "status": "bestanden",
+      "detail": {
+        "urspruenglich": 109,
+        "zugeordnet": 109,
+        "gruppen": 14
+      }
+    },
+    {
+      "pruefung": "Originaltracker unverändert und alle Status offen",
+      "status": "bestanden",
+      "detail": {
+        "offen": 109
+      }
+    },
+    {
+      "pruefung": "Lokale Markdown-Verweisziele vorhanden",
+      "status": "bestanden",
+      "detail": {
+        "anzahl": 30,
+        "fehlend": []
+      }
+    },
+    {
+      "pruefung": "Alle 36 Vue-Quelltext-Hashes identisch zur Auditbasis",
+      "status": "bestanden",
+      "detail": {
+        "anzahl": 36,
+        "abweichend": []
+      }
+    },
+    {
+      "pruefung": "Eigener Git-Diff ausschließlich Dokumentation",
+      "status": "bestanden",
+      "detail": {
+        "dateien": [
+          "docs/PROJECT_STATE.md",
+          "docs/design/UI-DESIGN-DIRECTION-2026-11-15.md",
+          "docs/design/UI-DESIGN-RESEARCH-2026-11-15.md",
+          "docs/design/UI-INVENTORY-2026-11-15.md",
+          "docs/design/UI-REDESIGN-PLAN-2026-11-15.md",
+          "docs/design/ui-research-2026-11-15/README.md",
+          "docs/design/ui-research-2026-11-15/checks.json",
+          "docs/design/ui-research-2026-11-15/coverage.json",
+          "docs/design/ui-research-2026-11-15/references.json"
+        ]
+      }
+    },
+    {
+      "pruefung": "Neue Dateien ohne offensichtliche Secrets oder persönliche Absolutpfade",
+      "status": "bestanden",
+      "detail": {
+        "auffaelligeDateien": []
+      }
+    },
+    {
+      "pruefung": "git diff --check",
+      "status": "bestanden",
+      "detail": {
+        "exitcode": 0
+      }
+    }
+  ],
+  "dokumentHashes": [
+    {
+      "file": "docs/PROJECT_STATE.md",
+      "sha256": "423532ab56503e7d096a80e262d3deb74de38f81b0c08acf2c0ee495432c8b36"
+    },
+    {
+      "file": "docs/design/UI-DESIGN-DIRECTION-2026-11-15.md",
+      "sha256": "5139eb7fc6563a05a2efb55a4ce6a8da36bf360f1fac2dd076028e0baa82550c"
+    },
+    {
+      "file": "docs/design/UI-DESIGN-RESEARCH-2026-11-15.md",
+      "sha256": "446ca76a09cbcf532857ffb0fca557185851a79426aa7ee1258407b05cccede5"
+    },
+    {
+      "file": "docs/design/UI-INVENTORY-2026-11-15.md",
+      "sha256": "cff237973b0c03367e3749820bd469f8ecd3160518b0abc7f0c14a59bb9fdaaf"
+    },
+    {
+      "file": "docs/design/UI-REDESIGN-PLAN-2026-11-15.md",
+      "sha256": "67bf748f73e0800f46014b3500db00b3ead75417428f76a64908dbd04ce9c195"
+    },
+    {
+      "file": "docs/design/ui-research-2026-11-15/README.md",
+      "sha256": "35ba8b318957884baa4a21e58454117763d564a701ea39260edede581a0a6cca"
+    },
+    {
+      "file": "docs/design/ui-research-2026-11-15/coverage.json",
+      "sha256": "0c40e4cbbb16480c114f8d884c61eaae83ca49e87c6c81e252489c4f305f71d9"
+    },
+    {
+      "file": "docs/design/ui-research-2026-11-15/references.json",
+      "sha256": "93489878150182c96137af0db8dafa85a0538beafed9e881ac7a5a7ea6a3dc03"
+    }
+  ]
+}

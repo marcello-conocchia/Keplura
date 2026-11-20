@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Keplura</title>
+    <script>
+      // DARK-FS anti-flash: apply the persisted (or system) palette BEFORE the
+      // first paint — theme.css switches all tokens on html[data-ic-theme].
+      // Mirrors src/theme-store.ts exactly (same key, same resolution rules);
+      // the store takes ownership of the attribute once Vue mounts.
+      // Keep in sync with STORAGE_KEY in theme-store.ts.
+      (function () {
+        try {
+          var m = localStorage.getItem("keplura.theme.mode");
+          if (m !== "light" && m !== "dark" && m !== "system") m = "system";
+          var dark =
+            m === "dark" ||
+            (m === "system" &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches);
+          document.documentElement.setAttribute(
+            "data-ic-theme",
+            dark ? "dark" : "light"
+          );
+        } catch (e) {
+          /* hardened webview without localStorage — :root light defaults win */
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,162 @@
+[
+  {
+    "id": "login",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "chat",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "konto-menu",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "organisation-menu",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "suche",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "wissen",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "arbeitsbereich-anlegen",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "wissensbasis-anlegen",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "wissensbasis-umbenennen",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "team",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "organisation-anlegen",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "organisation-umbenennen",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "mitglied-hinzufuegen",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "admin-providers",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "admin-models",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "admin-rag",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "admin-datasources",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "admin-websearch",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "admin-mcp",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "admin-directory",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "admin-status",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "admin-quality",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "admin-backup",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "verzeichnis-anlegen",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "benutzer-nachschlagen",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "datenquelle-assistent-art",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "testfrage-anlegen",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "testfragen-import",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "anbieter-anlegen",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "modell-anlegen",
+    "status": "live geöffnet/erfasst",
+    "viewport": "1440x1000"
+  },
+  {
+    "id": "mobil-admin",
+    "status": "live geöffnet/erfasst",
+    "viewport": "390x844"
+  },
+  {
+    "id": "mobil-navigation",
+    "status": "live geöffnet/erfasst",
+    "viewport": "390x844"
+  }
+]

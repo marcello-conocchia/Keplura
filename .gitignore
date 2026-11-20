@@ -1,0 +1,62 @@
+# Java / Maven
+target/
+*.class
+*.jar
+!**/maven-wrapper.jar
+
+# Node / frontend
+node_modules/
+dist/
+*.tsbuildinfo
+npm-debug.log*
+
+# Tauri / Rust
+desktop/src-tauri/target/
+desktop/src-tauri/gen/schemas/
+
+# Python E2E harness artifacts
+__pycache__/
+*.pyc
+
+# Scratch host tooling per task worktree (never commit local harness scripts)
+.devenv/
+
+# Local agent / automation state (worktrees, launch configs, browser traces) —
+# machine-specific and may hold local test credentials; never publish.
+.claude/
+.worktrees/
+.playwright-mcp/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local env overrides (never commit secrets or machine-specific config)
+.env.local
+.env
+# DEPLOY-BUNDLE: the prod env-file (copy of .env.production.example) carries
+# real DB credentials — same never-commit rule as .env.
+deploy/.env.production
+# Sicherung der Umbenennung (install.sh, ADR-0013) und weitere Kopien: gleiche Geheimnisse.
+deploy/.env.production.*
+!deploy/.env.production.example
+!.env.example
+
+# M3c: server-side document storage (dev/prod runs write here — uploaded
+# bytes are tenant data, never commit them; tests use target/* anyway).
+# The pattern is root-anchored, but `keplura.upload.dir` is relative to the
+# JVM cwd — starting the jar from server/ lands the same tree in server/data
+# (seen in the M3e evidence run), so ignore that location too.
+/data/
+server/data/
+# The knowledge e2e's stale-session leg restarts the jar with cwd=desktop/e2e
+# (UI-3 evidence run), so the same upload tree can land there too.
+desktop/e2e/data/
+
+# ci-local: symlink to the newest evidence run — rotates per run, never tracked
+ci/evidence/latest

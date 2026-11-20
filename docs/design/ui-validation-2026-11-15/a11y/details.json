@@ -1,0 +1,488 @@
+{
+  "contrast-chat-light": {
+    "checked": 157,
+    "failures": [],
+    "lowest": [
+      {
+        "text": "Alle 15 anzeigen",
+        "ratio": 4.97,
+        "min": 4.5,
+        "size": 12,
+        "fg": "rgb(102, 106, 98)",
+        "bg": "rgb(243, 243, 240)"
+      },
+      {
+        "text": "2",
+        "ratio": 4.97,
+        "min": 4.5,
+        "size": 12,
+        "fg": "rgb(102, 106, 98)",
+        "bg": "rgb(243, 243, 240)"
+      },
+      {
+        "text": "Arbeitsbereiche",
+        "ratio": 4.97,
+        "min": 4.5,
+        "size": 11,
+        "fg": "rgb(102, 106, 98)",
+        "bg": "rgb(243, 243, 240)"
+      },
+      {
+        "text": "Verbunden",
+        "ratio": 4.97,
+        "min": 4.5,
+        "size": 11,
+        "fg": "rgb(102, 106, 98)",
+        "bg": "rgb(243, 243, 240)"
+      },
+      {
+        "text": "· KI-Modell bereit",
+        "ratio": 4.97,
+        "min": 4.5,
+        "size": 11,
+        "fg": "rgb(102, 106, 98)",
+        "bg": "rgb(243, 243, 240)"
+      }
+    ]
+  },
+  "contrast-source-light": {
+    "checked": 12,
+    "failures": [],
+    "lowest": [
+      {
+        "text": "Dokumentvorschau · Textansicht",
+        "ratio": 5.52,
+        "min": 4.5,
+        "size": 12,
+        "fg": "rgb(102, 106, 98)",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "text": "Original herunterladen",
+        "ratio": 6.31,
+        "min": 4.5,
+        "size": 12,
+        "fg": "rgb(49, 92, 181)",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "text": "Zitierte Textstelle",
+        "ratio": 6.31,
+        "min": 4.5,
+        "size": 13,
+        "fg": "rgb(49, 92, 181)",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "text": "## Frist\nDie Inspektion des Pilotgeräts ",
+        "ratio": 13.76,
+        "min": 4.5,
+        "size": 16,
+        "fg": "rgb(32, 33, 31)",
+        "bg": "rgb(231, 237, 248)"
+      },
+      {
+        "text": "Pilot-Handbuch.md",
+        "ratio": 16.17,
+        "min": 4.5,
+        "size": 16,
+        "fg": "rgb(32, 33, 31)",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ]
+  },
+  "contrast-wizard-light": {
+    "step1": {
+      "checked": 16,
+      "failures": [],
+      "lowest": [
+        {
+          "text": "1",
+          "ratio": 5.37,
+          "min": 4.5,
+          "size": 14,
+          "fg": "rgb(49, 92, 181)",
+          "bg": "rgb(231, 237, 248)"
+        },
+        {
+          "text": "Art der Ablage",
+          "ratio": 5.37,
+          "min": 4.5,
+          "size": 14,
+          "fg": "rgb(49, 92, 181)",
+          "bg": "rgb(231, 237, 248)"
+        },
+        {
+          "text": "Weiter",
+          "ratio": 6.31,
+          "min": 4.5,
+          "size": 14,
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgb(49, 92, 181)"
+        },
+        {
+          "text": "Einrichtung",
+          "ratio": 6.85,
+          "min": 4.5,
+          "size": 13,
+          "fg": "rgb(84, 87, 80)",
+          "bg": "rgb(247, 247, 245)"
+        },
+        {
+          "text": "UI4 Gestaltung 1794748426008",
+          "ratio": 6.85,
+          "min": 4.5,
+          "size": 13,
+          "fg": "rgb(84, 87, 80)",
+          "bg": "rgb(247, 247, 245)"
+        }
+      ]
+    },
+    "step2": {
+      "checked": 16,
+      "failures": [],
+      "lowest": [
+        {
+          "text": "2",
+          "ratio": 5.37,
+          "min": 4.5,
+          "size": 14,
+          "fg": "rgb(49, 92, 181)",
+          "bg": "rgb(231, 237, 248)"
+        },
+        {
+          "text": "Verbindung",
+          "ratio": 5.37,
+          "min": 4.5,
+          "size": 14,
+          "fg": "rgb(49, 92, 181)",
+          "bg": "rgb(231, 237, 248)"
+        },
+        {
+          "text": "Einrichtung",
+          "ratio": 6.85,
+          "min": 4.5,
+          "size": 13,
+          "fg": "rgb(84, 87, 80)",
+          "bg": "rgb(247, 247, 245)"
+        },
+        {
+          "text": "1",
+          "ratio": 6.85,
+          "min": 4.5,
+          "size": 14,
+          "fg": "rgb(84, 87, 80)",
+          "bg": "rgb(247, 247, 245)"
+        },
+        {
+          "text": "Art der Ablage",
+          "ratio": 6.85,
+          "min": 4.5,
+          "size": 14,
+          "fg": "rgb(84, 87, 80)",
+          "bg": "rgb(247, 247, 245)"
+        }
+      ]
+    },
+    "warn": [
+      {
+        "text": "Mit „Weiter“ verbindet sich Keplura pr",
+        "ratio": 7.35,
+        "min": 4.5,
+        "size": 14,
+        "fg": "rgb(84, 87, 80)",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "text": "Name",
+        "ratio": 16.17,
+        "min": 4.5,
+        "size": 13,
+        "fg": "rgb(32, 33, 31)",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "text": "Ordner",
+        "ratio": 16.17,
+        "min": 4.5,
+        "size": 13,
+        "fg": "rgb(32, 33, 31)",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "text": "Ziel-Wissensbasis",
+        "ratio": 16.17,
+        "min": 4.5,
+        "size": 13,
+        "fg": "rgb(32, 33, 31)",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "text": "Messprobe",
+        "ratio": 16.17,
+        "min": 4.5,
+        "size": 14,
+        "fg": "rgb(32, 33, 31)",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ]
+  },
+  "contrast-chat-dark": {
+    "checked": 157,
+    "failures": [],
+    "lowest": [
+      {
+        "text": "gestoppt",
+        "ratio": 6.51,
+        "min": 4.5,
+        "size": 12,
+        "fg": "rgb(192, 197, 188)",
+        "bg": "rgb(38, 58, 90)"
+      },
+      {
+        "text": "gestoppt",
+        "ratio": 6.51,
+        "min": 4.5,
+        "size": 12,
+        "fg": "rgb(192, 197, 188)",
+        "bg": "rgb(38, 58, 90)"
+      },
+      {
+        "text": "14:00",
+        "ratio": 6.85,
+        "min": 4.5,
+        "size": 12,
+        "fg": "rgb(162, 170, 156)",
+        "bg": "rgb(30, 32, 30)"
+      },
+      {
+        "text": "Quellen",
+        "ratio": 6.85,
+        "min": 4.5,
+        "size": 12,
+        "fg": "rgb(162, 170, 156)",
+        "bg": "rgb(30, 32, 30)"
+      },
+      {
+        "text": "14:00",
+        "ratio": 6.85,
+        "min": 4.5,
+        "size": 12,
+        "fg": "rgb(162, 170, 156)",
+        "bg": "rgb(30, 32, 30)"
+      }
+    ]
+  },
+  "contrast-source-dark": {
+    "checked": 12,
+    "failures": [],
+    "lowest": [
+      {
+        "text": "Dokumentvorschau · Textansicht",
+        "ratio": 6.85,
+        "min": 4.5,
+        "size": 12,
+        "fg": "rgb(162, 170, 156)",
+        "bg": "rgb(30, 32, 30)"
+      },
+      {
+        "text": "Original herunterladen",
+        "ratio": 8.99,
+        "min": 4.5,
+        "size": 12,
+        "fg": "rgb(166, 191, 255)",
+        "bg": "rgb(30, 32, 30)"
+      },
+      {
+        "text": "Zitierte Textstelle",
+        "ratio": 8.99,
+        "min": 4.5,
+        "size": 13,
+        "fg": "rgb(166, 191, 255)",
+        "bg": "rgb(30, 32, 30)"
+      },
+      {
+        "text": "## Frist\nDie Inspektion des Pilotgeräts ",
+        "ratio": 10.09,
+        "min": 4.5,
+        "size": 16,
+        "fg": "rgb(240, 241, 237)",
+        "bg": "rgb(38, 58, 90)"
+      },
+      {
+        "text": "Pilot-Handbuch.md",
+        "ratio": 14.45,
+        "min": 4.5,
+        "size": 16,
+        "fg": "rgb(240, 241, 237)",
+        "bg": "rgb(30, 32, 30)"
+      }
+    ]
+  },
+  "contrast-wizard-dark": {
+    "step1": {
+      "checked": 16,
+      "failures": [],
+      "lowest": [
+        {
+          "text": "1",
+          "ratio": 6.28,
+          "min": 4.5,
+          "size": 14,
+          "fg": "rgb(166, 191, 255)",
+          "bg": "rgb(38, 58, 90)"
+        },
+        {
+          "text": "Art der Ablage",
+          "ratio": 6.28,
+          "min": 4.5,
+          "size": 14,
+          "fg": "rgb(166, 191, 255)",
+          "bg": "rgb(38, 58, 90)"
+        },
+        {
+          "text": "Weiter",
+          "ratio": 8.32,
+          "min": 4.5,
+          "size": 14,
+          "fg": "rgb(23, 37, 68)",
+          "bg": "rgb(166, 191, 255)"
+        },
+        {
+          "text": "Schritt 1 von 6",
+          "ratio": 8.48,
+          "min": 4.5,
+          "size": 13,
+          "fg": "rgb(192, 197, 188)",
+          "bg": "rgb(37, 40, 37)"
+        },
+        {
+          "text": "Die Verbindung wird beim Test gespeicher",
+          "ratio": 8.48,
+          "min": 4.5,
+          "size": 13,
+          "fg": "rgb(192, 197, 188)",
+          "bg": "rgb(37, 40, 37)"
+        }
+      ]
+    },
+    "step2": {
+      "checked": 16,
+      "failures": [],
+      "lowest": [
+        {
+          "text": "2",
+          "ratio": 6.28,
+          "min": 4.5,
+          "size": 14,
+          "fg": "rgb(166, 191, 255)",
+          "bg": "rgb(38, 58, 90)"
+        },
+        {
+          "text": "Verbindung",
+          "ratio": 6.28,
+          "min": 4.5,
+          "size": 14,
+          "fg": "rgb(166, 191, 255)",
+          "bg": "rgb(38, 58, 90)"
+        },
+        {
+          "text": "Schritt 2 von 6",
+          "ratio": 8.48,
+          "min": 4.5,
+          "size": 13,
+          "fg": "rgb(192, 197, 188)",
+          "bg": "rgb(37, 40, 37)"
+        },
+        {
+          "text": "Mit „Weiter“ verbindet sich Keplura pr",
+          "ratio": 8.48,
+          "min": 4.5,
+          "size": 14,
+          "fg": "rgb(192, 197, 188)",
+          "bg": "rgb(37, 40, 37)"
+        },
+        {
+          "text": "Die Verbindung wird beim Test gespeicher",
+          "ratio": 8.48,
+          "min": 4.5,
+          "size": 13,
+          "fg": "rgb(192, 197, 188)",
+          "bg": "rgb(37, 40, 37)"
+        }
+      ]
+    },
+    "warn": [
+      {
+        "text": "Mit „Weiter“ verbindet sich Keplura pr",
+        "ratio": 8.48,
+        "min": 4.5,
+        "size": 14,
+        "fg": "rgb(192, 197, 188)",
+        "bg": "rgb(37, 40, 37)"
+      },
+      {
+        "text": "Name",
+        "ratio": 13.14,
+        "min": 4.5,
+        "size": 13,
+        "fg": "rgb(240, 241, 237)",
+        "bg": "rgb(37, 40, 37)"
+      },
+      {
+        "text": "Ordner",
+        "ratio": 13.14,
+        "min": 4.5,
+        "size": 13,
+        "fg": "rgb(240, 241, 237)",
+        "bg": "rgb(37, 40, 37)"
+      },
+      {
+        "text": "Ziel-Wissensbasis",
+        "ratio": 13.14,
+        "min": 4.5,
+        "size": 13,
+        "fg": "rgb(240, 241, 237)",
+        "bg": "rgb(37, 40, 37)"
+      },
+      {
+        "text": "Messprobe",
+        "ratio": 13.14,
+        "min": 4.5,
+        "size": 14,
+        "fg": "rgb(240, 241, 237)",
+        "bg": "rgb(37, 40, 37)"
+      }
+    ]
+  },
+  "targets1440": [],
+  "targets390": [],
+  "keyboard": {
+    "seen": [
+      "sidebar-chats-toggle",
+      "chat-conv-item",
+      "chat-conv-delete",
+      "Alle 15 anzeigen",
+      "sidebar-nav-wissen",
+      "sidebar-nav-team",
+      "sidebar-nav-admin",
+      "sidebar-space-5",
+      "sidebar-kb-13",
+      "sidebar-kb-14",
+      "sidebar-reload",
+      "chat-new-plain",
+      "chat-new-rag",
+      "chat-copy-user",
+      "chat-code-copy",
+      "chat-msg-copy",
+      "chat-msg-export",
+      "chat-feedback-up",
+      "chat-feedback-down",
+      "chat-citation",
+      "chat-msg-retry",
+      "chat-kb-select",
+      "chat-prompt"
+    ],
+    "missing": []
+  }
+}

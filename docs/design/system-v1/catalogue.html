@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="de" data-ic-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Keplura · Designsystem 1.0</title>
+<style>
+/* Generiert aus tokens.json; nicht separat bearbeiten. */
+:root {
+  --ic-font: "Inter Variable", "Inter", "Segoe UI", system-ui, sans-serif;
+  --ic-font-mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+  --ic-space-0: 0px;
+  --ic-space-half: 2px;
+  --ic-space-1: 4px;
+  --ic-space-2: 8px;
+  --ic-space-3: 12px;
+  --ic-space-4: 16px;
+  --ic-space-5: 20px;
+  --ic-space-6: 24px;
+  --ic-space-8: 32px;
+  --ic-space-10: 40px;
+  --ic-space-12: 48px;
+  --ic-space-16: 64px;
+  --ic-text-xs: 0.75rem;
+  --ic-text-sm: 0.8125rem;
+  --ic-text-md: 0.875rem;
+  --ic-text-lg: 1rem;
+  --ic-text-xl: 1.25rem;
+  --ic-text-2xl: 1.5rem;
+  --ic-line-meta: 1.125rem;
+  --ic-line-ui: 1.25rem;
+  --ic-line-body: 1.625rem;
+  --ic-line-heading: 2rem;
+  --ic-radius-small: 4px;
+  --ic-radius-button: 6px;
+  --ic-radius-input: 6px;
+  --ic-radius-panel: 8px;
+  --ic-radius-dialog: 12px;
+  --ic-radius-avatar: 999px;
+  --ic-control-compact: 32px;
+  --ic-control-default: 40px;
+  --ic-control-touch: 44px;
+  --ic-icon-small: 16px;
+  --ic-icon-default: 20px;
+  --ic-sidebar-width: 248px;
+  --ic-knowledge-rail: 224px;
+  --ic-admin-rail: 208px;
+  --ic-page-max: 1280px;
+  --ic-reading-max: 720px;
+  --ic-form-max: 640px;
+  --ic-dialog-sm: 440px;
+  --ic-dialog-md: 640px;
+  --ic-dialog-lg: 880px;
+  --ic-dialog-wizard: 1040px;
+  --ic-source-width: 400px;
+  --ic-header-min: 56px;
+  --ic-motion-fast: 120ms;
+  --ic-motion-base: 160ms;
+  --ic-motion-panel: 200ms;
+  --ic-motion-ease: cubic-bezier(0.2, 0, 0, 1);
+  --ic-focus-width: 2px;
+  --ic-focus-offset: 2px;
+  --ic-z-sticky: 10;
+  --ic-z-menu: 30;
+  --ic-z-panel: 40;
+  --ic-z-scrim: 50;
+  --ic-z-dialog: 60;
+  --ic-z-feedback: 80;
+  --ic-canvas: #F7F7F5;
+  --ic-content: #FFFFFF;
+  --ic-surface: #FFFFFF;
+  --ic-sidebar: #F3F3F0;
+  --ic-surface-subtle: #F1F1EE;
+  --ic-text: #20211F;
+  --ic-text-2: #545750;
+  --ic-text-3: #666A62;
+  --ic-separator: #DDDFD9;
+  --ic-separator-faint: #E8E9E4;
+  --ic-input-edge: #7B8076;
+  --ic-accent: #315CB5;
+  --ic-accent-hover: #254A97;
+  --ic-on-accent: #FFFFFF;
+  --ic-hover-tint: #EAEAE6;
+  --ic-selection: #E7EDF8;
+  --ic-focus-color: #315CB5;
+  --ic-disabled-bg: #F1F1EE;
+  --ic-disabled-text: #666A62;
+  --ic-status-ok: #24633B;
+  --ic-status-ok-bg: #EAF4EC;
+  --ic-status-wait: #7A5100;
+  --ic-status-wait-bg: #FFF2D5;
+  --ic-status-error: #A52D2A;
+  --ic-status-error-bg: #FBEDEC;
+  --ic-scrim: rgba(20, 24, 20, 0.32);
+  --ic-shadow-float: 0 4px 16px rgba(20, 24, 20, 0.12);
+  --ic-shadow-panel: 0 16px 48px rgba(20, 24, 20, 0.18);
+  --ic-primary: var(--ic-accent);
+  --ic-on-primary: var(--ic-on-accent);
+  --ic-primary-hover: var(--ic-accent-hover);
+  --ic-hover-ink: var(--ic-accent-hover);
+  --ic-radius-pill: var(--ic-radius-small);
+  --ic-shadow-hairline: 0 0 0 1px var(--ic-separator);
+  --ic-shadow-raised: none;
+  --ic-focus-ring: 0 0 0 2px var(--ic-content), 0 0 0 4px var(--ic-focus-color);
+  --ic-transition: 160ms cubic-bezier(0.2, 0, 0, 1);
+  --ic-danger: var(--ic-status-error);
+  color-scheme: light;
+}
+html[data-ic-theme="dark"] {
+  --ic-canvas: #181A18;
+  --ic-content: #1E201E;
+  --ic-surface: #252825;
+  --ic-sidebar: #181A18;
+  --ic-surface-subtle: #2B2E2A;
+  --ic-text: #F0F1ED;
+  --ic-text-2: #C0C5BC;
+  --ic-text-3: #A2AA9C;
+  --ic-separator: #3B4238;
+  --ic-separator-faint: #30362E;
+  --ic-input-edge: #838D7D;
+  --ic-accent: #A6BFFF;
+  --ic-accent-hover: #BED0FF;
+  --ic-on-accent: #172544;
+  --ic-hover-tint: #30352F;
+  --ic-selection: #263A5A;
+  --ic-focus-color: #A6BFFF;
+  --ic-disabled-bg: #2B2E2A;
+  --ic-disabled-text: #A2AA9C;
+  --ic-status-ok: #99D4A8;
+  --ic-status-ok-bg: #223B2A;
+  --ic-status-wait: #F1CB80;
+  --ic-status-wait-bg: #3D321F;
+  --ic-status-error: #FFB3AA;
+  --ic-status-error-bg: #422825;
+  --ic-scrim: rgba(0, 0, 0, 0.64);
+  --ic-shadow-float: 0 4px 16px rgba(0, 0, 0, 0.32);
+  --ic-shadow-panel: 0 16px 48px rgba(0, 0, 0, 0.48);
+  color-scheme: dark;
+}
+
+@font-face{font-family:'Inter Variable';font-style:normal;font-weight:100 900;font-display:swap;src:url('/inter.woff2') format('woff2')}
+*{box-sizing:border-box}html{font-size:16px}body{margin:0;background:var(--ic-canvas);color:var(--ic-text);font:400 var(--ic-text-md)/var(--ic-line-ui) var(--ic-font)}button,input,select,textarea{font:inherit;color:inherit}a{color:var(--ic-accent);text-underline-offset:3px}button{cursor:pointer}button:disabled{cursor:default}h1,h2,h3,p{margin:0}h1{font-size:var(--ic-text-2xl);line-height:2rem;font-weight:600}h2{font-size:var(--ic-text-xl);line-height:1.75rem;font-weight:600}h3{font-size:var(--ic-text-lg);line-height:1.5rem;font-weight:600}code{font:400 var(--ic-text-sm)/var(--ic-line-ui) var(--ic-font-mono)}small{font-size:var(--ic-text-xs);line-height:var(--ic-line-meta);color:var(--ic-text-3)}:focus-visible{outline:var(--ic-focus-width) solid var(--ic-focus-color);outline-offset:var(--ic-focus-offset)}
+.top{background:var(--ic-content);border-bottom:1px solid var(--ic-separator)}.top-inner{max-width:1184px;min-height:72px;padding:16px 32px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.brand{display:flex;align-items:center;gap:12px;font-weight:600;font-size:16px}.brand svg{width:20px;height:20px}.brand span{font-size:14px;font-weight:400;color:var(--ic-text-2);border-left:1px solid var(--ic-separator);padding-left:12px}.theme{display:flex;align-items:center;gap:12px}main{max-width:1184px;padding:40px 32px 64px;margin:auto}.intro{display:flex;align-items:flex-start;gap:32px;justify-content:space-between;margin-bottom:40px}.intro p{margin-top:8px;color:var(--ic-text-2);max-width:680px;line-height:24px}.eyebrow{font-size:13px;font-weight:500;color:var(--ic-accent);margin-bottom:8px}.grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:32px 48px}.section{min-width:0;border-top:1px solid var(--ic-separator);padding-top:24px}.section-head{display:flex;align-items:center;gap:12px;margin-bottom:20px}.section-head small{font-variant-numeric:tabular-nums}.section h3{margin-bottom:12px}.muted{color:var(--ic-text-2)}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.stack{display:grid;gap:20px}.sample-copy{font-size:var(--ic-text-lg);line-height:var(--ic-line-body);margin-top:12px;max-width:65ch}.type-sample{margin-bottom:16px}.type-sample .sample-title{font-size:var(--ic-text-2xl);line-height:2rem}.swatches{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px 12px}.swatch{min-width:0}.swatch>span{display:block;height:48px;border:1px solid var(--ic-separator);border-radius:var(--ic-radius-small);margin-bottom:8px}.swatch code{font-size:12px;overflow-wrap:anywhere}.swatch small{display:block}.btn{min-height:var(--ic-control-default);display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:8px 12px;border:1px solid var(--ic-input-edge);border-radius:var(--ic-radius-button);background:var(--ic-surface);font-size:var(--ic-text-md);line-height:var(--ic-line-ui);font-weight:500;transition:background var(--ic-motion-fast) var(--ic-motion-ease)}.btn:hover:not(:disabled){background:var(--ic-hover-tint)}.btn:active:not(:disabled){background:var(--ic-selection)}.btn.primary{background:var(--ic-accent);color:var(--ic-on-accent);border-color:var(--ic-accent)}.btn.primary:hover:not(:disabled),.btn.primary:active:not(:disabled){background:var(--ic-accent-hover);border-color:var(--ic-accent-hover)}.btn.ghost{background:transparent;border-color:transparent;color:var(--ic-text-2)}.btn.ghost:hover:not(:disabled){background:var(--ic-hover-tint)}.btn.danger{background:var(--ic-status-error);color:var(--ic-on-accent);border-color:var(--ic-status-error)}.btn:disabled{background:var(--ic-disabled-bg);color:var(--ic-disabled-text);border-color:var(--ic-separator)}.btn.compact{min-height:var(--ic-control-compact);padding:4px 8px;font-size:13px}.btn.icon{width:40px;padding:8px}.btn.focus-demo{outline:2px solid var(--ic-focus-color);outline-offset:2px}.chip{display:inline-flex;gap:8px;align-items:center;border-radius:6px;padding:4px 8px;background:var(--ic-surface-subtle);font-size:13px}.field{display:grid;gap:8px;min-width:0}.field label{font-size:13px;font-weight:500}.field input,.field select,.field textarea{width:100%;min-width:0;min-height:40px;padding:8px 12px;background:var(--ic-surface);border:1px solid var(--ic-input-edge);border-radius:6px}.field input::placeholder{color:var(--ic-text-3)}.field .hint{font-size:13px;color:var(--ic-text-2);line-height:20px}.field input[aria-invalid=true]{border-color:var(--ic-status-error)}.field .error{color:var(--ic-status-error);display:flex;gap:8px;align-items:flex-start;font-size:14px}.field .error svg{flex:none;margin-top:2px}.choice{display:flex;align-items:center;gap:8px;min-height:32px;cursor:pointer}.choice input{width:16px;height:16px;accent-color:var(--ic-accent);margin:0}.status{display:inline-flex;gap:6px;align-items:center;border-radius:4px;padding:2px 8px;font-size:13px;font-weight:500;line-height:20px}.status.ok{color:var(--ic-status-ok);background:var(--ic-status-ok-bg)}.status.wait{color:var(--ic-status-wait);background:var(--ic-status-wait-bg)}.status.bad{color:var(--ic-status-error);background:var(--ic-status-error-bg)}.status.neutral{color:var(--ic-text-2);background:var(--ic-surface-subtle)}.table-wrap{overflow:auto;max-width:100%}table{border-collapse:collapse;width:100%;font-size:14px}caption{text-align:left;font-size:13px;color:var(--ic-text-2);padding:0 0 12px}th{text-align:left;font-size:13px;font-weight:500;color:var(--ic-text-2);padding:8px 8px;border-bottom:1px solid var(--ic-separator)}td{padding:12px 8px;border-bottom:1px solid var(--ic-separator);vertical-align:middle}td:first-child{padding-left:0}td small{display:block}.data-name{font-weight:500}.span-2{grid-column:1/-1}.feedback{padding:16px;background:var(--ic-status-error-bg);border-left:3px solid var(--ic-status-error);border-radius:0 6px 6px 0}.feedback p{margin:4px 0 12px;color:var(--ic-text-2)}.empty{background:var(--ic-content);padding:24px;border:1px solid var(--ic-separator);border-radius:8px}.empty p{margin:8px 0 16px;color:var(--ic-text-2)}.spacing{display:flex;align-items:end;gap:16px;flex-wrap:wrap}.spacing>div{font-size:12px;color:var(--ic-text-2)}.spacing i{display:block;width:24px;background:var(--ic-selection);border:1px solid var(--ic-accent);margin-bottom:8px}.foot{margin-top:40px;padding-top:24px;border-top:1px solid var(--ic-separator);display:flex;gap:16px;justify-content:space-between;flex-wrap:wrap;color:var(--ic-text-2);font-size:13px}.demo-status{min-height:20px;margin-top:12px;color:var(--ic-accent);font-size:13px}dialog{width:min(var(--ic-dialog-sm),calc(100vw - 32px));max-height:calc(100dvh - 32px);padding:24px;border:1px solid var(--ic-separator);border-radius:var(--ic-radius-dialog);background:var(--ic-surface);color:var(--ic-text);box-shadow:var(--ic-shadow-panel);overflow:auto}dialog::backdrop{background:var(--ic-scrim)}.dialog-head{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:20px}.dialog-head h2{font-size:20px}.dialog-head button{flex:none}.dialog-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:24px;flex-wrap:wrap}.dialog-note{margin:0 0 20px;color:var(--ic-text-2)}
+@media(max-width:767px){.top-inner{padding:12px 16px}.brand span{display:none}main{padding:24px 16px 40px}.intro{display:block;margin-bottom:32px}.intro>.status{margin-top:16px}.grid{grid-template-columns:minmax(0,1fr);gap:32px}.span-2{grid-column:auto}.theme>small{display:none}.field input,.field select,.field textarea{font-size:16px;min-height:44px}.btn,.btn.compact,.btn.icon{min-height:44px}.btn.icon{width:44px}.swatches{grid-template-columns:repeat(4,minmax(0,1fr))}.section-head{margin-bottom:16px}.row{row-gap:12px}.choice{min-height:44px}.dialog-actions .btn{flex:1}.foot{display:grid}.swatch code{font-size:12px}}
+@media(any-pointer:coarse){.btn,.btn.compact,.btn.icon,.field input,.field select,.choice{min-height:44px}.btn.icon{width:44px}.field input,.field select{font-size:16px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+@media(forced-colors:active){:focus-visible,.btn.focus-demo{outline:2px solid Highlight}.btn,.status,.field input{border:1px solid ButtonText}}
+</style></head><body>
+<header class="top"><div class="top-inner"><div class="brand"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h7a3 3 0 0 1 3 3v13a3 3 0 0 0-3-3H4zm16 0h-3a3 3 0 0 0-3 3v13a3 3 0 0 1 3-3h3z"/></svg> Keplura <span>Gestaltungssystem</span></div><div class="theme"><small>Referenz · Version 1.0</small><button class="btn compact" id="theme" aria-pressed="false">Dunkel anzeigen</button></div></div></header>
+<main><div class="intro"><div><div class="eyebrow">Phase 3 · gemeinsame Grundlage</div><h1>Klarheit bis ins Detail.</h1><p>Eine ruhige Sprache für Antworten, Daten und Verwaltung. Dieser Katalog zeigt die definierten Bausteine; die Anwendung wird in Phase 4 daran validiert.</p></div><span class="status neutral">Designreferenz</span></div>
+<div class="grid">
+<section class="section"><div class="section-head"><small>01</small><h2>Schrift &amp; Hierarchie</h2></div><div class="type-sample"><h3 class="sample-title">Wissen, das im Alltag weiterhilft.</h3><p class="sample-copy">Gut lesbare Antworten geben Orientierung. Die Quelle bleibt nah am Inhalt und lässt sich an der zitierten Stelle öffnen.</p></div><p class="muted">Personalhandbuch · Arbeitsbereich Verwaltung</p><small>Zuletzt aktualisiert heute, 09:42 Uhr · Beispiel</small></section>
+<section class="section"><div class="section-head"><small>02</small><h2>Flächen &amp; Farbe</h2></div><div class="swatches"><div class="swatch"><span style="background:var(--ic-canvas)"></span><code>canvas</code><small data-color="canvas">#F7F7F5</small></div><div class="swatch"><span style="background:var(--ic-content)"></span><code>content</code><small data-color="content">#FFFFFF</small></div><div class="swatch"><span style="background:var(--ic-sidebar)"></span><code>sidebar</code><small data-color="sidebar">#F3F3F0</small></div><div class="swatch"><span style="background:var(--ic-text)"></span><code>text</code><small data-color="text">#20211F</small></div><div class="swatch"><span style="background:var(--ic-text-2)"></span><code>text-2</code><small data-color="text-2">#545750</small></div><div class="swatch"><span style="background:var(--ic-accent)"></span><code>accent</code><small data-color="accent">#315CB5</small></div><div class="swatch"><span style="background:var(--ic-selection)"></span><code>selection</code><small data-color="selection">#E7EDF8</small></div><div class="swatch"><span style="background:var(--ic-input-edge)"></span><code>input-edge</code><small data-color="input-edge">#7B8076</small></div></div></section>
+<section class="section"><div class="section-head"><small>03</small><h2>Aktionen &amp; Zustände</h2></div><div class="stack"><div class="row"><button class="btn primary" data-demo="Aktion demonstriert. Es wurden keine Daten gespeichert."><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Wissensbasis anlegen</button><button class="btn" data-demo="Verbindungstest als Muster. Es gibt keine Serveranbindung.">Verbindung testen</button></div><div class="row"><button class="btn ghost" data-demo="Zusatzaktion demonstriert.">Abbrechen</button><button class="btn focus-demo" data-demo="Fokuszustand demonstriert.">Mit Fokus</button><button class="btn" disabled>Nicht verfügbar</button><button class="btn" aria-disabled="true" aria-busy="true">Wird gespeichert …</button></div><div class="row"><span class="status ok"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg> Durchsuchbar</span><span class="status wait"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 10 18H2zM12 9v5m0 3v.1"/></svg> Wird verarbeitet</span><span class="status bad"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 10 18H2zM12 9v5m0 3v.1"/></svg> Fehlgeschlagen</span></div></div><p class="demo-status" id="demo-status" role="status"></p></section>
+<section class="section"><div class="section-head"><small>04</small><h2>Felder &amp; Rückmeldung</h2></div><div class="stack"><div class="field"><label for="basis">Wissensbasis</label><input id="basis" value="Personalhandbuch" aria-describedby="basis-hint"><p class="hint" id="basis-hint">Ein Name, den dein Team leicht wiedererkennt.</p></div><div class="field"><label for="address">Serveradresse</label><input id="address" value="https://" aria-invalid="true" aria-describedby="address-error"><p class="error" id="address-error"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 10 18H2zM12 9v5m0 3v.1"/></svg> Bitte gib eine vollständige Serveradresse ein.</p></div><label class="choice"><input type="checkbox" checked> Nur für diesen Arbeitsbereich freigeben</label></div></section>
+<section class="section span-2"><div class="section-head"><small>05</small><h2>Daten mit klarer Ordnung</h2></div><div class="table-wrap" tabindex="0" role="region" aria-label="Beispiel einer Dokumenttabelle, bei Bedarf horizontal scrollbar"><table><caption>Dokumente · illustrative Beispieldaten</caption><thead><tr><th scope="col">Dokument</th><th scope="col">Status</th><th scope="col">Größe</th><th scope="col">Aktion</th></tr></thead><tbody><tr><td><span class="data-name">Personalhandbuch 2026.pdf</span><small>Wissensbasis Personalhandbuch</small></td><td><span class="status ok"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg> Durchsuchbar</span></td><td>2,4 MB</td><td><button class="btn compact ghost" data-demo="Dokumentaktion demonstriert. Keine Datei wird heruntergeladen.">Herunterladen</button></td></tr><tr><td><span class="data-name">Richtlinie zur Reisekostenabrechnung.docx</span><small>Langer deutscher Dateiname</small></td><td><span class="status wait"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 10 18H2zM12 9v5m0 3v.1"/></svg> Wird verarbeitet</span></td><td>184 KB</td><td><span class="muted">Bitte warten</span></td></tr></tbody></table></div></section>
+<section class="section"><div class="section-head"><small>06</small><h2>Leer ist kein Fehler</h2></div><div class="empty"><h3>Hier sind noch keine Dokumente</h3><p>Lade ein Dokument hoch, damit dein Team darin suchen und Fragen dazu stellen kann.</p><button class="btn" data-demo="Upload-Einstieg demonstriert. Kein Dateidialog und keine Serveranbindung."><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Dokument hochladen</button></div><div class="feedback" style="margin-top:20px"><h3>Dokumente konnten nicht geladen werden</h3><p>Prüfe die Verbindung und versuche es erneut.</p><button class="btn compact" data-demo="Wiederholungsaktion demonstriert. Keine Netzwerkanfrage.">Erneut versuchen</button></div></section>
+<section class="section"><div class="section-head"><small>07</small><h2>Formen &amp; Interaktion</h2></div><div class="stack"><div><h3>Eine Aufgabe. Ein klarer Abschluss.</h3><p class="muted" style="margin-bottom:16px">Dialoge erhalten Platz für Inhalt, verständliche Aktionen und sichtbaren Fokus.</p><button class="btn" id="open-dialog">Dialogmuster öffnen <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></button></div><div class="field"><label for="source-type">Datenquelle</label><select id="source-type"><option>Windows-Freigabe (SMB)</option><option>Linux-Verzeichnis</option><option>SharePoint</option></select></div><div><h3>Ein gemeinsames Abstandsraster</h3><div class="spacing"><div><i style="height:4px"></i>4px</div><div><i style="height:8px"></i>8px</div><div><i style="height:12px"></i>12px</div><div><i style="height:16px"></i>16px</div><div><i style="height:24px"></i>24px</div><div><i style="height:32px"></i>32px</div><div><i style="height:48px"></i>48px</div></div></div></div></section>
+</div><footer class="foot"><span>Lokaler Katalog ohne Serveranbindung · keine Produktabnahme</span><span>Inter · klare Hierarchie · zugängliche Kontraste</span></footer></main>
+<dialog id="dialog" aria-labelledby="dialog-title"><form method="dialog" id="demo-form"><div class="dialog-head"><h2 id="dialog-title">Wissensbasis anlegen</h2><button class="btn ghost icon" type="button" id="close-dialog" aria-label="Dialog schließen"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button></div><p class="dialog-note">Isoliertes Dialogmuster. Eingaben werden ausschließlich innerhalb dieser Vorschau verwendet.</p><div class="field"><label for="dialog-name">Name</label><input id="dialog-name" required autocomplete="off" placeholder="Zum Beispiel: Personalhandbuch"></div><div class="dialog-actions"><button class="btn" type="button" id="cancel-dialog">Abbrechen</button><button class="btn primary" type="submit">Anlegen</button></div></form></dialog>
+<script>
+const palettes={"light":{"canvas":"#F7F7F5","content":"#FFFFFF","surface":"#FFFFFF","sidebar":"#F3F3F0","surface-subtle":"#F1F1EE","text":"#20211F","text-2":"#545750","text-3":"#666A62","separator":"#DDDFD9","separator-faint":"#E8E9E4","input-edge":"#7B8076","accent":"#315CB5","accent-hover":"#254A97","on-accent":"#FFFFFF","hover-tint":"#EAEAE6","selection":"#E7EDF8","focus-color":"#315CB5","disabled-bg":"#F1F1EE","disabled-text":"#666A62","status-ok":"#24633B","status-ok-bg":"#EAF4EC","status-wait":"#7A5100","status-wait-bg":"#FFF2D5","status-error":"#A52D2A","status-error-bg":"#FBEDEC","scrim":"rgba(20, 24, 20, 0.32)","shadow-float":"0 4px 16px rgba(20, 24, 20, 0.12)","shadow-panel":"0 16px 48px rgba(20, 24, 20, 0.18)"},"dark":{"canvas":"#181A18","content":"#1E201E","surface":"#252825","sidebar":"#181A18","surface-subtle":"#2B2E2A","text":"#F0F1ED","text-2":"#C0C5BC","text-3":"#A2AA9C","separator":"#3B4238","separator-faint":"#30362E","input-edge":"#838D7D","accent":"#A6BFFF","accent-hover":"#BED0FF","on-accent":"#172544","hover-tint":"#30352F","selection":"#263A5A","focus-color":"#A6BFFF","disabled-bg":"#2B2E2A","disabled-text":"#A2AA9C","status-ok":"#99D4A8","status-ok-bg":"#223B2A","status-wait":"#F1CB80","status-wait-bg":"#3D321F","status-error":"#FFB3AA","status-error-bg":"#422825","scrim":"rgba(0, 0, 0, 0.64)","shadow-float":"0 4px 16px rgba(0, 0, 0, 0.32)","shadow-panel":"0 16px 48px rgba(0, 0, 0, 0.48)"}};
+const root=document.documentElement, theme=document.getElementById('theme'), status=document.getElementById('demo-status');
+theme.addEventListener('click',()=>{const dark=root.dataset.icTheme!=='dark';root.dataset.icTheme=dark?'dark':'light';theme.textContent=dark?'Hell anzeigen':'Dunkel anzeigen';theme.setAttribute('aria-pressed',String(dark));document.querySelectorAll('[data-color]').forEach(e=>e.textContent=palettes[dark?'dark':'light'][e.dataset.color]);});
+document.querySelectorAll('[data-demo]').forEach(b=>b.addEventListener('click',()=>{status.textContent=b.dataset.demo;}));
+const dialog=document.getElementById('dialog'), opener=document.getElementById('open-dialog'), field=document.getElementById('dialog-name');
+opener.addEventListener('click',()=>{dialog.showModal();field.focus();});
+for(const id of ['close-dialog','cancel-dialog'])document.getElementById(id).addEventListener('click',()=>dialog.close());
+dialog.addEventListener('close',()=>{field.value='';opener.focus();});
+document.getElementById('demo-form').addEventListener('submit',()=>{status.textContent='Dialogmuster abgeschlossen. Es wurden keine Produktdaten angelegt.';});
+</script></body></html>

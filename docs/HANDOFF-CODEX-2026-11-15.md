@@ -1,0 +1,86 @@
+# Übergabe — lokale Abnahme am 15.11.2026
+
+Branch: `codex/chat-productivity`, Basis `main@43302d3`. Der Auftrag bleibt
+Abnahme und Reparatur der Claude-Vorarbeit; keine neue Produkt-Roadmap beginnen.
+Kein Merge nach main, kein Force-Push, kein Release und kein Deployment.
+Git-Identität: Marcello Conocchia. Bestehende Daten erhalten.
+
+## Aktueller Prüfstand
+
+Vollständiger Lauf mit E2E auf `0966a72`: 449 Server-Tests in 66 Klassen,
+Frontend, Linux-Tauri, Wissen-Browser und Darstellung-Browser bestanden.
+Native Paketierung bestanden. Native Darstellungsprüfung zunächst rot wegen
+veralteter Oberfläche im Test. Das war keine vollständige grüne CI.
+Nach Anpassung bestehen alle acht E2E-Suiten in gezielten Wiederholungen.
+Der verbindliche Gesamtlauf auf dem endgültigen PR-Head wird nach diesem
+Dokumentationscommit ausgeführt. Sein genauer Commit, Exitstatus, Matrix
+und Protokoll werden im [Draft-PR #53](https://github.com/marcello-conocchia/IntraCore/pull/53)
+festgehalten, ohne den geprüften Commit danach zu verändern. Maßgeblich ist
+dieser SHA-bezogene Nachweis, nicht die Summe älterer Teilläufe.
+
+## Behobene Probleme
+
+- Datenquellen: lokale Rechte-/Pfadgrenzen, defekte SIDs, AD-Referrals,
+  unbekannte SMB-Rechte und doppelte Sperrzeilen abgesichert.
+- Globale Suche: fehlendes Leerzeichen im SQL verursacht keine 500 mehr.
+- Anhänge: generierte IDs und DB-Zeilensperre verhindern fremde IDs und
+  Überschreiten der Fünf-Dateien-Grenze bei parallelen Uploads.
+- Leere Wissensbasis blockiert vorhandenen Datei-, Web- oder Werkzeugkontext
+  nicht mehr. Große Anhänge und RAG als getrennte Nachrichten geprüft.
+- PDF: lange ungetrennte Wörter und Tabellenzellen umbrechen ohne Überlauf.
+- Websuche: wiederholtes Speichern ohne Schlüssel funktioniert; HTTP-Antworten
+  werden schon während des Lesens in Größe und Dauer begrenzt.
+- MCP: Streamable HTTP einschließlich JSON/SSE, Session-/Versionsheader,
+  Antwort-IDs, Aufräumen und generische Fehler abgesichert. Interne Ziele
+  brauchen die bestehende Betrieb-Freigabeliste. Werkzeugfreigaben verfallen
+  bei Ziel-/Tokenwechsel; paralleles Refresh stellt entzogene Rechte nicht
+  wieder her. Journal wird vor Ausführung geschrieben, ohne Journal kein
+  Aufruf. Werkzeugnamen bleiben trotz Normalisieren/Kürzen unterscheidbar.
+- Tool-Calling: echter TinyLlama-Rückfall ohne Werkzeugaufruf bestanden.
+  Andere Gateway-Fehler bleiben sichtbar; nach ausgeführtem Werkzeug wird
+  ein fehlgeschlagener Turn nicht erneut ausgeführt.
+- E2E: frische H2-Schemata mit Flyway; Konto-Menüs, Wissensauswahl in der
+  Eingabe, Dokumentvorschau und Ersteinrichtung berücksichtigt. Native
+  Darstellung über tatsächliche Fensterfarben geprüft, F11/Escape über
+  abgeschlossene Tauri-Aufrufe. Xvfb ohne Fenstermanager prüft keine echte
+  Größenänderung. Lokale IPv4-Bindung vermeidet IPv6-Startfehler der Harnesses.
+
+## Laufzeitnachweise
+
+Details und Einzelstatus stehen in `docs/tasks/DS-01-datasources.md`,
+`docs/tasks/CHAT-01-productivity.md` und `docs/tasks/MCP-01-mcp-server.md`.
+Evidence liegt unter `ci/evidence/DS-01-20261114/`, `DS-01-20261115/`,
+`CHAT-01-20261115/` und `MCP-01-20261115/`.
+`ci/evidence/E2E-20261115/` enthält die gezielten Wiederholungen;
+`ci/evidence/20261115-090456/` dokumentiert den anfänglich roten Gesamtlauf.
+Zusätzlicher DS-Browserlauf: importierte Quelle mit echter zitierter Antwort,
+Bewertung hoch/runter/zurücknehmen und sichtbare Qualitätsstatistik bestanden.
+`TikaDocumentTextExtractor.extract(String, Path)` wurde über echte PDF-/Scan-
+Uploads ausgeführt; seine null-Dokument-ID wird nur beim Fehlerprotokollieren
+verwendet, nicht dereferenziert.
+
+Echte isolierte Dienste: PostgreSQL/pgvector, OpenLDAP, Samba AD über LDAPS
+mit Hostnamenprüfung, SMB, SearXNG mit JSON, offizieller MCP-Beispielserver,
+Ollama qwen2.5:7b und TinyLlama. Keine Produktionswerkzeuge aufgerufen.
+Die ursprüngliche Pilotinstanz auf Port 18080 wurde nicht aktualisiert.
+Testdateien, Testkonten und QA-Volumes erhalten; Zugangsdaten bleiben in
+ignorierten lokalen Hilfsdateien und gehören nie in Git/Protokolle.
+
+## Offen und nicht als bestanden melden
+
+- Verbindliche vollständige CI: aktuellen SHA-bezogenen Nachweis im Draft-PR
+  kontrollieren; ältere Läufe ersetzen ihn nicht. Die finale Evidence bleibt
+  zusätzlich lokal unter `ci/evidence/<Zeitstempel>/` erhalten.
+- SharePoint/Entra: kein Microsoft-365-Testtenant vorhanden. Sites.Selected,
+  echte Gruppen-/Besucherrechte und Entra-Login sind nicht live abgenommen.
+  Entra-Gruppen werden bisher beim Login aktualisiert, ohne Graph-Auflösung
+  von Gruppenüberläufen.
+- Keine echte DFS-Topologie und kein NFS-Server vorhanden; Samba-SMB und
+  lokale POSIX-Dateien sind die tatsächlich geprüften Systeme.
+- Word-Export strukturell geprüft, nicht visuell in Microsoft Word.
+- Unabhängige Reviewer-/Security-/QA-Freigaben fehlen. Keine Merge-Freigabe.
+  Windows/macOS sind separate Release-Gates.
+
+Erst offene Prüfungen abschließen bzw. fehlende Infrastruktur ausdrücklich
+als nicht prüfbar dokumentieren. Danach unabhängige Reviews auf dem finalen
+Commit einholen; keine eigene Freigabe erfinden und nicht nach main mergen.

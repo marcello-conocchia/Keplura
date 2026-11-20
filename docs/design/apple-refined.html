@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keplura — Soft Structure · Apple Refined (final)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F5F7; --content:#FBFBFD; --white:#FFFFFF;
+    --ink:#1D1D1F; --ink2:#3A3A3C; --body:#6E6E73; --mut:#8E8E93;
+    --sep:rgba(0,0,0,.06); --sep2:rgba(0,0,0,.035);
+    --blue:#0071E3; --blue-act:#0060C0; --sel:rgba(0,0,0,.045); --tint:#EAF3FC; --tink:#1A66B8;
+    --ok:#34A853; --wait:#B26A00; --warn:#D97706;
+    --sh:0 1px 2px rgba(0,0,0,.04), 0 6px 16px rgba(0,0,0,.05);
+    --sh-lg:0 2px 6px rgba(0,0,0,.05), 0 18px 44px rgba(0,0,0,.09);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+  body{font-family:'Inter','SF Pro Text',system-ui,sans-serif;background:#EDECE9;color:var(--ink);padding:36px 40px}
+  .board-title{font-size:24px;font-weight:600;letter-spacing:-.4px}
+  .board-sub{font-size:13.5px;color:var(--body);margin:4px 0 2px}
+  .principles{font-size:12px;color:var(--mut);margin-bottom:26px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:1500px}
+  .plate{background:#E9E8E5;border-radius:18px;padding:12px}
+  .pt{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:600;color:var(--body);letter-spacing:.4px;text-transform:uppercase;padding:2px 6px 10px}
+  .pt span{font-weight:400;text-transform:none;letter-spacing:0;color:var(--mut)}
+  .win{background:var(--bg);border-radius:12px;overflow:hidden;box-shadow:var(--sh-lg);min-height:432px;display:flex;flex-direction:column}
+  .tbar{height:34px;display:flex;align-items:center;padding:0 14px;gap:7px;background:var(--bg);border-bottom:1px solid var(--sep2);flex:none}
+  .t{width:10px;height:10px;border-radius:50%;background:#E3E2DF;border:1px solid rgba(0,0,0,.05)}
+  .btn{font-size:13px;font-weight:500;color:var(--ink2);background:var(--white);border:1px solid rgba(0,0,0,.07);border-radius:8px;padding:6px 13px;cursor:pointer;box-shadow:0 .5px 1.5px rgba(0,0,0,.05)}
+  .bp{background:var(--blue);color:#fff;border-color:transparent}
+  .input{width:100%;background:var(--white);border:1px solid rgba(0,0,0,.08);border-radius:10px;padding:10px 12px;font:400 13.5px 'Inter';color:var(--ink)}
+  .input:focus{outline:none;border-color:rgba(0,113,227,.55);box-shadow:0 0 0 3.5px rgba(0,113,227,.14)}
+  .fld label{display:block;font-size:12px;font-weight:600;color:var(--body);margin:0 0 5px 2px}
+  .pill{display:inline-block;font-size:10.5px;font-weight:600;padding:2.5px 9px;border-radius:9999px}
+  .p-ok{background:rgba(52,168,83,.1);color:var(--ok)}
+  .p-wait{background:rgba(178,106,0,.1);color:var(--wait)}
+  .ic{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+  .ic-s{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  /* sidebar */
+  .shell{flex:1;display:flex;min-height:0}
+  .side{width:224px;background:var(--bg);border-right:1px solid var(--sep);padding:10px 10px 8px;display:flex;flex-direction:column;flex:none}
+  .swrap{padding:6px 8px 12px;display:flex;align-items:center;justify-content:space-between}
+  .swrap .nm{font-size:13px;font-weight:600;display:flex;gap:8px;align-items:center}
+  .grp{font-size:10.5px;font-weight:600;color:var(--mut);letter-spacing:.5px;text-transform:uppercase;padding:12px 10px 4px}
+  .ni{display:flex;align-items:center;gap:9px;padding:6px 10px;border-radius:7px;font-size:13px;color:var(--ink2);cursor:pointer;margin-bottom:1px}
+  .ni:hover{background:rgba(0,0,0,.03)}
+  .ni.act{background:var(--white);box-shadow:0 .5px 2px rgba(0,0,0,.08);font-weight:500}
+  .ni .ct2{margin-left:auto;font-size:11px;color:var(--mut)}
+  .sfoot{margin-top:auto;padding:9px 8px 2px;border-top:1px solid var(--sep);display:flex;align-items:center;gap:9px}
+  .av{width:26px;height:26px;border-radius:50%;background:#DCE2EA;color:#4A5568;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center}
+  .sfoot .un{font-size:12.5px;font-weight:500}.sfoot .ur{font-size:10.5px;color:var(--mut)}
+  /* content */
+  .main{flex:1;background:var(--content);display:flex;flex-direction:column;min-width:0}
+  .h1{font-size:21px;font-weight:600;letter-spacing:-.3px}
+  .sub{font-size:12.5px;color:var(--mut);margin-top:2px}
+  .top{padding:16px 24px 14px;display:flex;justify-content:space-between;align-items:flex-start}
+  .lst{padding:2px 14px 10px}
+  .li{display:flex;align-items:center;gap:12px;padding:10px 12px;border-bottom:1px solid var(--sep2)}
+  .li:last-child{border-bottom:none}
+  .fic{width:30px;height:30px;border-radius:8px;background:var(--white);border:1px solid var(--sep);display:flex;align-items:center;justify-content:center}
+  .lt{font-size:13px;font-weight:500;color:var(--ink)}
+  .lm{font-size:11.5px;color:var(--mut)}
+  .srow{padding:14px 24px 4px}
+  .schip{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:500;color:var(--tink);background:var(--tint);border-radius:9999px;padding:2px 8px}
+  .cite{padding:12px 24px 0 27px;position:relative}
+  .cite::before{content:"";position:absolute;left:14px;top:14px;bottom:0;width:1px;background:rgba(0,113,227,.22)}
+  .cite .src{font-size:11.5px;color:var(--body);display:flex;gap:6px;align-items:center}
+  .cite .snip{font-size:12px;color:var(--mut);margin-top:2px;line-height:1.5}
+  mark{background:rgba(0,113,227,.1);color:var(--ink);border-radius:2px;padding:0 1.5px}
+  .chat{flex:1;padding:14px 24px;display:flex;flex-direction:column;min-height:0;gap:14px}
+  .umsg{align-self:flex-end;max-width:74%;background:rgba(0,113,227,.07);border-radius:14px;border-bottom-right-radius:5px;padding:9px 14px;font-size:13px;line-height:1.55;color:var(--ink)}
+  .amsg{max-width:88%;font-size:13.5px;line-height:1.65;color:var(--ink2)}
+  .composer{margin:8px 16px 16px;background:var(--white);border:1px solid rgba(0,0,0,.06);border-radius:13px;box-shadow:var(--sh);padding:11px 13px;display:flex;gap:10px;align-items:center}
+  .composer input{flex:1;border:none;outline:none;font:400 13px 'Inter';background:transparent;color:var(--ink)}
+  .ib{width:27px;height:27px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--mut);cursor:pointer}
+  .send{background:var(--blue);color:#fff;border-radius:8px;width:27px;height:27px;display:flex;align-items:center;justify-content:center}
+  /* login */
+  .login{flex:1;display:flex;align-items:center;justify-content:center;background:var(--bg)}
+  .lw{width:320px}
+  .mark{display:flex;gap:9px;align-items:center;justify-content:center;margin-bottom:10px}
+  .mk{width:26px;height:26px;border-radius:7px;background:var(--blue);display:flex;align-items:center;justify-content:center}
+  .mk svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2.2}
+  .lwm{font-size:17px;font-weight:600;letter-spacing:-.2px}
+  .lsub{text-align:center;font-size:12.5px;color:var(--body);margin-bottom:26px}
+  .lw .fld{margin-bottom:12px}
+  .lw .btn{width:100%;text-align:center;padding:10px;margin-top:4px}
+  .lfoot{text-align:center;margin-top:20px;font-size:11.5px;color:var(--mut);display:flex;gap:6px;align-items:center;justify-content:center}
+  .ldot{width:6px;height:6px;border-radius:50%;background:var(--ok)}
+  /* spaces content */
+  .sect{padding:2px 24px}
+  .srowhead{display:flex;justify-content:space-between;align-items:center;margin:6px 0 6px}
+  .note{margin-top:22px;font-size:12px;color:var(--mut);max-width:1200px}
+</style>
+</head>
+<body>
+<div class="board-title">Keplura · „Soft Structure — Apple Refined“</div>
+<div class="board-sub">Finale Design-Richtung (Basis: Richtung 3, veredelt nach Apple/macOS-Produktivitäts-Prinzipien)</div>
+<div class="principles">Ruhig · hochwertig · leicht · präzise — Hierarchie über Typografie statt Boxen · Weißraum · subtile Schatten · Radien 10–14 · dünne Separatoren · Blau nur als Accent · keine Gradients · keine Emojis · keine Dashboard-Karten</div>
+
+<div class="grid">
+
+  <!-- 1 LOGIN -->
+  <div class="plate"><div class="pt">1 · Login<span>Fenster · zentriert · ohne Schnörkel</span></div>
+  <div class="win" style="min-height:432px">
+    <div class="tbar"><i class="t"></i><i class="t"></i><i class="t"></i></div>
+    <div class="login"><div class="lw">
+      <div class="mark"><span class="mk"><svg viewBox="0 0 24 24"><path d="M12 3l7 3.5v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9v-5L12 3z"/></svg></span><span class="lwm">Keplura</span></div>
+      <div class="lsub">Melden Sie sich bei Ihrem Unternehmen an.</div>
+      <div class="fld"><label>E-Mail</label><input class="input" value="anna@example.com"></div>
+      <div class="fld"><label>Passwort</label><input class="input" type="password" value="•••••••••••••"></div>
+      <button class="btn bp">Anmelden</button>
+      <div class="lfoot"><i class="ldot"></i>Verbunden · acme.keplura.local · API v1</div>
+    </div></div>
+  </div></div>
+
+  <!-- 2 MAIN SHELL -->
+  <div class="plate"><div class="pt">2 · Main Shell / Sidebar<span>Gruppierung: Chats · Organisation · unten Profil</span></div>
+  <div class="win"><div class="tbar"><i class="t"></i><i class="t"></i><i class="t"></i></div>
+    <div class="shell">
+      <div class="side">
+        <div class="swrap"><span class="nm"><span class="av" style="width:18px;height:18px;font-size:8px;border-radius:5px;background:var(--blue);color:#fff">A</span>ACME</span>
+          <span style="color:var(--mut);cursor:pointer"><svg class="ic-s" viewBox="0 0 24 24"><path d="M8 9l4-4 4 4M8 15l4 4 4-4"/></svg></span></div>
+        <div class="ni"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Übersicht</div>
+        <div class="ni"><svg class="ic" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4L4 21l1.1-4.3A8.4 8.4 0 1 1 21 11.5z"/></svg>Chats<span class="ct2">12</span></div>
+        <div class="ni act"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5v-13zM13 4h5.5A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5H13v-16z"/></svg>Wissen<span class="ct2">7</span></div>
+        <div class="grp">Organisationen</div>
+        <div class="ni"><span class="av" style="width:16px;height:16px;font-size:7.5px;border-radius:4px">IT</span>ACME IT</div>
+        <div class="ni"><span class="av" style="width:16px;height:16px;font-size:7.5px;border-radius:4px;background:#E5E4E1;color:#6E6E73">HR</span>ACME HR</div>
+        <div class="sfoot">
+          <span class="av">DN</span>
+          <span><span class="un">Demo Nutzer</span><br><span class="ur">ACME IT · OWNER</span></span>
+          <span style="margin-left:auto;color:var(--mut)"><svg class="ic-s" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2-1.2L14.3 3h-4l-.3 2.4a7 7 0 0 0-2 1.2l-2.3-.9-2 3.4 2 1.5a7 7 0 0 0 0 2.4l-2 1.5 2 3.4 2.3-.9a7 7 0 0 0 2 1.2l.3 2.4h4l.3-2.4a7 7 0 0 0 2-1.2l2.3.9 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/></svg></span>
+        </div>
+      </div>
+      <div class="main">
+        <div class="top"><div><div class="h1">ACME IT</div><div class="sub">3 Spaces · 7 Wissensdatenbanken · 152 Dokumente</div></div>
+          <button class="btn" style="display:inline-flex;gap:7px;align-items:center"><svg class="ic-s" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Space</button></div>
+        <div class="sect">
+          <div class="li"><div style="flex:1"><div class="lt">Support</div><div class="lm">Handbücher · Netzwerk · Onboarding — aktualisiert vor 2 Std.</div></div><span class="lm">128 Dok ›</span></div>
+          <div class="li"><div style="flex:1"><div class="lt">Produktwissen</div><div class="lm">1 Wissensdatenbank — Upload heute 09:14.</div></div><span class="lm">24 Dok ›</span></div>
+          <div class="li"><div style="flex:1"><div class="lt">Onboarding</div><div class="lm">Lesezugriff für alle Mitglieder.</div></div><span class="lm">2 Dok ›</span></div>
+        </div>
+      </div>
+    </div>
+  </div></div>
+
+  <!-- 3 SPACE + KNOWLEDGE -->
+  <div class="plate"><div class="pt">3 · Space + Knowledge + Dokumente<span>Ruhige Liste statt Karten — Finder/Notes-Prinzip</span></div>
+  <div class="win"><div class="tbar"><i class="t"></i><i class="t"></i><i class="t"></i></div>
+    <div class="shell">
+      <div class="side" style="width:170px">
+        <div class="swrap"><span class="nm" style="font-size:12px"><span class="av" style="width:16px;height:16px;font-size:7px;border-radius:4px;background:var(--blue);color:#fff">A</span>ACME IT</span></div>
+        <div class="ni"><svg class="ic" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4L4 21l1.1-4.3A8.4 8.4 0 1 1 21 11.5z"/></svg>Chats</div>
+        <div class="grp">Support · Spaces</div>
+        <div class="ni act"><svg class="ic" viewBox="0 0 24 24"><path d="M6 2h9l4 4v16H6z"/></svg>Handbücher</div>
+        <div class="ni">Netzwerk</div>
+        <div class="ni">Onboarding</div>
+      </div>
+      <div class="main">
+        <div class="top"><div><div class="h1">Handbücher</div><div class="sub">Support · 3 Dokumente</div></div>
+          <button class="btn bp" style="display:inline-flex;gap:7px;align-items:center"><svg class="ic-s" viewBox="0 0 24 24"><path d="M12 16V4M6 9l6-6 6 6M5 20h14"/></svg>Dokument hochladen</button></div>
+        <div class="lst">
+          <div class="li"><span class="fic"><svg class="ic" viewBox="0 0 24 24"><path d="M6 2h9l4 4v16H6z"/></svg></span>
+            <div style="flex:1"><div class="lt">serverhandbuch-2026.pdf</div><div class="lm">2,1 MB · 12. Aug. · 42 Seiten · 128 Chunks</div></div><span class="pill p-ok">indexiert</span></div>
+          <div class="li"><span class="fic"><svg class="ic" viewBox="0 0 24 24"><path d="M6 2h9l4 4v16H6z"/></svg></span>
+            <div style="flex:1"><div class="lt">runbook-notes.md</div><div class="lm">14 KB · 3. Sep. · 6 Chunks</div></div><span class="pill p-ok">indexiert</span></div>
+          <div class="li"><span class="fic"><svg class="ic" viewBox="0 0 24 24"><path d="M6 2h9l4 4v16H6z"/></svg></span>
+            <div style="flex:1"><div class="lt">licenzen.docx</div><div class="lm">340 KB · 4. Sep.</div></div><span class="pill p-wait">Parser ausstehend</span></div>
+        </div>
+        <div class="srow"><input class="input" placeholder="In diesem Space suchen" value="Neuen Drucker einrichten" style="border-radius:11px"></div>
+        <div class="cite">
+          <div class="src"><svg class="ic-s" viewBox="0 0 24 24"><path d="M6 2h9l4 4v16H6z"/></svg><b style="font-weight:500">serverhandbuch-2026.pdf</b> · Abschnitt 4 · 12. Aug.<span class="schip" style="margin-left:auto">0,74</span></div>
+          <div class="snip">… <mark>Drucker</mark> werden über Einstellungen → Peripherie → „Gerät hinzufügen“ eingebunden …</div>
+        </div>
+        <div class="cite">
+          <div class="src"><svg class="ic-s" viewBox="0 0 24 24"><path d="M6 2h9l4 4v16H6z"/></svg><b style="font-weight:500">runbook-notes.md</b> · Notiz 1 · 3. Sep.<span class="schip" style="margin-left:auto">0,61</span></div>
+          <div class="snip">Fall <mark>Drucker</mark> offline: DNS-Namen prüfen, dann Spooler neu starten …</div>
+        </div>
+        <div style="flex:1"></div>
+      </div>
+    </div>
+  </div></div>
+
+  <!-- 4 CHAT -->
+  <div class="plate"><div class="pt">4 · Chat mit Quellen<span>Natürlicher Content-Block · Quellen dezent darunter</span></div>
+  <div class="win"><div class="tbar"><i class="t"></i><i class="t"></i><i class="t"></i></div>
+    <div class="shell">
+      <div class="side" style="width:170px">
+        <div class="swrap"><span class="nm" style="font-size:12px"><span class="av" style="width:16px;height:16px;font-size:7px;border-radius:4px;background:var(--blue);color:#fff">A</span>ACME IT</span></div>
+        <div class="ni act"><svg class="ic" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4L4 21l1.1-4.3A8.4 8.4 0 1 1 21 11.5z"/></svg>Chats</div>
+        <div class="grp">Support · Wissen</div>
+        <div class="ni">Handbücher</div>
+        <div class="ni">Netzwerk</div>
+      </div>
+      <div class="main">
+        <div class="top" style="padding-bottom:10px"><div><div class="h1" style="font-size:17px">Rollout-Plan Q3</div><div class="sub">Kontext: Support · Handbücher · vor 2 Min</div></div>
+          <span style="color:var(--mut);cursor:pointer"><svg class="ic" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg></span></div>
+        <div class="chat">
+          <div class="umsg">Fasse den aktuellen Stand aus dem Handbuch zusammen und nenne mir die drei wichtigsten Schritte.</div>
+          <div class="amsg">Der Rollout läuft in drei Phasen: <b style="font-weight:600;color:var(--ink)">① Pilotgruppe</b> (Woche 1–2), <b style="font-weight:600;color:var(--ink)">② Abteilungsauswahl</b> (Woche 3–5), <b style="font-weight:600;color:var(--ink)">③ Vollausbau + Schulung</b> (Woche 6+).
+            <div class="cite" style="padding:10px 0 0 12px">
+              <div class="src"><svg class="ic-s" viewBox="0 0 24 24"><path d="M6 2h9l4 4v16H6z"/></svg><b style="font-weight:500">serverhandbuch-2026.pdf</b> · Abschnitt 4.2<span class="schip" style="margin-left:auto">0,81</span></div>
+              <div class="snip">„Der Rollout erfolgt in drei Phasen …“</div>
+            </div>
+          </div>
+        </div>
+        <div class="composer">
+          <span class="ib"><svg class="ic" viewBox="0 0 24 24"><path d="M21 12.5V12a9 9 0 1 0-9 9h6.4"/><path d="M16 16l5 5 2-2-5-5z" transform="translate(-3,-4) scale(.9)"/></svg></span>
+          <span class="ib" style="margin-left:auto;margin-right:2px"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>
+          <input placeholder="Fragen Sie Keplura …">
+          <span class="send"><svg class="ic-s" viewBox="0 0 24 24" style="stroke:#fff"><path d="M4 12h16M14 6l6 6-6 6"/></svg></span>
+        </div>
+      </div>
+    </div>
+  </div></div>
+
+</div>
+<div class="note">Reines Design-Mockup — noch keine Implementierung. Nach Freigabe wird „Soft Structure — Apple Refined“ als Designkarte (Tokens + Komponenten-Guideline in docs/DESIGN.md) und anschließend als UI-Redesign-Task mit voller Gate-Kette durch die Fabrik geschleust.</div>
+</body>
+</html>

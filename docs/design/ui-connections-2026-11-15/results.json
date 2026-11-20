@@ -1,0 +1,172 @@
+[
+  {
+    "name": "Echte Leseansicht websearch",
+    "mode": "nur echter QA-Lesezugriff, keine Verbindungstests",
+    "status": "bestanden"
+  },
+  {
+    "name": "Echte Leseansicht mcp",
+    "mode": "nur echter QA-Lesezugriff, keine Verbindungstests",
+    "status": "bestanden"
+  },
+  {
+    "name": "Echte Leseansicht directory",
+    "mode": "nur echter QA-Lesezugriff, keine Verbindungstests",
+    "status": "bestanden"
+  },
+  {
+    "name": "Websuche: Schlüssel beibehalten/entfernen und gespeicherter Status",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Websuche: ungespeichert, Busy, Testerfolg und Fehler ohne alte Treffer",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "MCP: Werkzeuge/Bereiche, fehlgeschlagene Änderung bleibt unverändert",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "MCP: fokussierter Anlagedialog, Dirty/Busy, Teilfehler und geleerter Schlüssel",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "MCP: Entfernen-Fehler im Dialog, Abbrechen erhält Verbindung und Fokus",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Verzeichnis: gespeichertes Passwort bleibt leer, Save ohne Passwort erhält es",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Verzeichnis: Verbindungstest, Benutzerabfrage und Fokusrückgabe",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Verzeichnis: Entwurf schützen und Entfernen-Fehler erhalten",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "websearch: Ladefehler statt fälschlich leerer Ansicht",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "mcp: Ladefehler statt fälschlich leerer Ansicht",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "directory: Ladefehler statt fälschlich leerer Ansicht",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Websuche: Tavily und Ausschalten erhalten die Anbieterwege",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Leere MCP-/Verzeichnisliste ist von einem Ladefehler getrennt",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "websearch light 1440: Katalog und Reflow",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "mcp light 1440: Katalog und Reflow",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "directory light 1440: Katalog und Reflow",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "websearch light 768: Katalog und Reflow",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "mcp light 768: Katalog und Reflow",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "directory light 768: Katalog und Reflow",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "websearch light 390: Katalog und Reflow",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "mcp light 390: Katalog und Reflow",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "directory light 390: Katalog und Reflow",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "websearch dark 1440: Katalog und Reflow",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "mcp dark 1440: Katalog und Reflow",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "directory dark 1440: Katalog und Reflow",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "websearch dark 768: Katalog und Reflow",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "mcp dark 768: Katalog und Reflow",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "directory dark 768: Katalog und Reflow",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "websearch dark 390: Katalog und Reflow",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "mcp dark 390: Katalog und Reflow",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  },
+  {
+    "name": "directory dark 390: Katalog und Reflow",
+    "mode": "synthetische Konfiguration und simulierte HTTP-Antworten",
+    "status": "bestanden"
+  }
+]

@@ -1,0 +1,103 @@
+{
+  "zeitpunktUtc": "2026-11-15T12:54:30.752Z",
+  "vergleichsbasis": "3a8f3987b95b8bbb7bba5b27e2b5c73a3bf23f78",
+  "produktbasis": "2de0a8a5203735507c00f56548daca2d2c2a05f9",
+  "art": "Spezifikations-/Tokenprüfung; keine App-/CI-/A11y-Abnahme",
+  "ergebnis": "bestanden",
+  "pruefungen": [
+    {
+      "pruefung": "Palette: erlaubte Kontrastpaare ohne Schwellenabrundung",
+      "status": "bestanden",
+      "detail": {
+        "paare": 160,
+        "minimumText": 4.5781,
+        "minimumControl": 3.308,
+        "fehler": []
+      }
+    },
+    {
+      "pruefung": "Gleiche semantische Rollen in beiden Themes",
+      "status": "bestanden",
+      "detail": {
+        "rollen": 28
+      }
+    },
+    {
+      "pruefung": "Bestands-Tokenreferenzen und Aliasse zugeordnet",
+      "status": "bestanden",
+      "detail": {
+        "bestandsNamen": 41,
+        "fehlend": [],
+        "aliasFehler": []
+      }
+    },
+    {
+      "pruefung": "109 Inventar-IDs vollständig/eindeutig mit gültigen Verträgen",
+      "status": "bestanden",
+      "detail": {
+        "ids": 109,
+        "vertragsfamilien": 8
+      }
+    },
+    {
+      "pruefung": "Alle 36 Vue-Dateien zugeordnet",
+      "status": "bestanden",
+      "detail": {
+        "anzahl": 36,
+        "fehlend": []
+      }
+    },
+    {
+      "pruefung": "Vue-Quelltexte identisch zur ursprünglichen Auditbasis",
+      "status": "bestanden",
+      "detail": {
+        "dateien": 36,
+        "abweichend": []
+      }
+    },
+    {
+      "pruefung": "Originaltracker unverändert/offen",
+      "status": "bestanden",
+      "detail": {
+        "offen": 109
+      }
+    },
+    {
+      "pruefung": "Eigener Diff nur Dokumentation/isolierte Referenz",
+      "status": "bestanden",
+      "detail": {
+        "dateien": 23
+      }
+    },
+    {
+      "pruefung": "Lokale Markdown-Ziele vorhanden, externe URLs syntaktisch gültig",
+      "status": "bestanden",
+      "detail": {
+        "lokaleLinks": 59,
+        "fehlend": [],
+        "urlFehler": []
+      }
+    },
+    {
+      "pruefung": "Katalog/CSS entsprechen der Tokenquelle",
+      "status": "bestanden",
+      "detail": {
+        "exitcode": 0
+      }
+    },
+    {
+      "pruefung": "git diff --check",
+      "status": "bestanden",
+      "detail": {
+        "exitcode": 0
+      }
+    },
+    {
+      "pruefung": "Keine offensichtlichen Secrets/persönlichen Pfade in neuen Referenztexten",
+      "status": "bestanden",
+      "detail": {
+        "auffaelligeDateien": []
+      }
+    }
+  ]
+}

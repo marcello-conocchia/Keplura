@@ -1,0 +1,87 @@
+[
+  {
+    "name": "FO-Vertrag light 1440",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "FO-Vertrag light 768",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "FO-Vertrag light 390",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "FO-Vertrag dark 1440",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "FO-Vertrag dark 768",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "FO-Vertrag dark 390",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "Bestätigung: sicherer Erstfokus, Escape und Fokusrückgabe",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "Bestätigung: Busy blockiert Schließen und Mehrfachaktion",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "MCP: Abbrechen erhält Verbindung und ruft DELETE nicht auf",
+    "mode": "synthetische Zeile, echte Oberfläche",
+    "status": "bestanden"
+  },
+  {
+    "name": "MCP: Busy, Fehler bleibt im Dialog, erneuter Versuch",
+    "mode": "HTTP 503/204 und Verzögerung simuliert",
+    "status": "bestanden"
+  },
+  {
+    "name": "Embedding: Folgen genannt, Abbruch unverändert, Fehler am Dialog",
+    "mode": "synthetischer Anbieter/Modell und HTTP 503",
+    "status": "bestanden"
+  },
+  {
+    "name": "Echte Formulare light 1440: Team, Wissen, Administration",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "Echte Formulare light 768: Team, Wissen, Administration",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "Echte Formulare light 390: Team, Wissen, Administration",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "Echte Formulare dark 1440: Team, Wissen, Administration",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "Echte Formulare dark 768: Team, Wissen, Administration",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "Echte Formulare dark 390: Team, Wissen, Administration",
+    "mode": "echt",
+    "status": "bestanden"
+  }
+]

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.1.1</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.keplura</groupId>
+    <artifactId>keplura-server</artifactId>
+    <version>0.1.0</version>
+    <name>Keplura Server</name>
+    <description>Keplura server API (foundation milestone)</description>
+
+    <licenses>
+        <license>
+            <name>Apache-2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <properties>
+        <java.version>21</java.version>
+        <!-- MVP-5: Apache Tika for real pdf/docx text extraction. Pinned to
+             the latest 3.x stable line (NOT 4.0.0, released 3 weeks ago —
+             too young for a security-reviewed dependency addition). Bump via
+             dependency review, never silently. -->
+        <tika.version>3.3.2</tika.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
+        </dependency>
+        <!--
+          M2a identity base: JPA persistence for the User entity. No Spring
+          Security filter chain — only the crypto-only artifact below is used,
+          for Argon2 password hashing (see docs/adr/0002).
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <!--
+          M3a (ADR-0006): schema migrations. Boot 4 keeps Flyway auto-config in
+          the modular spring-boot-flyway artifact; flyway-database-postgresql is
+          the vendor plugin required by Flyway 10+ for PostgreSQL URLs. The dev
+          profile disables Flyway (H2 + ddl-auto=update stay as before).
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-flyway</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+        </dependency>
+        <!-- M3a: PostgreSQL JDBC driver for prod-profile deployments (runtime only). -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+        <!-- Argon2 implementation in spring-security-crypto requires BouncyCastle at runtime.
+             1.85.x per security-gate follow-up from M2a (>=1.84 floor). -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.85.2</version>
+        </dependency>
+        <!--
+          Embedded database backing the dev/prod datasource fallbacks, so
+          builds, tests and local runs need no external database (ADR-0002).
+        -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!--
+          MVP-5: real pdf/docx text extraction behind DocumentIndexingService.
+          Lean by explicit task scope: tika-core (facade + EmptyParser config)
+          plus ONLY the two parser modules we accept — PDF via PDFBox, DOCX via
+          POI-OOXML. No tika-parsers-standard-package (that drags in ~150
+          parsers incl. legacy OLE/MS-Office/Project/Visio surface we never
+          reach: the upload whitelist is pdf/docx/txt/md/csv and the routing
+          config activates exactly these two). External network access is
+          switched off at the parser-config level (no EntityResolver fetches);
+          extraction limits (max chars/pages, timeout) are enforced in
+          TikaDocumentTextExtractor — see docs/development.md.
+        -->
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>${tika.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-parser-pdf-module</artifactId>
+            <version>${tika.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-parser-microsoft-module</artifactId>
+            <version>${tika.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Spring Boot 4 modularised test slices: @DataJpaTest lives here. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!--
+          TestRestTemplate (spring-boot-resttestclient, via starter-webmvc-test)
+          needs RestTemplateBuilder from the modularised spring-boot-restclient
+          artifact in Spring Boot 4. Test scope only — no production impact.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-restclient</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- ADR-0012 (Schritt 5): Windows-Freigaben (SMB2/3, NTFS-DACL, DFS) nur lesend.
+             smbj 0.14.0, Apache-2.0; zieht BouncyCastle (MIT), asn-one und mbassador (MIT). -->
+        <dependency>
+            <groupId>com.hierynomus</groupId>
+            <artifactId>smbj</artifactId>
+            <version>0.14.0</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

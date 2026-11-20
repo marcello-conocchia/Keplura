@@ -1,0 +1,105 @@
+# Keplura local infrastructure stack (M3a, ADR-0006; providers M4c).
+#
+# PostgreSQL 16 + pgvector for running the server against its real production
+# database engine locally (dev-server / owner machine). NOT a deployment stack:
+# there is no app service here — start the server per docs/development.md.
+#
+# The image is the upstream-maintained pgvector build of PostgreSQL 16
+# (pgvector/pgvector), which ships the `vector` extension used by M3b+.
+#
+# Usage (needs a container runtime — docker or podman-compose):
+#   cd deploy
+#   cp .env.example .env        # .env is git-ignored; fill in local values
+#   docker compose up -d db
+#   docker compose exec db psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" \
+#     -c 'SELECT version();'
+#
+# Model providers (A: Ollama, B: vLLM) are OPT-IN profiles below — the
+# default `up` never starts them. Hosted API (C) needs no container here.
+#
+# No credentials are committed: compose reads .env from this directory and
+# fails fast (:? required-variable syntax) instead of falling back to a
+# committed default.
+
+name: intracore-dev
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: keplura-pg
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB in deploy/.env (copy .env.example)}
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in deploy/.env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in deploy/.env}
+    ports:
+      # host:container — the server connects via localhost:5432 by default.
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # --- M4c model providers (opt-in profiles; never started by the default up)
+  #
+  # Both speak the OpenAI chat-completions protocol; the server selects them
+  # via KEPLURA_PROVIDER (ollama|vllm|api) — see docs/development.md
+  # "Model-Provider umschalten". A hosted API key (provider C) never enters
+  # this file or any container env: it lives on the SERVER process env only.
+
+  # A) Ollama — local CPU inference, no GPU needed. Start with:
+  #      docker compose --profile ollama up -d ollama
+  #      docker compose exec ollama ollama pull qwen2.5:0.5b  # tiny accept model
+  #    Weights live in the named volume (survive container removal). Then
+  #    boot the server with KEPLURA_PROVIDER=ollama — the base URL then
+  #    defaults to http://127.0.0.1:11434/v1 (the published port below).
+  ollama:
+    image: ollama/ollama:latest
+    container_name: keplura-ollama
+    profiles: ["ollama"]
+    restart: unless-stopped
+    ports:
+      # loopback only: Ollama has NO auth surface — never expose it on a
+      # LAN-facing interface; the server is the only caller anyway.
+      - "127.0.0.1:${OLLAMA_HOST_PORT:-11434}:11434"
+    volumes:
+      - ollamamodels:/root/.ollama
+    environment:
+      OLLAMA_KEEP_ALIVE: "10m"
+
+  # B) vLLM — GPU inference server. The GPU HARDWARE IS PO-SIDE (explicit
+  #    Non-Goal of M4c: the repo builds no GPU); this unit is the documented
+  #    shape for whoever owns the card. Start with:
+  #      docker compose --profile vllm up -d vllm
+  #    and boot the server with KEPLURA_PROVIDER=vllm (base URL then
+  #    defaults to http://127.0.0.1:8000/v1; for a remote GPU box set
+  #    KEPLURA_GATEWAY_BASE_URL to it). --max-model-len bounds the KV
+  #    cache; VLLM_MODEL is a placeholder — pick what fits the card.
+  vllm:
+    image: vllm/vllm-openai:latest
+    container_name: keplura-vllm
+    profiles: ["vllm"]
+    restart: unless-stopped
+    ports:
+      # loopback by default; publish to the LAN only on a trusted network:
+      - "${VLLM_HOST_BIND:-127.0.0.1}:${VLLM_HOST_PORT:-8000}:8000"
+    environment:
+      HUGGING_FACE_HUB_TOKEN: ${VLLM_HF_TOKEN:-}
+    volumes:
+      - hfcache:/root/.cache/huggingface
+    command: ["--model", "${VLLM_MODEL:-Qwen/Qwen2.5-0.5B-Instruct}", "--max-model-len", "4096"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  pgdata:
+  ollamamodels:
+  hfcache:

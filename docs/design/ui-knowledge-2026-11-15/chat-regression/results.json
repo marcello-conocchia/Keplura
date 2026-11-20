@@ -1,0 +1,72 @@
+[
+  {
+    "name": "Ein Einstieg, neuer Chat ohne Wissensbasis",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "Hauptnavigation bleibt beim Verlauf und Seitenwechsel stehen",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "Wissen optional wählen: Entwurf bleibt, neuer Chat neutral",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "Plusmenü, Dateiaktion, Wissensuntermenü und Escape",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "Mehrzeilig, automatische Höhe und IME ohne versehentliches Senden",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "Enter sendet, Stopp kehrt zur Eingabe zurück",
+    "mode": "HTTP-Antwort angehalten, kein Modellaufruf",
+    "status": "bestanden"
+  },
+  {
+    "name": "Chat light 1440: kompakt und ohne Überlauf",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "Chat light 949: kompakt und ohne Überlauf",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "Chat light 768: kompakt und ohne Überlauf",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "Chat light 390: kompakt und ohne Überlauf",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "Chat dark 1440: kompakt und ohne Überlauf",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "Chat dark 949: kompakt und ohne Überlauf",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "Chat dark 768: kompakt und ohne Überlauf",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "Chat dark 390: kompakt und ohne Überlauf",
+    "mode": "echt",
+    "status": "bestanden"
+  }
+]

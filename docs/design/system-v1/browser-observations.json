@@ -1,0 +1,60 @@
+{
+  "datum": "2026-11-15",
+  "art": "Isolierter Referenzkatalog; keine Produktabnahme",
+  "beobachtungen": [
+    {
+      "zustand": "Hell/Dunkel",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "h1Anzahl": 1,
+      "InterGeladen": true
+    },
+    {
+      "zustand": "Schmale Ansicht",
+      "viewport": [
+        390,
+        844
+      ],
+      "messung": {
+        "inputFont": "16px",
+        "inputHeight": 44,
+        "scrollWidth": 375,
+        "theme": "light",
+        "viewport": 375
+      }
+    },
+    {
+      "zustand": "Dialog geringe Höhe",
+      "viewport": [
+        480,
+        400
+      ],
+      "initialfokus": "dialog-name",
+      "tabFokus": "cancel-dialog",
+      "closed": true,
+      "focusReturned": true
+    },
+    {
+      "zustand": "320px Reflow",
+      "viewport": [
+        320,
+        800
+      ],
+      "messung": {
+        "scrollWidth": 305,
+        "viewport": 305
+      }
+    }
+  ],
+  "nichtGeprueft": [
+    "Produktansichten",
+    "Dirty-/Busyguard in der App",
+    "Screenreader",
+    "Echter Browserzoom",
+    "Forced-colors",
+    "Native Tauri-Laufzeit",
+    "Assistentenflow"
+  ]
+}

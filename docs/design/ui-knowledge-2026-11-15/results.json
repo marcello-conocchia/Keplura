@@ -1,0 +1,62 @@
+[
+  {
+    "name": "Echte Dokumente, Tabelle, Download und Verwaltungsdialoge",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "name": "Suchzustände: kein Ergebnis und verständlicher Fehler",
+    "mode": "Suchantworten 200 leer / HTTP 503 simuliert",
+    "status": "bestanden"
+  },
+  {
+    "name": "Basiswechsel: Ladezustand und keine verspätete fremde Liste",
+    "mode": "echte Listen, erste Antwort künstlich angehalten",
+    "status": "bestanden"
+  },
+  {
+    "name": "Namensfilter, keine passenden Dokumente, Statusgruppen",
+    "mode": "synthetische Stressliste",
+    "status": "bestanden"
+  },
+  {
+    "name": "Wissen light 1440: Auswahl, Typografie, Aktionen und Reflow",
+    "mode": "echte Oberfläche mit synthetischen langen Dateinamen/Statusgruppen",
+    "status": "bestanden"
+  },
+  {
+    "name": "Wissen light 938: Auswahl, Typografie, Aktionen und Reflow",
+    "mode": "echte Oberfläche mit synthetischen langen Dateinamen/Statusgruppen",
+    "status": "bestanden"
+  },
+  {
+    "name": "Wissen light 768: Auswahl, Typografie, Aktionen und Reflow",
+    "mode": "echte Oberfläche mit synthetischen langen Dateinamen/Statusgruppen",
+    "status": "bestanden"
+  },
+  {
+    "name": "Wissen light 390: Auswahl, Typografie, Aktionen und Reflow",
+    "mode": "echte Oberfläche mit synthetischen langen Dateinamen/Statusgruppen",
+    "status": "bestanden"
+  },
+  {
+    "name": "Wissen dark 1440: Auswahl, Typografie, Aktionen und Reflow",
+    "mode": "echte Oberfläche mit synthetischen langen Dateinamen/Statusgruppen",
+    "status": "bestanden"
+  },
+  {
+    "name": "Wissen dark 938: Auswahl, Typografie, Aktionen und Reflow",
+    "mode": "echte Oberfläche mit synthetischen langen Dateinamen/Statusgruppen",
+    "status": "bestanden"
+  },
+  {
+    "name": "Wissen dark 768: Auswahl, Typografie, Aktionen und Reflow",
+    "mode": "echte Oberfläche mit synthetischen langen Dateinamen/Statusgruppen",
+    "status": "bestanden"
+  },
+  {
+    "name": "Wissen dark 390: Auswahl, Typografie, Aktionen und Reflow",
+    "mode": "echte Oberfläche mit synthetischen langen Dateinamen/Statusgruppen",
+    "status": "bestanden"
+  }
+]

@@ -1,0 +1,61 @@
+[
+  {
+    "id": "V11",
+    "name": "Initialfokus auf Dialogtitel, großer Rahmen",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Breite 1040px"
+  },
+  {
+    "id": "V11",
+    "name": "Tab/Shift+Tab bleiben im modalen Dialog",
+    "mode": "echt",
+    "status": "rot",
+    "reason": "Tab 8 verlässt Dialog: {\"tag\":\"BODY\",\"testid\":null,\"text\":\"KepluraUGUI4 Gestaltung 1794748426008ADNeuer ChatChatWisse\",\"inDialog\":false}"
+  },
+  {
+    "id": "V11",
+    "name": "Escape ohne Änderung schließt, Fokus zurück auf Auslöser",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "id": "V11",
+    "name": "Escape mit Änderung: Verwerfen-Abfrage, Fokus „Weiter bearbeiten“",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "id": "V11",
+    "name": "Weiter bearbeiten erhält Eingabe und Fokusposition",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "id": "V11",
+    "name": "Doppeltes Escape umgeht Dirty-Schutz nicht",
+    "mode": "echt",
+    "status": "rot",
+    "reason": "Dialog wurde trotz ungespeicherter Änderung geschlossen\n\n0 !== 1\n"
+  },
+  {
+    "id": "V11",
+    "name": "Footer-Abbrechen nutzt denselben Schutz; Verwerfen schließt mit Fokusrückkehr",
+    "mode": "echt",
+    "status": "rot",
+    "reason": "locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByTestId('datasource-cancel')\n    - locator resolved to <button type=\"button\" data-v-e3216c45=\"\" data-v-bd85ff03=\"\" class=\"ic-action ghost default\" data-testid=\"datasource-cancel\">Abbrechen</button>\n  - attempting click action\n   "
+  },
+  {
+    "id": "V11",
+    "name": "Klick auf Hintergrund mit Änderung zeigt Verwerfen-Abfrage",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "id": "V11/V09",
+    "name": "Fehlgeschlagene Verbindung (echter nicht vorhandener Ordner): Fehler fokussiert, Werte bleiben",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Meldung: Der Ordner existiert nicht oder ist für den Server nicht lesbar."
+  }
+]

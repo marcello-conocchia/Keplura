@@ -1,0 +1,16 @@
+{
+  "identifier": "com.keplura.desktop",
+  "description": "Foundation milestone: core webview APIs plus credentialed HTTP to the configured Keplura Server only (ADR-0005). DARK-FS adds exactly one elevated window command: set_fullscreen (toggle for the sidebar/F11 path) — no other window control.",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:window:allow-set-fullscreen",
+    {
+      "identifier": "http:default",
+      "allow": [
+        { "url": "http://localhost:8080" },
+        { "url": "http://127.0.0.1:8080" }
+      ]
+    }
+  ]
+}

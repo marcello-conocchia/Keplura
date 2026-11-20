@@ -1,0 +1,12 @@
+Keplura
+Copyright 2026 The Keplura Authors
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+This product includes third-party software, each under its own license.
+The full inventory of runtime dependencies and their declared licenses is in
+docs/legal/THIRD_PARTY_LICENSES.md.
+
+The web and desktop user interface bundles the Inter typeface
+(https://rsms.me/inter/), Copyright the Inter Project Authors, licensed under
+the SIL Open Font License, Version 1.1.

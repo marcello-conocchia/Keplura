@@ -1,0 +1,229 @@
+[
+  {
+    "id": "V11",
+    "name": "Initialfokus auf Dialogtitel, großer Rahmen",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Breite 1040px"
+  },
+  {
+    "id": "V11",
+    "name": "Tab/Shift+Tab bleiben im modalen Dialog",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "5 unterschiedliche Fokusziele"
+  },
+  {
+    "id": "V11",
+    "name": "Escape ohne Änderung schließt, Fokus zurück auf Auslöser",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "id": "V11",
+    "name": "Escape mit Änderung: Verwerfen-Abfrage, Fokus „Weiter bearbeiten“",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "id": "V11",
+    "name": "Weiter bearbeiten erhält Eingabe und Fokusposition",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "id": "V11",
+    "name": "Doppeltes Escape umgeht Dirty-Schutz nicht",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "id": "V11",
+    "name": "Footer-Abbrechen nutzt denselben Schutz; Verwerfen schließt mit Fokusrückkehr",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "id": "V11",
+    "name": "Klick auf Hintergrund mit Änderung zeigt Verwerfen-Abfrage",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "id": "V11/V09",
+    "name": "Fehlgeschlagene Verbindung (echter nicht vorhandener Ordner): Fehler fokussiert, Werte bleiben",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Meldung: Der Ordner existiert nicht oder ist für den Server nicht lesbar."
+  },
+  {
+    "id": "V11",
+    "name": "Busy beim Speichern: Escape/Schließen/Abbrechen gesperrt, Statushinweis",
+    "mode": "simuliert: echte Antwort, künstlich 2,5 s verzögert",
+    "status": "bestanden"
+  },
+  {
+    "id": "V11/V09",
+    "name": "Probelauf HTTP 500: wahrheitsgemäßer Fehler, Werte bleiben",
+    "mode": "simuliert: HTTP 500",
+    "status": "bestanden",
+    "note": "Der Server hat nicht geantwortet. Bitte versuche es erneut."
+  },
+  {
+    "id": "V11",
+    "name": "Nach gespeichertem Probelauf kein falscher Verwerfen-Dialog",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "id": "V08",
+    "name": "LOCAL: Verbindung, Probelauf, Auswahl",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Verbunden. 43 Dateien gefunden, davon 43 übernehmbar (3 KB). Nur diese Unterordner/Dateien (optional) Ausschließen Größte Datei (MB) Beispiele: private/vertraul"
+  },
+  {
+    "id": "V08/V09",
+    "name": "LOCAL: Rechte-Vorschau sichtbar, ACL-Warnung beim Abwählen",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Linux-Benutzer (UID 0) 43 Dateien Linux-Gruppe (GID 0) 41 Dateien Alle angemeldeten Personen 1 Dateien Linux-Gruppe (GID 3001) 1 Dateien"
+  },
+  {
+    "id": "V08",
+    "name": "LOCAL: Zurück behält Werte, Zeitplan, Aktivierung, Abgleich „Aktuell“",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Aktuell · 43 Dateien · zuletzt 15.11.26, 14:03"
+  },
+  {
+    "id": "V09",
+    "name": "Aktivierung ok, Start fehlgeschlagen: Teilstand wird gemeldet",
+    "mode": "simuliert: HTTP 503 auf /run nach echter Aktivierung",
+    "status": "bestanden",
+    "note": "„UI4 Startfehler 1794751409530“ ist aktiviert, aber der erste Abgleich konnte nicht gestartet werden: Der Server hat nicht geantwortet. Bitte versuche es erneut. Starte ihn in der Liste mit „Jetzt abg"
+  },
+  {
+    "id": "V08/V10",
+    "name": "SMB: Verbindung mit Dienstkonto, Secret danach aus Formular entfernt",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "id": "V08",
+    "name": "SMB: NTFS-Rechte, Zeitplan, Aktivierung",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "ACL: Windows-Konto/-Gruppe S-1-5-21-509124982-392397791-488242078-500 3 Dateien Windows-Konto/-Gruppe S-1-5-21-509124982-3923 | Status: Aktuell · 3 Dateien · zuletzt 15.11.26, 14:03"
+  },
+  {
+    "id": "V10",
+    "name": "SMB bearbeiten: leeres Feld behält Zugang (Probelauf grün)",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "id": "V10/V09",
+    "name": "SMB: falsches Ersatzpasswort wird ehrlich abgelehnt, richtiges ersetzt wieder",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Anmeldung an der Freigabe abgelehnt (Benutzer oder Passwort falsch)."
+  },
+  {
+    "id": "V08",
+    "name": "SharePoint: Formularvariante (keine echte Integration ohne Testtenant)",
+    "mode": "nur Formular",
+    "status": "bestanden"
+  },
+  {
+    "id": "V11/V09",
+    "name": "Entfernen-Bestätigung (sm-Dialog): Fokus, Escape, Ergebnis wahrheitsgemäß",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "NICHT entfernt, Meldung: Der Server hat nicht geantwortet. Bitte versuche es erneut. (HTTP keine Antwort – CORS-Preflight)"
+  },
+  {
+    "id": "V12",
+    "name": "Assistent light 1440×1000: Rahmen, Aktionen erreichbar, kein Root-Überlauf",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Dialog 1040×662; kleine Ziele: keine"
+  },
+  {
+    "id": "V12",
+    "name": "Assistent light 900×640: Rahmen, Aktionen erreichbar, kein Root-Überlauf",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Dialog 868×608; kleine Ziele: keine"
+  },
+  {
+    "id": "V12",
+    "name": "Assistent light 768×1024: Rahmen, Aktionen erreichbar, kein Root-Überlauf",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Dialog 736×662; kleine Ziele: keine"
+  },
+  {
+    "id": "V12",
+    "name": "Assistent light 480×400: Rahmen, Aktionen erreichbar, kein Root-Überlauf",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Dialog 480×400; kleine Ziele: keine"
+  },
+  {
+    "id": "V12",
+    "name": "Assistent light 390×844: Rahmen, Aktionen erreichbar, kein Root-Überlauf",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Dialog 390×844; kleine Ziele: keine"
+  },
+  {
+    "id": "V12",
+    "name": "Assistent light 320×640: Rahmen, Aktionen erreichbar, kein Root-Überlauf",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Dialog 320×640; kleine Ziele: keine"
+  },
+  {
+    "id": "V12",
+    "name": "Assistent dark 1440×1000: Rahmen, Aktionen erreichbar, kein Root-Überlauf",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Dialog 1040×662; kleine Ziele: keine"
+  },
+  {
+    "id": "V12",
+    "name": "Assistent dark 900×640: Rahmen, Aktionen erreichbar, kein Root-Überlauf",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Dialog 868×608; kleine Ziele: keine"
+  },
+  {
+    "id": "V12",
+    "name": "Assistent dark 768×1024: Rahmen, Aktionen erreichbar, kein Root-Überlauf",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Dialog 736×662; kleine Ziele: keine"
+  },
+  {
+    "id": "V12",
+    "name": "Assistent dark 480×400: Rahmen, Aktionen erreichbar, kein Root-Überlauf",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Dialog 480×400; kleine Ziele: keine"
+  },
+  {
+    "id": "V12",
+    "name": "Assistent dark 390×844: Rahmen, Aktionen erreichbar, kein Root-Überlauf",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Dialog 390×844; kleine Ziele: keine"
+  },
+  {
+    "id": "V12",
+    "name": "Assistent dark 320×640: Rahmen, Aktionen erreichbar, kein Root-Überlauf",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Dialog 320×640; kleine Ziele: keine"
+  }
+]

@@ -1,0 +1,3006 @@
+openapi: 3.1.0
+info:
+  title: Keplura Server API
+  description: >-
+    Contract between Keplura Desktop and Keplura Server. The two products
+    communicate exclusively through this API.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+paths:
+  /api/v1/health:
+    get:
+      operationId: getHealth
+      summary: Liveness probe (operations only)
+      description: >-
+        Answers as long as the HTTP stack serves. Consumed by operators and
+        deployment probes, deliberately NOT by the desktop app, therefore no
+        CORS is enabled and requests are excluded from request logging.
+      responses:
+        "200":
+          description: Server is alive
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+  /api/v1/system/info:
+    get:
+      operationId: getSystemInfo
+      summary: Read-only system information
+      description: >-
+        Allows any origin (Access-Control-Allow-Origin: *) so the desktop
+        webview (Vite dev server / tauri://localhost) can call it directly.
+      responses:
+        "200":
+          description: System information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SystemInfo"
+  /api/v1/auth/login:
+    post:
+      operationId: login
+      summary: Start an authenticated session with local credentials (ADR-0002/0003)
+      description: >-
+        On success the server creates a session and sets TWO cookies: the
+        HttpOnly, SameSite=Lax session cookie (Secure in production) AND the
+        non-HttpOnly double-submit cookie `keplura_csrf` (SEC-2, ADR-0003
+        as amended) whose value is ALSO the body's `csrfToken` field — the
+        native Tauri cookie jar is unreadable from JS, so the body copy is
+        what the desktop stores (see docs/development.md, CSRF section).
+        Unknown email and wrong password are indistinguishable (same 401
+        body and status). Repeated failures per (client IP, email) are
+        throttled with 429 for 15 minutes. Login itself is the ONLY
+        state-changing endpoint exempt from the X-CSRF-Token requirement:
+        no session exists yet to bind a token to.
+        CORS: credentialed requests are allowed only from the desktop webview
+        origins (server property keplura.desktop.allowed-origins;
+        DesktopCorsConfig), since credentials and wildcard origin are
+        mutually exclusive by spec.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Authenticated; session cookie set
+          headers:
+            Set-Cookie:
+              description: >-
+                HttpOnly SameSite=Lax session cookie (KEPLURASESSION), Secure in
+                production. With rememberMe=true it survives app/browser restarts
+                for up to 30 days (operator-configurable); otherwise it is a
+                non-persistent session cookie. No 30-minute inactivity logout.
+                The server enforces an absolute lifetime and server restarts
+                invalidate these in-memory sessions.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "400":
+          description: Missing or blank email/password
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Invalid credentials (deliberately identical for unknown user and wrong password)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Too many failed attempts for this client/email (rate limit)
+          headers:
+            Retry-After:
+              description: Whole seconds until the rate-limit window expires (RFC 9110)
+              schema:
+                type: integer
+                format: int64
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/auth/logout:
+    post:
+      operationId: logout
+      summary: Invalidate the caller's session
+      description: >-
+        Always 204 — logging out without a session is not an error. The
+        destroyed session id is never reissued. SEC-2: WITH a live session the
+        double-submit pair must validate (header + csrf cookie against the
+        token bound to that session), else 403 {"error":"CSRF_INVALID"}; the
+        check lives in the controller because logout sits on the OPEN auth
+        prefix and must read the session it is about to destroy. A successful
+        logout also clears the keplura_csrf cookie.
+      parameters:
+        - $ref: "#/components/parameters/CsrfHeader"
+      responses:
+        "204":
+          description: Session invalidated (if one existed)
+        "403":
+          description: Session exists but the CSRF pair is missing/mismatched
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/auth/me:
+    get:
+      operationId: getAuthMe
+      summary: Read the caller's own profile incl. ADMIN-KI role (session restore)
+      description: >-
+        The restore path for a webview reload / app restart: the desktop (which
+        persisted userId+displayName at login) learns its CURRENT role from the
+        live DB row here — a role change takes effect on next restore without
+        re-login. Lives on the OPEN /auth prefix by design (same pattern as
+        logout/csrf: it reads its own session). 401 generic body without a
+        valid session. The role is display-only; admin enforcement is
+        server-side per-request under /api/v1/admin/**.
+      responses:
+        "200":
+          description: Own profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeResponse"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/auth/csrf:
+    get:
+      operationId: getCsrfToken
+      summary: Re-read the CSRF token bound to the caller's session (SEC-2)
+      description: >-
+        Desktop restore path: after a webview reload or localStorage rotation
+        the JS side may hold the session cookie (native jar) but no token. This
+        GET re-emits the session-bound token in the body AND re-affirms the
+        keplura_csrf cookie. Idempotent — an already-bound session KEEPS its
+        token, so header/cookie/session never drift. A pre-SEC-2 session
+        (no attribute) gets a token minted on the spot: the caller is already
+        proven authenticated by that session. 401 without a valid session.
+      responses:
+        "200":
+          description: The session's CSRF token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CsrfTokenResponse"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/auth/oidc/providers:
+    get:
+      operationId: getOidcCapabilities
+      summary: Second-login-path capabilities flag (ADR-0009 §3)
+      description: >-
+        Unauthenticated coarse GET the login screen polls with the same probe
+        cycle as /system/info: does this deployment have an ACTIVE corporate
+        OIDC provider? The body carries only the boolean and operator-chosen
+        id+name labels — never issuer/client-id/urls. Any error (incl. server
+        offline) collapses to "no button" on the desktop (fail closed).
+      responses:
+        "200":
+          description: Capabilities projection
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OidcCapabilities"
+  /api/v1/auth/oidc/{providerId}/begin:
+    get:
+      operationId: beginOidcLogin
+      summary: Start an authorization-code+PKCE login (302 to the IdP)
+      description: >-
+        Top-level navigation entry (desktop webview assigns location here —
+        not a fetch). Server creates/refreshes the session↔binding pair
+        (state + PKCE verifier + issued-at held ONLY server-side), then 302s
+        to the provider's authorization endpoint with the DERIVED
+        redirect_uri (never a caller param; open-redirect wall, ADR-0009 §3).
+        Unknown/inactive id → 404; provider unreachable → 503 generic body;
+        per-IP flood guard → 429 + Retry-After.
+      parameters:
+        - name: providerId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "302":
+          description: Redirect to the identity provider
+        "404":
+          description: Unknown or inactive provider (uniform, anti-enumeration)
+        "429":
+          description: Begin rate limit (Retry-After seconds)
+        "503":
+          description: Provider unreachable (generic ErrorResponse body)
+  /api/v1/auth/oidc/{providerId}/callback:
+    get:
+      operationId: oidcCallback
+      summary: Browser landing leg — completes code exchange, returns to desktop via fragment
+      description: >-
+        The ONLY endpoint an external browser reaches in the flow. Validates
+        state against the session binding, exchanges the code at the token
+        endpoint (PKCE verifier + Basic auth), verifies the ID token (JWKS
+        signature, iss/aud/exp/nonce) and applies the account-link rules
+        (ADR-0009 §6: existing link, else verified-email match, else 403
+        pending link — NO auto-provisioning). Success 302s to the FIXED
+        desktop redirect origin with `#oidc=<handoff>` (one-time 256-bit code,
+        60s TTL); EVERY failure 302s to the same target with `#oidc-error` —
+        never a reason, never a status page.
+      parameters:
+        - name: providerId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: code
+          in: query
+          required: false
+          schema: { type: string }
+        - name: state
+          in: query
+          required: false
+          schema: { type: string }
+        - name: error
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        "302":
+          description: Always — to the desktop redirect with #oidc or #oidc-error
+  /api/v1/auth/oidc/exchange:
+    post:
+      operationId: exchangeOidcHandoff
+      summary: Turn the one-time handoff fragment code into a desktop session
+      description: >-
+        CSRF-exempt like /auth/login (no session yet; the single-use handoff
+        IS the authenticator). Consumes the handoff (expired/unknown/consumed
+        → 401 generic), then mints the session through the SAME path as local
+        login: invalidate old session → fresh session → principal → CSRF
+        bind + cookies. Response shape is deliberately identical to
+        LoginResponse so the desktop treats both logins as one flow.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OidcExchangeRequest"
+      responses:
+        "200":
+          description: Authenticated; session + CSRF cookies set
+          headers:
+            Set-Cookie:
+              description: Same pair as POST /auth/login (KEPLURASESSION + keplura_csrf)
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Dead/unknown/consumed handoff (generic ErrorResponse)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Exchange flood guard (Retry-After seconds; generic body)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  # ---------------------------------------------------------------------------
+  # OIDC-M2-Tail (ADR-0009 §2): the admin OIDC surface lives under
+  # /api/v1/admin/** so the DOUBLE gate documented above (session+CSRF via
+  # SessionAuthConfig, ADMIN role via AdminGuardInterceptor) covers it with
+  # zero new wiring — 401/403 occur on every operation below and are
+  # documented once here (same convention as the AI provider admin API).
+  /api/v1/admin/oidc/providers:
+    get:
+      operationId: listOidcProviders
+      summary: Admin list of OIDC provider configs (ADR-0009 §2)
+      description: >-
+        Under /api/v1/admin/** — session + CSRF + ADMIN role gates apply
+        exactly like the AI provider admin API. DTO NEVER carries the secret
+        ciphertext: only secretSet + a fixed mask.
+      responses:
+        "200":
+          description: All configured providers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OidcProviderDto"
+    post:
+      operationId: createOidcProvider
+      summary: Admin create an OIDC provider config
+      description: >-
+        clientSecret (plaintext, write-only) is AES-GCM sealed with the
+        existing SecretCipher before it touches the DB; issuer and
+        discoveryUrl pass the SsrfGuard dial policy at SAVE time (config is
+        admin-trusted input but the fetch itself re-checks at use time).
+        active=true on a second row activates it and deactivates the previous
+        one in the same transaction (single-active-slot invariant).
+      parameters:
+        - $ref: "#/components/parameters/CsrfHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OidcProviderCreateRequest"
+      responses:
+        "200":
+          description: Stored provider (200, not 201 — @RestController default)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OidcProviderDto"
+        "400":
+          description: Validation failure (generic field message, no secret echo)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminErrorResponse"
+        "503":
+          description: Master key missing but a secret was supplied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminErrorResponse"
+  /api/v1/admin/oidc/providers/{id}:
+    patch:
+      operationId: patchOidcProvider
+      summary: Admin update an OIDC provider config (null field = unchanged)
+      description: >-
+        Blank/absent clientSecret KEEPS the stored secret (rotate-only-when-
+        given). Same SSRF re-validation on any changed URL; same single-active
+        swap rule when active flips to true.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - $ref: "#/components/parameters/CsrfHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OidcProviderPatchRequest"
+      responses:
+        "200":
+          description: Updated provider
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OidcProviderDto"
+        "400":
+          description: Validation failure
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminErrorResponse"
+        "404":
+          description: No such provider
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminErrorResponse"
+  /api/v1/admin/oidc/providers/{id}/links:
+    get:
+      operationId: listOidcLinks
+      summary: Admin view of a provider's account links
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Links (subject ↔ user)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OidcLinkDto"
+        "404":
+          description: No such provider
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminErrorResponse"
+    put:
+      operationId: assignOidcLink
+      summary: Admin explicit pairing of an IdP subject to an existing user
+      description: >-
+        The manual path for the pending-link case (ADR-0009 §6): body is
+        {subject, email}; email must match an ACTIVE user row, subject must
+        not already be linked to another user. UNIQUE(provider,subject) is
+        the hard race guard.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - $ref: "#/components/parameters/CsrfHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [subject, email]
+              properties:
+                subject: { type: string }
+                email: { type: string }
+      responses:
+        "200":
+          description: Created/updated link
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OidcLinkDto"
+        "400":
+          description: Unknown email, blank subject, or subject linked to another user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminErrorResponse"
+        "404":
+          description: No such provider
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminErrorResponse"
+  /api/v1/orgs:
+    get:
+      operationId: listMyOrgs
+      summary: List the caller's organizations (membership-filtered)
+      description: >-
+        Requires a valid session cookie. Returns ONLY organizations where the
+        caller has a membership row (ADR-0004); the caller id is taken from
+        the session, never from request data.
+      responses:
+        "200":
+          description: The caller's organizations (empty array if none)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OrganizationResponse"
+        "401":
+          description: No valid session (generic body, no session minted)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createOrg
+      summary: Create an organization; caller becomes OWNER
+      description: >-
+        Requires a valid session cookie. Organization and OWNER membership
+        are written in one transaction (ADR-0004). Name is trimmed and
+        limited to 200 characters.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrgRequest"
+      responses:
+        "201":
+          description: Organization created, caller is OWNER
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrganizationResponse"
+        "400":
+          description: Missing/blank or too-long name
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/orgs/{id}:
+    get:
+      operationId: getMyOrg
+      summary: Read one organization (members only)
+      description: >-
+        Requires a valid session cookie AND a membership row for the caller.
+        A foreign existing id and a non-existent id answer the identical 404
+        with no body, so this endpoint cannot be used to enumerate
+        organization ids (IDOR defence, ADR-0004).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: The organization plus the caller's role in it
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrganizationResponse"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found for this caller (does not exist OR not a member — indistinguishable)
+  /api/v1/orgs/{orgId}/members:
+    get:
+      operationId: listOrgMembers
+      summary: List an organization's roster (OWNER only, SEC-2)
+      description: >-
+        Every membership row: user id, display name, role (OWNER/MEMBER), join
+        instant. Existence (404 uniform for foreign/unknown org) is checked
+        before privilege (403 for a non-OWNER member) — same order as the
+        invite surfaces (ADR-0004 IDOR defence).
+      parameters:
+        - $ref: "#/components/parameters/OrgIdPath"
+      responses:
+        "200":
+          description: The roster, oldest membership first
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OrgMember"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Caller is a member but not the OWNER
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Org unknown to this caller (does not exist OR no membership — indistinguishable)
+  /api/v1/orgs/{orgId}/invites:
+    get:
+      operationId: listPendingInvites
+      summary: List an organization's pending invites (OWNER only, SEC-2)
+      description: >-
+        Pending = not yet used, not revoked, not expired. The plaintext token
+        is NEVER part of this list — only its metadata; the hash never leaves
+        the DB. Same 404-then-403 order as the members roster.
+      parameters:
+        - $ref: "#/components/parameters/OrgIdPath"
+      responses:
+        "200":
+          description: All pending invites of the org (may be empty)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OrgInvite"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Caller is a member but not the OWNER
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Org unknown to this caller (indistinguishable from non-existent)
+    post:
+      operationId: createOrgInvite
+      summary: Mint a one-time MEMBER invite token (OWNER only, SEC-2)
+      description: >-
+        Creates an invite for the org: 32 fresh SecureRandom bytes rendered
+        hex, stored ONLY as a SHA-256 hash, single-use, expires after 7 days
+        (INVITE_TTL). The plaintext token appears in this ONE 201 response and
+        nowhere else afterwards (list shows metadata only) — the desktop shows
+        it exactly once. No email is sent: the owner forwards the token inside
+        the org (documented SEC-2 scope boundary). Redeemed by any authenticated
+        user via POST /api/v1/invites/accept; the invited account must already
+        exist (no self-registration until OIDC — deliberate non-goal).
+      parameters:
+        - $ref: "#/components/parameters/OrgIdPath"
+        - $ref: "#/components/parameters/CsrfHeader"
+      responses:
+        "201":
+          description: Invite created; the plaintext token is delivered exactly once
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InviteCreatedResponse"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Not OWNER, or CSRF pair missing/mismatched (CSRF_INVALID)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Org unknown to this caller (indistinguishable from non-existent)
+  /api/v1/orgs/{orgId}/invites/{inviteId}:
+    delete:
+      operationId: revokeOrgInvite
+      summary: Revoke a pending invite (OWNER only, SEC-2)
+      description: >-
+        Tenant-pinned delete (org_id AND id in one statement): an id belonging
+        to another org answers the same 404 as a non-existent one. After
+        revocation the token never redeems again.
+      parameters:
+        - $ref: "#/components/parameters/OrgIdPath"
+        - name: inviteId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - $ref: "#/components/parameters/CsrfHeader"
+      responses:
+        "204":
+          description: Invite revoked
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Not OWNER, or CSRF pair missing/mismatched (CSRF_INVALID)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Invite unknown to this org (absent, other org's, or already used — indistinguishable)
+  /api/v1/invites/accept:
+    post:
+      operationId: acceptInvite
+      summary: Join the invite's organization as MEMBER (SEC-2)
+      description: >-
+        Identity is the SESSION, the token only selects the org — the route
+        sits on its own protected prefix (/api/v1/invites/**, SessionAuthConfig)
+        because the acceptor is by definition not yet reachable through any
+        org-scoped path. Single use: the redeem flips used_at atomically, a
+        replay is the same uniform 404 as unknown/revoked/expired (no probing).
+        An existing membership answers 409 and the invite survives for its
+        next reader. Mints MEMBER rows only — never OWNER (structural guard).
+      parameters:
+        - $ref: "#/components/parameters/CsrfHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InviteAcceptRequest"
+      responses:
+        "200":
+          description: Joined the organization
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InviteAcceptResponse"
+        "400":
+          description: Missing or blank token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: CSRF pair missing/mismatched (CSRF_INVALID)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Token unknown, used, revoked or expired (indistinguishable)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Caller is already a member of this organization (invite stays usable)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/orgs/{orgId}/spaces:
+    get:
+      operationId: listOrgSpaces
+      summary: List an organization's spaces (org members only)
+      description: >-
+        Requires a valid session cookie AND a membership row for {orgId}
+        (M3b: org membership IS the space ACL — no per-space roles yet).
+        A foreign org answers the same 404 as an absent one, so this route
+        cannot enumerate org ids either.
+      parameters:
+        - $ref: "#/components/parameters/OrgIdPath"
+      responses:
+        "200":
+          description: The organization's spaces (empty array if none)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SpaceResponse"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Organization not visible to this caller (foreign or absent — indistinguishable)
+    post:
+      operationId: createSpace
+      summary: Create a space inside the caller's organization
+      description: >-
+        Requires a valid session cookie AND membership in {orgId}. Name is
+        trimmed, limited to 200 characters and unique WITHIN the organization
+        (different orgs may reuse it).
+      parameters:
+        - $ref: "#/components/parameters/OrgIdPath"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSpaceRequest"
+      responses:
+        "201":
+          description: Space created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpaceResponse"
+        "400":
+          description: Missing/blank or too-long name
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Organization not visible to this caller (foreign or absent — indistinguishable)
+        "409":
+          description: A space with this name already exists in this organization
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/orgs/{orgId}/spaces/{spaceId}:
+    get:
+      operationId: getOrgSpace
+      summary: Read one space (org members only, via its own org path)
+      description: >-
+        Requires a valid session cookie AND membership in {orgId}, AND the
+        space must actually belong to {orgId}. A foreign space id under any
+        path, a wrong org path and an unknown id all answer the identical
+        empty 404 — this route cannot enumerate space ids (IDOR defence,
+        ADR-0004 pattern).
+      parameters:
+        - $ref: "#/components/parameters/OrgIdPath"
+        - name: spaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: The space
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpaceResponse"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not visible to this caller (absent, foreign org, or space belongs to another org — indistinguishable)
+  /api/v1/orgs/{orgId}/spaces/{spaceId}/knowledge-bases:
+    get:
+      operationId: listSpaceKnowledgeBases
+      summary: List a space's knowledge bases (org members only)
+      description: >-
+        Requires a valid session cookie AND a membership row for {orgId}, AND
+        the space must belong to {orgId} (M3c: org membership IS the kb ACL —
+        no per-kb roles yet). Foreign org, wrong org path and absent space all
+        answer the same empty 404. CORS: credentialed desktop webview origins
+        are allowed via the /api/v1/orgs/** mapping (DesktopCorsConfig; M3e —
+        the knowledge UI lists/creates kbs, uploads documents and searches
+        from the webview; GET+POST, Content-Type, exposed Retry-After,
+        Content-Disposition and X-Index-Status — pinned by
+        DesktopCorsIntegrationTest).
+      parameters:
+        - $ref: "#/components/parameters/OrgIdPath"
+        - $ref: "#/components/parameters/SpaceIdPath"
+      responses:
+        "200":
+          description: The space's knowledge bases (empty array if none)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KnowledgeBaseResponse"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Chain not visible to this caller (absent or foreign at any level — indistinguishable)
+    post:
+      operationId: createSpaceKnowledgeBase
+      summary: Create a knowledge base inside the caller's space
+      description: >-
+        Requires a valid session cookie AND membership in {orgId}, AND the
+        space must belong to {orgId}. Name is trimmed, limited to 200
+        characters and unique WITHIN the space (other spaces may reuse it).
+      parameters:
+        - $ref: "#/components/parameters/OrgIdPath"
+        - $ref: "#/components/parameters/SpaceIdPath"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateKnowledgeBaseRequest"
+      responses:
+        "201":
+          description: Knowledge base created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KnowledgeBaseResponse"
+        "400":
+          description: Missing/blank or too-long name
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Chain not visible to this caller (absent or foreign at any level — indistinguishable)
+        "409":
+          description: A knowledge base with this name already exists in this space
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/orgs/{orgId}/spaces/{spaceId}/knowledge-bases/{kbId}:
+    get:
+      operationId: getSpaceKnowledgeBase
+      summary: Read one knowledge base (org members only, via its own space path)
+      description: >-
+        Requires a valid session cookie AND membership in {orgId}, AND the kb
+        must belong to {spaceId} which must belong to {orgId}. A foreign kb id
+        under any path, a wrong space/org path and an unknown id all answer the
+        identical empty 404 — this route cannot enumerate kb ids (IDOR defence,
+        ADR-0004 pattern). DELETE is a documented M3c Non-Goal (like spaces).
+      parameters:
+        - $ref: "#/components/parameters/OrgIdPath"
+        - $ref: "#/components/parameters/SpaceIdPath"
+        - $ref: "#/components/parameters/KbIdPath"
+      responses:
+        "200":
+          description: The knowledge base
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KnowledgeBaseResponse"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not visible to this caller (absent or foreign at any level — indistinguishable)
+  /api/v1/orgs/{orgId}/spaces/{spaceId}/knowledge-bases/{kbId}/documents:
+    get:
+      operationId: listKbDocuments
+      summary: List a knowledge base's documents (org members only)
+      description: >-
+        Requires a valid session cookie AND the full membership + space + kb
+        chain. Returns METADATA ONLY (never the server-side storage path);
+        parsing/embedding of the bytes is M3d.
+      parameters:
+        - $ref: "#/components/parameters/OrgIdPath"
+        - $ref: "#/components/parameters/SpaceIdPath"
+        - $ref: "#/components/parameters/KbIdPath"
+      responses:
+        "200":
+          description: The kb's documents in upload order (empty array if none)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DocumentResponse"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Chain not visible to this caller (absent or foreign at any level — indistinguishable)
+    post:
+      operationId: uploadKbDocument
+      summary: Upload one document into the knowledge base (multipart)
+      description: >-
+        multipart/form-data with a single file part named "file". The stored
+        type is decided by the file EXTENSION against a server-side whitelist
+        (pdf/txt/md/docx/csv) — the client part Content-Type is ignored. The
+        part name is reduced to a safe display name and NEVER shapes the
+        storage path (server-generated UUID layout). Size is capped by
+        keplura.upload.max-size-bytes (default 20 MiB). Since M3d the
+        whitelisted types are indexed inside the upload transaction: txt/md/
+        csv decode as strict UTF-8, and since MVP-5 pdf/docx are extracted
+        with Apache Tika (PDFBox/POI) under resource limits — a document that
+        cannot be decoded/extracted (bad bytes, encrypted, over the extraction
+        caps) rolls the whole upload back to this 400; no half-indexed row is
+        ever visible. Virus scanning stays a documented gap.
+      parameters:
+        - $ref: "#/components/parameters/OrgIdPath"
+        - $ref: "#/components/parameters/SpaceIdPath"
+        - $ref: "#/components/parameters/KbIdPath"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  contentEncoding: binary
+                  description: The document bytes; filename extension must be whitelisted.
+      responses:
+        "201":
+          description: Document stored; metadata (incl. sha256 of the stored bytes) returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentResponse"
+        "400":
+          description: Missing/empty file part, unusable filename, non-whitelisted type, or content that failed indexing (invalid UTF-8 text, unparseable/encrypted pdf-docx, extraction limit hit)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Chain not visible to this caller (absent or foreign at any level — indistinguishable)
+        "413":
+          description: Document exceeds the configured upload size limit
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Document extraction pool saturated (MVP-5) — retry the upload shortly; nothing was stored
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/orgs/{orgId}/spaces/{spaceId}/knowledge-bases/{kbId}/documents/{documentId}/preview:
+    get:
+      operationId: previewKbDocument
+      summary: Read a bounded text window at a cited source location
+      description: >-
+        Session and complete tenant chain required. Returns already-indexed
+        text, never HTML, original active bytes or stored file paths. At most
+        21 chunks surround chunkIdx. Optional offsets/pages reject stale
+        citations with the same empty 404 as an inaccessible document. No
+        parser or model is invoked. Documents without indexed text return an
+        empty block list and their honest indexStatus.
+      parameters:
+        - $ref: "#/components/parameters/OrgIdPath"
+        - $ref: "#/components/parameters/SpaceIdPath"
+        - $ref: "#/components/parameters/KbIdPath"
+        - name: documentId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+        - name: chunkIdx
+          in: query
+          schema: { type: integer, minimum: 0, default: 0 }
+        - name: startOffset
+          in: query
+          schema: { type: integer, minimum: 0 }
+        - name: pageNumber
+          in: query
+          schema: { type: integer, minimum: 1 }
+      responses:
+        "200":
+          description: Private plain-text preview window
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+            X-Content-Type-Options:
+              schema: { type: string, const: nosniff }
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentPreview"
+        "400":
+          description: Invalid source position
+        "401":
+          description: No valid session
+        "404":
+          description: Document or source position unavailable (uniform empty response)
+  /api/v1/orgs/{orgId}/spaces/{spaceId}/knowledge-bases/{kbId}/documents/{documentId}/download:
+    get:
+      operationId: downloadKbDocument
+      summary: Stream one document's stored bytes back
+      description: >-
+        Requires a valid session cookie AND the full membership + space + kb
+        chain pinning THIS document (a victim document id under another kb,
+        space or org answers the identical empty 404). Serves the
+        server-mapped Content-Type for the whitelisted extension plus an
+        attachment Content-Disposition carrying the sanitised display name
+        (exposed to CORS clients). A row whose file went missing/unreadable
+        also answers 404 — the wire never distinguishes "not yours", "gone"
+        and "never existed".
+      parameters:
+        - $ref: "#/components/parameters/OrgIdPath"
+        - $ref: "#/components/parameters/SpaceIdPath"
+        - $ref: "#/components/parameters/KbIdPath"
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: The stored bytes
+          headers:
+            Content-Security-Policy:
+              description: "sandbox — text-type files can never execute in the caller's browser context"
+              schema:
+                type: string
+                example: sandbox
+            X-Content-Type-Options:
+              description: "nosniff — stored bytes keep their declared type"
+              schema:
+                type: string
+                example: nosniff
+            X-Index-Status:
+              description: >-
+                Honest searchability of this document (M3d; parser states
+                since MVP-5): INDEXED, NO_TEXT_LAYER (pdf/docx without an
+                extractable text layer, e.g. a scan) or NOT_INDEXED;
+                CORS-exposed so the desktop knowledge UI can render it per
+                row.
+              schema:
+                type: string
+                enum: [INDEXED, NO_TEXT_LAYER, NOT_INDEXED]
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                contentEncoding: binary
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not visible to this caller (absent, foreign chain, or unreadable file — indistinguishable)
+  /api/v1/orgs/{orgId}/spaces/{spaceId}/knowledge-bases/{kbId}/search:
+    post:
+      operationId: searchKbChunks
+      summary: RAG-light chunk search over one knowledge base (M3d)
+      description: >-
+        Embeds the query and returns the most similar chunks of THIS
+        knowledge base, each with full source attribution (documentId,
+        filename, chunkIdx, text, cosine score in [-1,1]) — retrieval with
+        citations, no generated answer (chat is a later milestone).
+        Requires a valid session AND the full membership + space + kb chain
+        (foreign/unknown at any level answers the identical 404 — the search
+        route cannot probe tenant structure either). Since MVP-5 every
+        whitelisted type is indexed: txt/md/csv are decoded as text, pdf/docx
+        are extracted with Apache Tika — a search hit may therefore cite text
+        that only exists inside a PDF/DOCX. A pdf/docx without extractable
+        text (a scan) is stored honestly with indexStatus=NO_TEXT_LAYER and
+        is absent from results; unparseable binaries (corrupt/encrypted/
+        over-limit) never reach the corpus at all (their upload 400s).
+        The response echoes the active backend ("memory" in-JVM cosine on
+        H2, "pgvector" native KNN on PostgreSQL+extension — see ADR-0007)
+        and the embedding model tag ("local-hash-*" is the deterministic
+        dev/CI stand-in, never a semantic model). CORS: the desktop knowledge
+        UI calls this route (JSON POST -> preflighted); the /api/v1/orgs/**
+        mapping allows GET+POST with Content-Type for the webview origins,
+        pinned by DesktopCorsIntegrationTest (M3e).
+      parameters:
+        - $ref: "#/components/parameters/OrgIdPath"
+        - $ref: "#/components/parameters/SpaceIdPath"
+        - $ref: "#/components/parameters/KbIdPath"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRequest"
+      responses:
+        "200":
+          description: Ranked chunks with citations (possibly empty if nothing matches)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResponse"
+        "400":
+          description: Blank or oversized query (max keplura.search.max-query-chars)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Chain not visible to this caller (absent or foreign at any level — indistinguishable)
+        "500":
+          description: Embedding/store outage (no internals revealed)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/gateway/status:
+    get:
+      operationId: getGatewayStatus
+      summary: Model gateway availability probe (M4a)
+      description: >-
+        Session-gated AND org-scoped: the caller MUST carry a valid session
+        cookie and the X-Keplura-Org header naming an organization it is a
+        member of. The response is EXACTLY one boolean — whether a model
+        upstream is configured on this server. The API key, the upstream URL,
+        the model list and every other configuration fact are server-side
+        only and can never be read through this API (or any other).
+      parameters:
+        - $ref: "#/components/parameters/GatewayOrgHeader"
+      responses:
+        "200":
+          description: Configuration state of the gateway
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GatewayStatus"
+        "400":
+          description: X-Keplura-Org header missing or not a positive integer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Org not visible to this caller (foreign or unknown — indistinguishable)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/gateway/chat/completions:
+    post:
+      operationId: createChatCompletion
+      summary: OpenAI-compatible chat proxy; upstream keys stay server-side (M4a)
+      description: >-
+        Session-gated AND org-scoped (X-Keplura-Org header, membership
+        required; foreign/unknown org is the uniform 404). The JSON request is
+        validated against an explicit whitelist and re-serialised before it
+        touches the configured upstream: unknown fields are DROPPED, and the
+        MVP contract rejects multimodal content parts plus tool/structured-
+        output fields (tools, tool_choice, response_format, functions) with a
+        400 instead of silently forwarding them. Message content must be a
+        plain string; model is required and may be pinned server-side via an
+        allow-list. stream=true relays the upstream SSE verbatim (raw data
+        frames ending in the DONE sentinel); a stream cut short by a timeout
+        or byte cap simply lacks the DONE sentinel — the honest incomplete
+        signal. The bearer key for the upstream is held ONLY by the server
+        and never appears in any response, header, or server log. Error
+        mapping is leak-free: upstream rate limit -> 429 (sanitised numeric
+        Retry-After only), unreachable/refused/5xx/wrong-content-type -> 502,
+        not configured -> 503, oversized body -> 413, invalid request -> 400;
+        upstream error bodies and headers are never relayed.
+      parameters:
+        - $ref: "#/components/parameters/GatewayOrgHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatCompletionRequest"
+      responses:
+        "200":
+          description: >-
+            Upstream answer relayed as-is: application/json (buffered) or
+            text/event-stream (SSE frames, X-Accel-Buffering: no).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatCompletionResponse"
+            text/event-stream:
+              schema:
+                type: string
+                description: Raw OpenAI-compatible SSE frames, DONE sentinel terminated.
+        "400":
+          description: Invalid JSON, missing model, bad role, disallowed model, unsupported field
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Org not visible to this caller (foreign or unknown — indistinguishable)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "413":
+          description: Request body over keplura.gateway.max-request-bytes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Upstream rate limit (generic body; Retry-After only in plain-seconds form)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: Upstream unreachable, refused, non-2xx, or wrong content type (generic body, no upstream detail)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Gateway not configured (no base URL; nothing was called)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/orgs/{orgId}/spaces/{spaceId}/chat/conversations:
+    get:
+      operationId: listChatConversations
+      summary: My chat conversations in one space (M4b)
+      description: >-
+        Session-gated. Personal threads: only conversations OWNED by the
+        session user inside this org+space are listed (newest activity first);
+        a conversation in the same space owned by another user is invisible
+        (uniform 404 on direct access). The org+space membership chain is
+        validated exactly like the knowledge routes.
+      parameters:
+        - $ref: "#/components/parameters/OrgIdPath"
+        - $ref: "#/components/parameters/SpaceIdPath"
+      responses:
+        "200":
+          description: Conversations (possibly empty)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChatConversation"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Org/space chain not visible to this caller (indistinguishable)
+    post:
+      operationId: createChatConversation
+      summary: Start a conversation, optionally pinned to a KB for RAG (M4b)
+      description: >-
+        Session-gated. knowledgeBaseId (optional) pins the retrieval context:
+        every turn then retrieves top-k chunks from that KB inside the same
+        space, grounds the prompt with them and attaches the citations to the
+        persisted answer. A kb that is not visible in this chain is the
+        uniform 404 (never a silently plain chat). Title optional; the first
+        prompt auto-titles an untitled thread.
+      parameters:
+        - $ref: "#/components/parameters/OrgIdPath"
+        - $ref: "#/components/parameters/SpaceIdPath"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateChatConversationRequest"
+      responses:
+        "201":
+          description: Created conversation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatConversation"
+        "400":
+          description: Oversized/blank-invalid title or malformed body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Chain (or knowledgeBaseId) not visible to this caller
+  /api/v1/orgs/{orgId}/chat/conversations/{conversationId}:
+    get:
+      operationId: getChatTranscript
+      summary: Full transcript of one personal conversation (M4b)
+      description: >-
+        Session-gated. Assistant rows carry their persisted citations and the
+        honest end status of their turn: complete | aborted (client Stop
+        killed the relay — the partial text IS what was persisted) | failed
+        (upstream could not answer) | incomplete (deadline/byte cap cut the
+        stream before the DONE sentinel).
+      parameters:
+        - $ref: "#/components/parameters/OrgIdPath"
+        - $ref: "#/components/parameters/ConversationIdPath"
+      responses:
+        "200":
+          description: Transcript, oldest message first
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatTranscript"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Conversation not yours/visible in this org (indistinguishable)
+    delete:
+      operationId: deleteChatConversation
+      summary: Hard delete one conversation and its messages (M4b)
+      description: >-
+        Session-gated; only the owning user's conversation inside this org
+        (same visibility predicate as the read that authorised it). Deletes
+        are permanent — M4b ships no trash/restore.
+      parameters:
+        - $ref: "#/components/parameters/OrgIdPath"
+        - $ref: "#/components/parameters/ConversationIdPath"
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Conversation not yours/visible in this org
+  /api/v1/orgs/{orgId}/chat/conversations/{conversationId}/stream:
+    post:
+      operationId: streamChatTurn
+      summary: One streaming chat turn over a persisted conversation (M4b)
+      description: >-
+        Session-gated. Body is ONLY {prompt} — the upstream request (model,
+        context window, framing) is built server-side from persisted history;
+        clients can never inject messages. The user prompt is committed BEFORE
+        the first byte; every error decision (400 blank/oversized prompt,
+        404 gone, 429 upstream rate limit, 502 upstream failure, 503 gateway
+        unconfigured) happens BEFORE the response opens, so error bodies keep
+        the plain ErrorResponse JSON shape. Once the stream opened, the
+        upstream SSE frames are relayed verbatim (OpenAI-compatible deltas,
+        DONE sentinel) followed by chat-only trailer events: "citations"
+        (JSON array, KB-grounded sources of this answer) and "turn"
+        ({status}). Stop = close the connection (abort the fetch): the
+        server's next write breaks, and the partial answer persists as
+        status=aborted. A cut-short stream without the DONE sentinel remains
+        the honest incomplete signal (M4a precedent).
+      parameters:
+        - $ref: "#/components/parameters/OrgIdPath"
+        - $ref: "#/components/parameters/ConversationIdPath"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatTurnRequest"
+      responses:
+        "200":
+          description: >-
+            text/event-stream: relayed upstream frames + citations/turn
+            trailer events; X-Accel-Buffering: no.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                description: Raw OpenAI-compatible SSE frames plus chat trailer events.
+        "400":
+          description: Blank or oversized prompt (max keplura.chat.max-prompt-chars) or invalid JSON
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No valid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Conversation not yours/visible in this org (or org unknown)
+        "429":
+          description: Upstream rate limit (generic body; Retry-After only in plain-seconds form)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: Upstream unreachable/refused/non-2xx (generic body; turn persisted as failed)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Gateway not configured (nothing called, prompt NOT persisted)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  # ---------------------------------------------------------------------------
+  # ADMIN-KI (ADR-0008): everything under /api/v1/admin/** is DOUBLE-GATED
+  # server-side: session+CSRF (SessionAuthConfig, same rules as every other
+  # authed endpoint) AND the ADMIN role (AdminGuardInterceptor). 401/403/403
+  # therefore occur on every admin operation below; they are documented once
+  # here instead of repeating them per response block.
+  /api/v1/admin/providers:
+    get:
+      operationId: listAdminProviders
+      summary: List configured KI providers (ADMIN-KI Scope B)
+      responses:
+        "200":
+          description: All providers, creation order
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminProvider"
+    post:
+      operationId: createAdminProvider
+      summary: Create a provider (ADMIN-KI Scope B)
+      description: >-
+        Validates name/type/baseUrl (http/https, syntactically legal host)
+        BEFORE the secret is touched; duplicate name (case-insensitive) is
+        400. The plaintext secret is write-only: it is stored AES-GCM-
+        encrypted and never appears in any response — only the booleans/mask
+        of AdminProvider. With the master key unset
+        (KEPLURA_SECRETS_MASTER_KEY) a non-empty secret fails 503
+        {"error":"MASTER_KEY_MISSING"}.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminProviderCreateRequest"
+      responses:
+        "200":
+          description: >-
+            Created row (200, not 201 - plain @RestController without
+            @ResponseStatus)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminProvider"
+        "400":
+          description: Validation failure (generic field message, no secret echo)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminErrorResponse"
+        "503":
+          description: Master key missing but a secret was supplied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminErrorResponse"
+  /api/v1/admin/providers/{id}:
+    patch:
+      operationId: updateAdminProvider
+      summary: Partial provider update (ADMIN-KI Scope B)
+      description: >-
+        Null field = unchanged. A blank/absent secret KEEPS the stored one
+        (PO discipline); a non-empty secret replaces it. Clearing a secret is
+        deliberately not an offered verb (delete+recreate instead).
+      parameters:
+        - $ref: "#/components/parameters/AdminIdPath"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminProviderPatchRequest"
+      responses:
+        "200":
+          description: Updated row
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminProvider"
+        "400":
+          description: Validation failure
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminErrorResponse"
+        "404":
+          description: No such provider
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminErrorResponse"
+  /api/v1/admin/providers/{id}/test:
+    post:
+      operationId: testAdminProvider
+      summary: Dial-out connection test for a STORED provider (ADMIN-KI Scope B/E)
+      description: >-
+        Deliberately NO arbitrary-URL probe: only a stored, operator-reviewed
+        row may be dialled. Route policy (SsrfGuard: loopback/RFC1918/CGNAT
+        allowed, link-local 169.254.0.0/16, ::1-except-loopback and metadata
+        IPs refused) runs BEFORE the dial, then the real endpoint (ollama:
+        /api/tags; otherwise /v1/models with the stored key). The response is
+        closed-vocabulary {reachable, code} — never a host, port, IP or
+        exception detail. code is one of: reachable,
+        reachable_upstream_error (host answered, non-2xx), unreachable
+        (DNS/connect/timeout). An SSRF-refused target is never dialled and
+        answers 400 {error, code:"connection_target_refused"} instead.
+      parameters:
+        - $ref: "#/components/parameters/AdminIdPath"
+      responses:
+        "200":
+          description: Test outcome (also for unreachable - the dial happened, the answer is data)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminConnectionTestResult"
+        "400":
+          description: SSRF-refused target (connection_target_refused) or unrestorable stored URL — never dialled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminErrorResponse"
+        "404":
+          description: No such provider
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminErrorResponse"
+  /api/v1/admin/models:
+    get:
+      operationId: listAdminModels
+      summary: List configured KI models with their provider names (ADMIN-KI Scope C)
+      responses:
+        "200":
+          description: All models, creation order
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminModel"
+    post:
+      operationId: createAdminModel
+      summary: Register a model on an existing provider (ADMIN-KI Scope C)
+      description: >-
+        modelType is CHAT or EMBEDDING (case-insensitive, normalised upper).
+        An EMBEDDING model REQUIRES embeddingDim in 8-65536 — it must match
+        the real output width of the upstream model. A CHAT model must NOT
+        carry one (400). temperature 0-2, maxOutputTokens 0-1024 (the gateway
+        clamps at 1024 — beyond it is refused, not silently capped).
+        providerId must reference an existing provider.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminModelCreateRequest"
+      responses:
+        "200":
+          description: Created row (200, not 201 — see AdminProvider create)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminModel"
+        "400":
+          description: Validation failure (incl. embeddingDim on a CHAT model, unknown provider, out-of-range dimension)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminErrorResponse"
+  /api/v1/admin/models/{id}:
+    patch:
+      operationId: updateAdminModel
+      summary: Partial model update (ADMIN-KI Scope C)
+      description: >-
+        modelType, provider and embeddingDim are immutable after creation
+        (dimension freeze). Blank/null fields are unchanged.
+      parameters:
+        - $ref: "#/components/parameters/AdminIdPath"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminModelPatchRequest"
+      responses:
+        "200":
+          description: Updated row
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminModel"
+        "400":
+          description: Validation failure (incl. immutable-field changes)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminErrorResponse"
+        "404":
+          description: No such model
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminErrorResponse"
+  /api/v1/admin/models/{id}/default:
+    put:
+      operationId: setAdminModelDefault
+      summary: Move the default slot of the model's type to this row (ADMIN-KI Scope C/D)
+      description: >-
+        Atomic (SERIALIZABLE swap): the previous default of the same type
+        (CHAT or EMBEDDING) is unset in the same transaction. A disabled
+        MODEL or a DISABLED PROVIDER cannot hold the default (400). Changing
+        the EMBEDDING default NEVER triggers re-indexing —
+        existing vectors keep the old model; the hint is surfaced via
+        rag-settings.
+      parameters:
+        - $ref: "#/components/parameters/AdminIdPath"
+      responses:
+        "200":
+          description: The new default row
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminModel"
+        "400":
+          description: Model disabled / invalid state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminErrorResponse"
+        "404":
+          description: No such model
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminErrorResponse"
+  /api/v1/admin/rag-settings:
+    get:
+      operationId: getAdminRagSettings
+      summary: Read-only RAG/chunking/chat defaults (ADMIN-KI Scope E)
+      description: >-
+        Pure visibility, NO editing surface (ADR-0008 Scope E): deployment
+        properties would need a restart anyway, and half-configured DB state
+        is worse than ENV-only truth. Includes the explicit re-index warning
+        for embedding-model changes.
+      responses:
+        "200":
+          description: Settings map (activeEmbeddingModel/Dim, envEmbeddingBackend, reindexOnModelChange, reindexHint, chunking{...editable:false}, chat{...editable:false})
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /api/v1/admin/system-status:
+    get:
+      operationId: getAdminSystemStatus
+      summary: Passive status board (ADMIN-KI Scope E)
+      description: >-
+        Reads ONLY local state — never dials a provider (an admin poll must
+        not hammer Ollama). Keys: gateway (ok / no_default_model / not_ready),
+        secretStore (ok / unavailable), db (ok / error), embedding
+        (state=static_backend, detail=backend class), providers (count),
+        models (count).
+      responses:
+        "200":
+          description: Component states
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: "#/components/schemas/AdminComponentState"
+  /api/v1/admin/seed-offer:
+    get:
+      operationId: getAdminSeedOffer
+      summary: Offer to import the existing ENV gateway config (ADMIN-KI Scope A)
+      description: >-
+        available=true only while NO provider row exists AND the ENV gateway
+        is configured (keplura.gateway.base-url + chat model). The key is
+        NEVER included — import re-uses the ENV key by leaving the provider
+        secret empty (RuntimeProviderConfigResolver falls back to ENV).
+      responses:
+        "200":
+          description: The offer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSeedOffer"
+  /api/v1/admin/seed-from-env:
+    post:
+      operationId: postAdminSeedFromEnv
+      summary: Apply the ENV seed offer explicitly (ADMIN-KI Scope A)
+      description: >-
+        One-click, idempotent-by-absence: creates provider (type from
+        keplura.gateway.provider, base URL) plus the ENV CHAT model row as
+        default. Refuses (created=false, message) once any provider exists or
+        without ENV gateway config. If the ENV api-key exists AND the master
+        key is loaded, the key is copied encrypted; without master key the
+        provider keeps no stored secret (ENV fallback still serves it).
+      responses:
+        "200":
+          description: >-
+            Always 200 with {created, message}: created=true on a successful
+            seed, created=false + German refusal text when there is nothing to
+            import or providers already exist (refusal is DATA, not an HTTP
+            error — the same honesty posture as the connection test).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSeedResult"
+components:
+  parameters:
+    CsrfHeader:
+      name: X-CSRF-Token
+      in: header
+      required: true
+      description: >-
+        SEC-2 double-submit token: the value of the `keplura_csrf` cookie
+        (delivered at login in body + cookie), echoed verbatim on every
+        POST/PUT/DELETE under /api/v1/** except login itself. Missing or
+        mismatching values fail closed with 403 {"error":"CSRF_INVALID"}.
+        OPTIONS preflights and GETs (incl. SSE streams) never need it — a
+        same-site GET cannot mutate state.
+      schema:
+        type: string
+    GatewayOrgHeader:
+      name: X-Keplura-Org
+      in: header
+      required: true
+      description: >-
+        Tenant selector for gateway calls (M4a): the numeric org id whose
+        membership authorises spending the shared model key. Validated
+        server-side against the session user; never trusted from a client
+        body, and CORS allows the header only for desktop webview origins.
+      schema:
+        type: integer
+        format: int64
+    OrgIdPath:
+      name: orgId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    SpaceIdPath:
+      name: spaceId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    KbIdPath:
+      name: kbId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    ConversationIdPath:
+      name: conversationId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    AdminIdPath:
+      name: id
+      in: path
+      required: true
+      description: Numeric admin row id (provider or model).
+      schema:
+        type: integer
+        format: int64
+  schemas:
+    # ---- ADMIN-KI (ADR-0008): admin surface shapes. The login response now
+    # additionally carries `role` (USER | ADMIN) — see LoginResponse. ----
+    AdminProvider:
+      type: object
+      required: [id, name, providerType, baseUrl, secretSet, secretMasked, timeoutSeconds, enabled]
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          description: Operator-visible label (max 200 chars, unique case-insensitively).
+        providerType:
+          type: string
+          enum: [ollama, vllm, api]
+        baseUrl:
+          type: string
+          description: Scheme+authority (no path/query/fragment), normalised lowercase.
+        secretSet:
+          type: boolean
+          description: Whether an ENCRYPTED secret exists for this provider. Never the secret itself.
+        secretMasked:
+          type: string
+          description: Constant mask when secretSet, else "" — constant-length by design, leaks no key length.
+        timeoutSeconds:
+          type: integer
+          description: Dial timeout for connection tests and runtime calls (1-300, default 30).
+        enabled:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    AdminProviderCreateRequest:
+      type: object
+      required: [name, providerType, baseUrl]
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+        providerType:
+          type: string
+          enum: [ollama, vllm, api]
+        baseUrl:
+          type: string
+        secret:
+          type: string
+          description: >-
+            Write-only plaintext (TLS only): stored AES-GCM-encrypted, never
+            echoed. Blank/absent = no secret (local Ollama, or the ENV seed
+            path which keeps using the ENV key).
+        timeoutSeconds:
+          type: integer
+        enabled:
+          type: boolean
+    AdminProviderPatchRequest:
+      type: object
+      additionalProperties: false
+      description: Null field = unchanged. Blank secret KEEPS the stored one; non-empty replaces it.
+      properties:
+        name:
+          type: string
+        baseUrl:
+          type: string
+        timeoutSeconds:
+          type: integer
+        enabled:
+          type: boolean
+        secret:
+          type: string
+    AdminConnectionTestResult:
+      type: object
+      required: [reachable, code]
+      additionalProperties: false
+      description: >-
+        Closed vocabulary from ConnectionTester. Deliberately NO host/port/
+        exception detail — a probe answer must not become an oracle.
+      properties:
+        reachable:
+          type: boolean
+        code:
+          type: string
+          enum: [reachable, reachable_upstream_error, unreachable]
+    AdminModel:
+      type: object
+      required: [id, providerId, providerName, name, technicalModelId, modelType, enabled, isDefault]
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+          format: int64
+        providerId:
+          type: integer
+          format: int64
+        providerName:
+          type: string
+        name:
+          type: string
+          description: Operator-visible label.
+        technicalModelId:
+          type: string
+          description: Model id sent upstream (Ollama name / OpenAI model field).
+        modelType:
+          type: string
+          enum: [CHAT, EMBEDDING]
+        embeddingDim:
+          type: ["integer", "null"]
+          description: Frozen at first EMBEDDING use (first-write-wins) - pgvector column width.
+        maxOutputTokens:
+          type: ["integer", "null"]
+        temperature:
+          type: ["number", "null"]
+        enabled:
+          type: boolean
+        isDefault:
+          type: boolean
+          description: Holds the default slot of its modelType (at most one per type).
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    AdminModelCreateRequest:
+      type: object
+      required: [providerId, name, technicalModelId, modelType]
+      additionalProperties: false
+      properties:
+        providerId:
+          type: integer
+          format: int64
+        name:
+          type: string
+        technicalModelId:
+          type: string
+        modelType:
+          type: string
+          enum: [CHAT, EMBEDDING]
+        embeddingDim:
+          type: ["integer", "null"]
+          description: REQUIRED for EMBEDDING (1-4096), rejected for CHAT.
+        maxOutputTokens:
+          type: ["integer", "null"]
+        temperature:
+          type: ["number", "null"]
+        enabled:
+          type: boolean
+    AdminModelPatchRequest:
+      type: object
+      additionalProperties: false
+      description: >-
+        Only the listed fields exist — modelType, providerId and embeddingDim
+        are not patchable at all (immutable after creation, dimension freeze).
+      properties:
+        name:
+          type: string
+        technicalModelId:
+          type: string
+        maxOutputTokens:
+          type: ["integer", "null"]
+        temperature:
+          type: ["number", "null"]
+        enabled:
+          type: boolean
+    AdminErrorResponse:
+      type: object
+      required: [error, code]
+      additionalProperties: false
+      description: >-
+        Admin-surface error body (AdminErrorAdvice) — like ErrorResponse plus
+        the stable machine code (connection_target_refused, admin_failure,
+        MASTER_KEY_MISSING...); generic text only, never exception detail.
+      properties:
+        error:
+          type: string
+        code:
+          type: string
+    AdminComponentState:
+      type: object
+      required: [state, detail]
+      additionalProperties: false
+      properties:
+        state:
+          type: string
+          description: ok / no_default_model / not_ready / unavailable / error / static_backend.
+        detail:
+          type: string
+    AdminSeedOffer:
+      type: object
+      required: [available, hasKey, providerType, baseUrl, chatModel]
+      additionalProperties: false
+      properties:
+        available:
+          type: boolean
+          description: True only while zero providers exist AND the ENV gateway is configured.
+        hasKey:
+          type: boolean
+          description: Whether the ENV gateway api-key is set (boolean only, never the value).
+        providerType:
+          type: string
+        baseUrl:
+          type: string
+        chatModel:
+          type: string
+    AdminSeedResult:
+      type: object
+      required: [created, message]
+      additionalProperties: false
+      properties:
+        created:
+          type: boolean
+        message:
+          type: string
+          description: Human summary of seeded rows; the ENV key is NOT imported as a stored secret.
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      additionalProperties: false
+      properties:
+        email:
+          type: string
+          format: email
+          description: Login email (case/whitespace-normalised server-side).
+        password:
+          type: string
+          description: Plaintext over TLS only; verified against Argon2.
+        rememberMe:
+          type: boolean
+          default: false
+          description: Persist the session cookie across app/browser restarts.
+    LoginResponse:
+      type: object
+      required:
+        - userId
+        - displayName
+        - csrfToken
+      additionalProperties: false
+      properties:
+        userId:
+          type: integer
+          format: int64
+          description: Stable local user id (app_user.id).
+        displayName:
+          type: string
+          description: Human-readable name; never any credential material.
+        csrfToken:
+          type: string
+          description: >-
+            SEC-2 double-submit token bound to the new session — identical to
+            the `keplura_csrf` cookie content. Send it as the X-CSRF-Token
+            header on every state-changing request afterwards; the native
+            desktop transport stores it (the cookie jar is JS-invisible).
+        role:
+          type: string
+          enum: [USER, ADMIN]
+          description: >-
+            ADMIN-KI: the caller's global role (see GET /auth/me). Drives
+            showing the admin section ONLY — enforcement stays server-side in
+            AdminGuardInterceptor, so a spoofed value here changes nothing.
+    MeResponse:
+      type: object
+      required: [userId, displayName, role]
+      additionalProperties: false
+      properties:
+        userId:
+          type: integer
+          format: int64
+        displayName:
+          type: string
+        role:
+          type: string
+          enum: [USER, ADMIN]
+          description: Fresh DB role of the caller (display-only, see LoginResponse.role).
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      additionalProperties: false
+      properties:
+        error:
+          type: string
+          description: Generic error code/text; never reveals which credential failed.
+    CsrfTokenResponse:
+      type: object
+      required:
+        - csrfToken
+      additionalProperties: false
+      properties:
+        csrfToken:
+          type: string
+          description: >-
+            SEC-2: the token bound to the CALLER's session (GET /auth/csrf
+            restore path). Idempotent — equals the previous binding; never a
+            fresh value on a session that already has one.
+    OidcCapabilities:
+      type: object
+      required: [oidcEnabled, providers]
+      additionalProperties: false
+      properties:
+        oidcEnabled:
+          type: boolean
+          description: True iff exactly one provider row is ACTIVE.
+        providers:
+          type: array
+          description: >-
+            Operator-facing labels only (the login screen shows at most one
+            button). Never issuer, client-id, or any URL.
+          items:
+            type: object
+            required: [id, name]
+            additionalProperties: false
+            properties:
+              id:
+                type: integer
+                format: int64
+              name:
+                type: string
+    OidcExchangeRequest:
+      type: object
+      required: [handoff]
+      additionalProperties: false
+      properties:
+        handoff:
+          type: string
+          description: >-
+            The one-time 256-bit hex code the callback delivered as
+            #oidc=<handoff> on the fixed desktop redirect origin. Single-use,
+            60s TTL, consumed by this call (replay → 401).
+        rememberMe:
+          type: boolean
+          default: false
+          description: Same session-cookie persistence choice as local login.
+    OidcProviderDto:
+      type: object
+      required: [id, name, issuer, discoveryUrl, clientId, secretSet, timeoutSeconds, active]
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          description: Operator label shown on the login button.
+        issuer:
+          type: string
+          description: Exact iss the ID token must carry (https URL).
+        discoveryUrl:
+          type: string
+          description: Full .../.well-known/openid-configuration URL.
+        clientId:
+          type: string
+        secretSet:
+          type: boolean
+          description: Whether a client secret is stored (write-only field).
+        secretMasked:
+          type: ["string", "null"]
+          description: Fixed mask when secretSet — never any secret material.
+        timeoutSeconds:
+          type: integer
+          description: Per-dial HTTP timeout for discovery/token/JWKS calls.
+        active:
+          type: boolean
+          description: >-
+            Single-active invariant: activating a provider deactivates the
+            previous one in the same transaction.
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    OidcProviderCreateRequest:
+      type: object
+      required: [name, issuer, discoveryUrl, clientId]
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+        issuer:
+          type: string
+        discoveryUrl:
+          type: string
+        clientId:
+          type: string
+        clientSecret:
+          type: string
+          description: >-
+            Plaintext over TLS, write-only: sealed with SecretCipher (AES-GCM)
+            before it touches the DB; never returned. Master key unset +
+            secret supplied → 503.
+        timeoutSeconds:
+          type: ["integer", "null"]
+          description: Null → property default (keplura.oidc.timeout-seconds).
+        active:
+          type: ["boolean", "null"]
+          description: Null → false.
+    OidcProviderPatchRequest:
+      type: object
+      additionalProperties: false
+      description: Null field = unchanged; blank/absent secret KEEPS the stored one.
+      properties:
+        name:
+          type: ["string", "null"]
+        issuer:
+          type: ["string", "null"]
+        discoveryUrl:
+          type: ["string", "null"]
+        clientId:
+          type: ["string", "null"]
+        clientSecret:
+          type: ["string", "null"]
+        timeoutSeconds:
+          type: ["integer", "null"]
+        active:
+          type: ["boolean", "null"]
+    OidcLinkDto:
+      type: object
+      required: [id, subject, userId, userEmail, createdAt]
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+          format: int64
+        subject:
+          type: string
+          description: IdP subject claim this row binds (unique per provider).
+        userId:
+          type: integer
+          format: int64
+        userEmail:
+          type: string
+          description: The linked user's email (admin already knows it).
+        createdAt:
+          type: string
+    OrgMember:
+      type: object
+      required:
+        - userId
+        - displayName
+        - role
+        - joinedAt
+      additionalProperties: false
+      properties:
+        userId:
+          type: integer
+          format: int64
+        displayName:
+          type: string
+          description: Display name of the user row; "(removed user)" if it vanished.
+        role:
+          type: string
+          enum: [OWNER, MEMBER]
+        joinedAt:
+          type: string
+          format: date-time
+    OrgInvite:
+      type: object
+      required:
+        - id
+        - orgId
+        - role
+        - expiresAt
+        - createdAt
+        - inviterName
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+          format: int64
+        orgId:
+          type: integer
+          format: int64
+        role:
+          type: string
+          enum: [MEMBER]
+          description: >-
+            Role the token grants on redemption. Structural guard: invites
+            ONLY ever mint MEMBER rows — an OWNER role cannot be invited.
+        expiresAt:
+          type: string
+          format: date-time
+          description: Mint instant + 7 days; an expired token is one 404 with unknown ones.
+        createdAt:
+          type: string
+          format: date-time
+        inviterName:
+          type: string
+          description: Display name of the OWNER who minted the invite.
+    InviteCreatedResponse:
+      type: object
+      required:
+        - invite
+        - token
+      additionalProperties: false
+      properties:
+        invite:
+          $ref: "#/components/schemas/OrgInvite"
+        token:
+          type: string
+          description: >-
+            Plaintext invite token — delivered in THIS response and never
+            again (the DB stores only its SHA-256 hash). Forward it inside
+            the org; the desktop shows it exactly once.
+    InviteAcceptRequest:
+      type: object
+      required:
+        - token
+      additionalProperties: false
+      properties:
+        token:
+          type: string
+          description: Plaintext token from POST /orgs/{orgId}/invites (whitespace-trimmed server-side).
+    InviteAcceptResponse:
+      type: object
+      required:
+        - orgId
+        - orgName
+      additionalProperties: false
+      properties:
+        orgId:
+          type: integer
+          format: int64
+        orgName:
+          type: string
+    GatewayStatus:
+      type: object
+      required:
+        - configured
+      additionalProperties: false
+      properties:
+        configured:
+          type: boolean
+          description: >-
+            Whether a model upstream is configured server-side. The ONLY
+            outward-facing configuration fact (M4a): key, URL and model list
+            never surface anywhere.
+    ChatCompletionRequest:
+      type: object
+      required:
+        - model
+        - messages
+      additionalProperties: true
+      description: >-
+        OpenAI-compatible chat request, MINUS the shapes the MVP refuses:
+        content must be a plain string (multimodal parts are 400), and
+        tools/tool_choice/response_format/functions are rejected outright.
+        Unknown fields are silently DROPPED during canonicalisation (never
+        forwarded). Server caps: body <= keplura.gateway.max-request-bytes
+        (413), <= max-messages messages, <= max-message-chars per content.
+      properties:
+        model:
+          type: string
+          minLength: 1
+          maxLength: 128
+          pattern: "^[A-Za-z0-9._:/@+-]+$"
+          description: Upstream model id; may be pinned by the server-side allow-list.
+        messages:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required:
+              - role
+              - content
+            additionalProperties: true
+            properties:
+              role:
+                type: string
+                enum: [system, user, assistant, tool, developer]
+              content:
+                type: string
+                description: Plain text content (multimodal arrays are rejected in this milestone).
+              name:
+                type: string
+                maxLength: 128
+        stream:
+          type: boolean
+          description: "true relays upstream SSE verbatim; false buffers one JSON answer."
+        temperature:
+          type: number
+        top_p:
+          type: number
+        presence_penalty:
+          type: number
+        frequency_penalty:
+          type: number
+        seed:
+          type: number
+        max_tokens:
+          type: integer
+          minimum: 0
+        max_completion_tokens:
+          type: integer
+          minimum: 0
+        n:
+          type: integer
+          minimum: 0
+        stop:
+          oneOf:
+            - type: string
+            - type: array
+              maxItems: 8
+              items:
+                type: string
+        do_sample:
+          type: boolean
+        logprobs:
+          type: boolean
+    ChatCompletionResponse:
+      type: object
+      description: >-
+        Upstream answer relayed byte-for-byte (M4a is a pure proxy: the server
+        does not parse or reshape completion payloads). The common OpenAI
+        fields are documented loosely; additional upstream fields pass
+        through, and ONLY on the 2xx success path — error bodies are replaced
+        by generic ErrorResponses, never relayed.
+      properties:
+        id:
+          type: string
+        object:
+          type: string
+        created:
+          type: integer
+          format: int64
+        model:
+          type: string
+        choices:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              index:
+                type: integer
+              message:
+                type: object
+                additionalProperties: true
+              finish_reason:
+                type: string
+        usage:
+          type: object
+          additionalProperties: true
+    CreateOrgRequest:
+      type: object
+      required:
+        - name
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Organization display name; trimmed server-side.
+    OrganizationResponse:
+      type: object
+      required:
+        - id
+        - name
+        - role
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Organization id (never resolvable by guessing — reads are membership-filtered).
+        name:
+          type: string
+          description: Trimmed organization name.
+        role:
+          type: string
+          enum: [OWNER, MEMBER]
+          description: The CALLER's role in this organization (from the membership table).
+    CreateSpaceRequest:
+      type: object
+      required:
+        - name
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Space display name; trimmed server-side, unique within the organization.
+    SpaceResponse:
+      type: object
+      required:
+        - id
+        - orgId
+        - name
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Space id (never resolvable by guessing — reads are membership-filtered and org-pinned).
+        orgId:
+          type: integer
+          format: int64
+          description: Owning organization id.
+        name:
+          type: string
+          description: Trimmed space name.
+    CreateKnowledgeBaseRequest:
+      type: object
+      required:
+        - name
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Knowledge-base display name; trimmed server-side, unique within the space.
+    KnowledgeBaseResponse:
+      type: object
+      required:
+        - id
+        - spaceId
+        - name
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Knowledge base id (never resolvable by guessing — reads are membership-filtered and space-pinned).
+        spaceId:
+          type: integer
+          format: int64
+          description: Owning space id.
+        name:
+          type: string
+          description: Trimmed knowledge-base name.
+    DocumentResponse:
+      type: object
+      required:
+        - id
+        - kbId
+        - filename
+        - contentType
+        - sizeBytes
+        - sha256
+        - uploadedBy
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Document id (visible only through its own org/space/kb chain).
+        kbId:
+          type: integer
+          format: int64
+          description: Owning knowledge base id.
+        filename:
+          type: string
+          description: Sanitised DISPLAY filename (ascii [A-Za-z0-9._ -]); never used to build the storage path.
+        contentType:
+          type: string
+          description: Server-mapped MIME type of the whitelisted extension (client part header ignored).
+        sizeBytes:
+          type: integer
+          format: int64
+          description: Byte count actually stored (measured while streaming, not the declared size).
+        sha256:
+          type: string
+          description: Lowercase hex sha256 over the stored bytes (integrity + M3d dedup anchor).
+        uploadedBy:
+          type: integer
+          format: int64
+          description: User id of the uploader (provenance, not ACL — membership is).
+        indexStatus:
+          type: string
+          enum: [INDEXED, NO_TEXT_LAYER, NOT_INDEXED]
+          description: >-
+            Honest searchability (M3d; real parsers since MVP-5): INDEXED =
+            chunk rows exist and the document is searchable (txt/md/csv
+            decoded as text, pdf/docx extracted via Apache Tika);
+            NO_TEXT_LAYER = a valid pdf/docx whose bytes carry no extractable
+            text (e.g. a scanned PDF — OCR is a Non-Goal), stored and
+            downloadable but honestly absent from search results;
+            NOT_INDEXED = indexable type without chunk rows (uploaded by an
+            older server before its content was ever parsed, or blank).
+            Unparseable binaries (corrupt, encrypted, over extraction
+            limits) never get a row at all — their upload 400s.
+    SearchRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        query:
+          type: string
+          minLength: 1
+          maxLength: 4000
+          description: >-
+            Query text (trim-checked, capped by
+            keplura.search.max-query-chars default 4000 — longer is 400
+            BEFORE any embedding work).
+        topK:
+          type: integer
+          format: int32
+          minimum: 1
+          default: 5
+          description: Desired number of hits; values above 50 are clamped server-side.
+    SearchResponse:
+      type: object
+      required:
+        - query
+        - topK
+        - backend
+        - model
+        - results
+      additionalProperties: false
+      properties:
+        query:
+          type: string
+          description: The trimmed query as searched.
+        topK:
+          type: integer
+          format: int32
+          description: Effective result cap after clamping.
+        backend:
+          type: string
+          enum: [memory, pgvector]
+          description: Active vector store (see ADR-0007) — memory = in-JVM cosine (H2/dev/CI), pgvector = native KNN.
+        model:
+          type: string
+          description: >-
+            Embedding model tag; "local-hash-*" marks the deterministic
+            dev/CI stand-in — never a semantic model (prod sets the gateway
+            model via ENV).
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchHit"
+    DocumentPreview:
+      type: object
+      additionalProperties: false
+      required: [documentId, filename, contentType, indexStatus, selectedChunkIdx, exactLocation, hasPrevious, hasNext, blocks]
+      properties:
+        sourceUpdatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Original file modification time, otherwise upload time; absent/null in historical citations.
+        documentId: { type: integer, format: int64 }
+        filename: { type: string }
+        contentType: { type: string }
+        indexStatus: { type: string, enum: [INDEXED, PENDING, FAILED, NO_TEXT_LAYER, NOT_INDEXED] }
+        selectedChunkIdx: { type: integer, minimum: 0 }
+        exactLocation: { type: boolean }
+        hasPrevious: { type: boolean }
+        hasNext: { type: boolean }
+        blocks:
+          type: array
+          maxItems: 21
+          items:
+            type: object
+            additionalProperties: false
+            required: [chunkIdx, text, pageNumber, sectionTitle]
+            properties:
+              chunkIdx: { type: integer, minimum: 0 }
+              text: { type: string, maxLength: 4000 }
+              pageNumber: { type: integer, nullable: true, minimum: 1 }
+              sectionTitle: { type: string, nullable: true }
+    SearchHit:
+      type: object
+      required:
+        - documentId
+        - filename
+        - chunkIdx
+        - text
+        - score
+      additionalProperties: false
+      properties:
+        sourceUpdatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Original file modification time, otherwise upload time; absent/null in historical citations.
+        documentId:
+          type: integer
+          format: int64
+          description: Source document id (citable via the download endpoint).
+        filename:
+          type: string
+          description: Sanitised display name of the source document.
+        chunkIdx:
+          type: integer
+          format: int32
+          description: 0-based chunk position inside the document (exact source location).
+        text:
+          type: string
+          description: The chunk text as stored and embedded.
+        score:
+          type: number
+          format: double
+          description: Retrieval score; local cross-encoder relevance in [0,1] when reranking is enabled, otherwise cosine similarity in [-1,1].
+        pageNumber:
+          type: integer
+          nullable: true
+          minimum: 1
+          description: Real PDF page; null for formats without reliable page boundaries or older indexes.
+        sectionTitle:
+          type: string
+          nullable: true
+        startOffset:
+          type: integer
+          nullable: true
+          minimum: 0
+          description: UTF-16 start offset in canonical extracted document text.
+        endOffset:
+          type: integer
+          nullable: true
+          description: Exclusive UTF-16 end offset in canonical extracted document text.
+    CreateChatConversationRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        knowledgeBaseId:
+          type: integer
+          format: int64
+          nullable: true
+          description: >-
+            Pins the RAG context (must be visible in the same org+space
+            chain). Null/absent = plain chat without citations.
+        title:
+          type: string
+          maxLength: 200
+          description: Optional display title (<= 200 chars; blank falls back to the default placeholder).
+    ChatConversation:
+      type: object
+      required: [id, spaceId, knowledgeBaseId, title, createdAt, updatedAt]
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+          format: int64
+        spaceId:
+          type: integer
+          format: int64
+        knowledgeBaseId:
+          type: integer
+          format: int64
+          nullable: true
+          description: RAG context kb of this thread; null = plain chat.
+        title:
+          type: string
+          description: Display title (first prompt auto-titles an untitled thread).
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last activity (turn started); the list sorts by this, descending.
+    ChatTurnRequest:
+      type: object
+      required: [prompt]
+      additionalProperties: false
+      properties:
+        prompt:
+          type: string
+          description: >-
+            The user message ONLY (max keplura.chat.max-prompt-chars,
+            default 4000). History/context is server-side; unknown body
+            fields are rejected, never forwarded.
+    ChatCitation:
+      type: object
+      required: [documentId, filename, chunkIdx, score]
+      additionalProperties: false
+      properties:
+        sourceUpdatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Original file modification time, otherwise upload time; absent/null in historical citations.
+        documentId:
+          type: integer
+          format: int64
+          nullable: true
+          description: >-
+            Source document (citable via the download route); null only for
+            citations whose document row was hard-deleted after the turn.
+        filename:
+          type: string
+          description: Sanitised display name AT CITATION TIME (survives document deletion).
+        chunkIdx:
+          type: integer
+          format: int32
+          description: 0-based chunk position inside the document ("Abschnitt N+1").
+        score:
+          type: number
+          format: double
+          description: Relevance of the grounding hit (cross-encoder when enabled, otherwise cosine).
+        pageNumber:
+          type: integer
+          nullable: true
+          minimum: 1
+        sectionTitle:
+          type: string
+          nullable: true
+        startOffset:
+          type: integer
+          nullable: true
+          minimum: 0
+        endOffset:
+          type: integer
+          nullable: true
+    ChatMessage:
+      type: object
+      required: [id, role, content, model, citations, status, createdAt]
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+          format: int64
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+          description: >-
+            Persisted text. For aborted/incomplete turns this is exactly the
+            partial text the client saw — never a guess.
+        model:
+          type: string
+          description: Model tag from the upstream response (empty for user rows/plain fallback).
+        citations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatCitation"
+          description: Grounding sources (assistant rows of kb-pinned threads; else empty).
+        status:
+          type: string
+          enum: [complete, aborted, failed, incomplete]
+          description: >-
+            Honest turn outcome — see getChatTranscript description. User
+            rows are always "complete" (their commit IS the turn start).
+        createdAt:
+          type: string
+          format: date-time
+    ChatTranscript:
+      type: object
+      required: [conversationId, messages]
+      additionalProperties: false
+      properties:
+        conversationId:
+          type: integer
+          format: int64
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatMessage"
+          description: Oldest message first.
+    Health:
+      type: object
+      required:
+        - status
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+          description: Liveness state; "UP" while the server serves traffic.
+          example: UP
+    SystemInfo:
+      type: object
+      required:
+        - product
+        - serverVersion
+        - apiVersion
+        - model
+      additionalProperties: false
+      properties:
+        product:
+          type: string
+          description: Product name reported by the server.
+          example: Keplura Server
+        serverVersion:
+          type: string
+          description: Semantic version of the running server build.
+          example: 0.1.0
+        apiVersion:
+          type: string
+          description: Version identifier of this API surface.
+          example: v1
+        model:
+          type: string
+          enum: [none, local, configured]
+          description: >-
+            Model-provider state (M4c), closed vocabulary only. "none" = no
+            model backend wired; "local" = the Ollama preset (on-box model);
+            "configured" = a remote backend is dialed (vLLM server or hosted
+            OpenAI-compatible API). Never an API key, base URL, raw provider
+            string or upstream model id — this endpoint is unauthenticated.
+          example: local

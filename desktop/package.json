@@ -1,0 +1,35 @@
+{
+  "name": "keplura-desktop",
+  "private": true,
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
+    "prebuild": "node ../scripts/sync-design-tokens.cjs --check"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.2.8",
+    "@tailwindcss/vite": "4.3.3",
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-http": "^2.6.0",
+    "dompurify": "3.4.15",
+    "marked": "16.4.1",
+    "pinia": "^4.0.3",
+    "reka-ui": "2.10.4",
+    "tailwindcss": "4.3.3",
+    "vue": "^3.5"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2",
+    "@vitejs/plugin-vue": "^6",
+    "typescript": "^5",
+    "vite": "^7",
+    "vue-tsc": "^3"
+  }
+}

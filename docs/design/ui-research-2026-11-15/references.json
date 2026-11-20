@@ -1,0 +1,274 @@
+{
+  "datum": "2026-11-15",
+  "methode": "Gelesene Primärquellen, öffentliche Abbildungen; keine fremden Produktkonten",
+  "referenzen": [
+    {
+      "id": "R01",
+      "titel": "Apple: Gestaltungsprinzipien",
+      "belegarten": [
+        "D"
+      ],
+      "abrufdatum": "2026-11-15",
+      "links": [
+        {
+          "label": "Human Interface Guidelines – Design principles",
+          "url": "https://developer.apple.com/design/human-interface-guidelines/design-principles/"
+        },
+        {
+          "label": "gelesene Textfassung",
+          "url": "https://developer.apple.com/design/human-interface-guidelines/design-principles.md"
+        }
+      ]
+    },
+    {
+      "id": "R02",
+      "titel": "Apple: Typografie und Lesen",
+      "belegarten": [
+        "D"
+      ],
+      "abrufdatum": "2026-11-15",
+      "links": [
+        {
+          "label": "Human Interface Guidelines – Typography",
+          "url": "https://developer.apple.com/design/human-interface-guidelines/typography/"
+        },
+        {
+          "label": "gelesene Textfassung",
+          "url": "https://developer.apple.com/design/human-interface-guidelines/typography.md"
+        }
+      ]
+    },
+    {
+      "id": "R03",
+      "titel": "Apple: Layout und Inhaltshierarchie",
+      "belegarten": [
+        "D"
+      ],
+      "abrufdatum": "2026-11-15",
+      "links": [
+        {
+          "label": "Human Interface Guidelines – Layout",
+          "url": "https://developer.apple.com/design/human-interface-guidelines/layout/"
+        },
+        {
+          "label": "gelesene Textfassung",
+          "url": "https://developer.apple.com/design/human-interface-guidelines/layout.md"
+        }
+      ]
+    },
+    {
+      "id": "R04",
+      "titel": "Apple: aufgabenbezogene Sheets",
+      "belegarten": [
+        "D"
+      ],
+      "abrufdatum": "2026-11-15",
+      "links": [
+        {
+          "label": "Human Interface Guidelines – Sheets",
+          "url": "https://developer.apple.com/design/human-interface-guidelines/sheets/"
+        },
+        {
+          "label": "gelesene Textfassung",
+          "url": "https://developer.apple.com/design/human-interface-guidelines/sheets.md"
+        }
+      ]
+    },
+    {
+      "id": "R05",
+      "titel": "Apple: Bestätigungen und Aktionsbeschriftung",
+      "belegarten": [
+        "D"
+      ],
+      "abrufdatum": "2026-11-15",
+      "links": [
+        {
+          "label": "Human Interface Guidelines – Alerts",
+          "url": "https://developer.apple.com/design/human-interface-guidelines/alerts/"
+        },
+        {
+          "label": "gelesene Textfassung",
+          "url": "https://developer.apple.com/design/human-interface-guidelines/alerts.md"
+        }
+      ]
+    },
+    {
+      "id": "R06",
+      "titel": "Apple: Bewegung und reduzierte Bewegung",
+      "belegarten": [
+        "D"
+      ],
+      "abrufdatum": "2026-11-15",
+      "links": [
+        {
+          "label": "Reduced Motion evaluation criteria",
+          "url": "https://developer.apple.com/help/app-store-connect/manage-app-accessibility/reduced-motion-evaluation-criteria"
+        }
+      ]
+    },
+    {
+      "id": "R07",
+      "titel": "Notion: Sidebar und kontextuelle Menüs",
+      "belegarten": [
+        "D",
+        "V"
+      ],
+      "abrufdatum": "2026-11-15",
+      "links": [
+        {
+          "label": "Navigate with the sidebar",
+          "url": "https://www.notion.com/help/navigate-with-the-sidebar"
+        },
+        {
+          "label": "betrachtetes Beispielbild: Sidebar-Kontextmenü",
+          "url": "https://images.ctfassets.net/spoqsaf9291f/2tpJheiXLOwBH9ZdZGnQt3/514bd06e33972f166580fa5c50bcdbdf/Group_61.png?w=3840&q=55&fm=webp"
+        }
+      ]
+    },
+    {
+      "id": "R08",
+      "titel": "Notion: Suche als eigener Arbeitsmodus",
+      "belegarten": [
+        "D"
+      ],
+      "abrufdatum": "2026-11-15",
+      "links": [
+        {
+          "label": "Search in your workspace",
+          "url": "https://www.notion.com/help/search"
+        }
+      ]
+    },
+    {
+      "id": "R09",
+      "titel": "Notion: Einstellungen und Rollen",
+      "belegarten": [
+        "D"
+      ],
+      "abrufdatum": "2026-11-15",
+      "links": [
+        {
+          "label": "Workspace settings",
+          "url": "https://www.notion.com/help/workspace-settings"
+        }
+      ]
+    },
+    {
+      "id": "R10",
+      "titel": "Linear: aktueller produktweiter Refresh",
+      "belegarten": [
+        "D"
+      ],
+      "abrufdatum": "2026-11-15",
+      "links": [
+        {
+          "label": "UI refresh – Changelog, 12.03.2026",
+          "url": "https://linear.app/changelog/2026-03-12-ui-refresh"
+        }
+      ]
+    },
+    {
+      "id": "R11",
+      "titel": "Linear: Gewichtung, Flächen und Wiederholung",
+      "belegarten": [
+        "D",
+        "V"
+      ],
+      "abrufdatum": "2026-11-15",
+      "links": [
+        {
+          "label": "A calmer interface for a product in motion, 12.03.2026",
+          "url": "https://linear.app/now/behind-the-latest-design-refresh"
+        },
+        {
+          "label": "betrachteter Vorher/Nachher-Vergleich der Sidebar",
+          "url": "https://webassets.linear.app/images/ornj730p/production/b6d6be14c96978b10553cfb9205be1065087e793-3904x2720.png?auto=format&dpr=2&q=95"
+        }
+      ]
+    },
+    {
+      "id": "R12",
+      "titel": "IBM Carbon: konventionelle, gut strukturierte Formulare",
+      "belegarten": [
+        "D",
+        "V"
+      ],
+      "abrufdatum": "2026-11-15",
+      "links": [
+        {
+          "label": "Form – Guidelines, aktualisiert 30.09.2026",
+          "url": "https://www.carbondesignsystem.com/building-blocks/core/components/form/guidelines"
+        },
+        {
+          "label": "betrachtete Formularanatomie",
+          "url": "https://cdn.carbondesignsystem.com/cxp-prod-payload-cms/form-usage-1.png"
+        }
+      ]
+    },
+    {
+      "id": "R13",
+      "titel": "IBM Carbon: Datenansichten und angemessene Dichte",
+      "belegarten": [
+        "D"
+      ],
+      "abrufdatum": "2026-11-15",
+      "links": [
+        {
+          "label": "Data table – Guidelines, aktualisiert 30.09.2026",
+          "url": "https://www.carbondesignsystem.com/building-blocks/core/components/data-table/guidelines"
+        }
+      ]
+    },
+    {
+      "id": "R14",
+      "titel": "IBM Carbon: verschiedene Ursachen für leere Flächen",
+      "belegarten": [
+        "D"
+      ],
+      "abrufdatum": "2026-11-15",
+      "links": [
+        {
+          "label": "Empty states, aktualisiert 11.08.2026",
+          "url": "https://www.carbondesignsystem.com/building-blocks/core/patterns/empty-states"
+        }
+      ]
+    },
+    {
+      "id": "R15",
+      "titel": "Red Hat PatternFly: komplexer Assistent und mobile Schrittführung",
+      "belegarten": [
+        "D",
+        "V"
+      ],
+      "abrufdatum": "2026-11-15",
+      "links": [
+        {
+          "label": "Wizard – Design guidelines, Release 6.7.0",
+          "url": "https://www.patternfly.org/components/wizard/design-guidelines/"
+        },
+        {
+          "label": "betrachtete Desktop-Anatomie",
+          "url": "https://www.patternfly.org/images/207b0e8e.svg"
+        },
+        {
+          "label": "betrachtete mobile Schrittübersicht",
+          "url": "https://www.patternfly.org/images/0c122590.svg"
+        }
+      ]
+    },
+    {
+      "id": "R16",
+      "titel": "W3C WAI: modal bedeutet ein konkretes Fokusverhalten",
+      "belegarten": [
+        "D"
+      ],
+      "abrufdatum": "2026-11-15",
+      "links": [
+        {
+          "label": "ARIA Authoring Practices Guide – Dialog (Modal) Pattern",
+          "url": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/"
+        }
+      ]
+    }
+  ]
+}

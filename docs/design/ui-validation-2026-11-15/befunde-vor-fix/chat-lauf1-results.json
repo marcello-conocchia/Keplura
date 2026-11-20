@@ -1,0 +1,208 @@
+[
+  {
+    "id": "V04",
+    "name": "Hauptbasiswechsel erhält Entwurf und startet neuen Wissens-Chat",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Unterhaltungen 1 → 2; Kontext: Antworten mit Quellen aus „Pilot-Handbuch“"
+  },
+  {
+    "id": "V04",
+    "name": "Zusatzbasen und Anhänge getrennt von der Hauptbasis bedienbar",
+    "mode": "echt",
+    "status": "rot",
+    "reason": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByTestId('chat-extra-kbs') to be visible\n"
+  },
+  {
+    "id": "V02",
+    "name": "Echte lange Antwort: Markdown, Tabelle, Code, Quellen, Lesetypografie",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Tabellen 1, Codeblöcke 1, Quellen 4, Text 16px/26px \"Inter Variable\", Länge 901"
+  },
+  {
+    "id": "V02",
+    "name": "Anhang im Chat: Datei-Kontext wird in echter Antwort genutzt",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Laut dem Anhang \"Anhang-UI4-1794750116155.txt\" ist Frau Testfeld aus dem Team Betrieb Ansprechpartnerin für das Pilotgerät. Die Telefon-Durc"
+  },
+  {
+    "id": "V03",
+    "name": "Feedback hilfreich: Zustand gesetzt und wieder zurückgenommen",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "id": "V03",
+    "name": "Export als DOCX und PDF liefert Dateien",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Keplura-Antwort.docx 3190 B, Keplura-Antwort.pdf 1937 B"
+  },
+  {
+    "id": "V03",
+    "name": "Stopp während Streaming beendet die Antwort, Composer wieder bereit",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Antworten 2 → 2; letzte: Laut dem Anhang \"Anhang-UI4-1794750116155.txt\" ist Frau Testfeld aus dem Team Be"
+  },
+  {
+    "id": "V03",
+    "name": "Neu versuchen sendet die letzte Frage erneut und schließt ab",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Antworten vorher 2, nachher 2"
+  },
+  {
+    "id": "V03",
+    "name": "Vorlagen im leeren Chat füllen den Composer",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Was sagen meine Dokumente zum Thema?"
+  },
+  {
+    "id": "V05",
+    "name": "Zitat öffnet Vorschau an der zitierten Stelle (nichtmodal ≥1440)",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "markiert: „## Frist\nDie Inspektion des Pilotgeräts erfolgt alle 37 Tage“, im Sichtbereich true, Chatbreite 746px"
+  },
+  {
+    "id": "V05",
+    "name": "Nichtmodal: Tab in den Chat möglich, Escape dort schließt Panel nicht",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "id": "V05",
+    "name": "Download des Originals liefert Datei",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "HTTP 200, 492 Bytes"
+  },
+  {
+    "id": "V05/V06",
+    "name": "Resize 1440→1200 macht Panel modal, Fokus bleibt im Panel; zurück nichtmodal",
+    "mode": "echt",
+    "status": "bestanden"
+  },
+  {
+    "id": "V05",
+    "name": "Ladezustand sichtbar",
+    "mode": "simuliert: echte Antwort, künstlich 2 s verzögert",
+    "status": "bestanden"
+  },
+  {
+    "id": "V05",
+    "name": "Fehlerzustand HTTP 404 (nicht mehr vorhanden): sichere Meldung mit Wiederholen",
+    "mode": "simuliert: HTTP 404",
+    "status": "bestanden",
+    "note": "Diese Textstelle ist nicht mehr verfügbar oder du hast keinen Zugriff mehr. Erneut versuchen"
+  },
+  {
+    "id": "V05",
+    "name": "Fehlerzustand HTTP 403 (kein Zugriff): sichere Meldung mit Wiederholen",
+    "mode": "simuliert: HTTP 403",
+    "status": "bestanden",
+    "note": "Die Vorschau konnte nicht geladen werden. Bitte versuche es erneut. Erneut versuchen"
+  },
+  {
+    "id": "V06",
+    "name": "Chat+Quelle light 1440×1000",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Panel 400px, nichtmodal, Schließen 32×32"
+  },
+  {
+    "id": "V06",
+    "name": "Chat+Quelle light 1200×900",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Panel 720px, modal, Schließen 32×32"
+  },
+  {
+    "id": "V06",
+    "name": "Chat+Quelle light 900×640",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Panel 720px, modal, Schließen 32×32"
+  },
+  {
+    "id": "V06",
+    "name": "Chat+Quelle light 768×1024",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Panel 720px, modal, Schließen 32×32"
+  },
+  {
+    "id": "V06",
+    "name": "Chat+Quelle light 480×400",
+    "mode": "echt",
+    "status": "rot",
+    "reason": "Senden nicht sichtbar: {\"x\":565.484375,\"y\":2177,\"width\":78.75,\"height\":44}"
+  },
+  {
+    "id": "V06",
+    "name": "Chat+Quelle light 390×844",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Panel 390px, modal, Schließen 44×44"
+  },
+  {
+    "id": "V06",
+    "name": "Chat+Quelle light 320×640",
+    "mode": "echt",
+    "status": "rot",
+    "reason": "Senden nicht sichtbar: {\"x\":29,\"y\":628,\"width\":78.75,\"height\":44}"
+  },
+  {
+    "id": "V06",
+    "name": "Chat+Quelle dark 1440×1000",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Panel 400px, nichtmodal, Schließen 32×32"
+  },
+  {
+    "id": "V06",
+    "name": "Chat+Quelle dark 1200×900",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Panel 720px, modal, Schließen 32×32"
+  },
+  {
+    "id": "V06",
+    "name": "Chat+Quelle dark 900×640",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Panel 720px, modal, Schließen 32×32"
+  },
+  {
+    "id": "V06",
+    "name": "Chat+Quelle dark 768×1024",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Panel 720px, modal, Schließen 32×32"
+  },
+  {
+    "id": "V06",
+    "name": "Chat+Quelle dark 480×400",
+    "mode": "echt",
+    "status": "rot",
+    "reason": "Senden nicht sichtbar: {\"x\":565.484375,\"y\":2177,\"width\":78.75,\"height\":44}"
+  },
+  {
+    "id": "V06",
+    "name": "Chat+Quelle dark 390×844",
+    "mode": "echt",
+    "status": "bestanden",
+    "note": "Panel 390px, modal, Schließen 44×44"
+  },
+  {
+    "id": "V06",
+    "name": "Chat+Quelle dark 320×640",
+    "mode": "echt",
+    "status": "rot",
+    "reason": "Senden nicht sichtbar: {\"x\":29,\"y\":628,\"width\":78.75,\"height\":44}"
+  }
+]

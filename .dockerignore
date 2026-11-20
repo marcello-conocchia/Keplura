@@ -1,0 +1,16 @@
+# Build only from sources. Windows dependencies and native Tauri outputs must
+# never overwrite the Linux dependencies installed in the web build stage.
+.git
+**/node_modules
+**/target
+**/dist
+**/.devenv
+ci/evidence
+**/data
+**/__pycache__
+
+# Runtime credentials and local overrides are not part of any image/context.
+**/.env
+**/.env.*
+**/*.log
+**/*.db
