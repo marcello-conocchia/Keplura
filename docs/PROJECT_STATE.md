@@ -14,8 +14,8 @@ geprüft (5 Commits, nur Inhaber/noreply, keine Zugangsdaten). Aktiv: vertraulic
 Sicherheitsmeldung über GitHub, Secret Scanning mit Push-Schutz,
 Dependabot-Warnungen und -Sicherheitsupdates. Hermes-Host frisch geklont (PO).
 Archiv `Keplura-intern` bleibt privat. Offen: Branch-Schutz für `main` (PO),
-Draft-PR #1 (nachgeholte Reviews aus dem Archiv), H2-Dev-Fehler beim
-Wissen-Anhängen (eigene Aufgabe).
+Draft-PR #1 (nachgeholte Reviews aus dem Archiv). H2-Dev-Fehler beim
+Wissen-Anhängen: behoben in #7.
 
 **Stand 20.11.2026: Open-Source-Vorbereitung auf main, PR #93 (OPEN-SOURCE-01), Merge `766ad7b` verifiziert.** Öffentliche Doku (README englisch mit Screenshots im Dunkelmodus, `docs/INSTALL.md`, `docs/OPERATIONS.md`, `docs/RELEASING.md`, CONTRIBUTING, SECURITY, CHANGELOG, `.env.example`, PR-Vorlage), Lizenz **Apache-2.0** (`LICENSE`, `NOTICE`, Lizenzfelder in pom/package.json/Cargo.toml), Lizenzinventar `docs/legal/THIRD_PARTY_LICENSES.md` mit Generator `scripts/third-party-licenses.cjs`, `.gitignore` für lokale Agenten-Ordner, CI-Workflow mit read-only Token. Bericht `docs/OPEN_SOURCE_READINESS.md`: Historie inkl. PR-Referenzen ohne Zugangsdaten (keine Rotation nötig), Abhängigkeiten lizenzrechtlich unkritisch; Gesamturteil **NOT READY** wegen offener PO-Punkte B2 (private E-Mail in 197 PR-Kopf-Commits, Empfehlung neues öffentliches Repo mit sauberem Start), B3 (Marke „Keplura“, Herkunft App-Icon), B4 (Sicherheitsmeldeweg beim Veröffentlichen aktivieren). Klasse B; statt vollem `ci-local.sh` Schnellprüfung (`mvn validate`, `cargo metadata --locked`, `npm ci --dry-run`) auf PO-Entscheidung — kein voller CI-Nachweis für #93. Nebenbefund: Dev-Profil (H2) „Wissen an Chat anhängen“ → HTTP 500 (`BadSqlGrammarException`), mit PostgreSQL ok; eigene Aufgabe offen. Repo bleibt privat; Sichtbarkeit nur nach ausdrücklicher PO-Freigabe.
 
