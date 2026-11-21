@@ -16,10 +16,20 @@ function files(dir) {
   });
 }
 
+// String literal as written in the source -> its value (JS escapes, either quote).
 function unquote(lit) {
-  if (lit.startsWith('"')) return JSON.parse(lit);
-  const inner = lit.slice(1, -1).replace(/\\'/g, "'").replace(/"/g, '\\"');
-  return JSON.parse('"' + inner + '"');
+  const body = lit.slice(1, -1);
+  let out = "";
+  for (let i = 0; i < body.length; i++) {
+    const c = body[i];
+    if (c !== "\\") { out += c; continue; }
+    const n = body[++i];
+    if (n === "n") out += "\n";
+    else if (n === "t") out += "\t";
+    else if (n === "u") { out += String.fromCharCode(parseInt(body.slice(i + 1, i + 5), 16)); i += 4; }
+    else out += n; // \\ \" \' and anything else: the character itself
+  }
+  return out;
 }
 
 const keys = new Map();
