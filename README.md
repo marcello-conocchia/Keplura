@@ -156,8 +156,8 @@ private repository: pull request numbers up to #95 and evidence paths under
 ## Known limitations
 
 - Pre-release software: no stable release, no long-term support promise yet.
-- Server messages (errors, sync and check results) are still German in the
-  English interface.
+- Server texts are translated in the English interface; a few rarely shown
+  ones (operator-only messages) stay German.
 - One server instance. Sessions are held in server memory, so a restart signs
   everyone out (no data loss). No high-availability setup.
 - The desktop app gets its server URL at build time (`VITE_SERVER_URL`).

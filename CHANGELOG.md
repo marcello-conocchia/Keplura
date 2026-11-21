@@ -17,6 +17,9 @@ the first tagged release (planned `0.1.0`, see [docs/RELEASING.md](docs/RELEASIN
   numbers and HR/health terms. The report shows only type and count, never
   the values. Files that cannot be read are listed as not checkable.
   Settings `keplura.exposure.content.*`.
+- Server texts (errors, sync, check and access results) appear in English
+  when the interface is English. Chat answers come in the language of the
+  question.
 - English user interface. The desktop app follows the system language and
   can be switched between English and German in the account menu or on the
   sign-in screen. `scripts/check-i18n.cjs` fails the build when an English

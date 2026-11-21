@@ -2,7 +2,7 @@
 // Gleicher Transport/CSRF wie api.ts; verständliche Ergebnisse statt roher Statuscodes.
 import { desktopFetch } from "./transport";
 import { serverUrl } from "./api";
-import { tr } from "./i18n";
+import { tr, serverText, translateServer } from "./i18n";
 
 export type Result<T> =
   | { kind: "ok"; value: T }
@@ -30,7 +30,7 @@ async function call<T>(method: string, path: string, body?: unknown, timeoutMs =
     let message = r.status === 404 ? tr("Der Eintrag existiert nicht mehr.") : tr("Ungültige Eingabe.");
     try {
       const e = (await r.json()) as { error?: string };
-      if (e.error && r.status !== 404) message = e.error;
+      if (e.error && r.status !== 404) message = serverText(e.error);
     } catch {
       /* kein Inhalt */
     }
@@ -39,7 +39,7 @@ async function call<T>(method: string, path: string, body?: unknown, timeoutMs =
   if (!r.ok) return { kind: "error" };
   if (r.status === 202 || r.status === 204) return { kind: "ok", value: undefined as T };
   try {
-    return { kind: "ok", value: (await r.json()) as T };
+    return { kind: "ok", value: translateServer((await r.json()) as T) };
   } catch {
     return { kind: "ok", value: undefined as T };
   }
