@@ -1,0 +1,36 @@
+ci-local gate — run 20261121-091756  (repo: /home/ci/K3)
+head: ce7fe7a | suites: none
+[native reader] 09:17:56: cargo build + cargo test --locked
+[1/4] server  09:17:57: mvn package (skipTests) + chunked surefire, forkCount=1, chunk=12
+  manifest: 78 test classes -> chunks of 12
+  chunk 1 (12 classes) 09:18:04
+  chunk 2 (12 classes) 09:18:35
+  chunk 3 (12 classes) 09:18:54
+  chunk 4 (12 classes) 09:19:23
+  chunk 5 (12 classes) 09:19:40
+  chunk 6 (12 classes) 09:20:08
+  chunk 7 (6 classes) 09:20:27
+[2/4] desktop 09:20:39: npm ci + npm run build (vue-tsc typecheck)
+[3/4] tauri   09:20:48: cargo check --all-targets (src-tauri, Linux)
+all selected stages green — evidence: /home/ci/K3/ci/evidence/20261121-091756
+
+================= RESULT MATRIX =================
+STAGE                        RESULT NOTE
+server:local-reader          PASS   locked Rust build and FD snapshot regressions
+server:package               PASS   compile + fat jar
+server:chunk-1               PASS   12 classes — [INFO] Tests run: 81, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-2               PASS   12 classes — [INFO] Tests run: 112, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-3               PASS   12 classes — [INFO] Tests run: 79, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-4               PASS   12 classes — [INFO] Tests run: 70, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-5               PASS   12 classes — [INFO] Tests run: 93, Failures: 0, Errors: 0, Skipped: 1
+server:chunk-6               PASS   12 classes — [INFO] Tests run: 73, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-7               PASS   6 classes — [INFO] Tests run: 35, Failures: 0, Errors: 0, Skipped: 0
+server:manifest-audit        PASS   78 classes, each exactly once in 7 chunks
+desktop:build                PASS   npm ci + vue-tsc + vite build
+desktop:cargo-check          PASS   cargo check --all-targets
+e2e                          SKIP   no suite selected (--suite/--with-e2e)
+-------------------------------------------------
+failed stages : 0
+exit code     : 0  (0 green / 1 test-fail / 2 gate-integrity / 3 resource-infra)
+evidence      : /home/ci/K3/ci/evidence/20261121-091756
+=================================================
