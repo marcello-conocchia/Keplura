@@ -610,6 +610,22 @@ export interface ChatTranscript {
   toolCalls?: ToolCallCard[];
 }
 
+/**
+ * TU-02: Stop in the chat — pending confirmations of this and older turns end without a call,
+ * and a turn still planning cannot create a confirmable card anymore. Best effort.
+ */
+export async function stopToolCalls(orgId: number, conversationId: number): Promise<boolean> {
+  try {
+    const response = await desktopFetch(
+      `${serverUrl}/api/v1/orgs/${orgId}/chat/conversations/${conversationId}/tool-calls/stop`,
+      { method: "POST", signal: AbortSignal.timeout(10000) },
+    );
+    return response.status === 204;
+  } catch {
+    return false;
+  }
+}
+
 export type ToolCallDecisionOutcome =
   | { kind: "ok"; card: ToolCallCard }
   /** already decided, expired or cancelled — the card shows the server's current state */

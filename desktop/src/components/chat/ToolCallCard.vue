@@ -9,15 +9,16 @@ import Button from "../ui/Button.vue";
 import StatusPill from "../ui/StatusPill.vue";
 import { tr, serverText, dateLocale } from "../../i18n";
 import {
-  argumentEntries, canDecide, hiddenArgumentCount, riskLabel, statusMeta, type ToolCallCard,
+  argumentEntries, canDecide, hiddenArgumentCount, riskLabel, statusMeta, summaryIsPartial, type ToolCallCard,
 } from "../../tool-cards";
 
 const props = defineProps<{ card: ToolCallCard; busy: boolean; error?: string | null }>();
 const emit = defineEmits<{ decide: [decision: "confirm" | "reject"] }>();
 
 const meta = computed(() => statusMeta(props.card.status));
-const args = computed(() => argumentEntries(props.card.arguments));
-const hidden = computed(() => hiddenArgumentCount(props.card.arguments));
+const args = computed(() => argumentEntries(props.card.argumentFields));
+const hidden = computed(() => hiddenArgumentCount(props.card.argumentFields));
+const partial = computed(() => summaryIsPartial(props.card.argumentFields));
 const decidable = computed(() => canDecide(props.card));
 const headingId = computed(() => `tool-call-${props.card.id}`);
 const deadline = computed(() =>
@@ -50,8 +51,20 @@ const deadline = computed(() =>
         <dd>{{ a.value }}</dd>
       </template>
     </dl>
-    <p v-else class="tool-card-note">{{ $t("Ohne Eingaben.") }}</p>
-    <p v-if="hidden > 0" class="tool-card-note">{{ $t("{0} weitere Eingaben nicht angezeigt.", hidden) }}</p>
+    <p v-else-if="card.argumentsText !== null" class="tool-card-note">{{ $t("Ohne Eingaben.") }}</p>
+    <p v-if="card.argumentsText === null" class="tool-card-note">{{ $t("Die Eingaben wurden nicht gespeichert (zu groß oder ungültig).") }}</p>
+    <p v-if="hidden > 0" class="tool-card-note">{{ $t("{0} weitere Eingaben nicht in der Übersicht.", hidden) }}</p>
+    <p v-if="partial" class="tool-card-note">{{ $t("Die Übersicht ist gekürzt. Maßgeblich sind die vollständigen Eingaben.") }}</p>
+
+    <!-- Exact stored text that runs on confirmation: always visible while a decision is open. -->
+    <div v-if="card.argumentsText !== null && decidable" class="tool-card-full">
+      <p class="tool-card-kicker">{{ $t("Vollständige Eingaben – genau so wird ausgeführt") }}</p>
+      <pre data-testid="chat-tool-call-arguments">{{ card.argumentsText }}</pre>
+    </div>
+    <details v-else-if="card.argumentsText !== null && card.argumentsText !== '{}'" class="tool-card-full">
+      <summary class="tool-card-kicker">{{ $t("Vollständige Eingaben anzeigen") }}</summary>
+      <pre data-testid="chat-tool-call-arguments">{{ card.argumentsText }}</pre>
+    </details>
 
     <div v-if="decidable" class="tool-card-confirm" role="group" :aria-label="$t('Aufruf bestätigen oder ablehnen')">
       <p class="tool-card-note">
@@ -89,6 +102,8 @@ const deadline = computed(() =>
 .tool-card-alert { margin: 0; color: var(--ic-status-error); font: 400 13px/20px var(--ic-font); }
 .tool-card-confirm { display: grid; gap: 8px; }
 .tool-card-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.tool-card-full pre { margin: 4px 0 0; max-height: 20rem; overflow: auto; padding: 8px 10px; border-radius: var(--ic-radius-small); background: var(--ic-surface-subtle); color: var(--ic-text); font: 400 12px/18px var(--ic-font-mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+.tool-card-full summary { cursor: pointer; }
 .tool-card-result pre { margin: 4px 0 0; max-height: 16rem; overflow: auto; padding: 8px 10px; border-radius: var(--ic-radius-small); background: var(--ic-surface-subtle); color: var(--ic-text); font: 400 12px/18px var(--ic-font-mono); white-space: pre-wrap; overflow-wrap: anywhere; }
 @media (max-width: 500px) { .tool-card-args { grid-template-columns: minmax(0, 1fr); } }
 </style>

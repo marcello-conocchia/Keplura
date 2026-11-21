@@ -55,10 +55,20 @@ public class ToolExecutionService {
     public record Outcome(String text, boolean invoked, String toolName) {
     }
 
-    /** Aufrufkarte, wie sie die Person sieht. Keine Zugangsdaten, keine internen Hashes. */
+    /**
+     * Aufrufkarte, wie sie die Person sieht. Keine Zugangsdaten, keine internen Hashes.
+     * {@code argumentsText} ist der exakt gespeicherte JSON-Text, der bei Bestätigung ausgeführt
+     * wird ({@code null} = nicht gespeichert, nur bei gesperrten Plänen); {@code argumentFields}
+     * zeigt dieselben Werte je Feld verlustfrei als Text (keine Rundung großer Zahlen im Client).
+     */
     public record ToolCallView(String id, Long promptMessageId, String tool, String source, String risk,
-                               JsonNode arguments, String status, boolean needsConfirmation, String result,
-                               String error, Instant createdAt, Instant expiresAt) {
+                               String argumentsText, List<ArgumentField> argumentFields, String status,
+                               boolean needsConfirmation, String result, String error, Instant createdAt,
+                               Instant expiresAt) {
+    }
+
+    /** Ein Eingabefeld, Wert verlustfrei als Text (Zeichenketten roh, sonst JSON). */
+    public record ArgumentField(String name, String value) {
     }
 
     /** Ausgang einer Entscheidung über eine ausstehende Karte. */
@@ -291,6 +301,18 @@ public class ToolExecutionService {
         }
     }
 
+    /**
+     * Stopp im Chat (TU-02): offene Bestätigungen dieses und älterer Turns enden ohne Aufruf, und
+     * ein noch planender Turn kann danach keine bestätigbare Karte mehr anlegen.
+     * {@code false}, wenn der Chat der Person nicht (mehr) gehört.
+     */
+    public boolean stop(Long userId, Long orgId, Long conversationId) {
+        ToolContext ctx = resolveContext(userId, orgId, conversationId);
+        if (ctx == null) return false;
+        cards.stop(conversationId, wallClock.get());
+        return true;
+    }
+
     public void deleteCards(Long conversationId) {
         cards.deleteConversation(conversationId);
     }
@@ -321,17 +343,24 @@ public class ToolExecutionService {
             return new Decision.Done(view(reload(row), now));
         }
         if (!cards.claimPending(row.id(), ToolCallStore.Status.RUNNING, now)) {
-            return new Decision.Conflict(view(reload(row), now)); // lost the race: never a second call
+            // Lost the race, or a newer question / a stop superseded this plan: never a call.
+            ToolCallStore.Row current = reload(row);
+            if (current.status() == ToolCallStore.Status.PENDING && current.superseded()) cards.cancel(row.id(), now);
+            return new Decision.Conflict(view(reload(row), now));
         }
         // From here the card is consumed: whatever happens, it is never executed again.
         ToolContext bound = new ToolContext(row.userId(), row.orgId(), row.spaceId(), row.conversationId());
         JsonNode args;
         try {
-            args = mapper.readTree(row.argumentsJson());
+            args = row.argumentsJson() == null ? null : mapper.readTree(row.argumentsJson());
         } catch (RuntimeException e) {
             args = null;
         }
-        Checked checked = args == null || !args.isObject() ? Checked.no("Die gespeicherten Argumente sind ungültig. Das Werkzeug wurde nicht aufgerufen.")
+        Duration used = row.promptMessageId() == null ? Duration.ZERO
+                : cards.timeUsed(row.conversationId(), row.promptMessageId(), now); // shared with the turn's other calls
+        Checked checked = used.compareTo(MAX_TOOL_TIME_PER_TURN) >= 0
+                ? Checked.no("Das Zeitbudget für Werkzeuge in dieser Antwort ist aufgebraucht.")
+                : args == null || !args.isObject() ? Checked.no("Die gespeicherten Argumente sind ungültig. Das Werkzeug wurde nicht aufgerufen.")
                 : !bound.equals(ctx) ? Checked.no("Der Zugriff auf diesen Chat besteht nicht mehr. Das Werkzeug wurde nicht aufgerufen.")
                 : row.risk() != ToolRisk.CRITICAL ? Checked.no(CHANGED)
                 : recheck(bound, row.adapter(), row.toolId(), row.definitionHash(), args, true);
@@ -360,17 +389,23 @@ public class ToolExecutionService {
     }
 
     private ToolCallView view(ToolCallStore.Row r, Instant now) {
-        JsonNode args;
-        try {
-            args = mapper.readTree(r.argumentsJson());
-        } catch (RuntimeException e) {
-            args = mapper.createObjectNode();
+        List<ArgumentField> fields = new java.util.ArrayList<>();
+        if (r.argumentsJson() != null) {
+            try {
+                JsonNode args = mapper.readTree(r.argumentsJson());
+                for (Map.Entry<String, JsonNode> e : args.properties()) {
+                    JsonNode v = e.getValue();
+                    fields.add(new ArgumentField(e.getKey(), v.isString() ? v.asString() : v.toString()));
+                }
+            } catch (RuntimeException e) {
+                fields.clear(); // the exact text below stays authoritative
+            }
         }
         ToolCallStore.Status status = ToolCallStore.effectiveStatus(r, now);
         return new ToolCallView(r.publicId(), r.promptMessageId(), r.toolName(), r.sourceName(),
-                r.risk() == null ? null : r.risk().name(), args, status.name(), r.needsConfirmation(),
-                status == ToolCallStore.Status.SUCCEEDED ? r.resultText() : null, r.error(), r.createdAt(),
-                status == ToolCallStore.Status.PENDING ? r.expiresAt() : null);
+                r.risk() == null ? null : r.risk().name(), r.argumentsJson(), List.copyOf(fields), status.name(),
+                r.needsConfirmation(), status == ToolCallStore.Status.SUCCEEDED ? r.resultText() : null, r.error(),
+                r.createdAt(), status == ToolCallStore.Status.PENDING ? r.expiresAt() : null);
     }
 
     /** Ein Antwort-Turn: angebotene Werkzeuge plus Zähler und Zeitbudget. Nicht threadsicher. */
@@ -432,6 +467,10 @@ public class ToolExecutionService {
                 args = null;
             }
             if (args == null || !args.isObject()) return blocked("Die Werkzeugargumente sind kein gültiges JSON-Objekt.", t, null);
+            // Store and execute exactly one canonical text; too large → blocked, never replaced.
+            String canonical = cards.canonical(args);
+            if (canonical == null) return blocked("Die Werkzeugargumente sind zu groß.", t, null);
+            args = mapper.readTree(canonical);
             String invalid = ToolArgumentValidator.validate(t.inputSchema(), args);
             if (invalid != null) return blocked(invalid + " Das Werkzeug wurde nicht aufgerufen.", t, args);
             if (spentNanos >= MAX_TOOL_TIME_PER_TURN.toNanos()) {
@@ -444,12 +483,20 @@ public class ToolExecutionService {
             if (checked.reason() != null) return blocked(checked.reason(), t, args);
             Instant now = wallClock.get();
             if (critical) {
+                if (promptMessageId == null) {
+                    return blocked("Der Aufruf kann nicht zur Bestätigung vorgelegt werden. Er wurde nicht ausgeführt.", t, args);
+                }
+                Optional<ToolCallStore.Row> pending;
                 try {
-                    cards.create(ctx, promptMessageId, t, hash, args, ToolCallStore.Status.PENDING, true, null, now);
+                    pending = cards.create(ctx, promptMessageId, t, hash, canonical, ToolCallStore.Status.PENDING, true, null, now);
                 } catch (RuntimeException e) {
                     log.warn("pending tool call not stored ({})", e.getClass().getSimpleName());
                     return new Outcome("Der Aufruf konnte nicht zur Bestätigung vorgelegt werden. Er wurde nicht ausgeführt.",
                             false, t.toolName());
+                }
+                if (pending.isEmpty()) {
+                    return new Outcome("Der Chat wurde inzwischen weitergeführt oder gestoppt. Der Aufruf wurde nicht vorgelegt "
+                            + "und nicht ausgeführt.", false, t.toolName());
                 }
                 return new Outcome("Der Aufruf des Werkzeugs „" + t.toolName() + "“ wurde der Person zur Bestätigung "
                         + "vorgelegt und ist NOCH NICHT ausgeführt. Sie kann ihn im Chat bestätigen oder ablehnen. "
@@ -457,7 +504,8 @@ public class ToolExecutionService {
             }
             ToolCallStore.Row card;
             try {
-                card = cards.create(ctx, promptMessageId, t, hash, args, ToolCallStore.Status.RUNNING, false, null, now);
+                card = cards.create(ctx, promptMessageId, t, hash, canonical, ToolCallStore.Status.RUNNING, false, null, now)
+                        .orElseThrow();
             } catch (RuntimeException e) {
                 log.warn("tool call card not stored ({})", e.getClass().getSimpleName());
                 return new Outcome("Das Werkzeug konnte nicht sicher protokolliert werden. Es wurde nicht aufgerufen.",
@@ -478,7 +526,7 @@ public class ToolExecutionService {
         private Outcome blocked(String reason, ToolDefinition t, JsonNode args) {
             if (t != null) {
                 try {
-                    cards.create(ctx, promptMessageId, t, definitionHash(t), args, ToolCallStore.Status.BLOCKED,
+                    cards.create(ctx, promptMessageId, t, definitionHash(t), cards.canonical(args), ToolCallStore.Status.BLOCKED,
                             t.risk() == ToolRisk.CRITICAL, reason, wallClock.get());
                 } catch (RuntimeException e) {
                     log.warn("blocked tool call card not stored ({})", e.getClass().getSimpleName());

@@ -7,6 +7,7 @@ import {
   createConversation,
   decideToolCall,
   deleteConversation,
+  stopToolCalls,
   fetchTranscript,
   serverUrl,
   streamChatTurn,
@@ -467,6 +468,17 @@ async function readBackTranscript(
 
 function stop() {
   stopController?.abort();
+  // TU-02: tell the server too — a pending or still-planned confirmation of this turn must not
+  // stay decidable after Stop. Best effort; the transcript re-read shows the outcome.
+  const s = scoped();
+  const conversationId = activeId.value;
+  if (s && conversationId !== null) {
+    void stopToolCalls(s.orgId, conversationId).then(async () => {
+      if (activeId.value !== conversationId) return;
+      const read = await fetchTranscript(s.orgId, conversationId);
+      if (read.kind === "ok" && activeId.value === conversationId) toolCalls.value = read.transcript.toolCalls ?? [];
+    });
+  }
 }
 
 // --- CHAT-POLISH §2: message actions ----------------------------------------

@@ -132,8 +132,9 @@ class ToolExecutionServiceTest {
         }
         assertThat(adapter.invocations).hasValue(0);
         assertThat(auditRows()).isZero();
+        // openTurn without a question id: a CRITICAL plan cannot even become a pending card
         assertThat(jdbc.queryForObject("select status from tool_call where function_name = 'f__critical'", String.class))
-                .isEqualTo("PENDING");
+                .isEqualTo("BLOCKED");
     }
 
     @Test void criticalCanNeverRunInsideTheTurnEvenIfReclassifiedMeanwhile() {

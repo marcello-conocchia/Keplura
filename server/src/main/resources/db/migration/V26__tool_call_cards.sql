@@ -19,7 +19,8 @@ CREATE TABLE tool_call (
     risk character varying(16),
     definition_hash character varying(64) NOT NULL,
     fingerprint character varying(64),
-    arguments_json character varying(16000) NOT NULL,
+    -- exakt gespeicherte, kanonische Argumente; NULL nur bei gesperrten Plänen, deren Argumente zu groß/ungültig waren
+    arguments_json character varying(16000),
     status character varying(16) NOT NULL,
     needs_confirmation boolean NOT NULL,
     result_text character varying(9000),
@@ -33,6 +34,14 @@ CREATE TABLE tool_call (
     CONSTRAINT tool_call_public_id_key UNIQUE (public_id)
 );
 CREATE INDEX tool_call_conversation_idx ON tool_call (conversation_id, created_at);
+
+-- Stopp im Chat: alle Pläne bis einschließlich dieser Frage sind ungültig (auch noch nicht angelegte).
+CREATE TABLE tool_call_stop (
+    conversation_id bigint NOT NULL,
+    stopped_prompt_id bigint NOT NULL,
+    stopped_at timestamp with time zone NOT NULL,
+    CONSTRAINT tool_call_stop_pkey PRIMARY KEY (conversation_id)
+);
 
 -- Audit-Zeile ↔ Karte (nachvollziehbar, weiterhin ohne Argumente/Ergebnisse im Protokoll).
 ALTER TABLE tool_call_log ADD COLUMN tool_call_id bigint;

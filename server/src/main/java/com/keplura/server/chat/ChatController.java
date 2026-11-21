@@ -196,6 +196,20 @@ public class ChatController {
         };
     }
 
+    /**
+     * TU-02: the existing Stop in the chat — pending confirmations of this and older turns end
+     * without a call, and a turn still planning can no longer create a confirmable card.
+     */
+    @PostMapping("/chat/conversations/{conversationId}/tool-calls/stop")
+    public ResponseEntity<ErrorResponse> stopToolCalls(@PathVariable("orgId") Long orgId,
+                                                       @PathVariable("conversationId") Long conversationId,
+                                                       HttpServletRequest httpRequest) {
+        AuthPrincipal principal = currentPrincipal(httpRequest);
+        return chatService.stopToolCalls(principal.userId(), orgId, conversationId)
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("conversation not found"));
+    }
+
     @DeleteMapping("/chat/conversations/{conversationId}")
     public ResponseEntity<ErrorResponse> delete(@PathVariable("orgId") Long orgId,
                                                 @PathVariable("conversationId") Long conversationId,

@@ -412,6 +412,27 @@ class ChatApiIntegrationTest {
                 Long.valueOf(chat))).isZero();
     }
 
+    @Test void stopEndpointEndsPendingConfirmationsOwnerOnly() throws Exception {
+        String[] scope = fixtureChain(false);
+        var fixture = enableFixtureTools();
+        fixture.risk = com.keplura.server.tool.ToolRisk.CRITICAL;
+        String chat = createConversation(scope[0], scope[1], scope[2], Map.of());
+        stubToolMode = "injection";
+        exchange("POST", streamPath(scope[1], chat), scope[0], Map.of("prompt", "Use echo once"));
+        String stopPath = transcriptPath(scope[1], chat) + "/tool-calls/stop";
+        String stranger = loginFreshUser("stop-stranger");
+        assertThat(exchange("POST", stopPath, stranger, null).getStatusCode().value()).isIn(403, 404);
+        assertThat(jdbc.queryForObject("select status from tool_call where conversation_id = ?", String.class,
+                Long.valueOf(chat))).isEqualTo("PENDING");
+        assertThat(exchange("POST", stopPath, scope[0], null).getStatusCode().value()).isEqualTo(204);
+        var json = tools.jackson.databind.json.JsonMapper.builder().build();
+        var card = json.readTree(exchange("GET", transcriptPath(scope[1], chat), scope[0], null).getBody()).path("toolCalls").get(0);
+        assertThat(card.path("status").asString()).isEqualTo("CANCELLED");
+        String decisionPath = transcriptPath(scope[1], chat) + "/tool-calls/" + card.path("id").asString() + "/decision";
+        assertThat(exchange("POST", decisionPath, scope[0], Map.of("decision", "confirm")).getStatusCode().value()).isEqualTo(409);
+        assertThat(fixture.invocations.get()).isZero();
+    }
+
     @Test void aNewMessageCancelsPendingConfirmations() {
         String[] scope = fixtureChain(false);
         var fixture = enableFixtureTools();

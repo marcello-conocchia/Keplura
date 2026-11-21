@@ -113,6 +113,11 @@ public class ChatService {
      * TU-02: the person's decision on one pending tool call of their own chat. Executes no model
      * turn; the bound call runs at most once inside ToolExecutionService.
      */
+    /** TU-02: Stop in the chat ends pending confirmations of this and older turns (no call). */
+    public boolean stopToolCalls(Long userId, Long orgId, Long conversationId) {
+        return toolExecution == null || toolExecution.stop(userId, orgId, conversationId);
+    }
+
     public com.keplura.server.tool.ToolExecutionService.Decision decideToolCall(Long userId, Long orgId, Long conversationId,
                                                                                String callId, boolean confirm) {
         if (toolExecution == null) return new com.keplura.server.tool.ToolExecutionService.Decision.NotFound();

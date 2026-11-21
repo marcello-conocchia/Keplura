@@ -10,7 +10,7 @@ const m = { exports: {} };
 new Function("exports", code)(m.exports);
 const c = m.exports;
 
-const card = (over = {}) => ({ id: "a", promptMessageId: 1, tool: "t", source: "S", risk: "CRITICAL", arguments: {},
+const card = (over = {}) => ({ id: "a", promptMessageId: 1, tool: "t", source: "S", risk: "CRITICAL", argumentsText: "{}", argumentFields: [],
   status: "PENDING", needsConfirmation: true, result: null, error: null, createdAt: "2026-11-21T10:00:00Z",
   expiresAt: "2026-11-21T10:10:00Z", ...over });
 const at = (iso) => Date.parse(iso);
@@ -33,15 +33,27 @@ test("only a pending, confirmable card before its deadline can be decided", () =
   assert.equal(c.canDecide(card({ expiresAt: "garbage" }), at("2026-11-21T10:05:00Z")), false);
 });
 
-test("arguments become plain text lines, long and nested values are shortened", () => {
-  const e = c.argumentEntries({ id: "T-1", n: 3, ok: true, none: null, nested: { a: [1, 2] }, html: "<img src=x onerror=1>", long: "x".repeat(500) });
-  assert.deepEqual(e.slice(0, 6).map((x) => x.value), ["T-1", "3", "true", "null", "{\"a\":[1,2]}", "<img src=x onerror=1>"]);
-  assert.ok(e[6].value.endsWith(" …") && e[6].value.length < 410);
-  assert.deepEqual(c.argumentEntries(null), []);
-  assert.deepEqual(c.argumentEntries([1, 2]), []);
-  const many = Object.fromEntries(Array.from({ length: 25 }, (_, i) => [`k${i}`, i]));
+test("summary uses lossless server text, marks every shortening; exact text stays the basis", () => {
+  const fields = [
+    { name: "id", value: "9007199254740993" }, // beyond 2^53: must not become ...992
+    { name: "html", value: "<img src=x onerror=1>" },
+    { name: "long", value: "x".repeat(400) + "; delete_all" },
+  ];
+  const e = c.argumentEntries(fields);
+  assert.equal(e[0].value, "9007199254740993");
+  assert.equal(e[1].value, "<img src=x onerror=1>");
+  assert.equal(e[2].truncated, true);
+  assert.ok(!e[2].value.includes("delete_all"));
+  assert.equal(c.summaryIsPartial(fields), true); // → card tells the person to check the full text
+  const many = Array.from({ length: 21 }, (_, i) => ({ name: i === 20 ? "delete_all" : `k${i}`, value: String(i) }));
   assert.equal(c.argumentEntries(many).length, 20);
-  assert.equal(c.hiddenArgumentCount(many), 5);
+  assert.equal(c.hiddenArgumentCount(many), 1);
+  assert.equal(c.summaryIsPartial(many), true);
+  assert.equal(c.summaryIsPartial([{ name: "a", value: "1" }]), false);
+  assert.deepEqual(c.argumentEntries(null), []);
+  // the exact text is a plain string from the server — no JSON.parse, no rounding
+  const card = { argumentsText: '{"id":9007199254740993,"delete_all":true}' };
+  assert.ok(card.argumentsText.includes("9007199254740993") && card.argumentsText.includes("delete_all"));
 });
 
 test("cards render after the answer of their question, or after the question if no answer exists", () => {

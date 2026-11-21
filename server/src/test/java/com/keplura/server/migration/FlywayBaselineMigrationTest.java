@@ -87,7 +87,7 @@ class FlywayBaselineMigrationTest {
                         "data_source", "data_source_file",
                         "quality_question", "quality_run", "quality_result", "prompt_template",
                         "chat_conversation_kb", "chat_attachment", "web_search_settings", "mcp_server",
-                        "mcp_server_space", "mcp_call_log", "tool_call_log", "tool_call");
+                        "mcp_server_space", "mcp_call_log", "tool_call_log", "tool_call", "tool_call_stop");
         // V4 must stay vendor-free on this leg: no pgvector twin table on H2
         assertThat(jdbc.queryForList("SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name = 'kb_chunk_embedding'", String.class))
                 .isEmpty();

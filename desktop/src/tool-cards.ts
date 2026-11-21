@@ -12,7 +12,13 @@ export interface ToolCallCard {
   tool: string;
   source: string;
   risk: "READ" | "WRITE" | "CRITICAL" | null;
-  arguments: Record<string, unknown> | null;
+  /**
+   * Exactly the stored JSON text that runs on confirmation — shown verbatim, never parsed in the
+   * client (JSON.parse would round integers beyond 2^53). null = not stored (blocked plan only).
+   */
+  argumentsText: string | null;
+  /** Same inputs per field, values already lossless text from the server. */
+  argumentFields: { name: string; value: string }[];
   status: ToolCallStatus;
   needsConfirmation: boolean;
   /** Tool output — foreign content, rendered as plain text only. */
@@ -62,30 +68,29 @@ const MAX_VALUE_CHARS = 400;
 const MAX_ENTRIES = 20;
 
 /**
- * Arguments as readable "key: value" lines (plain text, never HTML). Nested values are compact
- * JSON; long values are shortened in the list (the full JSON is available on demand).
+ * Short summary of the inputs as "key: value" lines (plain text, never HTML). Values come as
+ * lossless text from the server; long values are shortened and marked. The summary is never the
+ * basis of a decision: the exact full text (argumentsText) is always available on the card.
  */
-export function argumentEntries(args: Record<string, unknown> | null | undefined): { key: string; value: string }[] {
-  if (!args || typeof args !== "object" || Array.isArray(args)) return [];
-  const out: { key: string; value: string }[] = [];
-  for (const [key, raw] of Object.entries(args)) {
-    if (out.length >= MAX_ENTRIES) break;
-    let value: string;
-    if (typeof raw === "string") value = raw;
-    else if (raw === null || typeof raw === "number" || typeof raw === "boolean") value = String(raw);
-    else {
-      try { value = JSON.stringify(raw); } catch { value = "…"; }
-    }
-    if (value.length > MAX_VALUE_CHARS) value = value.slice(0, MAX_VALUE_CHARS) + " …";
-    out.push({ key, value });
-  }
-  return out;
+export function argumentEntries(
+  fields: { name: string; value: string }[] | null | undefined,
+): { key: string; value: string; truncated: boolean }[] {
+  if (!Array.isArray(fields)) return [];
+  return fields.slice(0, MAX_ENTRIES).map((f) => {
+    const value = typeof f.value === "string" ? f.value : String(f.value);
+    const truncated = value.length > MAX_VALUE_CHARS;
+    return { key: String(f.name), value: truncated ? value.slice(0, MAX_VALUE_CHARS) + " …" : value, truncated };
+  });
 }
 
-/** Number of arguments not shown because of the entry cap. */
-export function hiddenArgumentCount(args: Record<string, unknown> | null | undefined): number {
-  if (!args || typeof args !== "object" || Array.isArray(args)) return 0;
-  return Math.max(0, Object.keys(args).length - MAX_ENTRIES);
+/** Number of fields left out of the summary because of the entry cap. */
+export function hiddenArgumentCount(fields: { name: string; value: string }[] | null | undefined): number {
+  return Array.isArray(fields) ? Math.max(0, fields.length - MAX_ENTRIES) : 0;
+}
+
+/** True when the summary does not show everything (more fields or shortened values). */
+export function summaryIsPartial(fields: { name: string; value: string }[] | null | undefined): boolean {
+  return hiddenArgumentCount(fields) > 0 || argumentEntries(fields).some((e) => e.truncated);
 }
 
 /** Cards grouped by the question (user message id) they belong to, in server order. */

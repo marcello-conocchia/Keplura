@@ -682,7 +682,11 @@ export const EN: Record<string, string> = {
   // TU-02 tool call cards
   "Werkzeug": "Tool",
   "Ohne Eingaben.": "No inputs.",
-  "{0} weitere Eingaben nicht angezeigt.": "{0} more inputs not shown.",
+  "{0} weitere Eingaben nicht in der Übersicht.": "{0} more inputs not in the summary.",
+  "Die Eingaben wurden nicht gespeichert (zu groß oder ungültig).": "The inputs were not stored (too large or invalid).",
+  "Die Übersicht ist gekürzt. Maßgeblich sind die vollständigen Eingaben.": "The summary is shortened. The complete inputs are authoritative.",
+  "Vollständige Eingaben – genau so wird ausgeführt": "Complete inputs – exactly this runs",
+  "Vollständige Eingaben anzeigen": "Show complete inputs",
   "Aufruf bestätigen oder ablehnen": "Confirm or reject call",
   "Dieser Aufruf wird erst ausgeführt, wenn du ihn bestätigst. Bestätigt wird genau dieser Aufruf mit diesen Eingaben, bis {0}.": "This call runs only after you confirm it. You confirm exactly this call with these inputs, until {0}.",
   "Ausführen": "Run",

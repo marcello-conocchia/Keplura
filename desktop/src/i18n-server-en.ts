@@ -177,6 +177,7 @@ export const SERVER_EN: Record<string, string> = {
   "Das Werkzeug konnte nicht sicher protokolliert werden. Es wurde nicht aufgerufen.": "The tool could not be logged safely. It was not called.",
   "Die Höchstzahl von acht Werkzeug-Aufrufen je Antwort ist erreicht.": "The maximum of eight tool calls per answer has been reached.",
   "Die Werkzeugargumente sind zu groß.": "The tool arguments are too large.",
+  "Der Aufruf kann nicht zur Bestätigung vorgelegt werden. Er wurde nicht ausgeführt.": "The call cannot be presented for confirmation. It was not run.",
   "Die Werkzeugargumente sind kein gültiges JSON-Objekt.": "The tool arguments are not a valid JSON object.",
   "Das Zeitbudget für Werkzeuge in dieser Antwort ist aufgebraucht.": "The time budget for tools in this answer is used up.",
   "Unbekannte Risikoklasse. Erlaubt sind READ, WRITE und CRITICAL.": "Unknown risk class. Allowed are READ, WRITE and CRITICAL.",

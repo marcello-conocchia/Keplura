@@ -81,3 +81,8 @@ erneut Zugriff, Freigabe, Risikoklasse, Werkzeugdefinition, Verbindungsziel
 und Eingaben; jede Änderung macht sie ungültig. Ein bestätigter Aufruf läuft
 höchstens einmal; ist sein Ausgang unklar, wird er nicht wiederholt. Nach der
 Bestätigung entsteht keine neue Modellantwort.
+Vor der Bestätigung zeigt die Karte die vollständigen Eingaben genau so, wie
+sie ausgeführt werden; die Übersicht darüber kann gekürzt sein. Zu große
+Eingaben werden nicht gespeichert und nicht ausgeführt. Eine neue Frage im
+Chat oder „Stopp“ machen offene Bestätigungen dieses Turns ungültig. Alle
+Aufrufe einer Frage teilen sich die 120 Sekunden Werkzeugzeit.
