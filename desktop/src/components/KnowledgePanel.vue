@@ -377,7 +377,7 @@ async function reloadAll() {
       >
         <template v-if="auth.selectedKb">
           <div class="kx-head">
-            <div class="kx-heading"><h2 class="kx-title">{{ auth.selectedKb.name }}</h2><p class="kx-description"><span class="ic-num">{{auth.documents.length}}</span> {{ $t("{0} · Dateien und Inhalte dieser Wissensbasis", auth.documents.length === 1 ? $t("Dokument") : $t("Dokumente")) }}</p></div>
+            <div class="kx-heading"><h2 class="kx-title">{{ auth.selectedKb.name }}</h2><p class="kx-description"><span class="ic-num">{{auth.documents.length}}</span> {{ auth.documents.length === 1 ? $t("Dokument · Dateien und Inhalte dieser Wissensbasis") : $t("Dokumente · Dateien und Inhalte dieser Wissensbasis") }}</p></div>
             <Button variant="primary" data-testid="knowledge-upload-button" :disabled="uploading" @click="openFilePicker"><AppIcon name="upload" :size="16" />{{ $t("Dateien hochladen") }}</Button>
             <input
               id="knowledge-upload"

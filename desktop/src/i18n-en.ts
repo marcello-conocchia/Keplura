@@ -193,7 +193,6 @@ export const EN: Record<string, string> = {
   "Noch kein Arbeitsbereich": "No workspace yet",
   "Ein Arbeitsbereich bündelt Wissen und Chats eines Teams, zum Beispiel „Vertrieb“ oder „Produktion“.": "A workspace bundles a team's knowledge and chats, for example “Sales” or “Production”.",
   "Arbeitsbereich anlegen": "Create workspace",
-  "{0} · Dateien und Inhalte dieser Wissensbasis": "{0} · Files and content of this knowledge base",
   "Dokument": "Document",
   "Dateien hochladen": "Upload files",
   "In dieser Wissensbasis suchen": "Search this knowledge base",
@@ -953,7 +952,7 @@ export const EN: Record<string, string> = {
   "Das Dokument konnte nicht gelesen werden. Versuche „Erneut verarbeiten“.": "The document could not be read. Try “Process again”.",
   "Vermutlich ein eingescanntes Dokument ohne Text. Texterkennung (OCR) ist nicht verfügbar.": "Probably a scanned document without text. Text recognition (OCR) is not available.",
   "Dieser Dateityp wird gespeichert, aber nicht durchsucht.": "This file type is stored but not searched.",
-  "{0} Byte": "{0} bytes",
+  "{0} Byte": "{0} B",
   "Word": "Word",
   "Excel": "Excel",
   "PowerPoint": "PowerPoint",
@@ -995,4 +994,6 @@ export const EN: Record<string, string> = {
   "Server-Operatoren": "Server operators",
   "Ersteller-Besitzer": "Creator owner",
   "unbekannt": "unknown",
+  "Dokument · Dateien und Inhalte dieser Wissensbasis": "document · Files and content of this knowledge base",
+  "Dokumente · Dateien und Inhalte dieser Wissensbasis": "documents · Files and content of this knowledge base",
 };
