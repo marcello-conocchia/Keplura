@@ -1,0 +1,1212 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------< com.keplura:keplura-server >---------------------
+[INFO] Building Keplura Server 0.1.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-cli) @ keplura-server ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.keplura.server.search.OfficeFormatsTest
+[INFO] Tests run: 17, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.868 s -- in com.keplura.server.search.OfficeFormatsTest
+[INFO] Running com.keplura.server.mcp.McpSchemaFailClosedTest
+20:53:25.071 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-schema-d37ef4d9-367d-44d0-9d14-9b303d312a0d (H2 2.4)
+20:53:25.118 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:25.156 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:25.159 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.022s)
+20:53:25.166 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:25.210 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:25.224 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:25.249 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:25.259 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:25.272 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:25.287 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:25.299 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:25.314 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:25.324 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:25.340 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:25.356 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:25.368 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:25.377 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:25.405 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:25.418 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:25.431 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:25.445 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:25.454 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:25.468 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:25.474 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:25.487 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:25.494 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:25.501 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:25.510 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:25.515 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:25.526 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:25.535 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:25.544 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.159s)
+20:53:25.556 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+20:53:26.127 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-schema-868e30f1-4369-423a-9528-5ff8b175a27e (H2 2.4)
+20:53:26.135 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:26.149 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:26.150 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.012s)
+20:53:26.151 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:26.155 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:26.164 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:26.172 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:26.179 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:26.185 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:26.190 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:26.198 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:26.205 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:26.211 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:26.224 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:26.233 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:26.238 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:26.242 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:26.255 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:26.265 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:26.272 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:26.279 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:26.286 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:26.296 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:26.299 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:26.305 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:26.308 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:26.311 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:26.320 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:26.325 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:26.332 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:26.340 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:26.345 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.083s)
+20:53:26.346 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+20:53:26.560 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-schema-c4b885ba-4569-4476-8f3c-e9ea6702db5a (H2 2.4)
+20:53:26.566 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:26.581 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:26.582 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.010s)
+20:53:26.583 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:26.587 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:26.590 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:26.594 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:26.599 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:26.605 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:26.610 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:26.614 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:26.621 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:26.625 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:26.632 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:26.638 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:26.641 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:26.645 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:26.658 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:26.664 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:26.669 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:26.678 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:26.685 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:26.694 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:26.697 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:26.702 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:26.705 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:26.709 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:26.714 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:26.717 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:26.723 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:26.729 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:26.733 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.063s)
+20:53:26.734 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+20:53:26.920 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-schema-bc26f0c1-a7f0-481e-b5f9-44a571488079 (H2 2.4)
+20:53:26.924 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:26.933 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:26.934 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.007s)
+20:53:26.935 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:26.937 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:26.939 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:26.942 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:26.945 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:26.948 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:26.952 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:26.956 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:26.963 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:26.967 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:26.972 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:26.977 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:26.980 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:26.984 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:26.994 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:26.999 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:27.003 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:27.008 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:27.012 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:27.019 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:27.022 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:27.027 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:27.030 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:27.032 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:27.038 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:27.040 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:27.044 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:27.049 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:27.052 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.048s)
+20:53:27.053 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+20:53:27.238 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-schema-f6093541-077a-4843-a1ed-e9c834946dfd (H2 2.4)
+20:53:27.243 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:27.251 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:27.251 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.006s)
+20:53:27.252 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:27.254 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:27.255 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:27.258 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:27.261 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:27.265 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:27.270 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:27.273 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:27.278 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:27.281 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:27.286 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:27.290 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:27.295 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:27.299 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:27.308 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:27.314 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:27.318 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:27.323 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:27.327 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:27.332 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:27.336 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:27.343 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:27.346 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:27.350 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:27.355 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:27.358 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:27.363 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:27.368 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:27.371 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.049s)
+20:53:27.372 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+20:53:27.553 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-schema-61b24b44-4663-4198-bc32-1c2dabcfc638 (H2 2.4)
+20:53:27.557 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:27.566 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:27.566 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.005s)
+20:53:27.567 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:27.569 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:27.570 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:27.573 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:27.576 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:27.580 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:27.582 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:27.585 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:27.588 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:27.591 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:27.595 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:27.600 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:27.603 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:27.606 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:27.613 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:27.619 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:27.622 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:27.626 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:27.629 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:27.633 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:27.636 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:27.639 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:27.641 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:27.643 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:27.647 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:27.650 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:27.659 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:27.663 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:27.665 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.033s)
+20:53:27.666 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+20:53:27.878 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-schema-1427d7f6-da8e-4438-8511-e78ace52c0b6 (H2 2.4)
+20:53:27.882 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:27.890 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:27.891 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.006s)
+20:53:27.892 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:27.894 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:27.895 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:27.898 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:27.901 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:27.904 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:27.907 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:27.910 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:27.914 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:27.917 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:27.921 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:27.925 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:27.928 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:27.930 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:27.937 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:27.942 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:27.946 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:27.951 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:27.954 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:27.958 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:27.960 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:27.965 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:27.968 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:27.970 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:27.975 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:27.977 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:27.980 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:27.984 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:27.986 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.029s)
+20:53:27.986 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+20:53:28.164 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-schema-07f6ad32-bbd6-49cc-9bbe-ebd41a97b34e (H2 2.4)
+20:53:28.167 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:28.172 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:28.173 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.004s)
+20:53:28.173 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:28.175 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:28.176 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:28.178 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:28.180 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:28.183 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:28.186 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:28.188 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:28.191 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:28.193 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:28.196 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:28.199 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:28.200 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:28.202 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:28.207 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:28.210 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:28.213 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:28.217 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:28.219 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:28.223 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:28.224 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:28.227 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:28.229 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:28.231 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:28.234 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:28.236 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:28.239 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:28.242 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:28.245 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.018s)
+20:53:28.245 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+20:53:28.423 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-schema-fdcad0ea-e009-4962-b6eb-cca8cdf86016 (H2 2.4)
+20:53:28.426 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:28.431 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:28.432 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.004s)
+20:53:28.432 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:28.434 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:28.435 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:28.437 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:28.440 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:28.443 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:28.446 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:28.448 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:28.451 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:28.452 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:28.454 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:28.457 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:28.460 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:28.462 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:28.467 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:28.471 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:28.474 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:28.478 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:28.480 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:28.484 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:28.487 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:28.490 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:28.493 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:28.495 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:28.499 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:28.501 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:28.503 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:28.507 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:28.510 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.022s)
+20:53:28.510 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+20:53:28.686 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-schema-76199d9c-617e-4697-98c8-7fe046b65eee (H2 2.4)
+20:53:28.690 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:28.699 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:28.699 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.006s)
+20:53:28.700 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:28.702 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:28.703 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:28.705 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:28.709 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:28.711 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:28.713 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:28.715 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:28.719 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:28.722 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:28.724 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:28.729 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:28.733 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:28.735 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:28.743 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:28.746 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:28.749 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:28.753 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:28.755 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:28.759 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:28.761 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:28.764 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:28.766 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:28.770 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:28.776 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:28.778 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:28.782 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:28.785 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:28.788 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.026s)
+20:53:28.788 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.275 s -- in com.keplura.server.mcp.McpSchemaFailClosedTest
+[INFO] Running com.keplura.server.mcp.McpToolAdapterTest
+20:53:28.928 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-adapter-9f3fc947-de65-4125-b42d-ec5b8c73c093 (H2 2.4)
+20:53:28.932 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:28.939 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:28.939 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.005s)
+20:53:28.940 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:28.942 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:28.944 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:28.947 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:28.949 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:28.952 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:28.955 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:28.957 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:28.961 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:28.963 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:28.966 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:28.969 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:28.971 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:28.973 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:28.976 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:28.979 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:28.982 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:28.987 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:28.989 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:28.994 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:28.997 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:29.001 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:29.003 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:29.005 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:29.008 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:29.010 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:29.012 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:29.015 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:29.017 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.026s)
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (/home/ci/.m2/repository/net/bytebuddy/byte-buddy-agent/1.18.11/byte-buddy-agent-1.18.11.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+20:53:29.987 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-adapter-4cb29e76-67d4-4709-9a71-bf5a62e3df2f (H2 2.4)
+20:53:30.027 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:30.074 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:30.076 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.035s)
+20:53:30.083 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:30.109 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:30.120 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:30.155 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:30.176 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:30.194 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:30.212 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:30.231 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:30.250 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:30.265 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:30.282 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:30.305 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:30.321 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:30.332 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:30.366 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:30.378 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:30.389 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:30.405 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:30.418 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:30.437 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:30.445 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:30.460 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:30.466 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:30.472 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:30.486 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:30.491 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:30.501 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:30.510 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:30.517 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.204s)
+20:53:30.605 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-adapter-4372c50f-b3b7-493c-8056-0bd4aeed38f2 (H2 2.4)
+20:53:30.614 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:30.632 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:30.634 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.014s)
+20:53:30.637 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:30.641 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:30.643 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:30.648 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:30.653 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:30.660 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:30.666 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:30.671 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:30.678 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:30.684 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:30.690 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:30.699 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:30.703 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:30.706 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:30.720 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:30.728 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:30.735 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:30.744 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:30.749 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:30.760 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:30.764 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:30.775 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:30.781 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:30.785 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:30.797 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:30.800 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:30.805 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:30.811 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:30.817 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.081s)
+20:53:30.910 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-adapter-a2bd102f-a104-4ea0-bd27-53ee77f9561b (H2 2.4)
+20:53:30.916 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:30.929 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:30.930 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.010s)
+20:53:30.931 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:30.935 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:30.937 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:30.943 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:30.947 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:30.952 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:30.958 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:30.962 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:30.966 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:30.970 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:30.974 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:30.979 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:30.984 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:30.988 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:30.996 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:31.003 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:31.008 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:31.014 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:31.020 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:31.027 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:31.031 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:31.037 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:31.040 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:31.043 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:31.048 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:31.052 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:31.056 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:31.061 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:31.064 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.050s)
+20:53:31.098 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-adapter-685d6703-f2d3-4417-9b85-8bcf25954984 (H2 2.4)
+20:53:31.107 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:31.122 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:31.123 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.010s)
+20:53:31.124 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:31.127 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:31.129 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:31.133 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:31.137 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:31.140 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:31.146 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:31.153 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:31.158 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:31.163 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:31.167 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:31.173 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:31.177 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:31.179 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:31.186 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:31.190 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:31.195 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:31.199 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:31.203 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:31.208 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:31.211 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:31.216 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:31.221 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:31.225 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:31.230 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:31.234 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:31.239 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:31.244 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:31.248 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.045s)
+20:53:31.284 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-adapter-54f93ebf-bf5d-458d-ad90-975d73a12f6c (H2 2.4)
+20:53:31.289 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:31.296 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:31.296 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.004s)
+20:53:31.297 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:31.299 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:31.300 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:31.310 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:31.313 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:31.316 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:31.319 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:31.321 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:31.324 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:31.327 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:31.329 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:31.332 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:31.335 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:31.336 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:31.342 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:31.345 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:31.349 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:31.353 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:31.355 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:31.358 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:31.360 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:31.364 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:31.366 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:31.369 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:31.372 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:31.374 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:31.377 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:31.379 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:31.382 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.020s)
+20:53:31.411 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-adapter-912dc8ab-ca18-4669-919d-cf014c488ccb (H2 2.4)
+20:53:31.420 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:31.429 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:31.429 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.006s)
+20:53:31.430 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:31.432 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:31.434 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:31.437 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:31.439 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:31.442 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:31.445 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:31.448 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:31.451 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:31.453 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:31.457 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:31.461 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:31.464 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:31.466 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:31.471 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:31.474 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:31.478 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:31.482 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:31.484 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:31.488 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:31.490 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:31.495 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:31.498 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:31.500 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:31.505 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:31.508 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:31.511 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:31.514 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:31.517 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.028s)
+20:53:31.594 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-adapter-46c85205-917a-4bcf-b5ef-2d1dcc681769 (H2 2.4)
+20:53:31.599 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:31.607 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:31.607 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.004s)
+20:53:31.607 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:31.609 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:31.611 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:31.612 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:31.614 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:31.616 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:31.619 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:31.621 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:31.625 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:31.628 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:31.632 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:31.636 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:31.638 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:31.640 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:31.645 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:31.647 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:31.650 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:31.653 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:31.655 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:31.660 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:31.663 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:31.667 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:31.669 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:31.670 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:31.675 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:31.677 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:31.681 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:31.684 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:31.686 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.024s)
+20:53:31.715 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-adapter-c56fb44f-1398-456b-a86d-1bd734497857 (H2 2.4)
+20:53:31.719 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:31.728 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:31.728 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.006s)
+20:53:31.729 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:31.730 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:31.732 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:31.734 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:31.737 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:31.740 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:31.743 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:31.746 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:31.748 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:31.751 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:31.754 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:31.757 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:31.760 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:31.762 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:31.766 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:31.769 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:31.773 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:31.777 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:31.780 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:31.783 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:31.785 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:31.787 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:31.790 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:31.792 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:31.796 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:31.798 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:31.801 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:31.804 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:31.806 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.025s)
+20:53:31.823 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-adapter-db726f15-e4ad-44e1-930f-455a7342deaa (H2 2.4)
+20:53:31.828 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:31.836 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:31.837 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.006s)
+20:53:31.837 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:31.838 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:31.839 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:31.841 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:31.842 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:31.844 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:31.846 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:31.848 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:31.851 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:31.853 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:31.856 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:31.858 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:31.860 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:31.861 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:31.864 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:31.866 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:31.869 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:31.871 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:31.872 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:31.875 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:31.876 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:31.879 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:31.880 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:31.881 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:31.882 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:31.884 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:31.886 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:31.889 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:31.891 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.010s)
+20:53:31.926 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-adapter-1954d316-48cd-4de9-9c91-6fe158b75592 (H2 2.4)
+20:53:31.930 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:31.938 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:31.939 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.006s)
+20:53:31.939 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:31.941 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:31.942 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:31.944 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:31.946 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:31.948 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:31.951 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:31.952 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:31.956 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:31.957 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:31.960 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:31.962 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:31.964 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:31.965 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:31.968 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:31.970 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:31.972 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:31.975 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:31.977 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:31.980 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:31.983 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:31.985 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:31.986 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:31.988 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:31.991 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:31.993 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:31.995 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:31.998 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:32.006 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.017s)
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.126 s -- in com.keplura.server.mcp.McpToolAdapterTest
+[INFO] Running com.keplura.server.mcp.McpClientTest
+20:53:32.049 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+20:53:32.052 [main] WARN com.keplura.server.admin.SsrfGuard -- SSRF guard refused a dial target (policy veto)
+20:53:32.060 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+20:53:32.175 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+20:53:32.261 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+20:53:32.429 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.441 s -- in com.keplura.server.mcp.McpClientTest
+[INFO] Running com.keplura.server.mcp.McpAdminConcurrencyTest
+20:53:32.503 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-admin-94ad15e5-de4a-4154-8fa4-f97ebd9a36c7 (H2 2.4)
+20:53:32.507 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:32.512 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:32.512 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.003s)
+20:53:32.513 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:32.514 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:32.515 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:32.517 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:32.518 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:32.519 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:32.521 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:32.522 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:32.524 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:32.525 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:32.527 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:32.529 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:32.531 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:32.532 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:32.534 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:32.536 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:32.538 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:32.541 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:32.542 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:32.544 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:32.545 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:32.548 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:32.549 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:32.550 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:32.552 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:32.553 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:32.555 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:32.556 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:32.558 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.006s)
+20:53:32.578 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-admin-d8925f2f-9c3c-450e-87f8-2bad65678bf5 (H2 2.4)
+20:53:32.581 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:32.586 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:32.586 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.003s)
+20:53:32.587 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:32.588 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:32.589 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:32.590 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:32.591 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:32.593 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:32.595 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:32.596 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:32.597 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:32.598 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:32.600 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:32.602 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:32.603 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:32.604 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:32.607 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:32.609 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:32.611 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:32.612 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:32.613 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:32.615 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:32.616 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:32.619 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:32.620 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:32.621 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:32.624 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:32.625 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:32.626 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:32.628 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:32.630 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.004s)
+20:53:32.651 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-admin-a9c4d053-4929-4ed9-9a6a-148f6029a5ed (H2 2.4)
+20:53:32.654 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+20:53:32.659 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+20:53:32.659 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 26 migrations (execution time 00:00.003s)
+20:53:32.659 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+20:53:32.661 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+20:53:32.662 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+20:53:32.664 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+20:53:32.666 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+20:53:32.669 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+20:53:32.671 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+20:53:32.673 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+20:53:32.676 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+20:53:32.678 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+20:53:32.680 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+20:53:32.683 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+20:53:32.685 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+20:53:32.686 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+20:53:32.690 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+20:53:32.693 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+20:53:32.695 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+20:53:32.698 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+20:53:32.700 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+20:53:32.704 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+20:53:32.706 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+20:53:32.710 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+20:53:32.712 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+20:53:32.714 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+20:53:32.717 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+20:53:32.719 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+20:53:32.721 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+20:53:32.724 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+20:53:32.726 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 26 migrations to schema "PUBLIC", now at version v27 (execution time 00:00.017s)
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.251 s -- in com.keplura.server.mcp.McpAdminConcurrencyTest
+[INFO] Running com.keplura.server.datasource.LocalSourceConnectorTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.110 s -- in com.keplura.server.datasource.LocalSourceConnectorTest
+[INFO] Running com.keplura.server.datasource.NativeLocalReaderReasonTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.032 s -- in com.keplura.server.datasource.NativeLocalReaderReasonTest
+[INFO] Running com.keplura.server.org.OrgServiceTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.572 s -- in com.keplura.server.org.OrgServiceTest
+[INFO] Running com.keplura.server.org.OrgApiIntegrationTest
+20:53:33.551 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.keplura.server.org.OrgApiIntegrationTest]: OrgApiIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+20:53:33.750 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.org.OrgApiIntegrationTest
+20:53:33.802 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.keplura.server.org.OrgApiIntegrationTest]: OrgApiIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+20:53:33.811 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.org.OrgApiIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-11-21T20:53:34.168Z  INFO 4565 --- [keplura-server] [           main] c.k.server.org.OrgApiIntegrationTest     : Starting OrgApiIntegrationTest using Java 21.0.12.1 with PID 4565 (started by ci in /review/repo/server)
+2026-11-21T20:53:34.169Z DEBUG 4565 --- [keplura-server] [           main] c.k.server.org.OrgApiIntegrationTest     : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-21T20:53:34.169Z  INFO 4565 --- [keplura-server] [           main] c.k.server.org.OrgApiIntegrationTest     : The following 1 profile is active: "dev"
+2026-11-21T20:53:34.952Z  INFO 4565 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-21T20:53:35.085Z  INFO 4565 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 122 ms. Found 23 JPA repository interfaces.
+2026-11-21T20:53:35.899Z  INFO 4565 --- [keplura-server] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-11-21T20:53:35.922Z  INFO 4565 --- [keplura-server] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-21T20:53:35.922Z  INFO 4565 --- [keplura-server] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-11-21T20:53:35.979Z  INFO 4565 --- [keplura-server] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1795 ms
+2026-11-21T20:53:36.057Z DEBUG 4565 --- [keplura-server] [           main] c.k.server.auth.SessionLifetimeFilter    : Filter 'sessionLifetimeFilter' configured for use
+2026-11-21T20:53:36.292Z  INFO 4565 --- [keplura-server] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-21T20:53:36.347Z  INFO 4565 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-11-21T20:53:36.669Z  INFO 4565 --- [keplura-server] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-21T20:53:36.699Z  INFO 4565 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-11-21T20:53:36.712Z  INFO 4565 --- [keplura-server] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn734: url=jdbc:h2:mem:org-api-test user=SA
+2026-11-21T20:53:36.713Z  INFO 4565 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-11-21T20:53:36.772Z  INFO 4565 --- [keplura-server] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:org-api-test]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: ORG-API-TEST/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-21T20:53:37.837Z  INFO 4565 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-21T20:53:37.874Z  INFO 4565 --- [keplura-server] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-21T20:53:37.958Z  INFO 4565 --- [keplura-server] [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-11-21T20:53:38.586Z  INFO 4565 --- [keplura-server] [           main] com.keplura.server.admin.SecretCipher    : secret cipher: no KEPLURA_SECRETS_MASTER_KEY — provider secrets cannot be stored (admin surface stays usable without them)
+2026-11-21T20:53:38.599Z  INFO 4565 --- [keplura-server] [           main] c.keplura.server.SystemInfoController    : model provider state: provider=raw configured=false keyPresent=false
+2026-11-21T20:53:41.309Z  INFO 4565 --- [keplura-server] [           main] c.k.s.search.SearchStoreConfiguration    : search store: auto -> memory (pgvector probe not satisfied)
+2026-11-21T20:53:41.396Z  INFO 4565 --- [keplura-server] [           main] c.k.s.knowledge.DocumentIndexingQueue    : document indexing mode: sync
+2026-11-21T20:53:41.509Z  INFO 4565 --- [keplura-server] [           main] c.keplura.server.oidc.OidcConfiguration  : oidc: desktop handoff target fixed to http://localhost:1420/
+2026-11-21T20:53:41.669Z  WARN 4565 --- [keplura-server] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-21T20:53:42.130Z  INFO 4565 --- [keplura-server] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 41857 (http) with context path '/'
+2026-11-21T20:53:42.138Z  INFO 4565 --- [keplura-server] [           main] c.k.server.org.OrgApiIntegrationTest     : Started OrgApiIntegrationTest in 8.271 seconds (process running for 26.394)
+2026-11-21T20:53:42.320Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-21T20:53:42.320Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-11-21T20:53:42.321Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-11-21T20:53:42.334Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-1] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs -> 401 (1ms)
+2026-11-21T20:53:42.546Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (120ms)
+2026-11-21T20:53:42.566Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (14ms)
+2026-11-21T20:53:42.590Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-4] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs -> 200 (20ms)
+2026-11-21T20:53:42.619Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-6] c.k.server.RequestLoggingInterceptor     : GET /api/v1/system/info -> 200 (13ms)
+2026-11-21T20:53:42.625Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/logout -> 204 (1ms)
+2026-11-21T20:53:42.635Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-8] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs -> 401 (0ms)
+2026-11-21T20:53:42.640Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-9] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 401 (0ms)
+2026-11-21T20:53:42.645Z  INFO 4565 --- [keplura-server] [-auto-1-exec-10] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/1 -> 401 (0ms)
+2026-11-21T20:53:42.738Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (47ms)
+2026-11-21T20:53:42.819Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (30ms)
+2026-11-21T20:53:42.830Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (6ms)
+2026-11-21T20:53:42.849Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-4] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/2 -> 404 (13ms)
+2026-11-21T20:53:42.857Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-5] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/99999999 -> 404 (3ms)
+2026-11-21T20:53:42.932Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (36ms)
+2026-11-21T20:53:42.943Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 400 (6ms)
+2026-11-21T20:53:42.950Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-8] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 400 (3ms)
+2026-11-21T20:53:42.959Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-9] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 400 (4ms)
+2026-11-21T20:53:43.035Z  INFO 4565 --- [keplura-server] [-auto-1-exec-10] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (34ms)
+2026-11-21T20:53:43.049Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (9ms)
+2026-11-21T20:53:43.070Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-2] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/3 -> 200 (17ms)
+2026-11-21T20:53:43.149Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (33ms)
+2026-11-21T20:53:43.230Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (32ms)
+2026-11-21T20:53:43.240Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (5ms)
+2026-11-21T20:53:43.246Z  INFO 4565 --- [keplura-server] [o-auto-1-exec-6] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs -> 200 (2ms)
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.783 s -- in com.keplura.server.org.OrgApiIntegrationTest
+[INFO] Running com.keplura.server.org.OrgRepositoryTest
+2026-11-21T20:53:43.263Z  INFO 4565 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.org.OrgRepositoryTest]: OrgRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-21T20:53:43.278Z  INFO 4565 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.org.OrgRepositoryTest
+2026-11-21T20:53:43.279Z  INFO 4565 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.org.OrgRepositoryTest]: OrgRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-21T20:53:43.293Z  INFO 4565 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.org.OrgRepositoryTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-11-21T20:53:43.331Z  INFO 4565 --- [keplura-server] [           main] c.keplura.server.org.OrgRepositoryTest   : Starting OrgRepositoryTest using Java 21.0.12.1 with PID 4565 (started by ci in /review/repo/server)
+2026-11-21T20:53:43.331Z DEBUG 4565 --- [keplura-server] [           main] c.keplura.server.org.OrgRepositoryTest   : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-21T20:53:43.331Z  INFO 4565 --- [keplura-server] [           main] c.keplura.server.org.OrgRepositoryTest   : The following 1 profile is active: "dev"
+2026-11-21T20:53:43.460Z  INFO 4565 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-21T20:53:43.507Z  INFO 4565 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 45 ms. Found 23 JPA repository interfaces.
+2026-11-21T20:53:43.530Z  INFO 4565 --- [keplura-server] [           main] beddedDataSourceBeanFactoryPostProcessor : Replacing 'dataSource' DataSource bean with embedded version
+2026-11-21T20:53:43.555Z  INFO 4565 --- [keplura-server] [           main] o.s.j.d.e.EmbeddedDatabaseFactory        : Starting embedded database: url='jdbc:h2:mem:7d446d02-8682-477f-9405-1a4fbec684d9;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false', username='sa'
+2026-11-21T20:53:43.583Z  INFO 4565 --- [keplura-server] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-21T20:53:43.607Z  INFO 4565 --- [keplura-server] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-21T20:53:43.609Z  INFO 4565 --- [keplura-server] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:7d446d02-8682-477f-9405-1a4fbec684d9]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: 7D446D02-8682-477F-9405-1A4FBEC684D9/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-21T20:53:43.876Z  INFO 4565 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: drop table if exists ai_model cascade 
+Hibernate: drop table if exists ai_provider cascade 
+Hibernate: drop table if exists app_user cascade 
+Hibernate: drop table if exists chat_conversation cascade 
+Hibernate: drop table if exists chat_message cascade 
+Hibernate: drop table if exists data_source cascade 
+Hibernate: drop table if exists data_source_file cascade 
+Hibernate: drop table if exists directory_connection cascade 
+Hibernate: drop table if exists kb_chunk cascade 
+Hibernate: drop table if exists kb_document cascade 
+Hibernate: drop table if exists kb_document_acl cascade 
+Hibernate: drop table if exists knowledge_base cascade 
+Hibernate: drop table if exists membership cascade 
+Hibernate: drop table if exists oidc_account_link cascade 
+Hibernate: drop table if exists oidc_provider cascade 
+Hibernate: drop table if exists org_invite cascade 
+Hibernate: drop table if exists organization cascade 
+Hibernate: drop table if exists prompt_template cascade 
+Hibernate: drop table if exists quality_question cascade 
+Hibernate: drop table if exists quality_result cascade 
+Hibernate: drop table if exists quality_run cascade 
+Hibernate: drop table if exists space cascade 
+Hibernate: drop table if exists user_principal cascade 
+Hibernate: create table ai_model (embedding_dim integer, enabled boolean not null, is_default boolean not null, max_output_tokens integer, temperature numeric(4,3), created_at timestamp(6) with time zone not null, default_slot bigint, id bigint generated by default as identity, provider_id bigint not null, updated_at timestamp(6) with time zone not null, model_type varchar(20) not null, name varchar(200) not null, technical_model_id varchar(300) not null, primary key (id), constraint ai_model_default_slot_key unique (model_type, default_slot))
+Hibernate: create table ai_provider (enabled boolean not null, timeout_seconds integer not null, created_at timestamp(6) with time zone not null, id bigint generated by default as identity, updated_at timestamp(6) with time zone not null, provider_type varchar(20) not null, name varchar(200) not null unique, base_url varchar(500) not null, secret_cipher varchar(1000), primary key (id))
+Hibernate: create table app_user (must_change_password boolean not null, created_at timestamp(6) with time zone not null, id bigint generated by default as identity, role varchar(20) not null, display_name varchar(200) not null, password_hash varchar(200) not null, email varchar(320) not null unique, primary key (id))
+Hibernate: create table chat_conversation (created_at timestamp(6) with time zone not null, created_by bigint not null, id bigint generated by default as identity, knowledge_base_id bigint, org_id bigint not null, space_id bigint not null, updated_at timestamp(6) with time zone not null, title varchar(200) not null, primary key (id))
+Hibernate: create table chat_message (conversation_id bigint not null, created_at timestamp(6) with time zone not null, feedback varchar(8), feedback_at timestamp(6) with time zone, id bigint generated by default as identity, prompt_message_id bigint, role varchar(16) not null, status varchar(16) not null, model varchar(128) not null, citations_json varchar(16000) not null, content varchar(32000) not null, primary key (id))
+Hibernate: create table data_source (enabled boolean not null, files_failed integer not null, files_indexed integer not null, files_seen integer not null, interval_minutes integer not null, mirror_permissions boolean not null, created_at timestamp(6) with time zone not null, created_by bigint not null, id bigint generated by default as identity, knowledge_base_id bigint not null, last_run_finished_at timestamp(6) with time zone, last_run_started_at timestamp(6) with time zone, max_file_bytes bigint not null, org_id bigint not null, space_id bigint not null, updated_at timestamp(6) with time zone not null, kind varchar(20) not null, last_run_status varchar(20), client_id varchar(100), tenant_id varchar(100), display_name varchar(200) not null, username varchar(300), last_run_message varchar(1000), location varchar(1000) not null, include_patterns varchar(2000) not null, secret_cipher varchar(2000), exclude_patterns varchar(20000) not null, primary key (id))
+Hibernate: create table data_source_file (data_source_id bigint not null, document_id bigint, id bigint generated by default as identity, modified_at timestamp(6) with time zone not null, size_bytes bigint not null, acl_fingerprint varchar(64) not null, last_error varchar(500), relative_path varchar(2000) not null, primary key (id))
+Hibernate: create table directory_connection (allow_plain_ldap boolean not null, auto_provision boolean not null, enabled boolean not null, login_enabled boolean not null, start_tls boolean not null, created_at timestamp(6) with time zone not null, id bigint generated by default as identity, org_id bigint not null, updated_at timestamp(6) with time zone not null, kind varchar(20) not null, display_name varchar(200) not null, base_dn varchar(500) not null, bind_dn varchar(500) not null, url varchar(500) not null, user_filter varchar(500) not null, bind_secret_cipher varchar(2000), primary key (id))
+Hibernate: create table kb_chunk (chunk_idx integer not null, end_offset integer, page_number integer, start_offset integer, created_at timestamp(6) with time zone not null, document_id bigint not null, id bigint generated by default as identity, knowledge_base_id bigint not null, section_title varchar(512), chunk_text varchar(4000) not null, embedding varchar(65536) not null, primary key (id), constraint kb_chunk_document_id_chunk_idx_key unique (document_id, chunk_idx))
+Hibernate: create table kb_document (created_at timestamp(6) with time zone not null, id bigint generated by default as identity, knowledge_base_id bigint not null, size_bytes bigint not null, uploaded_by bigint not null, index_status varchar(20), sha256 varchar(64) not null, content_type varchar(200) not null, stored_path varchar(500) not null, filename varchar(255) not null, primary key (id))
+Hibernate: create table kb_document_acl (allow_read boolean not null, document_id bigint not null, id bigint generated by default as identity, principal varchar(300) not null, primary key (id))
+Hibernate: create table knowledge_base (created_at timestamp(6) with time zone not null, id bigint generated by default as identity, space_id bigint not null, name varchar(200) not null, primary key (id), constraint knowledge_base_space_id_name_key unique (space_id, name))
+Hibernate: create table membership (created_at timestamp(6) with time zone not null, org_id bigint not null, user_id bigint not null, role enum ('MEMBER','OWNER') not null, primary key (org_id, user_id))
+Hibernate: create table oidc_account_link (created_at timestamp(6) with time zone not null, id bigint generated by default as identity, provider_id bigint not null, user_id bigint not null, subject varchar(200) not null, primary key (id))
+Hibernate: create table oidc_provider (active boolean not null, timeout_seconds integer not null, active_slot bigint, created_at timestamp(6) with time zone not null, id bigint generated by default as identity, updated_at timestamp(6) with time zone not null, client_id varchar(200) not null, name varchar(200) not null unique, discovery_url varchar(500) not null, issuer varchar(500) not null, client_secret_cipher varchar(1000), primary key (id))
+Hibernate: create table org_invite (created_at timestamp(6) with time zone not null, expires_at timestamp(6) with time zone not null, id bigint generated by default as identity, inviter_id bigint not null, org_id bigint not null, used_at timestamp(6) with time zone, used_by bigint, token_hash varchar(64) not null, role enum ('MEMBER','OWNER') not null, primary key (id))
+Hibernate: create table organization (created_at timestamp(6) with time zone not null, id bigint generated by default as identity, name varchar(200) not null, primary key (id))
+Hibernate: create table prompt_template (created_at timestamp(6) with time zone not null, created_by bigint not null, id bigint generated by default as identity, org_id bigint not null, space_id bigint, updated_at timestamp(6) with time zone not null, title varchar(120) not null, body varchar(4000) not null, primary key (id))
+Hibernate: create table quality_question (created_at timestamp(6) with time zone not null, created_by bigint not null, id bigint generated by default as identity, knowledge_base_id bigint not null, org_id bigint not null, space_id bigint not null, expected_document varchar(500) not null, expected_phrase varchar(500), question varchar(2000) not null, primary key (id))
+Hibernate: create table quality_result (hit boolean not null, hit_rank integer, id bigint generated by default as identity, question_id bigint not null, run_id bigint not null, top_document varchar(500), primary key (id))
+Hibernate: create table quality_run (hits integer not null, total integer not null, finished_at timestamp(6) with time zone, id bigint generated by default as identity, knowledge_base_id bigint not null, run_by bigint not null, started_at timestamp(6) with time zone not null, primary key (id))
+Hibernate: create table space (created_at timestamp(6) with time zone not null, id bigint generated by default as identity, org_id bigint not null, name varchar(200) not null, primary key (id), constraint space_org_id_name_key unique (org_id, name))
+Hibernate: create table user_principal (id bigint generated by default as identity, refreshed_at timestamp(6) with time zone not null, user_id bigint not null, principal varchar(300) not null, primary key (id))
+Hibernate: create index chat_conversation_org_id_created_by_space_id_idx on chat_conversation (org_id, created_by, space_id)
+Hibernate: create index chat_message_conversation_id_idx on chat_message (conversation_id)
+Hibernate: create index kb_chunk_knowledge_base_id_idx on kb_chunk (knowledge_base_id)
+Hibernate: create index kb_document_knowledge_base_id_idx on kb_document (knowledge_base_id)
+2026-11-21T20:53:43.892Z  INFO 4565 --- [keplura-server] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-21T20:53:44.174Z  INFO 4565 --- [keplura-server] [           main] c.keplura.server.org.OrgRepositoryTest   : Started OrgRepositoryTest in 0.875 seconds (process running for 28.43)
+Hibernate: insert into organization (created_at,name,id) values (?,?,default)
+Hibernate: insert into app_user (created_at,display_name,email,must_change_password,password_hash,role,id) values (?,?,?,?,?,?,default)
+Hibernate: insert into organization (created_at,name,id) values (?,?,default)
+Hibernate: insert into organization (created_at,name,id) values (?,?,default)
+Hibernate: insert into membership (created_at,role,org_id,user_id) values (?,?,?,?)
+Hibernate: insert into membership (created_at,role,org_id,user_id) values (?,?,?,?)
+Hibernate: select m1_0.org_id,m1_0.user_id,m1_0.created_at,m1_0.role from membership m1_0 where m1_0.user_id=?
+Hibernate: insert into app_user (created_at,display_name,email,must_change_password,password_hash,role,id) values (?,?,?,?,?,?,default)
+Hibernate: insert into app_user (created_at,display_name,email,must_change_password,password_hash,role,id) values (?,?,?,?,?,?,default)
+Hibernate: insert into organization (created_at,name,id) values (?,?,default)
+Hibernate: insert into membership (created_at,role,org_id,user_id) values (?,?,?,?)
+Hibernate: select o1_0.id,o1_0.created_at,o1_0.name from organization o1_0 where o1_0.id=? and exists(select 1 from membership m1_0 where m1_0.org_id=? and m1_0.user_id=?)
+Hibernate: select o1_0.id,o1_0.created_at,o1_0.name from organization o1_0 where o1_0.id=? and exists(select 1 from membership m1_0 where m1_0.org_id=? and m1_0.user_id=?)
+Hibernate: select o1_0.id,o1_0.created_at,o1_0.name from organization o1_0 where o1_0.id=? and exists(select 1 from membership m1_0 where m1_0.org_id=? and m1_0.user_id=?)
+Hibernate: insert into app_user (created_at,display_name,email,must_change_password,password_hash,role,id) values (?,?,?,?,?,?,default)
+Hibernate: insert into organization (created_at,name,id) values (?,?,default)
+Hibernate: insert into membership (created_at,role,org_id,user_id) values (?,?,?,?)
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.111 s -- in com.keplura.server.org.OrgRepositoryTest
+[INFO] Running com.keplura.server.oidc.OidcLoginFlowIntegrationTest
+2026-11-21T20:53:44.375Z  INFO 4565 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.oidc.OidcLoginFlowIntegrationTest]: OidcLoginFlowIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-21T20:53:44.406Z  INFO 4565 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.oidc.OidcLoginFlowIntegrationTest
+2026-11-21T20:53:44.407Z  INFO 4565 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.oidc.OidcLoginFlowIntegrationTest]: OidcLoginFlowIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-21T20:53:44.408Z  INFO 4565 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.oidc.OidcLoginFlowIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-11-21T20:53:44.963Z  INFO 4565 --- [keplura-server] [           main] c.k.s.oidc.OidcLoginFlowIntegrationTest  : Starting OidcLoginFlowIntegrationTest using Java 21.0.12.1 with PID 4565 (started by ci in /review/repo/server)
+2026-11-21T20:53:44.963Z DEBUG 4565 --- [keplura-server] [           main] c.k.s.oidc.OidcLoginFlowIntegrationTest  : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-21T20:53:44.964Z  INFO 4565 --- [keplura-server] [           main] c.k.s.oidc.OidcLoginFlowIntegrationTest  : The following 1 profile is active: "dev"
+2026-11-21T20:53:45.119Z  INFO 4565 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-21T20:53:45.158Z  INFO 4565 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 38 ms. Found 23 JPA repository interfaces.
+2026-11-21T20:53:45.249Z  INFO 4565 --- [keplura-server] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-11-21T20:53:45.250Z  INFO 4565 --- [keplura-server] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-21T20:53:45.251Z  INFO 4565 --- [keplura-server] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-11-21T20:53:45.273Z  INFO 4565 --- [keplura-server] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 308 ms
+2026-11-21T20:53:45.281Z DEBUG 4565 --- [keplura-server] [           main] c.k.server.auth.SessionLifetimeFilter    : Filter 'sessionLifetimeFilter' configured for use
+2026-11-21T20:53:45.318Z  INFO 4565 --- [keplura-server] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-21T20:53:45.335Z  INFO 4565 --- [keplura-server] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-21T20:53:45.336Z  INFO 4565 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-11-21T20:53:45.337Z  INFO 4565 --- [keplura-server] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection conn754: url=jdbc:h2:mem:oidc-api-test user=SA
+2026-11-21T20:53:45.337Z  INFO 4565 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-11-21T20:53:45.338Z  INFO 4565 --- [keplura-server] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:oidc-api-test]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: OIDC-API-TEST/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-21T20:53:45.520Z  INFO 4565 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-21T20:53:45.534Z  INFO 4565 --- [keplura-server] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-21T20:53:45.578Z  INFO 4565 --- [keplura-server] [           main] com.keplura.server.admin.SecretCipher    : secret cipher: master key loaded (AES-256-GCM, HKDF-derived)
+2026-11-21T20:53:45.579Z  INFO 4565 --- [keplura-server] [           main] c.keplura.server.SystemInfoController    : model provider state: provider=raw configured=false keyPresent=false
+2026-11-21T20:53:45.702Z  INFO 4565 --- [keplura-server] [           main] com.keplura.server.admin.SsrfGuard       : SSRF allow-list active with 1 operator CIDR(s)
+2026-11-21T20:53:45.794Z  INFO 4565 --- [keplura-server] [           main] c.k.s.search.SearchStoreConfiguration    : search store: auto -> memory (pgvector probe not satisfied)
+2026-11-21T20:53:45.815Z  INFO 4565 --- [keplura-server] [           main] c.k.s.knowledge.DocumentIndexingQueue    : document indexing mode: sync
+2026-11-21T20:53:45.841Z  INFO 4565 --- [keplura-server] [           main] c.keplura.server.oidc.OidcConfiguration  : oidc: desktop handoff target fixed to http://localhost:1420/
+2026-11-21T20:53:45.880Z  WARN 4565 --- [keplura-server] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-21T20:53:45.976Z  INFO 4565 --- [keplura-server] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 40031 (http) with context path '/'
+2026-11-21T20:53:45.979Z  INFO 4565 --- [keplura-server] [           main] c.k.s.oidc.OidcLoginFlowIntegrationTest  : Started OidcLoginFlowIntegrationTest in 1.04 seconds (process running for 30.235)
+2026-11-21T20:53:46.014Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-1] o.a.c.c.C.[Tomcat-1].[localhost].[/]     : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-21T20:53:46.014Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-11-21T20:53:46.016Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-11-21T20:53:46.030Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/1/begin -> 302 (13ms)
+2026-11-21T20:53:46.193Z  WARN 4565 --- [keplura-server] [o-auto-2-exec-2] c.keplura.server.oidc.OidcLoginService   : oidc token refused: iss
+2026-11-21T20:53:46.194Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/1/callback -> 302 (156ms)
+2026-11-21T20:53:46.248Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/1/begin -> 302 (50ms)
+2026-11-21T20:53:46.347Z  WARN 4565 --- [keplura-server] [o-auto-2-exec-4] c.keplura.server.oidc.OidcLoginService   : oidc token refused: nonce
+2026-11-21T20:53:46.348Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/1/callback -> 302 (97ms)
+2026-11-21T20:53:46.395Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/1/begin -> 302 (44ms)
+2026-11-21T20:53:46.492Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/1/callback -> 302 (93ms)
+2026-11-21T20:53:46.583Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/providers -> 200 (9ms)
+2026-11-21T20:53:46.591Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/2/begin -> 302 (5ms)
+2026-11-21T20:53:46.749Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-9] c.keplura.server.oidc.OidcLoginService   : oidc verified-email claim linked user=1 at provider=2
+2026-11-21T20:53:46.751Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-9] c.keplura.server.oidc.OidcLoginService   : oidc login succeeded: provider=2 user=1
+2026-11-21T20:53:46.752Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/2/callback -> 302 (157ms)
+2026-11-21T20:53:46.762Z  INFO 4565 --- [keplura-server] [-auto-2-exec-10] c.k.server.oidc.OidcLoginController      : oidc session minted for user=1
+2026-11-21T20:53:46.765Z  INFO 4565 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/oidc/exchange -> 200 (7ms)
+2026-11-21T20:53:46.773Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/me -> 200 (3ms)
+2026-11-21T20:53:46.779Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-2] c.k.server.oidc.OidcLoginController      : oidc exchange rejected (unknown/expired/consumed handoff)
+2026-11-21T20:53:46.781Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/oidc/exchange -> 401 (3ms)
+2026-11-21T20:53:46.790Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/2/begin -> 302 (5ms)
+2026-11-21T20:53:46.890Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-4] c.keplura.server.oidc.OidcLoginService   : oidc login succeeded: provider=2 user=1
+2026-11-21T20:53:46.890Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/2/callback -> 302 (97ms)
+2026-11-21T20:53:46.955Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/3/begin -> 302 (45ms)
+2026-11-21T20:53:47.004Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/3/begin -> 302 (45ms)
+2026-11-21T20:53:47.009Z  WARN 4565 --- [keplura-server] [o-auto-2-exec-7] c.keplura.server.oidc.OidcLoginService   : oidc callback refused: state (provider=3)
+2026-11-21T20:53:47.010Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/3/callback -> 302 (2ms)
+2026-11-21T20:53:47.103Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (34ms)
+2026-11-21T20:53:47.128Z  WARN 4565 --- [keplura-server] [o-auto-2-exec-5] com.keplura.server.admin.SsrfGuard       : SSRF guard refused a dial target (policy veto)
+2026-11-21T20:53:47.133Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/admin/oidc/providers -> 400 (25ms)
+2026-11-21T20:53:47.160Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/5/begin -> 302 (5ms)
+2026-11-21T20:53:47.304Z  WARN 4565 --- [keplura-server] [o-auto-2-exec-7] c.keplura.server.oidc.OidcLoginService   : oidc login refused: unlinked subject (provider=5)
+2026-11-21T20:53:47.305Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/5/callback -> 302 (141ms)
+2026-11-21T20:53:47.379Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/5/begin -> 302 (45ms)
+2026-11-21T20:53:47.480Z  WARN 4565 --- [keplura-server] [o-auto-2-exec-9] c.keplura.server.oidc.OidcLoginService   : oidc login refused: unlinked subject (provider=5)
+2026-11-21T20:53:47.481Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/5/callback -> 302 (98ms)
+2026-11-21T20:53:47.532Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/6/begin -> 302 (4ms)
+2026-11-21T20:53:47.668Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/6/callback -> 302 (133ms)
+2026-11-21T20:53:47.715Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/6/begin -> 302 (44ms)
+2026-11-21T20:53:47.807Z  INFO 4565 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/6/callback -> 302 (89ms)
+2026-11-21T20:53:47.852Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/7/begin -> 302 (4ms)
+2026-11-21T20:53:48.000Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-5] c.keplura.server.oidc.OidcLoginService   : oidc verified-email claim linked user=5 at provider=7
+2026-11-21T20:53:48.000Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-5] c.keplura.server.oidc.OidcLoginService   : oidc login succeeded: provider=7 user=5
+2026-11-21T20:53:48.001Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/7/callback -> 302 (145ms)
+2026-11-21T20:53:48.005Z  WARN 4565 --- [keplura-server] [o-auto-2-exec-6] c.keplura.server.oidc.OidcLoginService   : oidc callback refused: binding (provider=7)
+2026-11-21T20:53:48.006Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/7/callback -> 302 (2ms)
+2026-11-21T20:53:48.023Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-7] c.k.server.oidc.OidcLoginController      : oidc exchange rejected (unknown/expired/consumed handoff)
+2026-11-21T20:53:48.024Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/oidc/exchange -> 401 (1ms)
+2026-11-21T20:53:48.028Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-3] c.k.server.oidc.OidcLoginController      : oidc exchange rejected (unknown/expired/consumed handoff)
+2026-11-21T20:53:48.029Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/oidc/exchange -> 401 (1ms)
+2026-11-21T20:53:48.033Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-9] c.k.server.oidc.OidcLoginController      : oidc exchange rejected (unknown/expired/consumed handoff)
+2026-11-21T20:53:48.034Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/oidc/exchange -> 401 (1ms)
+2026-11-21T20:53:48.129Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/9/begin -> 302 (3ms)
+2026-11-21T20:53:48.275Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-2] c.keplura.server.oidc.OidcLoginService   : oidc verified-email claim linked user=6 at provider=9
+2026-11-21T20:53:48.275Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-2] c.keplura.server.oidc.OidcLoginService   : oidc login succeeded: provider=9 user=6
+2026-11-21T20:53:48.276Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/9/callback -> 302 (143ms)
+2026-11-21T20:53:48.281Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-1] c.k.server.oidc.OidcLoginController      : oidc session minted for user=6
+2026-11-21T20:53:48.282Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/oidc/exchange -> 200 (2ms)
+2026-11-21T20:53:48.287Z  INFO 4565 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 403 (1ms)
+2026-11-21T20:53:48.345Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-4] com.keplura.server.auth.AuthService      : password changed (user id 6)
+2026-11-21T20:53:48.346Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/password -> 204 (54ms)
+2026-11-21T20:53:48.357Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (7ms)
+2026-11-21T20:53:48.377Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/10/begin -> 302 (3ms)
+2026-11-21T20:53:48.470Z  WARN 4565 --- [keplura-server] [o-auto-2-exec-7] c.keplura.server.oidc.OidcTokenClient    : oidc token endpoint refused (http 400)
+2026-11-21T20:53:48.471Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/10/callback -> 302 (91ms)
+2026-11-21T20:53:48.535Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/11/begin -> 302 (48ms)
+2026-11-21T20:53:48.539Z  WARN 4565 --- [keplura-server] [o-auto-2-exec-9] c.keplura.server.oidc.OidcLoginService   : oidc callback refused: state (provider=11)
+2026-11-21T20:53:48.540Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/11/callback -> 302 (2ms)
+2026-11-21T20:53:48.608Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (26ms)
+2026-11-21T20:53:48.619Z  WARN 4565 --- [keplura-server] [o-auto-2-exec-2] c.k.server.oidc.OidcDiscoveryClient      : oidc discovery: issuer mismatch for provider=null
+2026-11-21T20:53:48.621Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/admin/oidc/providers -> 400 (8ms)
+2026-11-21T20:53:48.629Z  WARN 4565 --- [keplura-server] [o-auto-2-exec-1] com.keplura.server.admin.SsrfGuard       : SSRF guard refused a dial target (policy veto)
+2026-11-21T20:53:48.630Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/admin/oidc/providers -> 400 (4ms)
+2026-11-21T20:53:48.684Z  INFO 4565 --- [keplura-server] [-auto-2-exec-10] c.keplura.server.oidc.OidcAdminService   : admin created oidc provider id=13 active=false
+2026-11-21T20:53:48.686Z  INFO 4565 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : POST /api/v1/admin/oidc/providers -> 200 (51ms)
+2026-11-21T20:53:48.746Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (28ms)
+2026-11-21T20:53:48.751Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : GET /api/v1/admin/oidc/providers -> 403 (1ms)
+2026-11-21T20:53:48.800Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/14/begin -> 302 (4ms)
+2026-11-21T20:53:48.943Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-7] c.keplura.server.oidc.OidcLoginService   : oidc login succeeded: provider=14 user=9
+2026-11-21T20:53:48.943Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/14/callback -> 302 (141ms)
+2026-11-21T20:53:48.966Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/providers -> 200 (2ms)
+2026-11-21T20:53:48.972Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/15/begin -> 404 (3ms)
+2026-11-21T20:53:48.978Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/15/callback -> 404 (2ms)
+2026-11-21T20:53:49.045Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (33ms)
+2026-11-21T20:53:49.052Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/me -> 200 (2ms)
+2026-11-21T20:53:49.071Z  INFO 4565 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/999999/begin -> 404 (2ms)
+2026-11-21T20:53:49.075Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/999999/callback -> 404 (2ms)
+2026-11-21T20:53:49.082Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/16/begin -> 302 (4ms)
+2026-11-21T20:53:49.085Z  WARN 4565 --- [keplura-server] [o-auto-2-exec-6] c.k.server.oidc.OidcLoginController      : oidc callback: provider=16 idp_error=access_denied
+2026-11-21T20:53:49.085Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/16/callback -> 302 (1ms)
+2026-11-21T20:53:49.145Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/begin -> 302 (3ms)
+2026-11-21T20:53:49.283Z  WARN 4565 --- [keplura-server] [o-auto-2-exec-8] c.keplura.server.oidc.OidcLoginService   : oidc token refused: nbf
+2026-11-21T20:53:49.284Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/callback -> 302 (136ms)
+2026-11-21T20:53:49.331Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/begin -> 302 (44ms)
+2026-11-21T20:53:49.427Z  WARN 4565 --- [keplura-server] [o-auto-2-exec-5] c.keplura.server.oidc.OidcLoginService   : oidc token refused: nbf
+2026-11-21T20:53:49.427Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/callback -> 302 (93ms)
+2026-11-21T20:53:49.475Z  INFO 4565 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/begin -> 302 (44ms)
+2026-11-21T20:53:49.571Z  WARN 4565 --- [keplura-server] [o-auto-2-exec-4] c.keplura.server.oidc.OidcLoginService   : oidc token refused: nbf
+2026-11-21T20:53:49.572Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/callback -> 302 (94ms)
+2026-11-21T20:53:49.647Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/begin -> 302 (44ms)
+2026-11-21T20:53:49.749Z  INFO 4565 --- [keplura-server] [-auto-2-exec-12] c.keplura.server.oidc.OidcLoginService   : oidc verified-email claim linked user=12 at provider=17
+2026-11-21T20:53:49.749Z  INFO 4565 --- [keplura-server] [-auto-2-exec-12] c.keplura.server.oidc.OidcLoginService   : oidc login succeeded: provider=17 user=12
+2026-11-21T20:53:49.750Z  INFO 4565 --- [keplura-server] [-auto-2-exec-12] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/callback -> 302 (100ms)
+2026-11-21T20:53:49.827Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/begin -> 302 (48ms)
+2026-11-21T20:53:49.930Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-9] c.keplura.server.oidc.OidcLoginService   : oidc verified-email claim linked user=13 at provider=17
+2026-11-21T20:53:49.931Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-9] c.keplura.server.oidc.OidcLoginService   : oidc login succeeded: provider=17 user=13
+2026-11-21T20:53:49.932Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/callback -> 302 (103ms)
+2026-11-21T20:53:49.971Z  INFO 4565 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/begin -> 302 (4ms)
+2026-11-21T20:53:50.074Z  INFO 4565 --- [keplura-server] [-auto-2-exec-11] c.keplura.server.oidc.OidcLoginService   : oidc verified-email claim linked user=14 at provider=17
+2026-11-21T20:53:50.075Z  INFO 4565 --- [keplura-server] [-auto-2-exec-11] c.keplura.server.oidc.OidcLoginService   : oidc login succeeded: provider=17 user=14
+2026-11-21T20:53:50.075Z  INFO 4565 --- [keplura-server] [-auto-2-exec-11] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/oidc/17/callback -> 302 (100ms)
+[INFO] Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.708 s -- in com.keplura.server.oidc.OidcLoginFlowIntegrationTest
+[INFO] Running com.keplura.server.auth.LoginRateLimiterTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.012 s -- in com.keplura.server.auth.LoginRateLimiterTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 98, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  36.561 s
+[INFO] Finished at: 2026-11-21T20:53:50Z
+[INFO] ------------------------------------------------------------------------
