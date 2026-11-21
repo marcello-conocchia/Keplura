@@ -1,6 +1,6 @@
 # TU-03a — Begrenzte mehrstufige Lesezugriffe
 
-Status: **Review-Korrektur im Draft-PR #19**, Branch `feat/tool-use-read-loop`, nicht gemergt. Claude hat auf `ca14bc7` einen major/medium-Befund und zwei minor-Befunde gemeldet; keine Freigabe. Alle drei in Produktcommit `15e3b63` korrigiert; erneute Linux-CI darauf Exit 0, Evidence `ci/evidence/20261121-200201/`. Gezielte unabhängige Re-Review durch Claude offen. Nächste einzelne Aufgabe nach TU-02 (PR #17, Merge `8f6852a`). Erster Umsetzungsschritt von TU-03 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Modell-/Werkzeugschleife, externe Aufrufe und Rechte.
+Status: **abgeschlossen, auf main** — PR #19, Squash-Merge `5c25bfa` (21.11.2026), Baum identisch mit freigegebenem Head `e4f5555`. Linux-CI Exit 0 auf Produktcommit `15e3b63`, Evidence `ci/evidence/20261121-200201/`; unabhängige Code-/Security-Freigabe durch Claude auf `e4f5555`. Erster Umsetzungsschritt von TU-03 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md); nächster Schritt [TU-03b](TU-03b-confirmed-continuation.md). Klasse A: Modell-/Werkzeugschleife, externe Aufrufe und Rechte.
 
 ## Ziel
 
