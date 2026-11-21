@@ -24,8 +24,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * RISK-01 — Oversharing-Check: prüft VOR der Übernahme für jede Datei einer
  * Quelle, ob sie für (praktisch) alle lesbar ist und ob Pfad/Name auf sensible
- * Inhalte hindeutet. Liest nur Dateiliste und Rechte, keine Inhalte, und
- * schreibt nichts — weder in Keplura noch in die Ablage.
+ * Inhalte hindeutet. Liest Dateiliste und Rechte und schreibt nichts — weder
+ * in Keplura noch in die Ablage.
  *
  * <p>RISK-02: Ist der {@link ExposureContentInspector} aktiv, wird zusätzlich der Inhalt
  * breit lesbarer Dateien auf sensible Muster geprüft. Dabei werden diese Dateien
