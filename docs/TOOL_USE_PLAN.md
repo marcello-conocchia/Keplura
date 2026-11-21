@@ -8,7 +8,7 @@ Diese Reihenfolge ersetzt ältere allgemeine Angaben zur nächsten UI-/Roadmap-A
 
 ## Verbindliche Reihenfolge
 
-**TU-01 und TU-02 sind auf main (PRs #15/#17, Merges `1296cdb`/`8f6852a`, 21.11.2026). Nächste einzelne Aufgabe ist TU-03a: begrenzte mehrstufige Lesezugriffe als erster Teil von TU-03. TU-03–TU-07 sind noch nicht abgeschlossen.** Genau eine aktive Implementierungsaufgabe. Größere Schritte werden bei Bedarf in kleine PRs zerlegt; nur die unmittelbar nächste Implementierungsaufgabe wird konkret angelegt.
+**TU-01, TU-02 und TU-03a sind auf main (PRs #15/#17/#19, Merges `1296cdb`/`8f6852a`/`5c25bfa`, 21.11.2026). Nächste einzelne Aufgabe ist TU-03b: begrenzte Fortsetzung nach konkreter Bestätigung als zweiter Teil von TU-03. TU-03–TU-07 sind noch nicht abgeschlossen.** Genau eine aktive Implementierungsaufgabe. Größere Schritte werden bei Bedarf in kleine PRs zerlegt; nur die unmittelbar nächste Implementierungsaufgabe wird konkret angelegt.
 
 | Schritt | Umfang | Abnahmeziel |
 | --- | --- | --- |
@@ -39,7 +39,7 @@ Nach jedem Merge PROJECT_STATE.md mit tatsächlichem Stand, Belegen und nächste
 
 ## Unmittelbar nächste Aufgabe
 
-**TU-03a — begrenzte mehrstufige Lesezugriffe**, siehe [Spec](tasks/TU-03a-read-loop.md). Implementiert im Draft-PR auf feat/tool-use-read-loop, nicht gemergt; major/medium-Review-Befund und zwei minor-Befunde in 15e3b63 korrigiert, erneute Linux-CI darauf grün (Evidence ci/evidence/20261121-200201/), gezielte Re-Review durch Claude offen. Werkzeugfähige Runden sehen nur die aktuelle Frage und eigene Schleifenergebnisse; private Belege ausschließlich in der Abschlussanfrage ohne Werkzeuge. Ergebnisse dürfen weitere freigegebene READ-Aufrufe informieren, aber keine neuen Schreibaktionen autorisieren. Automatische Wiederaufnahme nach konkreten Bestätigungen und davon abhängige Aktionsketten bleiben als weiterer TU-03-Umfang offen; TU-03a allein erfüllt nicht die gesamte Phase.
+**TU-03b — begrenzte Fortsetzung nach konkreter Bestätigung**, siehe [Spec](tasks/TU-03b-confirmed-continuation.md). Geplant, nicht gestartet. Nach einer ausdrücklichen Entscheidung zu einer CRITICAL-Karte setzt der Server dieselbe Frage einmal fort, mit Restbudget, nur READ-Folgeaufrufen und werkzeugloser Abschlussantwort. Erledigt: [TU-03a](tasks/TU-03a-read-loop.md) — Suchen → Detail lesen → Nachsuchen → Antwort mit READ-Folgeaufrufen (PR #19). Danach offen in TU-03: davon abhängige Schreibketten (eine weitere WRITE/CRITICAL-Aktion aus einem bestätigten Ergebnis). TU-03a und TU-03b allein erfüllen nicht die gesamte Phase.
 
 ## Vergleichsquellen (abgerufen am 21.11.2026)
 
