@@ -1,7 +1,7 @@
 // Chat-Produktivität: Vorlagen, globale Suche, Anhänge (PO-Freigabe 14.11.2026).
 import { desktopFetch } from "./transport";
 import { serverUrl } from "./api";
-import { tr } from "./i18n";
+import { tr, serverText, translateServer } from "./i18n";
 
 export type Res<T> = { kind: "ok"; value: T } | { kind: "error"; message: string } | { kind: "expired" };
 
@@ -25,7 +25,7 @@ export async function call<T>(method: string, path: string, body?: unknown, time
       : tr("Das hat nicht geklappt. Bitte versuche es erneut.");
     try {
       const e = (await r.json()) as { error?: string };
-      if (e.error && r.status === 400) message = e.error;
+      if (e.error && r.status === 400) message = serverText(e.error);
     } catch {
       /* kein Inhalt */
     }
@@ -33,7 +33,7 @@ export async function call<T>(method: string, path: string, body?: unknown, time
   }
   if (r.status === 204) return { kind: "ok", value: undefined as T };
   try {
-    return { kind: "ok", value: (await r.json()) as T };
+    return { kind: "ok", value: translateServer((await r.json()) as T) };
   } catch {
     return { kind: "ok", value: undefined as T };
   }

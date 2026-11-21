@@ -12,7 +12,7 @@
 // only ever carries {secretSet, secretMasked}, never a ciphertext.
 
 import { desktopFetch, serverOrigin } from "./transport";
-import { tr } from "./i18n";
+import { tr, serverText, translateServer } from "./i18n";
 
 const base = `${serverOrigin}/api/v1/admin`;
 
@@ -83,7 +83,7 @@ async function getJson<T>(path: string): Promise<{ kind: "ok"; value: T } | { ki
     if (response.status === 401) return { kind: "expired" };
     if (response.status === 403) return { kind: "forbidden" };
     if (!response.ok) return { kind: "error" };
-    return { kind: "ok", value: (await response.json()) as T };
+    return { kind: "ok", value: translateServer((await response.json()) as T) };
   } catch {
     return { kind: "error" };
   }
@@ -109,14 +109,14 @@ async function sendJson<T>(method: string, path: string, body: unknown): Promise
     // generic text (never upstream detail) so it is safe to show.
     try {
       const err = (await response.json()) as { error?: string };
-      return { kind: "invalid", message: err.error || tr("Ungültige Eingabe") };
+      return { kind: "invalid", message: err.error ? serverText(err.error) : tr("Ungültige Eingabe") };
     } catch {
       return { kind: "invalid", message: tr("Ungültige Eingabe") };
     }
   }
   if (!response.ok) return { kind: "error" };
   try {
-    return { kind: "ok", value: (await response.json()) as T };
+    return { kind: "ok", value: translateServer((await response.json()) as T) };
   } catch {
     return { kind: "error" };
   }
