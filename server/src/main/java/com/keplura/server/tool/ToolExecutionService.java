@@ -162,7 +162,7 @@ public class ToolExecutionService {
         String token = null;
         if (row.promptMessageId() != null && (row.status() == ToolCallStore.Status.SUCCEEDED || row.status() == ToolCallStore.Status.REJECTED)) {
             String candidate = java.util.UUID.randomUUID().toString();
-            if (questions.offer(row.promptMessageId(), row.id(), tokenHash(candidate))) token = candidate;
+            if (questions.offer(row.promptMessageId(), row.id(), tokenHash(candidate), wallClock.get())) token = candidate;
         }
         return new Decision.Done(view(row, wallClock.get()), token);
     }
@@ -180,7 +180,7 @@ public class ToolExecutionService {
         var found = cards.findOwned(callId, userId, orgId, conversationId);
         if (found.isEmpty()) return null;
         var row = found.get();
-        if (row.promptMessageId() == null || row.expiresAt() == null || !row.expiresAt().isAfter(wallClock.get())
+        if (row.promptMessageId() == null
                 || (row.status() != ToolCallStore.Status.SUCCEEDED && row.status() != ToolCallStore.Status.REJECTED)
                 || row.spaceId() != ctx.spaceId() || !cards.isCurrentQuestion(conversationId, row.promptMessageId())) return null;
         var saved = questions.find(row.promptMessageId());
@@ -195,7 +195,7 @@ public class ToolExecutionService {
             if (t == null || !definitionHash(t).equals(e.getValue().asString())) return null;
         }
         offered.keySet().removeIf(name -> !expected.has(name));
-        if (!questions.claim(state.promptId(), row.id(), tokenHash(token))) return null;
+        if (!questions.claim(state.promptId(), row.id(), tokenHash(token), wallClock.get())) return null;
         var turn = new ToolTurn(ctx, offered, state.promptId());
         turn.persisted = true;
         turn.readOnly = true;

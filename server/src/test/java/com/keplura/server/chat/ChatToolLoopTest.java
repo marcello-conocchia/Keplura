@@ -182,7 +182,7 @@ class ChatToolLoopTest {
             case "approval" -> adapter.approved=false;
             case "target" -> adapter.fingerprint="changed";
             case "schema" -> adapter.schema=M.readTree("{\"type\":\"object\",\"additionalProperties\":false}");
-            case "expired" -> jdbc.update("update tool_call set expires_at=?",Timestamp.from(Instant.now().minusSeconds(1)));
+            case "expired" -> jdbc.update("update tool_question set continuation_expires_at=?",Timestamp.from(Instant.now().minusSeconds(1)));
             case "space" -> {
                 jdbc.update("insert into space(id,org_id,name,created_at) values(2,1,'Other',current_timestamp)");
                 jdbc.update("update chat_conversation set space_id=2 where id=1");
@@ -263,6 +263,17 @@ class ChatToolLoopTest {
         assertThatThrownBy(() -> resume(done)).isInstanceOf(GatewayException.ToolsUnsupported.class);
         assertThat(take(done)).isNull();
         assertThat(requests).hasSize(3); assertThat(adapter.calls).containsExactly("critical");
+    }
+
+    @Test void confirmationExpiryDoesNotInvalidateFreshDecisionCapability() throws Exception {
+        var done=decide(true);
+        jdbc.update("update tool_call set expires_at=?",Timestamp.from(Instant.now().minusSeconds(1)));
+        script=(i,b) -> answer("Already executed");
+        assertThat(resume(done)).contains("Already executed");
+        assertThat(requests.getLast().path("messages").toString())
+                .contains("bereits genau einmal", "abgelehnte, offene oder gesperrte")
+                .doesNotContain("Ein vorgelegter oder gesperrter Aufruf wurde nicht ausgeführt");
+        assertThat(adapter.calls).containsExactly("critical");
     }
 
     @Test void resultDrivesReadFollowupAndCardsKeepOneQuestion() throws Exception {

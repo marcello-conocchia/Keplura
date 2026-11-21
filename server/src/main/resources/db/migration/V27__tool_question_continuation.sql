@@ -13,6 +13,7 @@ CREATE TABLE tool_question (
     ready boolean NOT NULL DEFAULT false,
     continued boolean NOT NULL DEFAULT false,
     continuation_hash varchar(64),
+    continuation_expires_at timestamp with time zone,
     decision_call_id bigint,
     created_at timestamp with time zone NOT NULL
 );

@@ -33,15 +33,16 @@ public final class ToolQuestionStore {
     public void checkpoint(long promptId, String dialogue, boolean ready) {
         jdbc.update("update tool_question set dialogue_json=?,ready=? where prompt_message_id=? and continued=false", dialogue, ready, promptId);
     }
-    public boolean offer(long promptId, long cardId, String hash) {
+    public boolean offer(long promptId, long cardId, String hash, Instant now) {
         return jdbc.update("""
-                update tool_question set continuation_hash=?,decision_call_id=? where prompt_message_id=?
-                and ready=true and continued=false and continuation_hash is null""", hash, cardId, promptId)==1;
+                update tool_question set continuation_hash=?,decision_call_id=?,continuation_expires_at=? where prompt_message_id=?
+                and ready=true and continued=false and continuation_hash is null""", hash, cardId, Timestamp.from(now.plusSeconds(60)), promptId)==1;
     }
-    public boolean claim(long promptId, long cardId, String hash) {
+    public boolean claim(long promptId, long cardId, String hash, Instant now) {
         return jdbc.update("""
                 update tool_question set continued=true,continuation_hash=null,ready=false where prompt_message_id=?
-                and decision_call_id=? and continuation_hash=? and ready=true and continued=false""", promptId,cardId,hash)==1;
+                and decision_call_id=? and continuation_hash=? and continuation_expires_at>?
+                and ready=true and continued=false""", promptId,cardId,hash,Timestamp.from(now))==1;
     }
     public void delete(long conversationId) { jdbc.update("delete from tool_question where conversation_id=?",conversationId); }
 }

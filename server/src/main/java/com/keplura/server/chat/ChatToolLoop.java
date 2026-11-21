@@ -95,7 +95,7 @@ final class ChatToolLoop {
                 for (int i = 2; i < dialogue.size(); i++) messages.add(dialogue.get(i));
                 messages.addObject().put("role", "system").put("content",
                         "Erstelle jetzt die Abschlussantwort aus den verfügbaren Belegen. Keine weiteren Werkzeugaktionen. "
-                        + "Ein vorgelegter oder gesperrter Aufruf wurde nicht ausgeführt.");
+                        + "Beachte den protokollierten Status: Behaupte keine Ausführung für abgelehnte, offene oder gesperrte Aufrufe.");
                 body.set("messages", messages);
             }
             GatewayClient.BufferedUpstreamResponse response;
