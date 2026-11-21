@@ -81,4 +81,11 @@ selbst. So fallen auch Dateien mit unauffälligem Namen auf („Liste.xlsx“ mi
 - Lauf gegen echten Server (Dev-Profil, H2) mit Linux-Ordner-Quelle (5 Testdateien, Rechte-Übernahme aus)
   und gebauter Oberfläche, Deutsch und Englisch: 2 IBANs + 4 Gehaltsbegriffe, 1 Kartennummer, 1 kaputtes
   PDF als „nicht prüfbar“, 1 Datei nur nach Namen. Bericht-JSON und Server-Log ohne Werte.
-- NICHT geprüft: SMB/SharePoint mit echten Inhalten, große Ablagen (Laufzeit), echte Scans.
+- Nach den Korrekturen: echter Lauf mit 1802 Dateien (1600 Text, 200 DOCX, 1 PDF mit Textschicht,
+  1 Scan-PDF ohne Text) einmal als Linux-Ordner und einmal über eine echte SMB-Freigabe (Samba,
+  Benutzer/Passwort): je 3–4 s, 17 IBAN-Funde, 4 Kartennummern, 1 × Gehaltsbegriffe, Scan „kein Text“,
+  Bericht und Server-Log ohne Werte. Dabei gefunden und behoben: Übergabe-Rennen im neuen
+  Ein-Thread-Pool meldete schnelle Dateien fälschlich als „Server ausgelastet“ (jetzt ein Warteplatz,
+  Test mit 40 DOCX hintereinander).
+- NICHT geprüft: SharePoint mit echten Inhalten, Windows-Server/AD-Rechte (Rechte-Übernahme an),
+  Scans mit OCR (bewusst kein OCR in dieser Stufe).

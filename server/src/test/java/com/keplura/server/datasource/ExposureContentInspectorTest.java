@@ -202,4 +202,17 @@ class ExposureContentInspectorTest {
             small.stop();
         }
     }
+
+    @Test
+    void manySmallOfficeFilesInARowAreNotRejectedAsBusy() throws Exception {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try (XWPFDocument doc = new XWPFDocument()) {
+            doc.createParagraph().createRun().setText("Protokoll ohne Besonderheiten");
+            doc.write(out);
+        }
+        for (int i = 0; i < 40; i++) {
+            var r = inspect("office/p" + i + ".docx", out.toByteArray());
+            assertThat(r.state()).as("file %d: %s", i, r.reason()).isEqualTo(ExposureContentInspector.CHECKED);
+        }
+    }
 }

@@ -16,7 +16,6 @@ import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -56,7 +55,7 @@ public class ExposureContentInspector {
     private final int maxChars;
     private final long maxRunMillis;
     private final ThreadPoolExecutor worker = new ThreadPoolExecutor(2, 2, 0L, TimeUnit.MILLISECONDS,
-            new SynchronousQueue<>(), r -> {
+            new java.util.concurrent.ArrayBlockingQueue<>(1), r -> {
                 Thread t = new Thread(r, "exposure-content");
                 t.setDaemon(true);
                 return t;

@@ -109,7 +109,7 @@ public class TikaDocumentTextExtractor {
     private final int timeoutSeconds;
     private final ThreadPoolExecutor parserPool;
     /**
-     * RISK-02: eigene Spur für die Inhaltsprüfung (ein Thread, ohne Warteschlange). So belegt
+     * RISK-02: eigene Spur für die Inhaltsprüfung (ein Thread, ein Warteplatz). So belegt
      * der Oversharing-Check nie die Plätze, die Uploads, Chat-Anhänge und Abgleich brauchen —
      * auch nicht, wenn ein abgebrochener Parse noch nachläuft.
      */
@@ -142,7 +142,10 @@ public class TikaDocumentTextExtractor {
                     return t;
                 },
                 new ThreadPoolExecutor.AbortPolicy());
-        this.inspectionPool = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new SynchronousQueue<>(),
+        // One running parse plus one waiting slot: a direct hand-off (SynchronousQueue) races
+        // with the worker returning to the queue and rejects back-to-back files spuriously.
+        this.inspectionPool = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
+                new java.util.concurrent.ArrayBlockingQueue<>(1),
                 r -> {
                     Thread t = new Thread(r, "tika-inspection");
                     t.setDaemon(true);
