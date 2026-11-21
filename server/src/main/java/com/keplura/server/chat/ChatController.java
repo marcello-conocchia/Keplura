@@ -167,6 +167,49 @@ public class ChatController {
         this.exportService = exportService;
     }
 
+    /** TU-02: body {"decision": "confirm" | "reject"} — nothing else is read (no arguments, targets or rights). */
+    public record ToolCallDecisionRequest(String decision) {
+    }
+
+    /**
+     * TU-02: decide one pending tool call of my own conversation. Session + CSRF like every
+     * state-changing route under {@code /api/v1/orgs/**}. A card that is already decided, expired or
+     * cancelled answers 409 with its current state and never triggers a second external call.
+     */
+    @PostMapping("/chat/conversations/{conversationId}/tool-calls/{callId}/decision")
+    public ResponseEntity<?> decideToolCall(@PathVariable("orgId") Long orgId,
+                                            @PathVariable("conversationId") Long conversationId,
+                                            @PathVariable("callId") String callId,
+                                            @org.springframework.web.bind.annotation.RequestBody(required = false) ToolCallDecisionRequest body,
+                                            HttpServletRequest httpRequest) {
+        AuthPrincipal principal = currentPrincipal(httpRequest);
+        String decision = body == null ? null : body.decision();
+        if (!"confirm".equals(decision) && !"reject".equals(decision)) {
+            return ResponseEntity.badRequest().body(new ErrorResponse("decision must be confirm or reject"));
+        }
+        var outcome = chatService.decideToolCall(principal.userId(), orgId, conversationId, callId, "confirm".equals(decision));
+        return switch (outcome) {
+            case com.keplura.server.tool.ToolExecutionService.Decision.Done d -> ResponseEntity.ok(d.card());
+            case com.keplura.server.tool.ToolExecutionService.Decision.Conflict c -> ResponseEntity.status(HttpStatus.CONFLICT).body(c.card());
+            case com.keplura.server.tool.ToolExecutionService.Decision.NotFound n ->
+                    ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("tool call not found"));
+        };
+    }
+
+    /**
+     * TU-02: the existing Stop in the chat — pending confirmations of this and older turns end
+     * without a call, and a turn still planning can no longer create a confirmable card.
+     */
+    @PostMapping("/chat/conversations/{conversationId}/tool-calls/stop")
+    public ResponseEntity<ErrorResponse> stopToolCalls(@PathVariable("orgId") Long orgId,
+                                                       @PathVariable("conversationId") Long conversationId,
+                                                       HttpServletRequest httpRequest) {
+        AuthPrincipal principal = currentPrincipal(httpRequest);
+        return chatService.stopToolCalls(principal.userId(), orgId, conversationId)
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("conversation not found"));
+    }
+
     @DeleteMapping("/chat/conversations/{conversationId}")
     public ResponseEntity<ErrorResponse> delete(@PathVariable("orgId") Long orgId,
                                                 @PathVariable("conversationId") Long conversationId,

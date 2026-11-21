@@ -5,7 +5,9 @@ import { useAuthStore } from "../auth-store";
 import {
   CHAT_PROMPT_MAX_LENGTH,
   createConversation,
+  decideToolCall,
   deleteConversation,
+  stopToolCalls,
   fetchTranscript,
   serverUrl,
   streamChatTurn,
@@ -24,6 +26,8 @@ import { copyText } from "./ui/clipboard";
 import SourcePreview from "./SourcePreview.vue";
 import TemplateMenu from "./chat/TemplateMenu.vue";
 import ChatContextBar from "./chat/ChatContextBar.vue";
+import ToolCallCard from "./chat/ToolCallCard.vue";
+import { cardsPromptAt, groupByPrompt, replaceCard, type ToolCallCard as ToolCallCardDto } from "../tool-cards";
 import { webSearchStatus } from "../productivity-api";
 import type { SourceSelection } from "../source-preview";
 import { tr, dateLocale, serverExact } from "../i18n";
@@ -71,6 +75,43 @@ const auth = useAuthStore();
 // streaming stay view-local: they are re-readable server-side at any time.
 const activeId = ref<number | null>(null);
 const messages = ref<ChatMessageDto[]>([]);
+/** TU-02: tool call cards of the open conversation (server state only). */
+const toolCalls = ref<ToolCallCardDto[]>([]);
+const cardsByPrompt = computed(() => groupByPrompt(toolCalls.value));
+const decidingCard = ref<string | null>(null);
+const cardError = ref<{ id: string; message: string } | null>(null);
+function cardsAt(index: number): ToolCallCardDto[] {
+  const prompt = cardsPromptAt(messages.value, index);
+  return prompt == null ? [] : cardsByPrompt.value.get(prompt) ?? [];
+}
+/** One decision at a time; the server consumes the pending call exactly once anyway. */
+async function decideCard(card: ToolCallCardDto, decision: "confirm" | "reject") {
+  if (decidingCard.value !== null) return;
+  const s = scoped();
+  const conversationId = activeId.value;
+  if (!s || conversationId === null) return;
+  decidingCard.value = card.id;
+  cardError.value = null;
+  try {
+    const outcome = await decideToolCall(s.orgId, conversationId, card.id, decision);
+    if (activeId.value !== conversationId) return;
+    if (outcome.kind === "ok" || outcome.kind === "conflict") {
+      toolCalls.value = replaceCard(toolCalls.value, outcome.card);
+      if (outcome.kind === "conflict") {
+        cardError.value = { id: card.id, message: tr("Dieser Aufruf wurde bereits entschieden oder ist nicht mehr offen.") };
+      }
+    } else if (outcome.kind === "expired") {
+      auth.dropExpiredSession();
+    } else {
+      // Unknown outcome: never retry automatically — re-read what the server knows.
+      cardError.value = { id: card.id, message: tr("Die Entscheidung konnte nicht bestätigt werden. Der Stand wird neu geladen.") };
+      const read = await fetchTranscript(s.orgId, conversationId);
+      if (read.kind === "ok" && activeId.value === conversationId) toolCalls.value = read.transcript.toolCalls ?? [];
+    }
+  } finally {
+    decidingCard.value = null;
+  }
+}
 const prompt = ref("");
 const composerKb = ref<number | null>(null);
 const contextBusy = ref(false);
@@ -174,6 +215,8 @@ async function loadList(keepActive = true) {
 
 function resetTranscript() {
   messages.value = [];
+  toolCalls.value = [];
+  cardError.value = null;
   streamedText.value = "";
   streamCitations.value = [];
 }
@@ -188,6 +231,7 @@ async function openConversation(id: number | null) {
   const outcome = await fetchTranscript(s.orgId, id);
   if (outcome.kind === "ok") {
     messages.value = outcome.transcript.messages;
+    toolCalls.value = outcome.transcript.toolCalls ?? [];
     await scrollToBottom();
   } else if (outcome.kind === "gone") {
     // deleted elsewhere / server-side prune: drop it from the list honestly
@@ -406,6 +450,7 @@ async function readBackTranscript(
     const read = await fetchTranscript(orgId, conversationId);
     if (read.kind === "ok") {
       messages.value = read.transcript.messages;
+      toolCalls.value = read.transcript.toolCalls ?? [];
       streamedText.value = "";
       streamCitations.value = [];
       const last = messages.value[messages.value.length - 1];
@@ -423,6 +468,17 @@ async function readBackTranscript(
 
 function stop() {
   stopController?.abort();
+  // TU-02: tell the server too — a pending or still-planned confirmation of this turn must not
+  // stay decidable after Stop. Best effort; the transcript re-read shows the outcome.
+  const s = scoped();
+  const conversationId = activeId.value;
+  if (s && conversationId !== null) {
+    void stopToolCalls(s.orgId, conversationId).then(async () => {
+      if (activeId.value !== conversationId) return;
+      const read = await fetchTranscript(s.orgId, conversationId);
+      if (read.kind === "ok" && activeId.value === conversationId) toolCalls.value = read.transcript.toolCalls ?? [];
+    });
+  }
 }
 
 // --- CHAT-POLISH §2: message actions ----------------------------------------
@@ -993,6 +1049,16 @@ onUnmounted(() => {
                   </button>
                 </div>
               </div>
+            </div>
+            <div v-if="cardsAt(mi).length" class="tool-cards max-w-[72ch]" data-testid="chat-tool-calls">
+              <ToolCallCard
+                v-for="c in cardsAt(mi)"
+                :key="c.id"
+                :card="c"
+                :busy="decidingCard === c.id"
+                :error="cardError?.id === c.id ? cardError.message : null"
+                @decide="(d) => decideCard(c, d)"
+              />
             </div>
           </template>
 

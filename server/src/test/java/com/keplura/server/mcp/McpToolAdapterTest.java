@@ -81,12 +81,13 @@ class McpToolAdapterTest {
         assertThat(echo().approved()).isFalse();
     }
 
-    @Test void unclassifiedCriticalOrUnsupportedToolsCannotBeApproved() {
+    @Test void unclassifiedOrUnsupportedToolsCannotBeApproved_criticalCanSinceTu02() {
         patch(List.of("echo", "rx"), null);
         assertThat(echo().approved()).isFalse(); // unclassified
         patch(null, Map.of("echo", "CRITICAL", "rx", "READ"));
         patch(List.of("echo", "rx"), null);
-        assertThat(echo().approved()).isFalse(); // CRITICAL waits for TU-02 confirmations
+        assertThat(echo().approved()).isTrue(); // CRITICAL: approvable, still runs only after per-call confirmation
+        assertThat(view("echo").enabled()).isTrue();
         assertThat(view("rx").schemaSupported()).isFalse();
         assertThat(view("rx").enabled()).isFalse();
     }

@@ -9,6 +9,7 @@
 // allows exactly the webview origins with credentials.
 
 import { desktopFetch, serverOrigin, setCsrfToken } from "./transport";
+import type { ToolCallCard } from "./tool-cards";
 
 /** Base URL of the Keplura Server API, configurable per environment. */
 export const serverUrl = serverOrigin;
@@ -605,6 +606,70 @@ export interface ChatMessageDto {
 export interface ChatTranscript {
   conversationId: number;
   messages: ChatMessageDto[];
+  /** TU-02: tool call cards of this conversation (mine only), each bound to its question. */
+  toolCalls?: ToolCallCard[];
+}
+
+/**
+ * TU-02: Stop in the chat — pending confirmations of this and older turns end without a call,
+ * and a turn still planning cannot create a confirmable card anymore. Best effort.
+ */
+export async function stopToolCalls(orgId: number, conversationId: number): Promise<boolean> {
+  try {
+    const response = await desktopFetch(
+      `${serverUrl}/api/v1/orgs/${orgId}/chat/conversations/${conversationId}/tool-calls/stop`,
+      { method: "POST", signal: AbortSignal.timeout(10000) },
+    );
+    return response.status === 204;
+  } catch {
+    return false;
+  }
+}
+
+export type ToolCallDecisionOutcome =
+  | { kind: "ok"; card: ToolCallCard }
+  /** already decided, expired or cancelled — the card shows the server's current state */
+  | { kind: "conflict"; card: ToolCallCard }
+  | { kind: "gone" }
+  | { kind: "expired" }
+  | { kind: "error" };
+
+/**
+ * TU-02: POST .../tool-calls/{id}/decision — only the decision travels; the server executes
+ * exactly the call it stored (arguments, target and rights are never taken from the client).
+ * No automatic retry: an unclear outcome is resolved by re-reading the transcript.
+ */
+export async function decideToolCall(
+  orgId: number,
+  conversationId: number,
+  callId: string,
+  decision: "confirm" | "reject",
+): Promise<ToolCallDecisionOutcome> {
+  let response: Response;
+  try {
+    response = await desktopFetch(
+      `${serverUrl}/api/v1/orgs/${orgId}/chat/conversations/${conversationId}/tool-calls/${encodeURIComponent(callId)}/decision`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ decision }),
+        signal: AbortSignal.timeout(120000),
+      },
+    );
+  } catch {
+    return { kind: "error" };
+  }
+  if (response.status === 401) return { kind: "expired" };
+  if (response.status === 404) return { kind: "gone" };
+  if (response.status === 200 || response.status === 409) {
+    try {
+      const card = (await response.json()) as ToolCallCard;
+      return response.status === 200 ? { kind: "ok", card } : { kind: "conflict", card };
+    } catch {
+      return { kind: "error" };
+    }
+  }
+  return { kind: "error" };
 }
 
 /** Server-side prompt cap mirrored from keplura.chat.max-prompt-chars. */

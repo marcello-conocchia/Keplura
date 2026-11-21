@@ -17,8 +17,11 @@
    - **Lesen** – liest nur. Läuft nach Freigabe.
    - **Schreiben** – kann Daten im angebundenen System ändern. Standardmäßig
      aus; nur bewusst freigeben.
-   - **Kritisch** – folgenreiche Aktion. Bleibt gesperrt, bis Keplura eine
-     Bestätigung je Aufruf anbietet (geplanter nächster Schritt TU-02).
+   - **Kritisch** – folgenreiche Aktion. Nach Freigabe plant das Modell den
+     Aufruf nur; er erscheint im Chat als Karte „Wartet auf Bestätigung“ mit
+     den genauen Eingaben. Ausgeführt wird erst, wenn die Person genau diesen
+     Aufruf bestätigt (Frist 10 Minuten, einmalig). Ablehnen, Fristablauf
+     oder eine neue Nachricht im Chat beenden ihn ohne Aufruf.
    Die Klasse setzt nur ein Admin. Angaben des MCP-Servers (z. B.
    `readOnlyHint`) werden dafür nicht übernommen.
 5. Eine geänderte Risikoklasse hebt die Freigabe dieses Werkzeugs auf. Ändert
@@ -67,3 +70,19 @@ Modelle ohne Tool-Calling können den normalen Chat weiterverwenden. Nur eine
 ausdrückliche Ablehnung dieser Fähigkeit vor dem ersten Werkzeugaufruf löst
 den Rückfall aus. Verbindungsfehler, Überlastung und Fehler nach bereits
 ausgeführten Werkzeugen lösen keine automatische Wiederholung aus.
+
+**Aufrufkarten (TU-02):** Jeder Werkzeugaufruf erscheint im Chat unter der
+Antwort als Karte mit Werkzeug, Verbindung, Risikoklasse, Eingaben und Status
+(wartet auf Bestätigung, läuft, erfolgreich, fehlgeschlagen, abgelehnt, nicht
+ausgeführt, abgelaufen, abgebrochen, Ausgang unklar). Ergebnisse sind
+Fremdinhalt und werden nur als Text angezeigt. Nur die Person des Chats sieht
+ihre Karten und kann entscheiden. Eine Bestätigung prüft vor der Ausführung
+erneut Zugriff, Freigabe, Risikoklasse, Werkzeugdefinition, Verbindungsziel
+und Eingaben; jede Änderung macht sie ungültig. Ein bestätigter Aufruf läuft
+höchstens einmal; ist sein Ausgang unklar, wird er nicht wiederholt. Nach der
+Bestätigung entsteht keine neue Modellantwort.
+Vor der Bestätigung zeigt die Karte die vollständigen Eingaben genau so, wie
+sie ausgeführt werden; die Übersicht darüber kann gekürzt sein. Zu große
+Eingaben werden nicht gespeichert und nicht ausgeführt. Eine neue Frage im
+Chat oder „Stopp“ machen offene Bestätigungen dieses Turns ungültig. Alle
+Aufrufe einer Frage teilen sich die 120 Sekunden Werkzeugzeit.

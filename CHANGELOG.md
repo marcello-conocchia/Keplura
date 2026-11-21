@@ -12,6 +12,12 @@ the first tagged release (planned `0.1.0`, see [docs/RELEASING.md](docs/RELEASIN
 
 ### Added
 
+- Tool call cards in the chat (TU-02): every tool call shows tool, connection,
+  risk class, inputs, status and the result or a generic error. Critical
+  tools can now be approved by admins; each single call then waits for the
+  person's explicit confirmation of exactly the shown call (10 minutes, once).
+  Rejecting, expiry or a new message end it without a call.
+
 - Oversharing check, stage 2: the content of broadly readable files is
   checked locally for IBANs, card numbers, German tax IDs, social security
   numbers and HR/health terms. The report shows only type and count, never

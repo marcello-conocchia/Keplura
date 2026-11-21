@@ -38,7 +38,8 @@ import java.util.Set;
 public class McpAdminController {
 
     /**
-     * enabled = wirksam freigegeben (klassifiziert, nicht CRITICAL, Schema prüfbar und angehakt).
+     * enabled = wirksam freigegeben (klassifiziert, Schema prüfbar und angehakt). CRITICAL läuft auch
+     * freigegeben nur nach Bestätigung je Aufruf durch die Person (TU-02).
      * legacyApproval = Freigabe aus der Zeit vor TU-01 ohne Risikoklasse — wirkt NICHT mehr.
      */
     public record ToolView(String name, String description, boolean enabled, String risk, boolean schemaSupported,
@@ -88,7 +89,7 @@ public class McpAdminController {
                             String name = t.path("name").asString("");
                             ToolRisk risk = risks.get(name);
                             String problem = ToolArgumentValidator.unsupportedReason(McpToolAdapter.schemaOf(t));
-                            boolean effective = on.contains(name) && risk != null && risk != ToolRisk.CRITICAL && problem == null;
+                            boolean effective = on.contains(name) && risk != null && problem == null;
                             tools.add(new ToolView(name, t.path("description").asString(""), effective,
                                     risk == null ? null : risk.name(), problem == null, problem,
                                     on.contains(name) && risk == null));
@@ -183,9 +184,9 @@ public class McpAdminController {
             if (in.enabledTools() != null) {
                 approved = new LinkedHashSet<>(in.enabledTools().stream().filter(known::containsKey).distinct().toList());
             }
-            // Only classified, non-CRITICAL tools with a supported schema can hold an approval.
-            approved.removeIf(t -> !known.containsKey(t) || risks.get(t) == null || risks.get(t) == ToolRisk.CRITICAL
-                    || !known.get(t).schemaSupported());
+            // Only classified tools with a supported schema can hold an approval. CRITICAL may be
+            // approved since TU-02: it still runs only after the person confirms each single call.
+            approved.removeIf(t -> !known.containsKey(t) || risks.get(t) == null || !known.get(t).schemaSupported());
             jdbc.update("update mcp_server set enabled_tools = ?, tool_risks = ? where id = ?",
                     String.join("\n", approved), McpToolAdapter.risksJson(risks), id);
         }

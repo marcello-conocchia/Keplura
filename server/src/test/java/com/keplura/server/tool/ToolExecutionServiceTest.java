@@ -121,24 +121,28 @@ class ToolExecutionServiceTest {
         assertThat(adapter.invocations).hasValue(1);
     }
 
-    @Test void unclassifiedUnapprovedAndCriticalToolsAreNotOfferedNorExecuted() {
+    @Test void unclassifiedAndUnapprovedToolsAreNotOfferedNorExecuted_criticalOnlyPlanned() {
         adapter.extra = List.of(adapter.def("unclassified", null, true), adapter.def("pending", ToolRisk.WRITE, false),
                 adapter.def("critical", ToolRisk.CRITICAL, true));
         var turn = turn();
-        assertThat(turn.offered()).containsOnlyKeys("f__echo");
+        // TU-02: an approved CRITICAL tool is offered, but the turn only plans it (pending card)
+        assertThat(turn.offered()).containsOnlyKeys("f__echo", "f__critical");
         for (String fn : List.of("f__unclassified", "f__pending", "f__critical")) {
             assertThat(turn.call(fn, "{\"message\":\"hi\"}").invoked()).isFalse();
         }
         assertThat(adapter.invocations).hasValue(0);
         assertThat(auditRows()).isZero();
+        // openTurn without a question id: a CRITICAL plan cannot even become a pending card
+        assertThat(jdbc.queryForObject("select status from tool_call where function_name = 'f__critical'", String.class))
+                .isEqualTo("BLOCKED");
     }
 
-    @Test void criticalCanNeverRunEvenIfOfferedEarlier() {
+    @Test void criticalCanNeverRunInsideTheTurnEvenIfReclassifiedMeanwhile() {
         var turn = turn();
         adapter.risk = ToolRisk.CRITICAL; // reclassified while the model was thinking
         assertThat(turn.call("f__echo", "{\"message\":\"hi\"}").invoked()).isFalse();
         assertThat(adapter.invocations).hasValue(0);
-        assertThat(ToolExecutionService.blockReason(adapter.def("x", ToolRisk.CRITICAL, true))).isNotNull();
+        assertThat(ToolExecutionService.blockReason(adapter.def("x", ToolRisk.CRITICAL, true))).isNull(); // offerable
     }
 
     @Test void unsupportedSchemaIsNotOffered() {
