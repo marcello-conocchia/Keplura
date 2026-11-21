@@ -87,5 +87,9 @@ selbst. So fallen auch Dateien mit unauffälligem Namen auf („Liste.xlsx“ mi
   Bericht und Server-Log ohne Werte. Dabei gefunden und behoben: Übergabe-Rennen im neuen
   Ein-Thread-Pool meldete schnelle Dateien fälschlich als „Server ausgelastet“ (jetzt ein Warteplatz,
   Test mit 40 DOCX hintereinander).
+- Zweite Prüfrunde: beide Prüfer haben die Korrekturen freigegeben; Restpunkte danach behoben
+  (Teilstücke längerer gruppierter Nummern zählen nicht, UTF-16 ohne Kennung = nicht prüfbar,
+  „Atteste“). Beim Praxistest fiel auf, dass die SMB-Bibliothek jeden Dateipfad ins INFO-Log
+  schreibt (auch beim Abgleich): jetzt `logging.level.com.hierynomus=WARN`.
 - NICHT geprüft: SharePoint mit echten Inhalten, Windows-Server/AD-Rechte (Rechte-Übernahme an),
   Scans mit OCR (bewusst kein OCR in dieser Stufe).
