@@ -20,7 +20,8 @@ const BASE = process.env.E2E_BASE || "http://localhost:1420";
 const API = "http://127.0.0.1:8080";
 const MOCK_PORT = 19931;
 const MAIL = "alex.baker@example.com";
-const SECRET = "Readme-Screens-2026!";
+// throwaway account of a throwaway database
+const SECRET = "Rs-" + require("node:crypto").randomBytes(12).toString("base64url");
 if (!JAR) { console.error("E2E_JAR required"); process.exit(2); }
 
 const ANSWER =
