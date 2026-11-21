@@ -165,6 +165,12 @@ public class ToolCallStore {
                 promptMessageId, conversationId) == 1;
     }
 
+    /** Explicit Stop only; a newer question does not cancel an already delivered normal answer. */
+    public boolean wasQuestionStopped(long conversationId, long promptMessageId) {
+        return jdbc.queryForObject("select count(*) from tool_call_stop where conversation_id = ? and stopped_prompt_id >= ?",
+                Integer.class, conversationId, promptMessageId) > 0;
+    }
+
     /** Bounded previous confirmed results; authorization is rechecked by ToolExecutionService. */
     public List<Row> completedBefore(long userId, long orgId, long conversationId, long promptMessageId) {
         return jdbc.query(SELECT + " where user_id = ? and org_id = ? and conversation_id = ?"

@@ -293,17 +293,17 @@ public class ToolExecutionService {
     }
 
     /** Display/persistence signal only; execution checks fail closed in ToolTurn.active(). */
-    public boolean questionEnded(Long conversationId, Long promptMessageId) {
+    public boolean questionStopped(Long conversationId, Long promptMessageId) {
         if (promptMessageId == null) return false;
         try {
-            return !cards.isCurrentQuestion(conversationId, promptMessageId);
+            return cards.wasQuestionStopped(conversationId, promptMessageId);
         } catch (RuntimeException e) {
             log.warn("tool question status unavailable ({})", e.getClass().getSimpleName());
             return false;
         }
     }
 
-    /** Previous confirmations inform a NEW explicit question, never the initial action planner. */
+    /** Previous confirmations inform a NEW explicit question's answer, never a tool-enabled request. */
     public String completedEvidence(Long userId, Long orgId, Long conversationId, Long promptMessageId) {
         if (promptMessageId == null) return "";
         StringBuilder out = new StringBuilder();

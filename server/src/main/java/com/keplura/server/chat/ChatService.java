@@ -416,7 +416,7 @@ public class ChatService {
             // so it gets its honest failed answer row, then the M4a error shape
             // (429/502/…) flows unchanged to the client.
             boolean stopped = ctx.interrupted().get()
-                    || (toolExecution != null && toolExecution.questionEnded(ctx.conversationId(), ctx.promptMessageId()));
+                    || (toolExecution != null && toolExecution.questionStopped(ctx.conversationId(), ctx.promptMessageId()));
             persistAnswer(ctx, "", "", stopped ? ChatMessage.STATUS_ABORTED : ChatMessage.STATUS_FAILED);
             throw e;
         }
@@ -471,7 +471,7 @@ public class ChatService {
         }
         observer.finish();
         if (aborted.get() || ctx.interrupted().get()
-                || (toolExecution != null && toolExecution.questionEnded(ctx.conversationId(), ctx.promptMessageId()))) {
+                || (toolExecution != null && toolExecution.questionStopped(ctx.conversationId(), ctx.promptMessageId()))) {
             endStatus = ChatMessage.STATUS_ABORTED;
         } else if (observer.sawDone() && !capped && !observer.overflowed()) {
             endStatus = ChatMessage.STATUS_COMPLETE;
@@ -632,7 +632,7 @@ public class ChatService {
         }
 
         // Only a NEW explicit question may use previous confirmed results as bounded evidence.
-        // This context never reaches the initial action planner in ChatToolLoop.
+        // This context only reaches tools-disabled completion, never a tool-enabled request.
         if (toolExecution != null) {
             String confirmed = toolExecution.completedEvidence(conversation.getCreatedBy(), conversation.getOrgId(),
                     conversation.getId(), promptMessageId);
