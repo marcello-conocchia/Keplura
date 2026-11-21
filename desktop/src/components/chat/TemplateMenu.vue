@@ -13,6 +13,7 @@ import { createTemplate, deleteTemplate, listTemplates, type PromptTemplate } fr
 import AppDialog from "../ui/AppDialog.vue";
 import AppIcon from "../ui/AppIcon.vue";
 import Button from "../ui/Button.vue";
+import { tr } from "../../i18n";
 
 const props = defineProps<{ currentPrompt: string; disabled?: boolean; compact?: boolean }>();
 const emit = defineEmits<{ insert: [string] }>();
@@ -50,7 +51,7 @@ async function save() {
   const r = await createTemplate(auth.selectedOrgId, scope.value === "space" ? auth.selectedSpaceId : null,
     title.value, body.value);
   if (r.kind !== "ok") {
-    saveError.value = r.kind === "error" ? r.message : "Deine Sitzung ist abgelaufen.";
+    saveError.value = r.kind === "error" ? r.message : tr("Deine Sitzung ist abgelaufen.");
     return;
   }
   saveOpen.value = false;
@@ -68,53 +69,53 @@ async function remove(t: PromptTemplate) {
 
 <template>
   <DropdownMenuRoot>
-    <DropdownMenuTrigger :class="['tpl-trigger', { compact }]" title="Vorlagen" :disabled="disabled" data-testid="chat-templates" aria-label="Vorlagen">
-      <AppIcon name="edit" :size="16" /><span v-if="!compact">Vorlagen</span>
+    <DropdownMenuTrigger :class="['tpl-trigger', { compact }]" :title="$t('Vorlagen')" :disabled="disabled" data-testid="chat-templates" :aria-label="$t('Vorlagen')">
+      <AppIcon name="edit" :size="16" /><span v-if="!compact">{{ $t("Vorlagen") }}</span>
     </DropdownMenuTrigger>
     <DropdownMenuPortal>
       <DropdownMenuContent class="ic-menu tpl-menu" :side-offset="6" align="start" side="top">
         <template v-if="spaceTemplates.length">
-          <DropdownMenuLabel class="ic-menu-label">{{ auth.selectedSpace?.name ?? "Arbeitsbereich" }}</DropdownMenuLabel>
+          <DropdownMenuLabel class="ic-menu-label">{{ auth.selectedSpace?.name ?? $t("Arbeitsbereich") }}</DropdownMenuLabel>
           <DropdownMenuItem v-for="t in spaceTemplates" :key="t.id" class="ic-menu-item" data-testid="chat-template-item" @select="emit('insert', t.body)">
             <span class="ic-menu-text">{{ t.title }}</span>
           </DropdownMenuItem>
         </template>
         <template v-if="orgTemplates.length">
-          <DropdownMenuLabel class="ic-menu-label">Ganze Organisation</DropdownMenuLabel>
+          <DropdownMenuLabel class="ic-menu-label">{{ $t("Ganze Organisation") }}</DropdownMenuLabel>
           <DropdownMenuItem v-for="t in orgTemplates" :key="t.id" class="ic-menu-item" data-testid="chat-template-item" @select="emit('insert', t.body)">
             <span class="ic-menu-text">{{ t.title }}</span>
           </DropdownMenuItem>
         </template>
-        <DropdownMenuLabel v-if="!templates.length" class="ic-menu-label">Noch keine Vorlagen</DropdownMenuLabel>
+        <DropdownMenuLabel v-if="!templates.length" class="ic-menu-label">{{ $t("Noch keine Vorlagen") }}</DropdownMenuLabel>
         <DropdownMenuSeparator class="ic-menu-sep" />
         <DropdownMenuItem class="ic-menu-item" :disabled="!currentPrompt.trim()" data-testid="chat-template-save" @select="openSave">
-          <AppIcon name="plus" :size="13" /><span class="ic-menu-text">Aktuelle Frage als Vorlage speichern</span>
+          <AppIcon name="plus" :size="13" /><span class="ic-menu-text">{{ $t("Aktuelle Frage als Vorlage speichern") }}</span>
         </DropdownMenuItem>
         <DropdownMenuItem v-if="templates.some((t) => t.canEdit)" class="ic-menu-item" @select="manageOpen = true">
-          <AppIcon name="edit" :size="13" /><span class="ic-menu-text">Vorlagen verwalten</span>
+          <AppIcon name="edit" :size="13" /><span class="ic-menu-text">{{ $t("Vorlagen verwalten") }}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenuPortal>
   </DropdownMenuRoot>
 
-  <AppDialog :open="saveOpen" title="Als Vorlage speichern" :error="saveError" @close="saveOpen = false">
+  <AppDialog :open="saveOpen" :title="$t('Als Vorlage speichern')" :error="saveError" @close="saveOpen = false">
     <form class="tpl-form" @submit.prevent="save">
-      <label>Name der Vorlage <input class="ic-native-control" v-model="title" required maxlength="120" placeholder="z. B. Angebot prüfen" data-testid="chat-template-title" /></label>
-      <label>Text <textarea class="ic-native-control" v-model="body" required maxlength="4000" rows="5"></textarea></label>
+      <label>{{ $t("Name der Vorlage") }} <input class="ic-native-control" v-model="title" required maxlength="120" :placeholder="$t('z. B. Angebot prüfen')" data-testid="chat-template-title" /></label>
+      <label>{{ $t("Text") }} <textarea class="ic-native-control" v-model="body" required maxlength="4000" rows="5"></textarea></label>
       <fieldset class="tpl-scope">
-        <legend>Für wen?</legend>
-        <label v-if="auth.selectedSpaceId !== null"><input v-model="scope" type="radio" value="space" /> Arbeitsbereich „{{ auth.selectedSpace?.name }}“</label>
-        <label><input v-model="scope" type="radio" value="org" /> Ganze Organisation</label>
+        <legend>{{ $t("Für wen?") }}</legend>
+        <label v-if="auth.selectedSpaceId !== null"><input v-model="scope" type="radio" value="space" /> {{ $t("Arbeitsbereich „{0}“", auth.selectedSpace?.name) }}</label>
+        <label><input v-model="scope" type="radio" value="org" /> {{ $t("Ganze Organisation") }}</label>
       </fieldset>
-      <div class="tpl-actions"><Button variant="primary" type="submit" data-testid="chat-template-submit">Speichern</Button></div>
+      <div class="tpl-actions"><Button variant="primary" type="submit" data-testid="chat-template-submit">{{ $t("Speichern") }}</Button></div>
     </form>
   </AppDialog>
 
-  <AppDialog :open="manageOpen" title="Vorlagen verwalten" @close="manageOpen = false">
+  <AppDialog :open="manageOpen" :title="$t('Vorlagen verwalten')" @close="manageOpen = false">
     <ul class="tpl-list">
       <li v-for="t in templates.filter((x) => x.canEdit)" :key="t.id">
-        <span><strong>{{ t.title }}</strong><br /><small>{{ t.spaceId === null ? "Ganze Organisation" : "Arbeitsbereich" }}</small></span>
-        <Button variant="icon" class="p-[6px]" :aria-label="`Vorlage ${t.title} löschen`" title="Löschen" @click="remove(t)"><AppIcon name="trash" :size="13" /></Button>
+        <span><strong>{{ t.title }}</strong><br /><small>{{ t.spaceId === null ? $t("Ganze Organisation") : $t("Arbeitsbereich") }}</small></span>
+        <Button variant="icon" class="p-[6px]" :aria-label="$t('Vorlage {0} löschen', t.title)" :title="$t('Löschen')" @click="remove(t)"><AppIcon name="trash" :size="13" /></Button>
       </li>
     </ul>
   </AppDialog>

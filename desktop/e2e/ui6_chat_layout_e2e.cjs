@@ -9,7 +9,7 @@ fs.mkdirSync(env.E2E_OUT,{recursive:true});
 const results=[];
 (async()=>{
   const browser=await chromium.launch({headless:true,args:['--no-sandbox'],...(env.E2E_CHROME?{executablePath:env.E2E_CHROME}:{})});
-  const page=await browser.newPage({viewport:{width:1440,height:1000},locale:'de-DE'});
+  const page=await browser.newPage({ locale: 'de-DE',viewport:{width:1440,height:1000},locale:'de-DE'});
   const shot=name=>page.screenshot({path:path.join(env.E2E_OUT,`${name}.png`)});
   async function point(name,fn,mode='echt'){
     try{await fn();results.push({name,mode,status:'bestanden'});}

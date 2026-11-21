@@ -13,6 +13,7 @@ import { KB_NAME_MAX_LENGTH, ORG_NAME_MAX_LENGTH, SPACE_NAME_MAX_LENGTH } from "
 import type { AppView } from "../navigation";
 import Button from "./ui/Button.vue";
 import Input from "./ui/Input.vue";
+import { tr } from "../i18n";
 
 const emit = defineEmits<{ navigate: [AppView] }>();
 const auth = useAuthStore();
@@ -44,11 +45,11 @@ const firstName = computed(() => (auth.user?.displayName ?? "").split(/\s+/)[0])
 
 function failText(kind: string, what: string, max: number): string {
   switch (kind) {
-    case "invalid-name": return `Bitte einen Namen mit 1 bis ${max} Zeichen eingeben.`;
-    case "duplicate-name": return `${what} mit diesem Namen gibt es bereits.`;
-    case "expired": return "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.";
-    case "rate-limited": return "Gerade sind zu viele Anfragen unterwegs. Bitte versuche es gleich noch einmal.";
-    default: return "Das hat nicht geklappt. Bitte versuche es erneut.";
+    case "invalid-name": return tr("Bitte einen Namen mit 1 bis {0} Zeichen eingeben.", max);
+    case "duplicate-name": return tr("{0} mit diesem Namen gibt es bereits.", what);
+    case "expired": return tr("Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.");
+    case "rate-limited": return tr("Gerade sind zu viele Anfragen unterwegs. Bitte versuche es gleich noch einmal.");
+    default: return tr("Das hat nicht geklappt. Bitte versuche es erneut.");
   }
 }
 
@@ -61,7 +62,7 @@ async function createOrg() {
     orgName.value = "";
     await auth.loadKnowledge();
   } else {
-    error.value = failText(r.kind, "Eine Organisation", ORG_NAME_MAX_LENGTH);
+    error.value = failText(r.kind, tr("Eine Organisation"), ORG_NAME_MAX_LENGTH);
   }
   busy.value = false;
 }
@@ -72,7 +73,7 @@ async function createSpace() {
   error.value = "";
   const r = await auth.createSpace(spaceName.value.trim());
   if (r.kind === "created") spaceName.value = "";
-  else error.value = failText(r.kind, "Einen Arbeitsbereich", SPACE_NAME_MAX_LENGTH);
+  else error.value = failText(r.kind, tr("Einen Arbeitsbereich"), SPACE_NAME_MAX_LENGTH);
   busy.value = false;
 }
 
@@ -86,7 +87,7 @@ async function createKb() {
     // nächster sinnvoller Schritt: Dokumente hochladen
     emit("navigate", "wissen");
   } else {
-    error.value = failText(r.kind, "Eine Wissensbasis", KB_NAME_MAX_LENGTH);
+    error.value = failText(r.kind, tr("Eine Wissensbasis"), KB_NAME_MAX_LENGTH);
   }
   busy.value = false;
 }
@@ -96,22 +97,22 @@ async function createKb() {
   <main class="ob" data-testid="onboarding-view">
     <div class="ob-inner">
       <header class="ob-head">
-        <p class="ob-kicker">Erste Schritte · {{ Math.min(current, 3) }} von 3</p>
-        <h1 class="ob-title">Willkommen{{ firstName ? `, ${firstName}` : "" }}</h1>
-        <p class="ob-lead">In drei kurzen Schritten ist Keplura für dein Team bereit. Namen kannst du später jederzeit ändern.</p>
+        <p class="ob-kicker">{{ $t("Erste Schritte · {0} von 3", Math.min(current, 3)) }}</p>
+        <h1 class="ob-title">{{ $t("Willkommen{0}", firstName ? `, ${firstName}` : "") }}</h1>
+        <p class="ob-lead">{{ $t("In drei kurzen Schritten ist Keplura für dein Team bereit. Namen kannst du später jederzeit ändern.") }}</p>
       </header>
 
       <ol class="ob-steps">
         <li class="ob-step" :class="{ done: hasOrg, active: current === 1 }" data-testid="onboarding-step-org" :aria-current="current === 1 ? 'step' : undefined">
           <span class="ob-num" aria-hidden="true">{{ hasOrg ? "✓" : "1" }}</span>
           <div class="ob-body">
-            <h2>Organisation anlegen</h2>
-            <p v-if="hasOrg" class="ob-done">„{{ auth.selectedOrg?.name ?? auth.orgs[0]?.name }}“ ist angelegt.</p>
+            <h2>{{ $t("Organisation anlegen") }}</h2>
+            <p v-if="hasOrg" class="ob-done">{{ $t("„{0}“ ist angelegt.", auth.selectedOrg?.name ?? auth.orgs[0]?.name) }}</p>
             <template v-else>
-              <p class="ob-text">Meist der Firmenname, zum Beispiel „Muster GmbH“. Du wirst automatisch Verwalter:in.</p>
+              <p class="ob-text">{{ $t("Meist der Firmenname, zum Beispiel „Muster GmbH“. Du wirst automatisch Verwalter:in.") }}</p>
               <form class="ob-form" @submit.prevent="createOrg">
-                <Input id="ob-org" v-model="orgName" label="Name der Organisation" :maxlength="ORG_NAME_MAX_LENGTH" autocomplete="organization" data-testid="onboarding-org-name" :disabled="busy" />
-                <Button variant="primary" type="submit" :busy="busy" :disabled="!orgName.trim()" data-testid="onboarding-org-submit">Anlegen</Button>
+                <Input id="ob-org" v-model="orgName" :label="$t('Name der Organisation')" :maxlength="ORG_NAME_MAX_LENGTH" autocomplete="organization" data-testid="onboarding-org-name" :disabled="busy" />
+                <Button variant="primary" type="submit" :busy="busy" :disabled="!orgName.trim()" data-testid="onboarding-org-submit">{{ $t("Anlegen") }}</Button>
               </form>
               <p v-if="error" class="connection-note error" role="alert" data-testid="onboarding-error">{{ error }}</p>
             </template>
@@ -121,14 +122,14 @@ async function createKb() {
         <li class="ob-step" :class="{ done: hasSpace, active: current === 2 }" data-testid="onboarding-step-space" :aria-current="current === 2 ? 'step' : undefined">
           <span class="ob-num" aria-hidden="true">{{ hasSpace ? "✓" : "2" }}</span>
           <div class="ob-body">
-            <h2>Arbeitsbereich anlegen</h2>
-            <p v-if="hasSpace" class="ob-done">„{{ auth.selectedSpace?.name }}“ ist angelegt.</p>
+            <h2>{{ $t("Arbeitsbereich anlegen") }}</h2>
+            <p v-if="hasSpace" class="ob-done">{{ $t("„{0}“ ist angelegt.", auth.selectedSpace?.name) }}</p>
             <template v-else>
-              <p class="ob-text">Ein Arbeitsbereich bündelt Wissen und Chats eines Teams, zum Beispiel „Vertrieb“.</p>
+              <p class="ob-text">{{ $t("Ein Arbeitsbereich bündelt Wissen und Chats eines Teams, zum Beispiel „Vertrieb“.") }}</p>
               <template v-if="current === 2">
                 <form class="ob-form" @submit.prevent="createSpace">
-                  <Input id="ob-space" v-model="spaceName" label="Name des Arbeitsbereichs" :maxlength="SPACE_NAME_MAX_LENGTH" autocomplete="off" data-testid="onboarding-space-name" :disabled="busy" />
-                  <Button variant="primary" type="submit" :busy="busy" :disabled="!spaceName.trim()" data-testid="onboarding-space-submit">Anlegen</Button>
+                  <Input id="ob-space" v-model="spaceName" :label="$t('Name des Arbeitsbereichs')" :maxlength="SPACE_NAME_MAX_LENGTH" autocomplete="off" data-testid="onboarding-space-name" :disabled="busy" />
+                  <Button variant="primary" type="submit" :busy="busy" :disabled="!spaceName.trim()" data-testid="onboarding-space-submit">{{ $t("Anlegen") }}</Button>
                 </form>
                 <p v-if="error" class="connection-note error" role="alert" data-testid="onboarding-error">{{ error }}</p>
               </template>
@@ -139,14 +140,14 @@ async function createKb() {
         <li class="ob-step" :class="{ done: hasKb, active: current === 3 }" data-testid="onboarding-step-kb" :aria-current="current === 3 ? 'step' : undefined">
           <span class="ob-num" aria-hidden="true">{{ hasKb ? "✓" : "3" }}</span>
           <div class="ob-body">
-            <h2>Erste Wissensbasis anlegen</h2>
-            <p v-if="hasKb" class="ob-done">„{{ auth.selectedKb?.name ?? auth.kbs[0]?.name }}“ ist angelegt.</p>
+            <h2>{{ $t("Erste Wissensbasis anlegen") }}</h2>
+            <p v-if="hasKb" class="ob-done">{{ $t("„{0}“ ist angelegt.", auth.selectedKb?.name ?? auth.kbs[0]?.name) }}</p>
             <template v-else>
-              <p class="ob-text">Eine Sammlung zusammengehöriger Dokumente, zum Beispiel „Handbücher“ oder „Richtlinien“.</p>
+              <p class="ob-text">{{ $t("Eine Sammlung zusammengehöriger Dokumente, zum Beispiel „Handbücher“ oder „Richtlinien“.") }}</p>
               <template v-if="current === 3">
                 <form class="ob-form" @submit.prevent="createKb">
-                  <Input id="ob-kb" v-model="kbName" label="Name der Wissensbasis" :maxlength="KB_NAME_MAX_LENGTH" autocomplete="off" data-testid="onboarding-kb-name" :disabled="busy" />
-                  <Button variant="primary" type="submit" :busy="busy" :disabled="!kbName.trim()" data-testid="onboarding-kb-submit">Anlegen</Button>
+                  <Input id="ob-kb" v-model="kbName" :label="$t('Name der Wissensbasis')" :maxlength="KB_NAME_MAX_LENGTH" autocomplete="off" data-testid="onboarding-kb-name" :disabled="busy" />
+                  <Button variant="primary" type="submit" :busy="busy" :disabled="!kbName.trim()" data-testid="onboarding-kb-submit">{{ $t("Anlegen") }}</Button>
                 </form>
                 <p v-if="error" class="connection-note error" role="alert" data-testid="onboarding-error">{{ error }}</p>
               </template>
@@ -156,15 +157,15 @@ async function createKb() {
       </ol>
 
       <section class="ob-next" aria-labelledby="ob-next-title">
-        <h2 id="ob-next-title">Danach</h2>
+        <h2 id="ob-next-title">{{ $t("Danach") }}</h2>
         <ul class="ob-next-list">
           <li data-testid="onboarding-step-docs">
-            <strong>Dokumente hochladen</strong>
-            <span>PDF, Word, Excel, PowerPoint, Text, Markdown oder CSV. Nach Schritt 3 öffnet sich „Wissen“ automatisch, dort lädst du sie hoch.</span>
+            <strong>{{ $t("Dokumente hochladen") }}</strong>
+            <span>{{ $t("PDF, Word, Excel, PowerPoint, Text, Markdown oder CSV. Nach Schritt 3 öffnet sich „Wissen“ automatisch, dort lädst du sie hoch.") }}</span>
           </li>
           <li data-testid="onboarding-step-team">
-            <strong>Kolleginnen und Kollegen hinzufügen</strong>
-            <span>Unter „Team“ legst du Zugänge an oder erstellst Einladungscodes.</span>
+            <strong>{{ $t("Kolleginnen und Kollegen hinzufügen") }}</strong>
+            <span>{{ $t("Unter „Team“ legst du Zugänge an oder erstellst Einladungscodes.") }}</span>
           </li>
         </ul>
       </section>

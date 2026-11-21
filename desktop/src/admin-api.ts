@@ -12,6 +12,7 @@
 // only ever carries {secretSet, secretMasked}, never a ciphertext.
 
 import { desktopFetch, serverOrigin } from "./transport";
+import { tr } from "./i18n";
 
 const base = `${serverOrigin}/api/v1/admin`;
 
@@ -108,9 +109,9 @@ async function sendJson<T>(method: string, path: string, body: unknown): Promise
     // generic text (never upstream detail) so it is safe to show.
     try {
       const err = (await response.json()) as { error?: string };
-      return { kind: "invalid", message: err.error || "Ungültige Eingabe" };
+      return { kind: "invalid", message: err.error || tr("Ungültige Eingabe") };
     } catch {
-      return { kind: "invalid", message: "Ungültige Eingabe" };
+      return { kind: "invalid", message: tr("Ungültige Eingabe") };
     }
   }
   if (!response.ok) return { kind: "error" };

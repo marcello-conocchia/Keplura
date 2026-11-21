@@ -21,7 +21,9 @@ import { useAuthStore } from "../auth-store";
 import { useThemeStore } from "../theme-store";
 import type { AppView } from "../navigation";
 import AppIcon from "./ui/AppIcon.vue";
+import BrandMark from "./ui/BrandMark.vue";
 import type { IconName } from "./ui/AppIcon.vue";
+import { tr, locale, setLocale } from "../i18n";
 
 const auth = useAuthStore();
 const theme = useThemeStore();
@@ -47,9 +49,9 @@ const emit = defineEmits<{
 }>();
 
 const nav: { view: AppView; label: string; icon: IconName; testid: string }[] = [
-  { view: "chat", label: "Chat", icon: "chat", testid: "sidebar-nav-chat" },
-  { view: "wissen", label: "Wissen", icon: "book", testid: "sidebar-nav-wissen" },
-  { view: "team", label: "Team", icon: "users", testid: "sidebar-nav-team" },
+  { view: "chat", label: tr("Chat"), icon: "chat", testid: "sidebar-nav-chat" },
+  { view: "wissen", label: tr("Wissen"), icon: "book", testid: "sidebar-nav-wissen" },
+  { view: "team", label: tr("Team"), icon: "users", testid: "sidebar-nav-team" },
 ];
 
 function initialsOf(name: string): string {
@@ -58,16 +60,16 @@ function initialsOf(name: string): string {
   return (parts.length === 1 ? parts[0].slice(0, 2) : parts[0][0] + parts[1][0]).toUpperCase();
 }
 const currentOrg = computed(() => auth.orgs.find((o) => o.id === auth.selectedOrgId) ?? auth.orgs[0] ?? null);
-const userName = computed(() => auth.user?.displayName || "Keplura-Nutzer");
+const userName = computed(() => auth.user?.displayName || tr("Keplura-Nutzer"));
 
 const statusLabel = computed(() =>
-  props.status === "connected" ? "Verbunden" : props.status === "unreachable" ? "Keine Verbindung" : "Verbindung wird geprüft…",
+  props.status === "connected" ? tr("Verbunden") : props.status === "unreachable" ? tr("Keine Verbindung") : tr("Verbindung wird geprüft…"),
 );
 const statusTone = computed(() =>
   props.status === "connected" ? "var(--ic-status-ok)" : props.status === "unreachable" ? "var(--ic-status-error)" : "var(--ic-status-wait)",
 );
 const modelLabel = computed(() =>
-  props.modelState === "local" ? "KI-Modell lokal" : props.modelState === "configured" ? "KI-Modell bereit" : "Kein KI-Modell",
+  props.modelState === "local" ? tr("KI-Modell lokal") : props.modelState === "configured" ? tr("KI-Modell bereit") : tr("Kein KI-Modell"),
 );
 
 async function newChat() {
@@ -118,33 +120,33 @@ function openKb(kbId: number) {
 </script>
 
 <template>
-  <nav class="sb" data-testid="sidebar" aria-label="Hauptnavigation">
-    <div class="brand"><span class="brand-symbol" aria-hidden="true"><AppIcon name="book" /></span>Keplura</div>
+  <nav class="sb" data-testid="sidebar" :aria-label="$t('Hauptnavigation')">
+    <div class="brand"><BrandMark :size="30" />Keplura</div>
     <!-- Kopf: Organisation + Benutzer -->
     <div class="head">
       <DropdownMenuRoot v-if="auth.orgs.length">
-        <DropdownMenuTrigger class="org" data-testid="sidebar-org" aria-label="Organisation wechseln">
+        <DropdownMenuTrigger class="org" data-testid="sidebar-org" :aria-label="$t('Organisation wechseln')">
           <span class="org-logo" aria-hidden="true">{{ initialsOf(currentOrg?.name ?? "") }}</span>
           <span class="org-name">{{ currentOrg?.name }}</span>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M7 10l5 5 5-5" /></svg>
         </DropdownMenuTrigger>
         <DropdownMenuPortal>
           <DropdownMenuContent class="ic-menu" :side-offset="4" align="start">
-            <DropdownMenuLabel class="ic-menu-label">Organisation wechseln</DropdownMenuLabel>
+            <DropdownMenuLabel class="ic-menu-label">{{ $t("Organisation wechseln") }}</DropdownMenuLabel>
             <DropdownMenuItem v-for="org in auth.orgs" :key="org.id" class="ic-menu-item" :data-testid="`sidebar-org-${org.id}`" @select="auth.selectOrg(org.id)">
               <span class="ic-menu-logo" aria-hidden="true">{{ initialsOf(org.name) }}</span>
               <span class="ic-menu-text">{{ org.name }}</span>
               <span v-if="org.id === currentOrg?.id" class="ic-menu-check">✓</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator class="ic-menu-sep" />
-            <DropdownMenuItem class="ic-menu-item" @select="emit('navigate', 'team')">Organisationen verwalten</DropdownMenuItem>
+            <DropdownMenuItem class="ic-menu-item" @select="emit('navigate', 'team')">{{ $t("Organisationen verwalten") }}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenuPortal>
       </DropdownMenuRoot>
-      <span v-else class="org org-none" data-testid="sidebar-org-empty">Noch keine Organisation</span>
+      <span v-else class="org org-none" data-testid="sidebar-org-empty">{{ $t("Noch keine Organisation") }}</span>
 
       <DropdownMenuRoot>
-        <DropdownMenuTrigger class="me" :aria-label="`Konto: ${userName}`" data-testid="sidebar-user">
+        <DropdownMenuTrigger class="me" :aria-label="$t('Konto: {0}', userName)" data-testid="sidebar-user">
           <span class="me-avatar">{{ initialsOf(userName) }}</span>
           <span class="me-dot" :style="{ background: statusTone }" aria-hidden="true"></span>
         </DropdownMenuTrigger>
@@ -152,27 +154,35 @@ function openKb(kbId: number) {
           <DropdownMenuContent class="ic-menu" :side-offset="4" align="end">
             <DropdownMenuLabel class="ic-menu-label strong">{{ userName }}</DropdownMenuLabel>
             <DropdownMenuSeparator class="ic-menu-sep" />
-            <DropdownMenuLabel class="ic-menu-label">Darstellung</DropdownMenuLabel>
+            <DropdownMenuLabel class="ic-menu-label">{{ $t("Darstellung") }}</DropdownMenuLabel>
             <DropdownMenuItem class="ic-menu-item" data-testid="theme-light" @select="theme.setMode('light')">
-              <AppIcon name="sun" :size="13" /><span class="ic-menu-text">Hell</span><span v-if="theme.mode === 'light'" class="ic-menu-check">✓</span>
+              <AppIcon name="sun" :size="13" /><span class="ic-menu-text">{{ $t("Hell") }}</span><span v-if="theme.mode === 'light'" class="ic-menu-check">✓</span>
             </DropdownMenuItem>
             <DropdownMenuItem class="ic-menu-item" data-testid="theme-dark" @select="theme.setMode('dark')">
-              <AppIcon name="moon" :size="13" /><span class="ic-menu-text">Dunkel</span><span v-if="theme.mode === 'dark'" class="ic-menu-check">✓</span>
+              <AppIcon name="moon" :size="13" /><span class="ic-menu-text">{{ $t("Dunkel") }}</span><span v-if="theme.mode === 'dark'" class="ic-menu-check">✓</span>
             </DropdownMenuItem>
             <DropdownMenuItem class="ic-menu-item" data-testid="theme-toggle" @select="theme.setMode('system')">
-              <AppIcon name="auto" :size="13" /><span class="ic-menu-text">Wie System</span><span v-if="theme.mode === 'system'" class="ic-menu-check">✓</span>
+              <AppIcon name="auto" :size="13" /><span class="ic-menu-text">{{ $t("Wie System") }}</span><span v-if="theme.mode === 'system'" class="ic-menu-check">✓</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator class="ic-menu-sep" />
+            <DropdownMenuLabel class="ic-menu-label">{{ $t("Sprache") }}</DropdownMenuLabel>
+            <DropdownMenuItem class="ic-menu-item" data-testid="locale-de" lang="de" @select="setLocale('de')">
+              <AppIcon name="globe" :size="13" /><span class="ic-menu-text">Deutsch</span><span v-if="locale === 'de'" class="ic-menu-check">✓</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem class="ic-menu-item" data-testid="locale-en" lang="en" @select="setLocale('en')">
+              <AppIcon name="globe" :size="13" /><span class="ic-menu-text">English</span><span v-if="locale === 'en'" class="ic-menu-check">✓</span>
             </DropdownMenuItem>
             <template v-if="showFullscreen">
               <DropdownMenuSeparator class="ic-menu-sep" />
-              <DropdownMenuItem class="ic-menu-item" data-testid="fullscreen-toggle" :aria-label="isFullscreen ? 'Vollbild verlassen' : 'Vollbild aktivieren'" @select="emit('toggleFullscreen')">
+              <DropdownMenuItem class="ic-menu-item" data-testid="fullscreen-toggle" :aria-label="isFullscreen ? $t('Vollbild verlassen') : $t('Vollbild aktivieren')" @select="emit('toggleFullscreen')">
                 <AppIcon :name="isFullscreen ? 'compress' : 'expand'" :size="13" />
-                <span class="ic-menu-text">{{ isFullscreen ? "Vollbild verlassen" : "Vollbild" }}</span>
-                <span class="ic-menu-kbd">F11</span>
+                <span class="ic-menu-text">{{ isFullscreen ? $t("Vollbild verlassen") : $t("Vollbild") }}</span>
+                <span class="ic-menu-kbd">{{ $t("F11") }}</span>
               </DropdownMenuItem>
             </template>
             <DropdownMenuSeparator class="ic-menu-sep" />
             <DropdownMenuItem class="ic-menu-item" data-testid="sidebar-logout" @select="emit('logout')">
-              <AppIcon name="logout" :size="13" /><span class="ic-menu-text">Abmelden</span>
+              <AppIcon name="logout" :size="13" /><span class="ic-menu-text">{{ $t("Abmelden") }}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenuPortal>
@@ -183,9 +193,9 @@ function openKb(kbId: number) {
     <div class="quick">
       <button type="button" class="new" data-testid="sidebar-new-chat" :disabled="auth.selectedSpaceId === null" @click="newChat">
         <AppIcon name="edit" :size="15" />
-        <span>Neuer Chat</span>
+        <span>{{ $t("Neuer Chat") }}</span>
       </button>
-      <button type="button" class="search" title="Suchen (Strg+K)" aria-label="Suchen (Strg+K)" data-testid="sidebar-search" @click="openPalette">
+      <button type="button" class="search" :title="$t('Suchen (Strg+K)')" :aria-label="$t('Suchen (Strg+K)')" data-testid="sidebar-search" @click="openPalette">
         <AppIcon name="search" :size="15" />
       </button>
     </div>
@@ -217,20 +227,20 @@ function openKb(kbId: number) {
           @click="emit('navigate', 'admin')"
         >
           <AppIcon name="admin" />
-          <span class="label">Administration</span>
+          <span class="label">{{ $t("Administration") }}</span>
         </button>
       </li>
     </ul>
 
     <div class="sidebar-context">
-      <section v-if="auth.conversations.length" class="sidebar-history" aria-label="Unterhaltungen">
-        <div class="sidebar-section-head"><span>Unterhaltungen</span>
+      <section v-if="auth.conversations.length" class="sidebar-history" :aria-label="$t('Unterhaltungen')">
+        <div class="sidebar-section-head"><span>{{ $t("Unterhaltungen") }}</span>
           <button
             v-if="auth.conversations.length"
             type="button"
             class="toggle"
             :aria-expanded="chatsOpen"
-            :aria-label="chatsOpen ? 'Verlauf einklappen' : 'Verlauf ausklappen'"
+            :aria-label="chatsOpen ? $t('Verlauf einklappen') : $t('Verlauf ausklappen')"
             data-testid="sidebar-chats-toggle"
             @click="toggleChats"
           >
@@ -248,15 +258,15 @@ function openKb(kbId: number) {
               @click="openChat(c.id)"
             >
               <span class="label">{{ c.title }}</span>
-              <span v-if="c.knowledgeBaseId !== null" class="kb-mark" title="Mit Wissen"><AppIcon name="book" :size="13" /></span>
+              <span v-if="c.knowledgeBaseId !== null" class="kb-mark" :title="$t('Mit Wissen')"><AppIcon name="book" :size="13" /></span>
             </button>
             <button
               type="button"
               class="chat-del"
               data-testid="chat-conv-delete"
               :data-conv-id="c.id"
-              title="Unterhaltung löschen"
-              aria-label="Unterhaltung löschen"
+              :title="$t('Unterhaltung löschen')"
+              :aria-label="$t('Unterhaltung löschen')"
               @click="deleteChat(c.id)"
             >
               <AppIcon name="trash" :size="13" />
@@ -264,7 +274,7 @@ function openKb(kbId: number) {
           </li>
           <li v-if="auth.conversations.length > 6">
             <button type="button" class="item subitem muted" @click="showAllChats = !showAllChats">
-              {{ showAllChats ? "Weniger anzeigen" : `Alle ${auth.conversations.length} anzeigen` }}
+              {{ showAllChats ? $t("Weniger anzeigen") : $t("Alle {0} anzeigen", auth.conversations.length) }}
             </button>
           </li>
         </ul>
@@ -272,7 +282,7 @@ function openKb(kbId: number) {
 
     <!-- Arbeitsbereiche als Baum -->
     <div v-if="auth.spaces.length" class="section">
-      <p class="section-title">Arbeitsbereiche</p>
+      <p class="section-title">{{ $t("Arbeitsbereiche") }}</p>
       <ul class="tree" role="list">
         <li v-for="space in auth.spaces" :key="space.id">
           <button
@@ -301,7 +311,7 @@ function openKb(kbId: number) {
               </button>
             </li>
             <li v-if="auth.kbs.length === 0">
-              <button type="button" class="item subitem muted" @click="emit('navigate', 'wissen')">Wissensbasis anlegen …</button>
+              <button type="button" class="item subitem muted" @click="emit('navigate', 'wissen')">{{ $t("Wissensbasis anlegen …") }}</button>
             </li>
           </ul>
         </li>
@@ -314,8 +324,8 @@ function openKb(kbId: number) {
       <span class="dot" :style="{ background: statusTone }" aria-hidden="true"></span>
       <span>{{ statusLabel }}</span>
       <span v-if="status === 'connected' && modelState" class="sep" data-testid="sidebar-model">· {{ modelLabel }}</span>
-      <span v-if="status === 'connected' && serverVersion" class="ver ic-num" data-testid="sidebar-version" :title="`Server-Version ${serverVersion}`">v{{ serverVersion }}</span>
-      <button type="button" class="reload" data-testid="sidebar-reload" title="Neu laden" aria-label="Neu laden" @click="emit('reload')">
+      <span v-if="status === 'connected' && serverVersion" class="ver ic-num" data-testid="sidebar-version" :title="`Server-Version ${serverVersion}`">{{ $t("v{0}", serverVersion) }}</span>
+      <button type="button" class="reload" data-testid="sidebar-reload" :title="$t('Neu laden')" :aria-label="$t('Neu laden')" @click="emit('reload')">
         <AppIcon name="refresh" :size="13" />
       </button>
 

@@ -5,6 +5,7 @@ import { documentSourceUrl, fetchSourcePreview, type DocumentPreview, type Sourc
 import Button from "./ui/Button.vue";
 import SourceFreshness from "./ui/SourceFreshness.vue";
 import AppIcon from "./ui/AppIcon.vue";
+import { tr } from "../i18n";
 
 const props = defineProps<{source: SourceSelection}>();
 const emit = defineEmits<{close: []; expired: []}>();
@@ -26,10 +27,10 @@ function updateWidth() {
 }
 const originalUrl = computed(() => `${documentSourceUrl(props.source)}/download`);
 const emptyText = computed(() => preview.value?.indexStatus === "PENDING"
-  ? "Das Dokument wird noch verarbeitet. Bitte versuche es gleich erneut."
+  ? tr("Das Dokument wird noch verarbeitet. Bitte versuche es gleich erneut.")
   : preview.value?.indexStatus === "NO_TEXT_LAYER"
-    ? "Dieses Dokument enthält keinen lesbaren Text. Du kannst das Original herunterladen."
-    : "Für dieses Dokument ist noch keine Textvorschau verfügbar.");
+    ? tr("Dieses Dokument enthält keinen lesbaren Text. Du kannst das Original herunterladen.")
+    : tr("Für dieses Dokument ist noch keine Textvorschau verfügbar."));
 
 async function load() {
   const ticket = ++sequence;
@@ -42,8 +43,8 @@ async function load() {
     if (result.kind === "expired") { emit("expired"); return; }
     if (result.kind !== "ok") {
       error.value = result.kind === "gone"
-        ? "Diese Textstelle ist nicht mehr verfügbar oder du hast keinen Zugriff mehr."
-        : "Die Vorschau konnte nicht geladen werden. Bitte versuche es erneut.";
+        ? tr("Diese Textstelle ist nicht mehr verfügbar oder du hast keinen Zugriff mehr.")
+        : tr("Die Vorschau konnte nicht geladen werden. Bitte versuche es erneut.");
       return;
     }
     preview.value = result.preview;
@@ -67,31 +68,31 @@ onBeforeUnmount(() => { sequence++; controller?.abort(); media.removeEventListen
 <template>
   <Teleport to="body">
     <div v-if="narrow" class="source-scrim" aria-hidden="true" @click="emit('close')"></div>
-    <dialog id="document-source-preview" @cancel.prevent="emit('close')" ref="panel" class="source-panel" role="dialog" :aria-modal="narrow" aria-label="Dokumentvorschau" data-testid="document-preview">
+    <dialog id="document-source-preview" @cancel.prevent="emit('close')" ref="panel" class="source-panel" role="dialog" :aria-modal="narrow" :aria-label="$t('Dokumentvorschau')" data-testid="document-preview">
       <header class="source-header">
-        <div class="min-w-0"><p class="source-caption">Dokumentvorschau · Textansicht</p><h2>{{ preview?.filename || source.filename }}</h2><SourceFreshness :value="preview ? preview.sourceUpdatedAt : source.sourceUpdatedAt" /></div>
-        <button ref="closeButton" type="button" class="source-close" aria-label="Dokumentvorschau schließen" @click="emit('close')"><AppIcon name="close" :size="15" /></button>
+        <div class="min-w-0"><p class="source-caption">{{ $t("Dokumentvorschau · Textansicht") }}</p><h2>{{ preview?.filename || source.filename }}</h2><SourceFreshness :value="preview ? preview.sourceUpdatedAt : source.sourceUpdatedAt" /></div>
+        <button ref="closeButton" type="button" class="source-close" :aria-label="$t('Dokumentvorschau schließen')" @click="emit('close')"><AppIcon name="close" :size="15" /></button>
       </header>
       <div class="source-tools" data-testid="chat-source-detail">
-        <a :href="originalUrl" download data-testid="chat-source-download">Original herunterladen</a>
-        <button v-if="center !== source.chunkIdx" type="button" @click="center = source.chunkIdx; load()">Zur zitierten Stelle</button>
+        <a :href="originalUrl" download data-testid="chat-source-download">{{ $t("Original herunterladen") }}</a>
+        <button v-if="center !== source.chunkIdx" type="button" @click="center = source.chunkIdx; load()">{{ $t("Zur zitierten Stelle") }}</button>
       </div>
       <div class="source-reading" aria-live="polite">
-        <p v-if="loading" role="status">Die Textstelle wird geladen …</p>
-        <div v-else-if="error" role="alert"><p>{{ error }}</p><Button variant="secondary" @click="load">Erneut versuchen</Button></div>
+        <p v-if="loading" role="status">{{ $t("Die Textstelle wird geladen …") }}</p>
+        <div v-else-if="error" role="alert"><p>{{ error }}</p><Button variant="secondary" @click="load">{{ $t("Erneut versuchen") }}</Button></div>
         <template v-else-if="preview">
           <p v-if="!preview.blocks.length">{{ emptyText }}</p>
           <template v-else>
-            <p v-if="!preview.exactLocation" class="source-caption">Ältere Quelle: Eine genaue Seitenposition wurde noch nicht gespeichert.</p>
-            <Button v-if="preview.hasPrevious" variant="secondary" @click="move(-1)">Vorherige Textabschnitte</Button>
+            <p v-if="!preview.exactLocation" class="source-caption">{{ $t("Ältere Quelle: Eine genaue Seitenposition wurde noch nicht gespeichert.") }}</p>
+            <Button v-if="preview.hasPrevious" variant="secondary" @click="move(-1)">{{ $t("Vorherige Textabschnitte") }}</Button>
             <section v-for="(block, index) in preview.blocks" :key="block.chunkIdx" :data-source-chunk="block.chunkIdx" class="source-block" :class="{'source-cited': block.chunkIdx === source.chunkIdx}" data-testid="document-preview-block">
               <h3 v-if="block.pageNumber && (index === 0 || block.pageNumber !== preview.blocks[index - 1].pageNumber)">{{ sourcePageLabel(source.filename) }} {{ block.pageNumber }}</h3>
-              <p v-if="block.chunkIdx === source.chunkIdx || block.sectionTitle && (index === 0 || block.sectionTitle !== preview.blocks[index - 1].sectionTitle)" class="source-section" data-testid="document-preview-location">{{ block.sectionTitle || `Abschnitt ${block.chunkIdx + 1}` }}</p>
-              <p v-if="block.chunkIdx === source.chunkIdx" class="source-citation-label">Zitierte Textstelle</p>
+              <p v-if="block.chunkIdx === source.chunkIdx || block.sectionTitle && (index === 0 || block.sectionTitle !== preview.blocks[index - 1].sectionTitle)" class="source-section" data-testid="document-preview-location">{{ block.sectionTitle || $t("Abschnitt {0}", block.chunkIdx + 1) }}</p>
+              <p v-if="block.chunkIdx === source.chunkIdx" class="source-citation-label">{{ $t("Zitierte Textstelle") }}</p>
               <mark v-if="block.chunkIdx === source.chunkIdx" data-testid="document-preview-highlight">{{ block.text }}</mark>
               <p v-else class="source-text">{{ block.text }}</p>
             </section>
-            <Button v-if="preview.hasNext" variant="secondary" @click="move(1)">Weitere Textabschnitte</Button>
+            <Button v-if="preview.hasNext" variant="secondary" @click="move(1)">{{ $t("Weitere Textabschnitte") }}</Button>
           </template>
         </template>
       </div>

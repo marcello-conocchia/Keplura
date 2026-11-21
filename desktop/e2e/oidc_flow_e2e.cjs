@@ -252,7 +252,7 @@ async function waitForLoginCard(page) {
   /** One fresh browser context (sockets + cookies) per jar boot. */
   async function openPage() {
     if (context) await context.close().catch(() => {});
-    context = await browser.newContext({ viewport: { width: 1200, height: 1600 } });
+    context = await browser.newContext({ locale: 'de-DE', viewport: { width: 1200, height: 1600 } });
     const page = await context.newPage();
     netLog = [];
     page.on("requestfailed", (req) => netLog.push(`FAIL ${req.method()} ${req.url()} ${req.failure()?.errorText}`));

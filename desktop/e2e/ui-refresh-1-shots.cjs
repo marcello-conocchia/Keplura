@@ -37,7 +37,7 @@ const GEOM_IDS = [
 
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE });
-  const page = await browser.newPage({ viewport: { width: 1100, height: 800 }, colorScheme: "light" });
+  const page = await browser.newPage({ locale: 'de-DE', viewport: { width: 1100, height: 800 }, colorScheme: "light" });
   const shot = (name) => page.screenshot({ path: path.join(OUT_DIR, name) });
 
   await page.goto(BASE, { waitUntil: "networkidle" });

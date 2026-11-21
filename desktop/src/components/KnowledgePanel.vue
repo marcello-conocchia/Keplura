@@ -32,6 +32,7 @@ import { formatSize, statusLabel } from "./knowledge/status";
 import SourcePreview from "./SourcePreview.vue";
 import SourceFreshness from "./ui/SourceFreshness.vue";
 import type { SourceSelection } from "../source-preview";
+import { tr } from "../i18n";
 
 const auth = useAuthStore();
 const previewSource = ref<SourceSelection | null>(null);
@@ -83,8 +84,8 @@ function openKbForm() {
 }
 
 const commonError: Record<string, string> = {
-  expired: "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.",
-  error: "Das hat nicht geklappt. Bitte versuche es später erneut.",
+  expired: tr("Deine Sitzung ist abgelaufen. Bitte melde dich erneut an."),
+  error: tr("Das hat nicht geklappt. Bitte versuche es später erneut."),
 };
 
 async function submitCreateSpace() {
@@ -96,13 +97,13 @@ async function submitCreateSpace() {
   if (outcome.kind === "created") {
     spaceName.value = "";
     spaceFormOpen.value = false;
-    showToast("ok", `Arbeitsbereich „${outcome.item.name}“ angelegt.`);
+    showToast("ok", tr("Arbeitsbereich „{0}“ angelegt.", outcome.item.name));
     return;
   }
   spaceError.value =
-    outcome.kind === "invalid-name" ? `Bitte einen Namen mit 1 bis ${SPACE_NAME_MAX_LENGTH} Zeichen eingeben.`
-    : outcome.kind === "duplicate-name" ? "Einen Arbeitsbereich mit diesem Namen gibt es bereits."
-    : outcome.kind === "parent-gone" ? "Die Organisation ist nicht mehr verfügbar. Die Ansicht wurde aktualisiert."
+    outcome.kind === "invalid-name" ? tr("Bitte einen Namen mit 1 bis {0} Zeichen eingeben.", SPACE_NAME_MAX_LENGTH)
+    : outcome.kind === "duplicate-name" ? tr("Einen Arbeitsbereich mit diesem Namen gibt es bereits.")
+    : outcome.kind === "parent-gone" ? tr("Die Organisation ist nicht mehr verfügbar. Die Ansicht wurde aktualisiert.")
     : commonError[outcome.kind];
 }
 
@@ -115,13 +116,13 @@ async function submitCreateKb() {
   if (outcome.kind === "created") {
     kbName.value = "";
     kbFormOpen.value = false;
-    showToast("ok", `Wissensbasis „${outcome.item.name}“ angelegt.`);
+    showToast("ok", tr("Wissensbasis „{0}“ angelegt.", outcome.item.name));
     return;
   }
   kbError.value =
-    outcome.kind === "invalid-name" ? `Bitte einen Namen mit 1 bis ${KB_NAME_MAX_LENGTH} Zeichen eingeben.`
-    : outcome.kind === "duplicate-name" ? "Eine Wissensbasis mit diesem Namen gibt es bereits."
-    : outcome.kind === "parent-gone" ? "Der Arbeitsbereich ist nicht mehr verfügbar. Die Ansicht wurde aktualisiert."
+    outcome.kind === "invalid-name" ? tr("Bitte einen Namen mit 1 bis {0} Zeichen eingeben.", KB_NAME_MAX_LENGTH)
+    : outcome.kind === "duplicate-name" ? tr("Eine Wissensbasis mit diesem Namen gibt es bereits.")
+    : outcome.kind === "parent-gone" ? tr("Der Arbeitsbereich ist nicht mehr verfügbar. Die Ansicht wurde aktualisiert.")
     : commonError[outcome.kind];
 }
 
@@ -143,7 +144,7 @@ async function submitRename() {
   renaming.value = false;
   if (r.kind === "ok") {
     renameTarget.value = null;
-    showToast("ok", "Wissensbasis umbenannt.");
+    showToast("ok", tr("Wissensbasis umbenannt."));
     await auth.loadKnowledge();
   } else {
     renameError.value = manageErrorText(r.kind);
@@ -154,13 +155,13 @@ type Pending = { kind: "kb"; kb: KnowledgeBase } | { kind: "doc"; doc: Knowledge
 const pendingDelete = ref<Pending | null>(null);
 const deleting = ref(false);
 const deleteError = ref("");
-const deleteTitle = computed(() => (pendingDelete.value?.kind === "kb" ? "Wissensbasis löschen?" : "Dokument löschen?"));
+const deleteTitle = computed(() => (pendingDelete.value?.kind === "kb" ? tr("Wissensbasis löschen?") : tr("Dokument löschen?")));
 const deleteMessage = computed(() => {
   const p = pendingDelete.value;
   if (!p) return "";
   return p.kind === "kb"
-    ? `„${p.kb.name}“ wird mit allen Dokumenten endgültig gelöscht. Chats, die sich darauf bezogen haben, bleiben erhalten, nutzen das Wissen aber nicht mehr.`
-    : `„${p.doc.filename}“ wird endgültig gelöscht und steht im Chat nicht mehr als Quelle zur Verfügung.`;
+    ? tr("„{0}“ wird mit allen Dokumenten endgültig gelöscht. Chats, die sich darauf bezogen haben, bleiben erhalten, nutzen das Wissen aber nicht mehr.", p.kb.name)
+    : tr("„{0}“ wird endgültig gelöscht und steht im Chat nicht mehr als Quelle zur Verfügung.", p.doc.filename);
 });
 function askDelete(p: Pending) {
   deleteError.value = "";
@@ -176,7 +177,7 @@ async function confirmDelete() {
   deleting.value = false;
   if (r.kind === "ok" || r.kind === "not-found") {
     pendingDelete.value = null;
-    showToast("ok", p.kind === "kb" ? "Wissensbasis gelöscht." : "Dokument gelöscht.");
+    showToast("ok", p.kind === "kb" ? tr("Wissensbasis gelöscht.") : tr("Dokument gelöscht."));
     await auth.loadKnowledge();
   } else {
     deleteError.value = manageErrorText(r.kind);
@@ -212,19 +213,19 @@ async function uploadOne(file: File) {
       // zurück zur Liste, damit die neue Datei sichtbar ist
       query.value = "";
       auth.searchResult = null;
-      showToast("ok", `„${outcome.document.filename}“ hochgeladen (${formatSize(outcome.document.sizeBytes)}) – ${statusLabel(outcome.document.indexStatus)}.`);
+      showToast("ok", tr("„{0}“ hochgeladen ({1}) – {2}.", outcome.document.filename, formatSize(outcome.document.sizeBytes), statusLabel(outcome.document.indexStatus)));
       break;
     case "rejected-type":
-      showToast("error", `„${file.name}“ konnte nicht übernommen werden. Erlaubt sind ${acceptText}; die Datei muss lesbar und nicht verschlüsselt sein.`);
+      showToast("error", tr("„{0}“ konnte nicht übernommen werden. Erlaubt sind {1}; die Datei muss lesbar und nicht verschlüsselt sein.", file.name, acceptText));
       break;
     case "too-large":
-      showToast("error", `„${file.name}“ ist zu groß. Die Obergrenze liegt standardmäßig bei 20 MB.`);
+      showToast("error", tr("„{0}“ ist zu groß. Die Obergrenze liegt standardmäßig bei 20 MB.", file.name));
       break;
     case "parser-busy":
-      showToast("error", `Der Server ist gerade ausgelastet. Bitte lade „${file.name}“ gleich noch einmal hoch.`);
+      showToast("error", tr("Der Server ist gerade ausgelastet. Bitte lade „{0}“ gleich noch einmal hoch.", file.name));
       break;
     case "parent-gone":
-      showToast("error", "Die Wissensbasis ist nicht mehr verfügbar. Die Ansicht wurde aktualisiert.");
+      showToast("error", tr("Die Wissensbasis ist nicht mehr verfügbar. Die Ansicht wurde aktualisiert."));
       break;
     default:
       showToast("error", commonError[outcome.kind] ?? commonError.error);
@@ -258,7 +259,7 @@ async function download(doc: KnowledgeDocument) {
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 10000);
   } catch {
-    showToast("error", "Das Dokument konnte nicht geöffnet werden.");
+    showToast("error", tr("Das Dokument konnte nicht geöffnet werden."));
   }
 }
 
@@ -266,10 +267,10 @@ async function reindex(doc: KnowledgeDocument) {
   if (!auth.selectedOrgId || !auth.selectedSpaceId) return;
   const r = await reindexDocument(auth.selectedOrgId, auth.selectedSpaceId, doc.kbId, doc.id);
   if (r.kind === "ok") {
-    showToast("ok", `„${doc.filename}“ wird erneut verarbeitet.`);
+    showToast("ok", tr("„{0}“ wird erneut verarbeitet.", doc.filename));
     await auth.loadKnowledge();
   } else {
-    showToast("error", r.kind === "invalid" ? `„${doc.filename}“ konnte nicht gelesen werden.` : manageErrorText(r.kind));
+    showToast("error", r.kind === "invalid" ? tr("„{0}“ konnte nicht gelesen werden.", doc.filename) : manageErrorText(r.kind));
   }
 }
 
@@ -305,8 +306,8 @@ async function submitSearch() {
   if (outcome.kind === "ok") return;
   showToast(
     "error",
-    outcome.kind === "invalid-query" ? `Bitte einen Suchbegriff mit 1 bis ${SEARCH_QUERY_MAX_LENGTH} Zeichen eingeben.`
-    : outcome.kind === "parent-gone" ? "Die Wissensbasis ist nicht mehr verfügbar. Die Ansicht wurde aktualisiert."
+    outcome.kind === "invalid-query" ? tr("Bitte einen Suchbegriff mit 1 bis {0} Zeichen eingeben.", SEARCH_QUERY_MAX_LENGTH)
+    : outcome.kind === "parent-gone" ? tr("Die Wissensbasis ist nicht mehr verfügbar. Die Ansicht wurde aktualisiert.")
     : commonError[outcome.kind] ?? commonError.error,
   );
 }
@@ -337,10 +338,10 @@ async function reloadAll() {
       </p>
       <div class="kx-bar-actions">
         <Button variant="ghost" data-testid="knowledge-space-new" :disabled="auth.selectedOrgId === null" @click="openSpaceForm">
-          <AppIcon name="plus" :size="13" /> Neuer Arbeitsbereich
+          <AppIcon name="plus" :size="13" /> {{ $t("Neuer Arbeitsbereich") }}
         </Button>
 
-        <Button variant="icon" class="p-[6px]" data-testid="knowledge-reload" title="Aktualisieren" aria-label="Aktualisieren" @click="reloadAll">
+        <Button variant="icon" class="p-[6px]" data-testid="knowledge-reload" :title="$t('Aktualisieren')" :aria-label="$t('Aktualisieren')" @click="reloadAll">
           <AppIcon name="refresh" :size="13" />
         </Button>
       </div>
@@ -350,9 +351,9 @@ async function reloadAll() {
     <p v-if="toast" class="note" :class="toastKind" role="status" data-testid="knowledge-toast">{{ toast }}</p>
 
     <div v-if="auth.selectedSpaceId === null && auth.selectedOrgId !== null" class="empty">
-      <h2>Noch kein Arbeitsbereich</h2>
-      <p>Ein Arbeitsbereich bündelt Wissen und Chats eines Teams, zum Beispiel „Vertrieb“ oder „Produktion“.</p>
-      <Button variant="primary" @click="openSpaceForm">Arbeitsbereich anlegen</Button>
+      <h2>{{ $t("Noch kein Arbeitsbereich") }}</h2>
+      <p>{{ $t("Ein Arbeitsbereich bündelt Wissen und Chats eines Teams, zum Beispiel „Vertrieb“ oder „Produktion“.") }}</p>
+      <Button variant="primary" @click="openSpaceForm">{{ $t("Arbeitsbereich anlegen") }}</Button>
     </div>
 
     <div v-else-if="auth.selectedSpaceId !== null" class="kx-grid">
@@ -376,8 +377,8 @@ async function reloadAll() {
       >
         <template v-if="auth.selectedKb">
           <div class="kx-head">
-            <div class="kx-heading"><h2 class="kx-title">{{ auth.selectedKb.name }}</h2><p class="kx-description"><span class="ic-num">{{auth.documents.length}}</span> {{ auth.documents.length === 1 ? 'Dokument' : 'Dokumente' }} · Dateien und Inhalte dieser Wissensbasis</p></div>
-            <Button variant="primary" data-testid="knowledge-upload-button" :disabled="uploading" @click="openFilePicker"><AppIcon name="upload" :size="16" />Dateien hochladen</Button>
+            <div class="kx-heading"><h2 class="kx-title">{{ auth.selectedKb.name }}</h2><p class="kx-description"><span class="ic-num">{{auth.documents.length}}</span> {{ auth.documents.length === 1 ? $t("Dokument · Dateien und Inhalte dieser Wissensbasis") : $t("Dokumente · Dateien und Inhalte dieser Wissensbasis") }}</p></div>
+            <Button variant="primary" data-testid="knowledge-upload-button" :disabled="uploading" @click="openFilePicker"><AppIcon name="upload" :size="16" />{{ $t("Dateien hochladen") }}</Button>
             <input
               id="knowledge-upload"
               ref="fileInputRef"
@@ -393,46 +394,46 @@ async function reloadAll() {
           </div>
 
           <form class="search" data-testid="knowledge-search-form" role="search" @submit.prevent="submitSearch">
-            <div class="search-entry"><Input label="In dieser Wissensbasis suchen" label-hidden icon="search"
+            <div class="search-entry"><Input :label="$t('In dieser Wissensbasis suchen')" label-hidden icon="search"
               id="knowledge-search-query"
               v-model="query"
               data-testid="knowledge-search-query"
               type="search"
               :maxlength="SEARCH_QUERY_MAX_LENGTH"
-              :placeholder="`In „${auth.selectedKb.name}“ suchen …`"
+              :placeholder="$t('In „{0}“ suchen …', auth.selectedKb.name)"
               autocomplete="off"
             /></div>
-            <Button v-if="auth.searchResult" variant="ghost" @click="clearSearch">Zurücksetzen</Button>
+            <Button v-if="auth.searchResult" variant="ghost" @click="clearSearch">{{ $t("Zurücksetzen") }}</Button>
             <Button type="submit" variant="secondary" data-testid="knowledge-search-submit" :disabled="!canSearch">
-              {{ searching ? "Suche…" : "Suchen" }}
+              {{ searching ? $t("Suche…") : $t("Suchen") }}
             </Button>
           </form>
 
           <p v-if="uploading" class="progress" role="status" data-testid="knowledge-upload-progress">
-            <span class="spinner" aria-hidden="true"></span> „{{ uploadFileName }}“ wird hochgeladen …
+            <span class="spinner" aria-hidden="true"></span> {{ $t("„{0}“ wird hochgeladen …", uploadFileName) }}
           </p>
 
-          <section v-if="auth.searchResult" class="results" aria-label="Suchergebnisse">
+          <section v-if="auth.searchResult" class="results" :aria-label="$t('Suchergebnisse')">
             <p class="results-sum" data-testid="knowledge-search-summary">
               <span class="ic-num">{{ auth.searchResult.results.length }}</span>
-              {{ auth.searchResult.results.length === 1 ? "Fundstelle" : "Fundstellen" }} für „{{ auth.searchResult.query }}“
+              {{ $t("{0} für „{1}“", auth.searchResult.results.length === 1 ? $t("Fundstelle") : $t("Fundstellen"), auth.searchResult.query) }}
             </p>
             <ol v-if="auth.searchResult.results.length" class="hits" data-testid="knowledge-result-list">
               <li v-for="(hit, i) in auth.searchResult.results" :key="i" class="hit" data-testid="knowledge-result-item">
                 <p class="hit-src" data-testid="knowledge-result-source">
                   <AppIcon name="doc" :size="13" />
                   <button type="button" class="source-name" @click="openSearchSource(hit)">{{ hit.filename }}</button>
-                  <span class="hit-part">{{ hit.pageNumber ? `${sourcePageLabel(hit.filename)} ${hit.pageNumber} · ` : "" }}{{ hit.sectionTitle || `Abschnitt ${hit.chunkIdx + 1}` }}</span>
+                  <span class="hit-part">{{ hit.pageNumber ? `${sourcePageLabel(hit.filename)} ${hit.pageNumber} · ` : "" }}{{ hit.sectionTitle || $t("Abschnitt {0}", hit.chunkIdx + 1) }}</span>
                   <span data-testid="knowledge-result-score" hidden>{{ hit.score.toFixed(3) }}</span>
                 </p>
                 <SourceFreshness :value="hit.sourceUpdatedAt" />
                 <p class="hit-text" data-testid="knowledge-result-snippet">{{ hit.text }}</p>
               </li>
             </ol>
-            <p v-else class="muted" data-testid="knowledge-result-empty">Nichts gefunden. Versuche andere oder weniger Begriffe.</p>
+            <p v-else class="muted" data-testid="knowledge-result-empty">{{ $t("Nichts gefunden. Versuche andere oder weniger Begriffe.") }}</p>
           </section>
 
-          <div v-else-if="(auth.documentsBusy || auth.knowledgeBusy) && !auth.documents.length && !uploading" class="knowledge-loading" role="status" data-testid="knowledge-loading">Dokumente werden geladen …</div>
+          <div v-else-if="(auth.documentsBusy || auth.knowledgeBusy) && !auth.documents.length && !uploading" class="knowledge-loading" role="status" data-testid="knowledge-loading">{{ $t("Dokumente werden geladen …") }}</div>
           <DocumentTable
             v-else
             :key="auth.selectedKb.id"
@@ -445,44 +446,44 @@ async function reloadAll() {
             <template #empty>
               <div class="drop" data-testid="knowledge-doc-empty">
                 <AppIcon name="upload" />
-                <p><strong>Noch keine Dokumente.</strong> Ziehe Dateien hierher oder wähle „Hochladen“.</p>
-                <p class="muted">{{ acceptText }} · bis 20 MB je Datei</p>
+                <p><strong>{{ $t("Noch keine Dokumente.") }}</strong> {{ $t("Ziehe Dateien hierher oder wähle „Hochladen“.") }}</p>
+                <p class="muted">{{ $t("{0} · bis 20 MB je Datei", acceptText) }}</p>
               </div>
             </template>
           </DocumentTable>
         </template>
         <div v-else class="empty slim">
-          <p>Wähle eine Wissensbasis aus oder lege eine neue an.</p>
+          <p>{{ $t("Wähle eine Wissensbasis aus oder lege eine neue an.") }}</p>
         </div>
       </div>
     </div>
 
-    <AppDialog :open="spaceFormOpen" title="Neuer Arbeitsbereich" :error="spaceError" @close="spaceFormOpen = false">
+    <AppDialog :open="spaceFormOpen" :title="$t('Neuer Arbeitsbereich')" :error="spaceError" @close="spaceFormOpen = false">
       <form data-testid="knowledge-space-form" class="dlg" @submit.prevent="submitCreateSpace">
-        <Input id="knowledge-space-name" v-model="spaceName" label="Name" data-testid="knowledge-space-name" :maxlength="SPACE_NAME_MAX_LENGTH" autocomplete="off" :disabled="creatingSpace" required />
+        <Input id="knowledge-space-name" v-model="spaceName" :label="$t('Name')" data-testid="knowledge-space-name" :maxlength="SPACE_NAME_MAX_LENGTH" autocomplete="off" :disabled="creatingSpace" required />
         <div class="dlg-actions">
-          <Button variant="ghost" @click="spaceFormOpen = false">Abbrechen</Button>
-          <Button type="submit" variant="primary" data-testid="knowledge-space-submit" :disabled="!canCreateSpace">{{ creatingSpace ? "Wird angelegt…" : "Anlegen" }}</Button>
+          <Button variant="ghost" @click="spaceFormOpen = false">{{ $t("Abbrechen") }}</Button>
+          <Button type="submit" variant="primary" data-testid="knowledge-space-submit" :disabled="!canCreateSpace">{{ creatingSpace ? $t("Wird angelegt…") : $t("Anlegen") }}</Button>
         </div>
       </form>
     </AppDialog>
 
-    <AppDialog :open="kbFormOpen" title="Neue Wissensbasis" :error="kbError" @close="kbFormOpen = false">
+    <AppDialog :open="kbFormOpen" :title="$t('Neue Wissensbasis')" :error="kbError" @close="kbFormOpen = false">
       <form data-testid="knowledge-kb-form" class="dlg" @submit.prevent="submitCreateKb">
-        <Input id="knowledge-kb-name" v-model="kbName" label="Name" data-testid="knowledge-kb-name" :maxlength="KB_NAME_MAX_LENGTH" autocomplete="off" :disabled="creatingKb" required />
+        <Input id="knowledge-kb-name" v-model="kbName" :label="$t('Name')" data-testid="knowledge-kb-name" :maxlength="KB_NAME_MAX_LENGTH" autocomplete="off" :disabled="creatingKb" required />
         <div class="dlg-actions">
-          <Button variant="ghost" @click="kbFormOpen = false">Abbrechen</Button>
-          <Button type="submit" variant="primary" data-testid="knowledge-kb-submit" :disabled="!canCreateKb">{{ creatingKb ? "Wird angelegt…" : "Anlegen" }}</Button>
+          <Button variant="ghost" @click="kbFormOpen = false">{{ $t("Abbrechen") }}</Button>
+          <Button type="submit" variant="primary" data-testid="knowledge-kb-submit" :disabled="!canCreateKb">{{ creatingKb ? $t("Wird angelegt…") : $t("Anlegen") }}</Button>
         </div>
       </form>
     </AppDialog>
 
-    <AppDialog :open="renameTarget !== null" title="Wissensbasis umbenennen" :error="renameError" @close="renameTarget = null">
+    <AppDialog :open="renameTarget !== null" :title="$t('Wissensbasis umbenennen')" :error="renameError" @close="renameTarget = null">
       <form class="dlg" data-testid="knowledge-kb-rename-form" @submit.prevent="submitRename">
-        <Input id="knowledge-kb-rename" v-model="renameValue" label="Neuer Name" :maxlength="KB_NAME_MAX_LENGTH" autocomplete="off" :disabled="renaming" required />
+        <Input id="knowledge-kb-rename" v-model="renameValue" :label="$t('Neuer Name')" :maxlength="KB_NAME_MAX_LENGTH" autocomplete="off" :disabled="renaming" required />
         <div class="dlg-actions">
-          <Button variant="ghost" @click="renameTarget = null">Abbrechen</Button>
-          <Button type="submit" variant="primary" :disabled="renaming || renameValue.trim() === ''">Speichern</Button>
+          <Button variant="ghost" @click="renameTarget = null">{{ $t("Abbrechen") }}</Button>
+          <Button type="submit" variant="primary" :disabled="renaming || renameValue.trim() === ''">{{ $t("Speichern") }}</Button>
         </div>
       </form>
     </AppDialog>
@@ -493,7 +494,7 @@ async function reloadAll() {
       :message="deleteMessage"
       :busy="deleting"
       :error="deleteError"
-      confirm-label="Endgültig löschen"
+      :confirm-label="$t('Endgültig löschen')"
       @confirm="confirmDelete"
       @close="pendingDelete = null"
     />

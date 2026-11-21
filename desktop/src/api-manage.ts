@@ -3,6 +3,7 @@
 // and error discipline as api.ts — coarse outcomes, no server text in the UI.
 import { desktopFetch } from "./transport";
 import { serverUrl } from "./api";
+import { tr } from "./i18n";
 
 export type ManageOutcome<T = void> =
   | { kind: "ok"; data: T }
@@ -62,12 +63,12 @@ export const removeMember = (o: number, userId: number) => send("DELETE", `/api/
 /** Plain-language message for a failed management call. */
 export function manageErrorText(kind: Exclude<ManageOutcome["kind"], "ok">): string {
   switch (kind) {
-    case "forbidden": return "Dafür fehlt dir die Berechtigung. Wende dich an eine Verwalterin oder einen Verwalter.";
-    case "conflict": return "Dieser Name ist bereits vergeben.";
-    case "invalid": return "Die Eingabe ist ungültig.";
-    case "not-found": return "Der Eintrag existiert nicht mehr. Die Ansicht wurde aktualisiert.";
-    case "expired": return "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.";
-    default: return "Das hat nicht geklappt. Bitte versuche es später erneut.";
+    case "forbidden": return tr("Dafür fehlt dir die Berechtigung. Wende dich an eine Verwalterin oder einen Verwalter.");
+    case "conflict": return tr("Dieser Name ist bereits vergeben.");
+    case "invalid": return tr("Die Eingabe ist ungültig.");
+    case "not-found": return tr("Der Eintrag existiert nicht mehr. Die Ansicht wurde aktualisiert.");
+    case "expired": return tr("Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.");
+    default: return tr("Das hat nicht geklappt. Bitte versuche es später erneut.");
   }
 }
 

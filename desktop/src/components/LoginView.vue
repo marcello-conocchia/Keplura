@@ -8,6 +8,7 @@ import AppIcon from "./ui/AppIcon.vue";
 import Button from "./ui/Button.vue";
 import Input from "./ui/Input.vue";
 import AccessShell from "./layout/AccessShell.vue";
+import { tr, locale, setLocale } from "../i18n";
 
 /**
  * Login form (M2d, restyled UI-1 to DESIGN.md mockup panel 1): centred card
@@ -45,7 +46,7 @@ const messageKind = ref<"error" | "warn" | "">("");
 /** Instance of the Input component — only the exposed focus() is used. */
 const emailRef = ref<{ focus: () => void } | null>(null);
 
-const OFFLINE_TEXT = "Server nicht erreichbar. Bitte Verbindung prüfen.";
+const OFFLINE_TEXT = tr("Server nicht erreichbar. Bitte Verbindung prüfen.");
 /** Kein doppelter Hinweis: steht oben schon „nicht erreichbar“, entfällt die gleichlautende Meldung. */
 const showMessage = computed(() => message.value !== "" && !(props.status === "unreachable" && message.value === OFFLINE_TEXT));
 
@@ -62,10 +63,10 @@ const emit = defineEmits<{ retry: [] }>();
 /** User-facing connection state stays German on browser and desktop. */
 const statusLabel = computed(() =>
   props.status === "connected"
-    ? "Verbunden"
+    ? tr("Verbunden")
     : props.status === "unreachable"
-      ? "Keine Verbindung"
-      : "Verbindung wird geprüft …",
+      ? tr("Keine Verbindung")
+      : tr("Verbindung wird geprüft …"),
 );
 
 /** Origin part of the configured server URL for the quiet footer line. */
@@ -81,10 +82,10 @@ const serverHost = computed(() => {
 const themeModeLabel = computed(
   () =>
     theme.mode === "light"
-      ? "Hell"
+      ? tr("Hell")
       : theme.mode === "dark"
-        ? "Dunkel"
-        : "System",
+        ? tr("Dunkel")
+        : tr("System"),
 );
 const themeIcon = computed(() =>
   theme.mode === "light"
@@ -108,14 +109,14 @@ async function submit() {
       break;
     case "invalid":
       messageKind.value = "error";
-      message.value = "Anmeldung fehlgeschlagen. Bitte E-Mail bzw. Benutzername und Passwort prüfen.";
+      message.value = tr("Anmeldung fehlgeschlagen. Bitte E-Mail bzw. Benutzername und Passwort prüfen.");
       break;
     case "rate-limited":
       messageKind.value = "warn";
       message.value =
-        "Zu viele Versuche. Bitte später erneut anmelden" +
+        tr("Zu viele Versuche. Bitte später erneut anmelden") +
         (outcome.retryAfterSeconds
-          ? ` (ca. ${Math.ceil(outcome.retryAfterSeconds / 60)} Minute(n) warten).`
+          ? tr(" (ca. {0} Minute(n) warten).", Math.ceil(outcome.retryAfterSeconds / 60))
           : ".");
       break;
     case "offline":
@@ -124,7 +125,7 @@ async function submit() {
       break;
     case "server-error":
       messageKind.value = "error";
-      message.value = "Anmeldung derzeit nicht möglich. Bitte später erneut versuchen.";
+      message.value = tr("Anmeldung derzeit nicht möglich. Bitte später erneut versuchen.");
       break;
   }
 }
@@ -149,12 +150,12 @@ function startOidc() {
 <template>
   <AccessShell
     data-testid="login-card"
-    title="Willkommen im Teamwissen"
-    intro="Melde dich mit deinen Zugangsdaten an, um Dokumente zu finden und Fragen zu stellen."
+    :title="$t('Willkommen im Teamwissen')"
+    :intro="$t('Melde dich mit deinen Zugangsdaten an, um Dokumente zu finden und Fragen zu stellen.')"
   >
     <div v-if="status === 'unreachable'" class="connection-note error login-offline" role="alert" data-testid="login-offline">
-      <p>Der Keplura-Server ist gerade nicht erreichbar. Prüfe die Verbindung und versuche es erneut.</p>
-      <Button size="compact" data-testid="connection-retry" @click="emit('retry')">Erneut versuchen</Button>
+      <p>{{ $t("Der Keplura-Server ist gerade nicht erreichbar. Prüfe die Verbindung und versuche es erneut.") }}</p>
+      <Button size="compact" data-testid="connection-retry" @click="emit('retry')">{{ $t("Erneut versuchen") }}</Button>
     </div>
 
     <form class="login-form" data-testid="login-form" @submit.prevent="submit">
@@ -162,7 +163,7 @@ function startOidc() {
         id="login-email"
         ref="emailRef"
         v-model="email"
-        label="E-Mail oder Benutzername"
+        :label="$t('E-Mail oder Benutzername')"
         type="text"
         data-testid="login-email"
         autocomplete="username"
@@ -171,7 +172,7 @@ function startOidc() {
       <Input
         id="login-password"
         v-model="password"
-        label="Passwort"
+        :label="$t('Passwort')"
         type="password"
         data-testid="login-password"
         autocomplete="current-password"
@@ -180,7 +181,7 @@ function startOidc() {
 
       <label class="login-remember">
         <input v-model="rememberMe" type="checkbox" data-testid="login-remember-me" :disabled="auth.busy" />
-        Angemeldet bleiben
+        {{ $t("Angemeldet bleiben") }}
       </label>
 
       <p
@@ -198,7 +199,7 @@ function startOidc() {
         data-testid="login-submit"
         :disabled="!canSubmit || auth.busy"
       >
-        {{ auth.busy ? "Anmelden…" : "Anmelden" }}
+        {{ auth.busy ? $t("Anmelden…") : $t("Anmelden") }}
       </Button>
     </form>
 
@@ -206,11 +207,11 @@ function startOidc() {
          Firmen-IdP meldet (Capabilities-Abfrage, schließt bei Fehler). -->
     <div v-if="oidcActive" class="login-oidc">
       <p v-if="auth.oidcFailed" class="connection-note error" role="alert" data-testid="login-oidc-message">
-        Anmeldung über das Firmenkonto fehlgeschlagen. Bitte erneut versuchen oder mit E-Mail und Passwort anmelden.
+        {{ $t("Anmeldung über das Firmenkonto fehlgeschlagen. Bitte erneut versuchen oder mit E-Mail und Passwort anmelden.") }}
       </p>
-      <div aria-hidden="true" class="login-or"><span></span>oder<span></span></div>
+      <div aria-hidden="true" class="login-or"><span></span>{{ $t("oder") }}<span></span></div>
       <Button variant="outline" class="login-submit" data-testid="login-oidc-button" :disabled="auth.busy" @click="startOidc">
-        Mit Firmenkonto anmelden
+        {{ $t("Mit Firmenkonto anmelden") }}
       </Button>
     </div>
 
@@ -226,16 +227,25 @@ function startOidc() {
             variant="icon"
             size="compact"
             data-testid="theme-toggle"
-            :title="`Darstellung: ${themeModeLabel}`"
-            :aria-label="`Darstellung wechseln, aktuell ${themeModeLabel}`"
+            :title="$t('Darstellung: {0}', themeModeLabel)"
+            :aria-label="$t('Darstellung wechseln, aktuell {0}', themeModeLabel)"
             @click="theme.cycle()"
           ><AppIcon :name="themeIcon" :size="15" /></Button>
           <Button
             variant="icon"
             size="compact"
+            data-testid="locale-toggle"
+            :lang="locale === 'de' ? 'en' : 'de'"
+            :title="locale === 'de' ? 'Switch to English' : 'Auf Deutsch umstellen'"
+            :aria-label="locale === 'de' ? 'Switch to English' : 'Auf Deutsch umstellen'"
+            @click="setLocale(locale === 'de' ? 'en' : 'de')"
+          ><span class="login-locale">{{ locale === "de" ? "EN" : "DE" }}</span></Button>
+          <Button
+            variant="icon"
+            size="compact"
             data-testid="fullscreen-toggle"
-            :title="isFullscreen ? 'Vollbild verlassen (Escape)' : 'Vollbild (F11)'"
-            :aria-label="isFullscreen ? 'Vollbild verlassen' : 'Vollbild aktivieren'"
+            :title="isFullscreen ? $t('Vollbild verlassen (Escape)') : $t('Vollbild (F11)')"
+            :aria-label="isFullscreen ? $t('Vollbild verlassen') : $t('Vollbild aktivieren')"
             @click="void toggleFullscreen()"
           ><AppIcon :name="isFullscreen ? 'compress' : 'expand'" :size="15" /></Button>
         </span>
@@ -245,6 +255,7 @@ function startOidc() {
 </template>
 
 <style scoped>
+.login-locale { font: 600 12px/16px var(--ic-font); letter-spacing: .02em; }
 .login-offline { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
 .login-offline p { margin: 0; }
 .login-form { display: grid; gap: 4px; }

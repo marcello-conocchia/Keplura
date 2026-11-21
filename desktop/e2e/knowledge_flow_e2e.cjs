@@ -154,7 +154,7 @@ async function bootSession(page, email, password, orgName) {
 }
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE });
-  const page = await browser.newPage({ viewport: { width: 1100, height: 1400 } });
+  const page = await browser.newPage({ locale: 'de-DE', viewport: { width: 1100, height: 1400 } });
   const shot = (name) => page.screenshot({ path: path.join(OUT_DIR, name), fullPage: true });
 
   // --- login ---

@@ -5,7 +5,9 @@ const fs = require("node:fs");
 const path = require("node:path");
 const code = ts.transpileModule(fs.readFileSync(path.join(__dirname, "../src/source-freshness.ts"), "utf8"), {compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
 const compiled = {exports:{}};
-new Function("exports", code)(compiled.exports);
+// German UI strings: stand-in for src/i18n.ts (no Vue needed here)
+const i18n = { tr: (s) => s, dateLocale: () => "de-DE" };
+new Function("exports", "require", code)(compiled.exports, (m) => (m === "./i18n" ? i18n : require(m)));
 const { sourceFreshness } = compiled.exports;
 const now = new Date("2026-11-15T12:00:00Z");
 test("Drei Kalenderjahre: Grenze ist frisch, erst davor älter", () => {

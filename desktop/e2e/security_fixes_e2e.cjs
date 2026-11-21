@@ -31,7 +31,7 @@ async function request(page, path, method = 'GET', body) {
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', headless: true,
     args: ['--no-sandbox', '--disable-dev-shm-usage'] });
   try {
-    const admin = await browser.newContext();
+    const admin = await browser.newContext({ locale: 'de-DE' });
     const page = await admin.newPage();
     await login(page, email, password);
     await page.getByTestId('sidebar-nav-admin').waitFor();
@@ -57,7 +57,7 @@ async function request(page, path, method = 'GET', body) {
       email: colleague, displayName: 'Synthetic colleague',
     });
     assert.equal(member.status, 201); assert(member.body.startPassword);
-    const separate = await browser.newContext();
+    const separate = await browser.newContext({ locale: 'de-DE' });
     const userPage = await separate.newPage();
     await login(userPage, colleague, member.body.startPassword);
     await userPage.getByTestId('change-password-view').waitFor();

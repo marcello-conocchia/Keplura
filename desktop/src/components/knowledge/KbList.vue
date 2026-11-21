@@ -14,9 +14,9 @@ onMounted(() => { media = matchMedia("(min-width: 1280px)"); update(); media.add
 onUnmounted(() => media?.removeEventListener("change", update));
 </script>
 <template>
-  <aside class="kbl" aria-label="Wissensbasen" :class="{ compact: !wide }">
+  <aside class="kbl" :aria-label="$t('Wissensbasen')" :class="{ compact: !wide }">
     <template v-if="wide">
-      <div class="kbl-head"><h2>Wissensbasen</h2><Button variant="icon" size="compact" data-testid="knowledge-kb-new" title="Neue Wissensbasis" aria-label="Neue Wissensbasis" @click="emit('create')"><AppIcon name="plus" :size="16" /></Button></div>
+      <div class="kbl-head"><h2>{{ $t("Wissensbasen") }}</h2><Button variant="icon" size="compact" data-testid="knowledge-kb-new" :title="$t('Neue Wissensbasis')" :aria-label="$t('Neue Wissensbasis')" @click="emit('create')"><AppIcon name="plus" :size="16" /></Button></div>
       <ul v-if="kbs.length" class="kbl-list" data-testid="knowledge-kb-list">
         <li v-for="kb in kbs" :key="kb.id" class="kbl-item" :class="{ active: kb.id === selectedId }" data-testid="knowledge-kb-item">
           <button type="button" class="kbl-btn" :data-testid="'knowledge-kb-select-' + kb.id" :aria-current="kb.id === selectedId ? 'true' : undefined" @click="emit('select',kb.id)">
@@ -25,27 +25,27 @@ onUnmounted(() => media?.removeEventListener("change", update));
         </li>
       </ul>
       <div v-if="canManage && selected" class="kbl-manage">
-        <Button variant="ghost" size="compact" :data-testid="'knowledge-kb-rename-' + selected.id" @click="emit('rename',selected)"><AppIcon name="edit" :size="13" />Umbenennen</Button>
-        <Button variant="icon" size="compact" :data-testid="'knowledge-kb-delete-' + selected.id" :aria-label="`„${selected.name}“ löschen`" title="Wissensbasis löschen" @click="emit('remove',selected)"><AppIcon name="trash" :size="16" /></Button>
+        <Button variant="ghost" size="compact" :data-testid="'knowledge-kb-rename-' + selected.id" @click="emit('rename',selected)"><AppIcon name="edit" :size="13" />{{ $t("Umbenennen") }}</Button>
+        <Button variant="icon" size="compact" :data-testid="'knowledge-kb-delete-' + selected.id" :aria-label="$t('„{0}“ löschen', selected.name)" :title="$t('Wissensbasis löschen')" @click="emit('remove',selected)"><AppIcon name="trash" :size="16" /></Button>
       </div>
     </template>
     <template v-else>
-      <span class="kbl-caption">Wissensbasis</span>
+      <span class="kbl-caption">{{ $t("Wissensbasis") }}</span>
       <DropdownMenuRoot>
-        <DropdownMenuTrigger class="kbl-switch" data-testid="knowledge-kb-switch" aria-label="Wissensbasis wechseln"><AppIcon name="folder" :size="16" /><span class="kbl-name">{{ selected?.name || 'Bitte auswählen' }}</span><AppIcon class="kbl-chevron" name="chevron" :size="13" /></DropdownMenuTrigger>
+        <DropdownMenuTrigger class="kbl-switch" data-testid="knowledge-kb-switch" :aria-label="$t('Wissensbasis wechseln')"><AppIcon name="folder" :size="16" /><span class="kbl-name">{{ selected?.name || $t("Bitte auswählen") }}</span><AppIcon class="kbl-chevron" name="chevron" :size="13" /></DropdownMenuTrigger>
         <DropdownMenuPortal><DropdownMenuContent class="ic-menu" :side-offset="8" align="start">
-          <DropdownMenuItem v-for="kb in kbs" :key="kb.id" class="ic-menu-item" :data-testid="'knowledge-kb-select-'+kb.id" @select="emit('select',kb.id)"><AppIcon name="folder" :size="16" /><span class="ic-menu-text">{{kb.name}}</span><span v-if="kb.id===selectedId" aria-label="Ausgewählt">✓</span></DropdownMenuItem>
+          <DropdownMenuItem v-for="kb in kbs" :key="kb.id" class="ic-menu-item" :data-testid="'knowledge-kb-select-'+kb.id" @select="emit('select',kb.id)"><AppIcon name="folder" :size="16" /><span class="ic-menu-text">{{kb.name}}</span><span v-if="kb.id===selectedId" :aria-label="$t('Ausgewählt')">✓</span></DropdownMenuItem>
           <DropdownMenuSeparator v-if="kbs.length" class="ic-menu-sep" />
-          <DropdownMenuItem class="ic-menu-item" data-testid="knowledge-kb-new-menu" @select="emit('create')"><AppIcon name="plus" :size="16" />Neue Wissensbasis</DropdownMenuItem>
+          <DropdownMenuItem class="ic-menu-item" data-testid="knowledge-kb-new-menu" @select="emit('create')"><AppIcon name="plus" :size="16" />{{ $t("Neue Wissensbasis") }}</DropdownMenuItem>
           <template v-if="canManage && selected">
-            <DropdownMenuItem class="ic-menu-item" :data-testid="'knowledge-kb-rename-'+selected.id" @select="emit('rename',selected)"><AppIcon name="edit" :size="16" />Umbenennen</DropdownMenuItem>
-            <DropdownMenuItem class="ic-menu-item" :data-testid="'knowledge-kb-delete-'+selected.id" @select="emit('remove',selected)"><AppIcon name="trash" :size="16" />Wissensbasis löschen</DropdownMenuItem>
+            <DropdownMenuItem class="ic-menu-item" :data-testid="'knowledge-kb-rename-'+selected.id" @select="emit('rename',selected)"><AppIcon name="edit" :size="16" />{{ $t("Umbenennen") }}</DropdownMenuItem>
+            <DropdownMenuItem class="ic-menu-item" :data-testid="'knowledge-kb-delete-'+selected.id" @select="emit('remove',selected)"><AppIcon name="trash" :size="16" />{{ $t("Wissensbasis löschen") }}</DropdownMenuItem>
           </template>
         </DropdownMenuContent></DropdownMenuPortal>
       </DropdownMenuRoot>
-      <Button variant="icon" size="compact" data-testid="knowledge-kb-new" aria-label="Neue Wissensbasis" title="Neue Wissensbasis" @click="emit('create')"><AppIcon name="plus" :size="16" /></Button>
+      <Button variant="icon" size="compact" data-testid="knowledge-kb-new" :aria-label="$t('Neue Wissensbasis')" :title="$t('Neue Wissensbasis')" @click="emit('create')"><AppIcon name="plus" :size="16" /></Button>
     </template>
-    <p v-if="!kbs.length" class="kbl-empty" data-testid="knowledge-kb-empty">Noch keine Wissensbasis. Lege eine an, zum Beispiel „Handbücher“.</p>
+    <p v-if="!kbs.length" class="kbl-empty" data-testid="knowledge-kb-empty">{{ $t("Noch keine Wissensbasis. Lege eine an, zum Beispiel „Handbücher“.") }}</p>
   </aside>
 </template>
 <style scoped>

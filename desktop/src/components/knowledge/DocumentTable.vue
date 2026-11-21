@@ -26,25 +26,25 @@ const groups = computed(() => {
 
 <template>
   <div class="dl">
-    <div v-if="documents.length>8" class="dl-filter"><Input id="knowledge-doc-filter" v-model="filter" label="Dokumente filtern" label-hidden icon="search" type="search" placeholder="Dokumente nach Namen filtern …" data-testid="knowledge-doc-filter" /></div>
+    <div v-if="documents.length>8" class="dl-filter"><Input id="knowledge-doc-filter" v-model="filter" :label="$t('Dokumente filtern')" label-hidden icon="search" type="search" :placeholder="$t('Dokumente nach Namen filtern …')" data-testid="knowledge-doc-filter" /></div>
     <div v-if="documents.length" class="dl-list" data-testid="knowledge-doc-list">
       <section v-for="g in groups" :key="g.status" class="doc-group">
         <button type="button" class="group-heading" :aria-expanded="!collapsed[g.status]" @click="collapsed[g.status]=!collapsed[g.status]">
           <AppIcon class="group-chevron" :class="{open:!collapsed[g.status]}" name="chevron" :size="13" /><StatusRing :status="g.status" /><span>{{statusLabel(g.status)}}</span><span class="group-count ic-num">{{g.docs.length}}</span>
         </button>
         <table v-if="!collapsed[g.status]" :aria-label="statusLabel(g.status)">
-          <thead><tr><th scope="col">Dokument</th><th scope="col" class="size">Größe</th><th scope="col" class="date">Hinzugefügt</th><th scope="col" class="actions-heading"><span class="sr-only">Aktionen</span></th></tr></thead>
+          <thead><tr><th scope="col">{{ $t("Dokument") }}</th><th scope="col" class="size">{{ $t("Größe") }}</th><th scope="col" class="date">{{ $t("Hinzugefügt") }}</th><th scope="col" class="actions-heading"><span class="sr-only">{{ $t("Aktionen") }}</span></th></tr></thead>
           <tbody><tr v-for="doc in g.docs" :key="doc.id" data-testid="knowledge-doc-item">
             <td class="document-cell"><div class="document-name"><AppIcon name="doc" :size="20" /><div class="document-label"><span class="name" data-testid="knowledge-doc-name" :title="doc.filename">{{doc.filename}}</span><span class="document-meta">{{fileType(doc.filename)}}<span class="mobile-meta"> · {{formatSize(doc.sizeBytes)}} · {{formatDate(doc.createdAt)}}</span></span></div></div><span class="sr-only" data-testid="knowledge-doc-status" :data-index-status="doc.indexStatus">{{statusLabel(doc.indexStatus)}}. {{statusHint(doc.indexStatus)}}</span></td>
             <td class="size ic-num">{{formatSize(doc.sizeBytes)}}</td><td class="date ic-num">{{formatDate(doc.createdAt)}}</td>
             <td class="document-actions"><div class="actions">
-              <Button variant="icon" size="compact" title="Herunterladen" :aria-label="`„${doc.filename}“ herunterladen`" data-testid="knowledge-doc-download" @click="emit('download',doc)"><AppIcon name="download" :size="16" /></Button>
-              <template v-if="canChange(doc)"><Button variant="icon" size="compact" title="Erneut verarbeiten" :aria-label="`„${doc.filename}“ erneut verarbeiten`" data-testid="knowledge-doc-reindex" @click="emit('reindex',doc)"><AppIcon name="refresh" :size="16" /></Button><Button variant="icon" size="compact" title="Löschen" :aria-label="`„${doc.filename}“ löschen`" data-testid="knowledge-doc-delete" @click="emit('remove',doc)"><AppIcon name="trash" :size="16" /></Button></template>
+              <Button variant="icon" size="compact" :title="$t('Herunterladen')" :aria-label="$t('„{0}“ herunterladen', doc.filename)" data-testid="knowledge-doc-download" @click="emit('download',doc)"><AppIcon name="download" :size="16" /></Button>
+              <template v-if="canChange(doc)"><Button variant="icon" size="compact" :title="$t('Erneut verarbeiten')" :aria-label="$t('„{0}“ erneut verarbeiten', doc.filename)" data-testid="knowledge-doc-reindex" @click="emit('reindex',doc)"><AppIcon name="refresh" :size="16" /></Button><Button variant="icon" size="compact" :title="$t('Löschen')" :aria-label="$t('„{0}“ löschen', doc.filename)" data-testid="knowledge-doc-delete" @click="emit('remove',doc)"><AppIcon name="trash" :size="16" /></Button></template>
             </div></td>
           </tr></tbody>
         </table>
       </section>
-      <p v-if="!groups.length" class="none">Keine Dokumente passen zum Filter.</p>
+      <p v-if="!groups.length" class="none">{{ $t("Keine Dokumente passen zum Filter.") }}</p>
     </div>
     <slot v-else name="empty" />
   </div>

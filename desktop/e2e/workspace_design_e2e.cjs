@@ -10,7 +10,7 @@ for (const key of ['E2E_EMAIL', 'E2E_PASSWORD', 'E2E_OUT']) {
 (async () => {
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'],
     ...(env.E2E_CHROME ? { executablePath: env.E2E_CHROME } : {}) });
-  const page = await browser.newPage({ viewport: { width: 1600, height: 1050 } });
+  const page = await browser.newPage({ locale: 'de-DE', viewport: { width: 1600, height: 1050 } });
   fs.mkdirSync(env.E2E_OUT, { recursive: true });
   const shot = async name => {
     await page.evaluate(() => document.fonts.ready);

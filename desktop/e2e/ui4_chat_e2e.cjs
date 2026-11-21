@@ -19,7 +19,7 @@ const stamp = Date.now();
 (async () => {
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'],
     ...(env.E2E_CHROME ? { executablePath: env.E2E_CHROME } : {}) });
-  const ctx = await browser.newContext({ viewport: { width: 1440, height: 1000 }, locale: 'de-DE', acceptDownloads: true });
+  const ctx = await browser.newContext({ locale: 'de-DE', viewport: { width: 1440, height: 1000 }, locale: 'de-DE', acceptDownloads: true });
   const page = await ctx.newPage();
   const shot = async (name, full = false) => {
     await page.evaluate(() => document.fonts.ready);

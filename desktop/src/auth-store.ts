@@ -47,6 +47,7 @@ import {
   type Space,
   type UploadOutcome,
 } from "./api";
+import { tr } from "./i18n";
 
 /**
  * Session auth state for the desktop (M2d). Holds ONLY the non-sensitive
@@ -305,7 +306,7 @@ export const useAuthStore = defineStore("auth", () => {
     if (result.kind === "error") {
       // A failed list must never render the previous parent's rows.
       resetSpaceScope();
-      knowledgeError.value = "Bereiche konnten nicht geladen werden.";
+      knowledgeError.value = tr("Bereiche konnten nicht geladen werden.");
       return false;
     }
     spaces.value = result.items;
@@ -374,7 +375,7 @@ export const useAuthStore = defineStore("auth", () => {
     }
     if (result.kind === "error") {
       resetKbScope();
-      knowledgeError.value = "Knowledge Bases konnten nicht geladen werden.";
+      knowledgeError.value = tr("Knowledge Bases konnten nicht geladen werden.");
       return false;
     }
     kbs.value = result.items;
@@ -405,7 +406,7 @@ export const useAuthStore = defineStore("auth", () => {
       if (result.kind === "expired") { dropExpiredSession(); return false; }
       if (result.kind === "error") {
         documents.value = [];
-        knowledgeError.value = "Dokumente konnten nicht geladen werden.";
+        knowledgeError.value = tr("Dokumente konnten nicht geladen werden.");
         return false;
       }
       documents.value = result.items;
@@ -430,7 +431,7 @@ export const useAuthStore = defineStore("auth", () => {
       await loadOrgs();
     }
     if (orgs.value.length === 0) {
-      knowledgeError.value = "Bitte zuerst einer Organisation beitreten oder eine anlegen.";
+      knowledgeError.value = tr("Bitte zuerst einer Organisation beitreten oder eine anlegen.");
       return;
     }
     if (selectedOrgId.value === null || !orgs.value.some((o) => o.id === selectedOrgId.value)) {

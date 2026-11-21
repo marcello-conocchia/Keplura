@@ -20,6 +20,7 @@ import ConfirmDialog from "../ui/ConfirmDialog.vue";
 import ExposureDialog from "./ExposureDialog.vue";
 import Input from "../ui/Input.vue";
 import StatusPill from "../ui/StatusPill.vue";
+import { tr, dateLocale } from "../../i18n";
 
 const auth = useAuthStore();
 const items = ref<DataSource[]>([]);
@@ -60,28 +61,28 @@ onMounted(async () => {
 onBeforeUnmount(() => { disposed = true; listRequest++; if (poll) clearInterval(poll); });
 
 function kbName(id: number) {
-  return auth.kbs.find(k => k.id === id)?.name ?? `Wissensbasis ${id}`;
+  return auth.kbs.find(k => k.id === id)?.name ?? tr("Wissensbasis {0}", id);
 }
 function kindName(d: DataSource) {
-  return d.kind === "SMB" ? "Windows-Freigabe" : d.kind === "SHAREPOINT" ? "SharePoint" : "Linux-Ordner";
+  return d.kind === "SMB" ? tr("Windows-Freigabe") : d.kind === "SHAREPOINT" ? "SharePoint" : tr("Linux-Ordner");
 }
 function operation(d: DataSource) {
-  return d.enabled ? "Aktiv" : d.lastRunStatus ? "Pausiert" : "Nicht aktiviert";
+  return d.enabled ? tr("Aktiv") : d.lastRunStatus ? tr("Pausiert") : tr("Nicht aktiviert");
 }
 function schedule(d: DataSource) {
-  if (!d.enabled) return d.lastRunStatus ? "Zeitplan pausiert" : "Zeitplan noch nicht aktiv";
-  if (d.intervalMinutes === 60) return "Stündlich";
-  if (d.intervalMinutes === 1440) return "Täglich";
-  if (d.intervalMinutes % 60 === 0) return `Alle ${d.intervalMinutes / 60} Stunden`;
-  return `Alle ${d.intervalMinutes} Minuten`;
+  if (!d.enabled) return d.lastRunStatus ? tr("Zeitplan pausiert") : tr("Zeitplan noch nicht aktiv");
+  if (d.intervalMinutes === 60) return tr("Stündlich");
+  if (d.intervalMinutes === 1440) return tr("Täglich");
+  if (d.intervalMinutes % 60 === 0) return tr("Alle {0} Stunden", d.intervalMinutes / 60);
+  return tr("Alle {0} Minuten", d.intervalMinutes);
 }
 function statusText(d: DataSource): string {
   switch (d.lastRunStatus) {
-    case "RUNNING": return "Wird abgeglichen";
-    case "OK": return "Erfolgreich";
-    case "PARTIAL": return "Teilweise erfolgreich";
-    case "FAILED": return "Fehlgeschlagen";
-    default: return "Noch kein Abgleich";
+    case "RUNNING": return tr("Wird abgeglichen");
+    case "OK": return tr("Erfolgreich");
+    case "PARTIAL": return tr("Teilweise erfolgreich");
+    case "FAILED": return tr("Fehlgeschlagen");
+    default: return tr("Noch kein Abgleich");
   }
 }
 function tone(d: DataSource): "ok" | "wait" | "error" | "neutral" {
@@ -93,9 +94,9 @@ const activeCount = computed(() => items.value.filter(d => d.enabled).length);
 const pausedCount = computed(() => items.value.filter(d => !d.enabled && d.lastRunStatus).length);
 const newCount = computed(() => items.value.filter(d => !d.enabled && !d.lastRunStatus).length);
 const visibleItems = computed(() => {
-  const q = query.value.trim().toLocaleLowerCase("de-DE");
+  const q = query.value.trim().toLocaleLowerCase(dateLocale());
   return items.value.filter(d => {
-    const matches = !q || [d.displayName, d.location, kbName(d.knowledgeBaseId), kindName(d)].some(t => t.toLocaleLowerCase("de-DE").includes(q));
+    const matches = !q || [d.displayName, d.location, kbName(d.knowledgeBaseId), kindName(d)].some(t => t.toLocaleLowerCase(dateLocale()).includes(q));
     return matches && (filter.value === "all" || filter.value === "active" && d.enabled
       || filter.value === "paused" && !d.enabled && !!d.lastRunStatus
       || filter.value === "new" && !d.enabled && !d.lastRunStatus
@@ -127,7 +128,7 @@ function afterMenuClose(event: Event) {
 }
 
 function when(iso: string | null) {
-  return iso ? new Date(iso).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" }) : "–";
+  return iso ? new Date(iso).toLocaleString(dateLocale(), { dateStyle: "short", timeStyle: "short" }) : "–";
 }
 function size(b: number) {
   return b >= 1024 ** 3 ? `${(b / 1024 ** 3).toFixed(1)} GB` : b >= 1024 ** 2 ? `${Math.round(b / 1024 ** 2)} MB` : `${Math.round(b / 1024)} KB`;
@@ -161,7 +162,7 @@ const savedWizard = ref("");
 const stepHeading = ref<HTMLElement | null>(null);
 const wizardDirty = computed(() => JSON.stringify(w.value) !== savedWizard.value);
 watch(step, async () => { await nextTick(); stepHeading.value?.focus(); });
-const stepTitles = ["Art der Ablage", "Verbindung", "Auswahl", "Rechte", "Zeitplan", "Aktivieren"];
+const stepTitles = [tr("Art der Ablage"), tr("Verbindung"), tr("Auswahl"), tr("Rechte"), tr("Zeitplan"), tr("Aktivieren")];
 
 function startWizard(existing?: DataSource) {
   error.value = "";
@@ -250,8 +251,8 @@ async function activate() {
   const run = await runDataSource(source.value.id);
   busy.value = false;
   open.value = false;
-  if (run.kind === "ok") show("ok", `„${u.value.displayName}“ ist aktiv. Der erste Abgleich läuft – das kann je nach Menge einige Minuten dauern.`);
-  else show("error", `„${u.value.displayName}“ ist aktiviert, aber der erste Abgleich konnte nicht gestartet werden: ${resultText(run)} Starte ihn in der Liste mit „Jetzt abgleichen“ erneut.`);
+  if (run.kind === "ok") show("ok", tr("„{0}“ ist aktiv. Der erste Abgleich läuft – das kann je nach Menge einige Minuten dauern.", u.value.displayName));
+  else show("error", tr("„{0}“ ist aktiviert, aber der erste Abgleich konnte nicht gestartet werden: {1} Starte ihn in der Liste mit „Jetzt abgleichen“ erneut.", u.value.displayName, resultText(run)));
   await load();
 }
 
@@ -266,7 +267,7 @@ async function runNow(d: DataSource) {
   pending.value.add(d.id);
   try {
     const r = await runDataSource(d.id);
-    if (r.kind === "ok") show("ok", `Abgleich von „${d.displayName}“ gestartet.`);
+    if (r.kind === "ok") show("ok", tr("Abgleich von „{0}“ gestartet.", d.displayName));
     else show("error", resultText(r));
     await load();
   } finally { pending.value.delete(d.id); }
@@ -278,7 +279,7 @@ async function toggle(d: DataSource) {
     const r = await updateDataSource(d.id, { enabled: !d.enabled });
     if (r.kind === "ok") {
       items.value = items.value.map(item => item.id === d.id ? r.value : item);
-      show("ok", `Automatischer Abgleich für „${d.displayName}“ ${r.value.enabled ? 'aktiviert' : 'pausiert'}.`);
+      show("ok", tr("Automatischer Abgleich für „{0}“ {1}.", d.displayName, r.value.enabled ? 'aktiviert' : 'pausiert'));
     } else show("error", resultText(r));
     await load();
     await focusAfterRemoval(d.id);
@@ -320,7 +321,7 @@ async function confirmDelete() {
     const r = await deleteDataSource(d.id);
     if (r.kind === "ok") {
       deleteTarget.value = null;
-      show("ok", "Datenquelle entfernt. Die übernommenen Dokumente wurden aus Keplura gelöscht; die Originale bleiben unverändert.");
+      show("ok", tr("Datenquelle entfernt. Die übernommenen Dokumente wurden aus Keplura gelöscht; die Originale bleiben unverändert."));
       await load(); await focusAfterRemoval(d.id);
     } else deleteError.value = resultText(r);
   } finally { deleting.value = false; }
@@ -331,210 +332,204 @@ async function confirmDelete() {
 <template>
   <section class="ds" data-testid="admin-datasources-section">
     <header class="ds-overview-head">
-      <div><h2>Datenquellen</h2><p class="ds-lead">Verbinde Ablagen und übernimm Dateien mit ihren Zugriffsrechten.</p></div>
+      <div><h2>{{ $t("Datenquellen") }}</h2><p class="ds-lead">{{ $t("Verbinde Ablagen und übernimm Dateien mit ihren Zugriffsrechten.") }}</p></div>
       <div class="ds-head-actions">
-        <Button variant="icon" size="compact" data-testid="datasource-reload" :disabled="refreshing" :busy="refreshing" title="Datenquellen aktualisieren" aria-label="Datenquellen aktualisieren" @click="load"><AppIcon name="refresh" :size="16" /></Button>
-        <Button variant="primary" :disabled="auth.kbs.length === 0" data-testid="datasource-create" @click="startWizard()"><AppIcon name="plus" :size="16" />Datenquelle hinzufügen</Button>
+        <Button variant="icon" size="compact" data-testid="datasource-reload" :disabled="refreshing" :busy="refreshing" :title="$t('Datenquellen aktualisieren')" :aria-label="$t('Datenquellen aktualisieren')" @click="load"><AppIcon name="refresh" :size="16" /></Button>
+        <Button variant="primary" :disabled="auth.kbs.length === 0" data-testid="datasource-create" @click="startWizard()"><AppIcon name="plus" :size="16" />{{ $t("Datenquelle hinzufügen") }}</Button>
       </div>
     </header>
     <p v-if="note" class="ds-note" :class="noteKind" :role="noteKind === 'error' ? 'alert' : 'status'" data-testid="datasource-note">{{ note }}</p>
-    <div v-if="listError" class="ds-error" role="alert" data-testid="datasource-list-error"><p>{{listError}}</p><Button size="compact" :disabled="refreshing" @click="load">Erneut versuchen</Button></div>
-    <p v-if="!loaded && refreshing" class="ds-loading" role="status" data-testid="datasource-loading">Datenquellen werden geladen …</p>
+    <div v-if="listError" class="ds-error" role="alert" data-testid="datasource-list-error"><p>{{listError}}</p><Button size="compact" :disabled="refreshing" @click="load">{{ $t("Erneut versuchen") }}</Button></div>
+    <p v-if="!loaded && refreshing" class="ds-loading" role="status" data-testid="datasource-loading">{{ $t("Datenquellen werden geladen …") }}</p>
     <template v-if="loaded">
-      <p v-if="auth.kbs.length === 0" class="ds-prerequisite">Lege zuerst unter „Wissen“ eine Wissensbasis an. Dort werden die Dateien abgelegt.</p>
+      <p v-if="auth.kbs.length === 0" class="ds-prerequisite">{{ $t("Lege zuerst unter „Wissen“ eine Wissensbasis an. Dort werden die Dateien abgelegt.") }}</p>
       <template v-if="items.length">
         <div class="ds-toolbar">
-          <div class="ds-search"><Input ref="searchField" id="datasource-query" v-model="query" label="Datenquellen durchsuchen" label-hidden icon="search" type="search" placeholder="Quellen oder Ordner suchen …" data-testid="datasource-search" /></div>
-          <select v-model="filter" class="ic-native-control ds-filter" aria-label="Datenquellen filtern" data-testid="datasource-filter"><option value="all">Alle Quellen</option><option value="active">Aktiv</option><option value="paused">Pausiert</option><option value="new">Nicht aktiviert</option><option value="problems">Mit Problemen</option></select>
+          <div class="ds-search"><Input ref="searchField" id="datasource-query" v-model="query" :label="$t('Datenquellen durchsuchen')" label-hidden icon="search" type="search" :placeholder="$t('Quellen oder Ordner suchen …')" data-testid="datasource-search" /></div>
+          <select v-model="filter" class="ic-native-control ds-filter" :aria-label="$t('Datenquellen filtern')" data-testid="datasource-filter"><option value="all">{{ $t("Alle Quellen") }}</option><option value="active">{{ $t("Aktiv") }}</option><option value="paused">{{ $t("Pausiert") }}</option><option value="new">{{ $t("Nicht aktiviert") }}</option><option value="problems">{{ $t("Mit Problemen") }}</option></select>
         </div>
-        <div class="ds-summary" data-testid="datasource-summary"><span>{{visibleItems.length}} von {{items.length}} Quellen</span><span>{{activeCount}} aktiv · {{pausedCount}} pausiert<span v-if="newCount"> · {{newCount}} nicht aktiviert</span></span></div>
+        <div class="ds-summary" data-testid="datasource-summary"><span>{{ $t("{0} von {1} Quellen", visibleItems.length, items.length) }}</span><span>{{ $t("{0} aktiv · {1} pausiert", activeCount, pausedCount) }}<span v-if="newCount"> {{ $t("· {0} nicht aktiviert", newCount) }}</span></span></div>
         <div v-if="visibleItems.length" class="ds-list" data-testid="datasource-list">
-          <table class="ds-table" aria-label="Datenquellen"><thead><tr><th scope="col">Quelle</th><th scope="col" class="ds-operation-col">Betrieb</th><th scope="col" class="ds-result-col">Letzter Abgleich</th><th scope="col" class="ds-action-col"><span class="ds-sr-only">Aktionen</span></th></tr></thead>
+          <table class="ds-table" :aria-label="$t('Datenquellen')"><thead><tr><th scope="col">{{ $t("Quelle") }}</th><th scope="col" class="ds-operation-col">{{ $t("Betrieb") }}</th><th scope="col" class="ds-result-col">{{ $t("Letzter Abgleich") }}</th><th scope="col" class="ds-action-col"><span class="ds-sr-only">{{ $t("Aktionen") }}</span></th></tr></thead>
             <tbody><tr v-for="d in visibleItems" :key="d.id" :data-source-id="d.id" data-testid="datasource-item">
-              <td class="ds-source"><div class="ds-title-line"><span class="ds-name">{{d.displayName}}</span><span class="ds-kind">{{kindName(d)}}</span></div><span class="ds-path" :title="d.location">{{d.location}}</span><span class="ds-meta">Ziel: {{kbName(d.knowledgeBaseId)}}</span></td>
-              <td class="ds-operation"><span class="ds-mobile-label">Betrieb</span><StatusPill :tone="d.enabled ? 'info' : 'neutral'" data-testid="datasource-operation">{{operation(d)}}</StatusPill><span class="ds-meta">{{schedule(d)}}</span></td>
-              <td class="ds-result"><span class="ds-mobile-label">Letzter Abgleich</span><StatusPill :tone="tone(d)" data-testid="datasource-status">{{statusText(d)}}</StatusPill>
-                <span v-if="d.lastRunStatus === 'RUNNING'" class="ds-meta">Gestartet {{when(d.lastRunStartedAt)}}</span>
-                <template v-else-if="d.lastRunStatus"><time class="ds-meta" :datetime="d.lastRunFinishedAt || undefined">{{when(d.lastRunFinishedAt)}}</time><span class="ds-meta">{{d.filesSeen}} {{d.filesSeen === 1 ? 'Datei' : 'Dateien'}}<template v-if="d.filesFailed"> · {{d.filesFailed}} mit Problemen</template></span></template>
+              <td class="ds-source"><div class="ds-title-line"><span class="ds-name">{{d.displayName}}</span><span class="ds-kind">{{kindName(d)}}</span></div><span class="ds-path" :title="d.location">{{d.location}}</span><span class="ds-meta">{{ $t("Ziel: {0}", kbName(d.knowledgeBaseId)) }}</span></td>
+              <td class="ds-operation"><span class="ds-mobile-label">{{ $t("Betrieb") }}</span><StatusPill :tone="d.enabled ? 'info' : 'neutral'" data-testid="datasource-operation">{{operation(d)}}</StatusPill><span class="ds-meta">{{schedule(d)}}</span></td>
+              <td class="ds-result"><span class="ds-mobile-label">{{ $t("Letzter Abgleich") }}</span><StatusPill :tone="tone(d)" data-testid="datasource-status">{{statusText(d)}}</StatusPill>
+                <span v-if="d.lastRunStatus === 'RUNNING'" class="ds-meta">{{ $t("Gestartet {0}", when(d.lastRunStartedAt)) }}</span>
+                <template v-else-if="d.lastRunStatus"><time class="ds-meta" :datetime="d.lastRunFinishedAt || undefined">{{when(d.lastRunFinishedAt)}}</time><span class="ds-meta">{{d.filesSeen}} {{d.filesSeen === 1 ? $t("Datei") : $t("Dateien")}}<template v-if="d.filesFailed"> {{ $t("· {0} mit Problemen", d.filesFailed) }}</template></span></template>
                 <span v-if="d.lastRunMessage" class="ds-run-message">{{d.lastRunMessage}}</span>
-                <Button v-if="d.filesFailed > 0 || d.lastRunStatus === 'FAILED' || d.lastRunStatus === 'PARTIAL'" variant="ghost" size="compact" class="ds-problems-action" data-testid="datasource-problems" @click="showProblems(d)">Probleme ansehen</Button>
+                <Button v-if="d.filesFailed > 0 || d.lastRunStatus === 'FAILED' || d.lastRunStatus === 'PARTIAL'" variant="ghost" size="compact" class="ds-problems-action" data-testid="datasource-problems" @click="showProblems(d)">{{ $t("Probleme ansehen") }}</Button>
               </td>
               <td class="ds-acts"><div class="ds-row-actions">
-                <Button variant="secondary" size="compact" :disabled="d.lastRunStatus === 'RUNNING' || !d.enabled || pending.has(d.id)" data-testid="datasource-run" aria-label="Jetzt abgleichen" :title="!d.enabled ? 'Aktiviere zuerst den automatischen Abgleich' : d.lastRunStatus === 'RUNNING' ? 'Der Abgleich läuft bereits' : 'Jetzt abgleichen'" @click="runNow(d)"><AppIcon name="refresh" :size="16" /><span class="ds-run-label">Abgleichen</span></Button>
-                <DropdownMenuRoot><DropdownMenuTrigger class="ds-more" :disabled="pending.has(d.id)" :aria-label="`Aktionen für ${d.displayName}`" title="Weitere Aktionen" data-testid="datasource-actions"><AppIcon name="more" :size="20" /></DropdownMenuTrigger><DropdownMenuPortal><DropdownMenuContent class="ic-menu" align="end" :side-offset="6" :collision-padding="12" @close-auto-focus="afterMenuClose">
-                  <DropdownMenuItem class="ic-menu-item" data-testid="datasource-settings" @select="menuDialog(d, () => startWizard(d))"><AppIcon name="edit" :size="16" />Einstellungen</DropdownMenuItem>
-                  <DropdownMenuItem class="ic-menu-item" data-testid="datasource-exposure" @select="menuDialog(d, () => { exposureFor = d; })">Oversharing prüfen</DropdownMenuItem>
-                  <DropdownMenuItem class="ic-menu-item" data-testid="datasource-toggle" @select="toggle(d)">{{d.enabled ? 'Pausieren' : 'Aktivieren'}}</DropdownMenuItem>
-                  <DropdownMenuItem v-if="d.filesFailed > 0 || d.lastRunStatus === 'FAILED'" class="ic-menu-item" @select="menuDialog(d, () => showProblems(d))">Probleme ansehen</DropdownMenuItem>
-                  <DropdownMenuSeparator class="ic-menu-sep" /><DropdownMenuItem class="ic-menu-item ds-menu-danger" data-testid="datasource-delete" @select="menuDialog(d, () => askDelete(d))"><AppIcon name="trash" :size="16" />Entfernen</DropdownMenuItem>
+                <Button variant="secondary" size="compact" :disabled="d.lastRunStatus === 'RUNNING' || !d.enabled || pending.has(d.id)" data-testid="datasource-run" :aria-label="$t('Jetzt abgleichen')" :title="!d.enabled ? $t('Aktiviere zuerst den automatischen Abgleich') : d.lastRunStatus === 'RUNNING' ? $t('Der Abgleich läuft bereits') : $t('Jetzt abgleichen')" @click="runNow(d)"><AppIcon name="refresh" :size="16" /><span class="ds-run-label">{{ $t("Abgleichen") }}</span></Button>
+                <DropdownMenuRoot><DropdownMenuTrigger class="ds-more" :disabled="pending.has(d.id)" :aria-label="$t('Aktionen für {0}', d.displayName)" :title="$t('Weitere Aktionen')" data-testid="datasource-actions"><AppIcon name="more" :size="20" /></DropdownMenuTrigger><DropdownMenuPortal><DropdownMenuContent class="ic-menu" align="end" :side-offset="6" :collision-padding="12" @close-auto-focus="afterMenuClose">
+                  <DropdownMenuItem class="ic-menu-item" data-testid="datasource-settings" @select="menuDialog(d, () => startWizard(d))"><AppIcon name="edit" :size="16" />{{ $t("Einstellungen") }}</DropdownMenuItem>
+                  <DropdownMenuItem class="ic-menu-item" data-testid="datasource-exposure" @select="menuDialog(d, () => { exposureFor = d; })">{{ $t("Oversharing prüfen") }}</DropdownMenuItem>
+                  <DropdownMenuItem class="ic-menu-item" data-testid="datasource-toggle" @select="toggle(d)">{{d.enabled ? $t("Pausieren") : $t("Aktivieren")}}</DropdownMenuItem>
+                  <DropdownMenuItem v-if="d.filesFailed > 0 || d.lastRunStatus === 'FAILED'" class="ic-menu-item" @select="menuDialog(d, () => showProblems(d))">{{ $t("Probleme ansehen") }}</DropdownMenuItem>
+                  <DropdownMenuSeparator class="ic-menu-sep" /><DropdownMenuItem class="ic-menu-item ds-menu-danger" data-testid="datasource-delete" @select="menuDialog(d, () => askDelete(d))"><AppIcon name="trash" :size="16" />{{ $t("Entfernen") }}</DropdownMenuItem>
                 </DropdownMenuContent></DropdownMenuPortal></DropdownMenuRoot>
               </div></td>
             </tr></tbody>
           </table>
         </div>
-        <div v-else class="ds-empty" data-testid="datasource-no-results"><h3>Keine passenden Quellen</h3><p>Versuche einen anderen Suchbegriff oder setze den Filter zurück.</p><Button @click="resetFilters">Filter zurücksetzen</Button></div>
+        <div v-else class="ds-empty" data-testid="datasource-no-results"><h3>{{ $t("Keine passenden Quellen") }}</h3><p>{{ $t("Versuche einen anderen Suchbegriff oder setze den Filter zurück.") }}</p><Button @click="resetFilters">{{ $t("Filter zurücksetzen") }}</Button></div>
       </template>
-      <div v-else class="ds-empty" data-testid="datasource-empty"><AppIcon name="folder" :size="20" /><h3>Deine erste Datenquelle</h3><p>Verbinde eine Ablage, damit Keplura neue und geänderte Dateien automatisch übernimmt. Die Originaldateien bleiben unverändert.</p><p class="ds-meta">Windows-Freigaben · Linux-Ordner · SharePoint</p></div>
+      <div v-else class="ds-empty" data-testid="datasource-empty"><AppIcon name="folder" :size="20" /><h3>{{ $t("Deine erste Datenquelle") }}</h3><p>{{ $t("Verbinde eine Ablage, damit Keplura neue und geänderte Dateien automatisch übernimmt. Die Originaldateien bleiben unverändert.") }}</p><p class="ds-meta">{{ $t("Windows-Freigaben · Linux-Ordner · SharePoint") }}</p></div>
     </template>
-    <details class="ds-explanation"><summary>Wie werden Dateien und Rechte übernommen?</summary><p>Keplura liest die Originaldateien, ohne sie zu verändern. Bei eingeschalteter Rechteübernahme findet jede Person nur die Dokumente, auf die sie auch in der ursprünglichen Ablage zugreifen darf.</p></details>
+    <details class="ds-explanation"><summary>{{ $t("Wie werden Dateien und Rechte übernommen?") }}</summary><p>{{ $t("Keplura liest die Originaldateien, ohne sie zu verändern. Bei eingeschalteter Rechteübernahme findet jede Person nur die Dokumente, auf die sie auch in der ursprünglichen Ablage zugreifen darf.") }}</p></details>
 
-    <AppDialog ref="wizardDialog" :open="open" :title="source ? 'Datenquelle einrichten' : 'Datenquelle hinzufügen'" :error="error" size="wizard" :busy="busy" :dirty="wizardDirty" initial-focus="title" @close="closeWizard">
+    <AppDialog ref="wizardDialog" :open="open" :title="source ? $t('Datenquelle einrichten') : $t('Datenquelle hinzufügen')" :error="error" size="wizard" :busy="busy" :dirty="wizardDirty" initial-focus="title" @close="closeWizard">
       <div class="wizard-layout">
-        <nav class="wizard-nav" aria-label="Einrichtungsschritte"><p class="wizard-caption">Einrichtung</p>
+        <nav class="wizard-nav" :aria-label="$t('Einrichtungsschritte')"><p class="wizard-caption">{{ $t("Einrichtung") }}</p>
           <ol class="ds-steps"><li v-for="(t, i) in stepTitles" :key="t" :class="{ on: step === i + 1, done: step > i + 1 }">
             <button type="button" :disabled="busy || i + 1 > step" :aria-current="step === i + 1 ? 'step' : undefined" @click="step = (i + 1) as Step"><span class="step-number">{{ i + 1 }}</span>{{ t }}</button>
           </li></ol>
-          <details class="wizard-mobile"><summary>Schritt {{ step }} von 6 · {{ stepTitles[step - 1] }}</summary><ol><li v-for="(t,i) in stepTitles" :key="t"><button type="button" :disabled="busy || i + 1 > step" :aria-current="step === i + 1 ? 'step' : undefined" @click="step = (i + 1) as Step">{{ i + 1 }} · {{ t }}</button></li></ol></details>
+          <details class="wizard-mobile"><summary>{{ $t("Schritt {0} von 6 · {1}", step, stepTitles[step - 1]) }}</summary><ol><li v-for="(t,i) in stepTitles" :key="t"><button type="button" :disabled="busy || i + 1 > step" :aria-current="step === i + 1 ? 'step' : undefined" @click="step = (i + 1) as Step">{{ i + 1 }} · {{ t }}</button></li></ol></details>
           <p class="wizard-scope">{{ auth.selectedOrg?.name }}<br />{{ auth.selectedSpace?.name }}</p>
         </nav>
-        <div class="wizard-main"><p class="wizard-caption">Schritt {{ step }} von 6</p><h3 ref="stepHeading" tabindex="-1" class="wizard-title">{{ stepTitles[step - 1] }}</h3>
+        <div class="wizard-main"><p class="wizard-caption">{{ $t("Schritt {0} von 6", step) }}</p><h3 ref="stepHeading" tabindex="-1" class="wizard-title">{{ stepTitles[step - 1] }}</h3>
       <!-- 1 Art -->
       <div v-if="step === 1" class="ds-form">
         <label class="ds-choice"><input v-model="w.kind" name="source-kind" type="radio" value="SMB" />
-          <span><strong>Windows-Freigabe</strong><br />z. B. \\fileserver\Abteilungen – auch Samba und DFS</span></label>
+          <span><strong>{{ $t("Windows-Freigabe") }}</strong><br />{{ $t("z. B. \\\\fileserver\\Abteilungen – auch Samba und DFS") }}</span></label>
         <label class="ds-choice"><input v-model="w.kind" name="source-kind" type="radio" value="SHAREPOINT" />
-          <span><strong>SharePoint Online</strong><br />eine Site oder Dokumentbibliothek aus Microsoft 365</span></label>
+          <span><strong>{{ $t("SharePoint Online") }}</strong><br />{{ $t("eine Site oder Dokumentbibliothek aus Microsoft 365") }}</span></label>
         <label class="ds-choice" :class="{ off: localRoots.length === 0 }"><input v-model="w.kind" name="source-kind" type="radio" value="LOCAL" :disabled="localRoots.length === 0" />
-          <span><strong>Linux-Ordner</strong><br />
-            <template v-if="localRoots.length">auf dem Keplura-Server eingebunden, z. B. per NFS unter {{ localRoots.join(", ") }}</template>
-            <template v-else>Noch nicht eingerichtet. Bitte lasse den Ordner auf dem Keplura-Server bereitstellen.</template>
+          <span><strong>{{ $t("Linux-Ordner") }}</strong><br />
+            <template v-if="localRoots.length">{{ $t("auf dem Keplura-Server eingebunden, z. B. per NFS unter {0}", localRoots.join(", ")) }}</template>
+            <template v-else>{{ $t("Noch nicht eingerichtet. Bitte lasse den Ordner auf dem Keplura-Server bereitstellen.") }}</template>
           </span></label>
       </div>
 
       <!-- 2 Verbindung -->
       <div v-if="step === 2" class="ds-form">
-        <label>Name <input class="ic-native-control" v-model="w.displayName" maxlength="200" placeholder="z. B. Vertrieb – Angebote" data-testid="datasource-name" /></label>
-        <label v-if="w.kind === 'SMB'">Freigabe und Ordner <input class="ic-native-control" v-model="w.location" placeholder="\\fileserver\Abteilungen\Vertrieb" data-testid="datasource-location" /></label>
+        <label>{{ $t("Name") }} <input class="ic-native-control" v-model="w.displayName" maxlength="200" :placeholder="$t('z. B. Vertrieb – Angebote')" data-testid="datasource-name" /></label>
+        <label v-if="w.kind === 'SMB'">{{ $t("Freigabe und Ordner") }} <input class="ic-native-control" v-model="w.location" placeholder="\\fileserver\Abteilungen\Vertrieb" data-testid="datasource-location" /></label>
         <template v-else-if="w.kind === 'SHAREPOINT'">
-          <label>Adresse der Site, Bibliothek oder des Ordners
-            <input class="ic-native-control" v-model="w.location" placeholder="https://firma.sharepoint.com/sites/Vertrieb/Freigegebene Dokumente" data-testid="datasource-location" /></label>
-          <label>Verzeichnis-ID (Tenant) <input class="ic-native-control" v-model="w.tenantId" placeholder="firma.onmicrosoft.com oder GUID" autocomplete="off" /></label>
-          <label>Anwendungs-ID (Client-ID) <input class="ic-native-control" v-model="w.clientId" placeholder="00000000-0000-0000-0000-000000000000" autocomplete="off" /></label>
-          <label>{{ source?.secretSet ? 'Clientschlüssel ändern (optional)' : 'Geheimer Clientschlüssel' }} <input class="ic-native-control" v-model="w.password" type="password" autocomplete="new-password"
-                                                 :placeholder="source?.secretSet ? 'bleibt gespeichert – nur zum Ändern eingeben' : ''" /></label>
+          <label>{{ $t("Adresse der Site, Bibliothek oder des Ordners") }}
+            <input class="ic-native-control" v-model="w.location" :placeholder="$t('https://firma.sharepoint.com/sites/Vertrieb/Freigegebene Dokumente')" data-testid="datasource-location" /></label>
+          <label>{{ $t("Verzeichnis-ID (Tenant)") }} <input class="ic-native-control" v-model="w.tenantId" :placeholder="$t('firma.onmicrosoft.com oder GUID')" autocomplete="off" /></label>
+          <label>{{ $t("Anwendungs-ID (Client-ID)") }} <input class="ic-native-control" v-model="w.clientId" placeholder="00000000-0000-0000-0000-000000000000" autocomplete="off" /></label>
+          <label>{{ source?.secretSet ? $t("Clientschlüssel ändern (optional)") : $t("Geheimer Clientschlüssel") }} <input class="ic-native-control" v-model="w.password" type="password" autocomplete="new-password"
+                                                 :placeholder="source?.secretSet ? $t('bleibt gespeichert – nur zum Ändern eingeben') : ''" /></label>
           <details class="ds-help">
-            <summary>So richtest du den Zugang in Microsoft 365 ein</summary>
+            <summary>{{ $t("So richtest du den Zugang in Microsoft 365 ein") }}</summary>
             <ol>
-              <li>Entra Admin Center → App-Registrierungen → Neue Registrierung „Keplura“.</li>
-              <li>API-Berechtigungen → Microsoft Graph → Anwendungsberechtigung <strong>Sites.Selected</strong> → Administratorzustimmung erteilen.</li>
-              <li>Zertifikate &amp; Geheimnisse → neuen geheimen Clientschlüssel anlegen und hier eintragen.</li>
-              <li>Die gewünschte Site für die App freigeben (Leserecht). Anleitung: <code>docs/howto/sharepoint.md</code>.</li>
-              <li>Für die Anmeldung der Mitarbeiter: Entra-Anmeldung unter Administration einrichten und im Token die Gruppen ausgeben (Tokenkonfiguration → Gruppenanspruch).</li>
+              <li>{{ $t("Entra Admin Center → App-Registrierungen → Neue Registrierung „Keplura“.") }}</li>
+              <li>{{ $t("API-Berechtigungen → Microsoft Graph → Anwendungsberechtigung") }} <strong>{{ $t("Sites.Selected") }}</strong> {{ $t("→ Administratorzustimmung erteilen.") }}</li>
+              <li>{{ $t("Zertifikate & Geheimnisse → neuen geheimen Clientschlüssel anlegen und hier eintragen.") }}</li>
+              <li>{{ $t("Die gewünschte Site für die App freigeben (Leserecht). Anleitung:") }} <code>{{ $t("docs/howto/sharepoint.md") }}</code>.</li>
+              <li>{{ $t("Für die Anmeldung der Mitarbeiter: Entra-Anmeldung unter Administration einrichten und im Token die Gruppen ausgeben (Tokenkonfiguration → Gruppenanspruch).") }}</li>
             </ol>
           </details>
         </template>
-        <label v-else>Ordner <input class="ic-native-control" v-model="w.location" :placeholder="(localRoots[0] ?? '/mnt/quellen') + '/vertrieb'" data-testid="datasource-location" /></label>
+        <label v-else>{{ $t("Ordner") }} <input class="ic-native-control" v-model="w.location" :placeholder="(localRoots[0] ?? '/mnt/quellen') + '/vertrieb'" data-testid="datasource-location" /></label>
         <template v-if="w.kind === 'SMB'">
-          <label>Dienstkonto (nur Lesen) <input class="ic-native-control" v-model="w.username" placeholder="FIRMA\svc-keplura" autocomplete="off" /></label>
-          <label>{{ source?.secretSet ? 'Passwort ändern (optional)' : 'Passwort' }} <input class="ic-native-control" v-model="w.password" type="password" autocomplete="new-password"
-                                 :placeholder="source?.secretSet ? 'bleibt gespeichert – nur zum Ändern eingeben' : ''" /></label>
+          <label>{{ $t("Dienstkonto (nur Lesen)") }} <input class="ic-native-control" v-model="w.username" placeholder="FIRMA\svc-keplura" autocomplete="off" /></label>
+          <label>{{ source?.secretSet ? $t("Passwort ändern (optional)") : $t("Passwort") }} <input class="ic-native-control" v-model="w.password" type="password" autocomplete="new-password"
+                                 :placeholder="source?.secretSet ? $t('bleibt gespeichert – nur zum Ändern eingeben') : ''" /></label>
         </template>
-        <label>Ziel-Wissensbasis
+        <label>{{ $t("Ziel-Wissensbasis") }}
           <select class="ic-native-control" v-model="w.knowledgeBaseId" :disabled="!!source">
             <option v-for="k in auth.kbs" :key="k.id" :value="k.id">{{ k.name }}</option>
           </select>
         </label>
-        <p v-if="source?.secretSet" class="ds-hint" data-testid="datasource-secret-saved">Zugang gespeichert. Ein leeres Passwortfeld behält den gespeicherten Zugang bei.</p>
-        <p class="ds-hint">Mit „Weiter“ verbindet sich Keplura probeweise und zählt die Dateien. Es wird noch nichts übernommen.</p>
+        <p v-if="source?.secretSet" class="ds-hint" data-testid="datasource-secret-saved">{{ $t("Zugang gespeichert. Ein leeres Passwortfeld behält den gespeicherten Zugang bei.") }}</p>
+        <p class="ds-hint">{{ $t("Mit „Weiter“ verbindet sich Keplura probeweise und zählt die Dateien. Es wird noch nichts übernommen.") }}</p>
       </div>
 
       <!-- 3 Auswahl -->
       <div v-if="step === 3" class="ds-form">
-        <p v-if="preview" class="ds-ok">{{ preview.message }} {{ preview.filesFound }} Dateien gefunden, davon
-          <strong>{{ preview.filesAccepted }}</strong> übernehmbar ({{ size(preview.bytesAccepted) }}).
-          <template v-if="preview.skippedType"> {{ preview.skippedType }} haben ein nicht unterstütztes Format.</template>
-          <template v-if="preview.skippedSize"> {{ preview.skippedSize }} sind zu groß.</template>
-          <template v-if="preview.skippedPattern"> {{ preview.skippedPattern }} sind ausgeschlossen.</template></p>
-        <label>Nur diese Unterordner/Dateien (optional)
-          <input class="ic-native-control" v-model="w.includePatterns" placeholder="z. B. angebote/**, handbuecher/**" /></label>
-        <label>Ausschließen
+        <p v-if="preview" class="ds-ok">{{ $t("{0} {1} Dateien gefunden, davon", preview.message, preview.filesFound) }}
+          <strong>{{ preview.filesAccepted }}</strong> {{ $t("übernehmbar ({0}).", size(preview.bytesAccepted)) }}
+          <template v-if="preview.skippedType"> {{ $t("{0} haben ein nicht unterstütztes Format.", preview.skippedType) }}</template>
+          <template v-if="preview.skippedSize"> {{ $t("{0} sind zu groß.", preview.skippedSize) }}</template>
+          <template v-if="preview.skippedPattern"> {{ $t("{0} sind ausgeschlossen.", preview.skippedPattern) }}</template></p>
+        <label>{{ $t("Nur diese Unterordner/Dateien (optional)") }}
+          <input class="ic-native-control" v-model="w.includePatterns" :placeholder="$t('z. B. angebote/**, handbuecher/**')" /></label>
+        <label>{{ $t("Ausschließen") }}
           <input class="ic-native-control" v-model="w.excludePatterns" /></label>
-        <label>Größte Datei (MB) <input class="ic-native-control" v-model.number="w.maxMb" type="number" min="1" max="200" /></label>
-        <p v-if="preview?.sample.length" class="ds-hint">Beispiele: {{ preview.sample.slice(0, 5).join(" · ") }}</p>
-        <p class="ds-hint">Formate: PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX), Text, Markdown, CSV. Muster: ** = beliebig viele Ordner, * = beliebiger Name.</p>
+        <label>{{ $t("Größte Datei (MB)") }} <input class="ic-native-control" v-model.number="w.maxMb" type="number" min="1" max="200" /></label>
+        <p v-if="preview?.sample.length" class="ds-hint">{{ $t("Beispiele: {0}", preview.sample.slice(0, 5).join(" · ")) }}</p>
+        <p class="ds-hint">{{ $t("Formate: PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX), Text, Markdown, CSV. Muster: ** = beliebig viele Ordner, * = beliebiger Name.") }}</p>
       </div>
 
       <!-- 4 Rechte -->
       <div v-if="step === 4" class="ds-form">
         <label class="ds-check"><input v-model="w.mirrorPermissions" type="checkbox" data-testid="datasource-mirror" />
-          Zugriffsrechte der Ablage übernehmen (empfohlen)</label>
-        <p v-if="!w.mirrorPermissions" class="ds-warn">Ohne Rechte-Übernahme sehen alle Mitglieder der Wissensbasis alle Dateien dieser Quelle.</p>
+          {{ $t("Zugriffsrechte der Ablage übernehmen (empfohlen)") }}</label>
+        <p v-if="!w.mirrorPermissions" class="ds-warn">{{ $t("Ohne Rechte-Übernahme sehen alle Mitglieder der Wissensbasis alle Dateien dieser Quelle.") }}</p>
         <template v-if="w.mirrorPermissions && preview">
-          <p class="ds-hint">Stichprobe von {{ preview.aclSampled }} Dateien<template v-if="preview.aclUnreadable">, davon {{ preview.aclUnreadable }} ohne lesbare Rechte (sind für niemanden sichtbar)</template>:</p>
+          <p class="ds-hint">{{ $t("Stichprobe von {0} Dateien", preview.aclSampled) }}<template v-if="preview.aclUnreadable">{{ $t(", davon {0} ohne lesbare Rechte (sind für niemanden sichtbar)", preview.aclUnreadable) }}</template>:</p>
           <p v-if="preview.aclUnreadable && preview.aclUnreadableReason" class="ds-warn" data-testid="datasource-acl-reason">{{ preview.aclUnreadableReason }}</p>
           <ul class="ds-acl" data-testid="datasource-acl-preview">
-            <li v-for="p in preview.principals" :key="p.principal"><span :title="p.principal">{{ principalLabel(p.principal, p.label) }}</span><span class="ic-num">{{ p.files }} Dateien</span></li>
-            <li v-if="preview.principals.length === 0">Keine Leserechte gefunden – das Dienstkonto sieht die Rechte evtl. nicht.</li>
+            <li v-for="p in preview.principals" :key="p.principal"><span :title="p.principal">{{ principalLabel(p.principal, p.label) }}</span><span class="ic-num">{{ $t("{0} Dateien", p.files) }}</span></li>
+            <li v-if="preview.principals.length === 0">{{ $t("Keine Leserechte gefunden – das Dienstkonto sieht die Rechte evtl. nicht.") }}</li>
           </ul>
           <div class="ds-exposure-cta" data-testid="datasource-exposure-cta">
-            <p class="ds-hint"><strong>Vor dem Aktivieren empfohlen:</strong> alle {{ preview.filesAccepted }} Dateien prüfen, welche für praktisch alle lesbar sind
-              und sensibel wirken (z. B. Gehalt, Personalakte, Passwörter). Es wird nichts übernommen.</p>
-            <Button variant="secondary" size="compact" :disabled="busy || !source || wizardDirty" :title="wizardDirty ? 'Erst mit „Weiter“ speichern' : undefined" data-testid="datasource-exposure-start" @click="exposureFor = source">Oversharing prüfen</Button>
+            <p class="ds-hint"><strong>{{ $t("Vor dem Aktivieren empfohlen:") }}</strong> {{ $t("alle {0} Dateien prüfen, welche für praktisch alle lesbar sind und sensibel wirken (z. B. Gehalt, Personalakte, Passwörter). Es wird nichts übernommen.", preview.filesAccepted) }}</p>
+            <Button variant="secondary" size="compact" :disabled="busy || !source || wizardDirty" :title="wizardDirty ? $t('Erst mit „Weiter“ speichern') : undefined" data-testid="datasource-exposure-start" @click="exposureFor = source">{{ $t("Oversharing prüfen") }}</Button>
           </div>
-          <p v-if="w.kind === 'SHAREPOINT'" class="ds-hint">Mitarbeiter erhalten diese Rechte, wenn sie sich mit ihrem Microsoft-365-Konto anmelden.
-            SharePoint-Gruppen „Mitglieder“ und „Besitzer“ zählen als die zugehörige Microsoft-365-Gruppe; andere SharePoint-Gruppen
-            (z. B. „Besucher“) werden nicht übernommen – diese Dateien sieht dann nur, wer zusätzlich direkt berechtigt ist.</p>
-          <p v-else class="ds-hint">Damit Personen diese Rechte haben, müssen sie sich über das Verzeichnis anmelden (Administration → Verzeichnis).
-            Freigabe-Berechtigungen werden nicht ausgewertet; maßgeblich sind die Datei- bzw. NTFS-Rechte.</p>
+          <p v-if="w.kind === 'SHAREPOINT'" class="ds-hint">{{ $t("Mitarbeiter erhalten diese Rechte, wenn sie sich mit ihrem Microsoft-365-Konto anmelden. SharePoint-Gruppen „Mitglieder“ und „Besitzer“ zählen als die zugehörige Microsoft-365-Gruppe; andere SharePoint-Gruppen (z. B. „Besucher“) werden nicht übernommen – diese Dateien sieht dann nur, wer zusätzlich direkt berechtigt ist.") }}</p>
+          <p v-else class="ds-hint">{{ $t("Damit Personen diese Rechte haben, müssen sie sich über das Verzeichnis anmelden (Administration → Verzeichnis). Freigabe-Berechtigungen werden nicht ausgewertet; maßgeblich sind die Datei- bzw. NTFS-Rechte.") }}</p>
         </template>
       </div>
 
       <!-- 5 Zeitplan -->
       <div v-if="step === 5" class="ds-form">
-        <label>Änderungen übernehmen alle
+        <label>{{ $t("Änderungen übernehmen alle") }}
           <select class="ic-native-control" v-model.number="w.intervalMinutes">
-            <option :value="15">15 Minuten</option>
-            <option :value="60">Stunde</option>
-            <option :value="360">6 Stunden</option>
-            <option :value="1440">Tag</option>
+            <option :value="15">{{ $t("15 Minuten") }}</option>
+            <option :value="60">{{ $t("Stunde") }}</option>
+            <option :value="360">{{ $t("6 Stunden") }}</option>
+            <option :value="1440">{{ $t("Tag") }}</option>
           </select>
         </label>
-        <p class="ds-hint">Neue und geänderte Dateien werden übernommen, gelöschte entfernt, geänderte Rechte nachgezogen.</p>
+        <p class="ds-hint">{{ $t("Neue und geänderte Dateien werden übernommen, gelöschte entfernt, geänderte Rechte nachgezogen.") }}</p>
       </div>
 
       <!-- 6 Aktivieren -->
       <div v-if="step === 6" class="ds-form">
         <p><strong>{{ w.displayName }}</strong> – {{ w.location }}</p>
-        <p class="ds-hint">{{ preview?.filesAccepted ?? 0 }} Dateien werden übernommen, danach alle
-          {{ w.intervalMinutes >= 60 ? w.intervalMinutes / 60 + " Std." : w.intervalMinutes + " Min." }} abgeglichen.
-          Rechte: {{ w.mirrorPermissions ? "wie in der Ablage" : "alle Mitglieder der Wissensbasis" }}.</p>
+        <p class="ds-hint">{{ $t("{0} Dateien werden übernommen, danach alle {1} abgeglichen. Rechte: {2}.", preview?.filesAccepted ?? 0, w.intervalMinutes >= 60 ? w.intervalMinutes / 60 + $t(" Std.") : w.intervalMinutes + $t(" Min."), w.mirrorPermissions ? $t("wie in der Ablage") : $t("alle Mitglieder der Wissensbasis")) }}</p>
       </div>
 
         </div>
       </div>
       <template #footer>
-        <p class="wizard-save-hint">{{ source ? 'Die getestete Verbindung ist gespeichert. Ungespeicherte Änderungen werden beim Abbrechen verworfen.' : 'Die Verbindung wird beim Test gespeichert. Die Übernahme startet erst nach dem Aktivieren.' }}</p>
+        <p class="wizard-save-hint">{{ source ? $t("Die getestete Verbindung ist gespeichert. Ungespeicherte Änderungen werden beim Abbrechen verworfen.") : $t("Die Verbindung wird beim Test gespeichert. Die Übernahme startet erst nach dem Aktivieren.") }}</p>
       <div class="ds-actions">
-        <Button variant="ghost" :disabled="busy" data-testid="datasource-cancel" @click="wizardDialog?.requestClose()">Abbrechen</Button>
-        <Button v-if="step > 1" variant="ghost" type="button" :disabled="busy" @click="step = (step - 1) as Step">Zurück</Button>
+        <Button variant="ghost" :disabled="busy" data-testid="datasource-cancel" @click="wizardDialog?.requestClose()">{{ $t("Abbrechen") }}</Button>
+        <Button v-if="step > 1" variant="ghost" type="button" :disabled="busy" @click="step = (step - 1) as Step">{{ $t("Zurück") }}</Button>
         <span class="ds-spacer"></span>
         <Button v-if="step < 6" variant="primary" :disabled="busy || !canNext" data-testid="datasource-next" :busy="busy" @click="next">
-          {{ busy ? "Bitte warten …" : "Weiter" }}
+          {{ busy ? $t("Bitte warten …") : $t("Weiter") }}
         </Button>
         <Button v-else variant="primary" :disabled="busy" data-testid="datasource-activate" :busy="busy" @click="activate">
-          {{ busy ? "Bitte warten …" : "Aktivieren und abgleichen" }}
+          {{ busy ? $t("Bitte warten …") : $t("Aktivieren und abgleichen") }}
         </Button>
       </div>
       </template>
     </AppDialog>
 
-    <AppDialog :open="problemsFor !== null" title="Dateien mit Problemen" :error="problemsError" initial-focus="title" @close="closeProblems">
+    <AppDialog :open="problemsFor !== null" :title="$t('Dateien mit Problemen')" :error="problemsError" initial-focus="title" @close="closeProblems">
       <p class="ds-problem-source">{{problemsFor?.displayName}}</p>
-      <p v-if="problemsLoading" role="status" data-testid="datasource-problems-loading">Probleme werden geladen …</p>
-      <div v-else-if="problemsError"><Button data-testid="datasource-problems-retry" @click="problemsFor && showProblems(problemsFor)">Erneut versuchen</Button></div>
-      <ul v-else class="ds-problems" data-testid="datasource-problems-list"><li v-for="p in problems" :key="p.relativePath"><code>{{p.relativePath}}</code><span>{{p.error}}</span></li><li v-if="!problems.length">Keine Dateien mit Problemen gemeldet.<span v-if="problemsFor?.lastRunMessage">{{problemsFor.lastRunMessage}}</span></li></ul>
-      <template #footer><Button @click="closeProblems">Schließen</Button></template>
+      <p v-if="problemsLoading" role="status" data-testid="datasource-problems-loading">{{ $t("Probleme werden geladen …") }}</p>
+      <div v-else-if="problemsError"><Button data-testid="datasource-problems-retry" @click="problemsFor && showProblems(problemsFor)">{{ $t("Erneut versuchen") }}</Button></div>
+      <ul v-else class="ds-problems" data-testid="datasource-problems-list"><li v-for="p in problems" :key="p.relativePath"><code>{{p.relativePath}}</code><span>{{p.error}}</span></li><li v-if="!problems.length">{{ $t("Keine Dateien mit Problemen gemeldet.") }}<span v-if="problemsFor?.lastRunMessage">{{problemsFor.lastRunMessage}}</span></li></ul>
+      <template #footer><Button @click="closeProblems">{{ $t("Schließen") }}</Button></template>
     </AppDialog>
 
     <ExposureDialog :source="exposureFor" @close="exposureFor = null" @updated="exposureUpdated" />
 
     <ConfirmDialog
       :open="deleteTarget !== null"
-      title="Datenquelle entfernen?"
+      :title="$t('Datenquelle entfernen?')"
       :busy="deleting"
       :error="deleteError"
-      :message="`„${deleteTarget?.displayName ?? ''}“ wird entfernt und alle daraus übernommenen Dokumente werden aus Keplura gelöscht. Die Originaldateien bleiben unverändert.`"
-      confirm-label="Entfernen"
+      :message="$t('„{0}“ wird entfernt und alle daraus übernommenen Dokumente werden aus Keplura gelöscht. Die Originaldateien bleiben unverändert.', deleteTarget?.displayName ?? '')"
+      :confirm-label="$t('Entfernen')"
       @confirm="confirmDelete"
       @close="deleteTarget = null"
     />

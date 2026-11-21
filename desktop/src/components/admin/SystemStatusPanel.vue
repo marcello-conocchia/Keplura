@@ -6,6 +6,7 @@ import { useAuthStore } from "../../auth-store";
 import AppIcon from "../ui/AppIcon.vue";
 import Button from "../ui/Button.vue";
 import StatusPill from "../ui/StatusPill.vue";
+import { tr } from "../../i18n";
 
 const emit = defineEmits<{ forbidden: [] }>();
 const auth = useAuthStore();
@@ -20,19 +21,19 @@ async function load() {
   if (disposed) return;
   loading.value = false;
   if (s.kind === "ok") { status.value = s.value; loadError.value = ""; }
-  else if (s.kind === "forbidden") { emit("forbidden"); loadError.value = "Dafür sind Administrationsrechte nötig."; }
+  else if (s.kind === "forbidden") { emit("forbidden"); loadError.value = tr("Dafür sind Administrationsrechte nötig."); }
   else if (s.kind === "expired") auth.dropExpiredSession();
-  else loadError.value = "Systemstatus konnte nicht geladen werden.";
+  else loadError.value = tr("Systemstatus konnte nicht geladen werden.");
 }
 onMounted(load);
 
-const LABELS: Record<string, string> = {
-  backend: "Keplura-Server", database: "Datenbank", providers: "KI-Anbieter",
-  chatModel: "Antwortmodell", embeddingModel: "Dokumentsuche", secretStore: "Geschützte Zugangsdaten",
-};
-const STATE_LABELS: Record<string, string> = { ok: "Bereit", degraded: "Eingeschränkt", unreachable: "Nicht erreichbar",
-  disabled: "Deaktiviert", not_configured: "Nicht eingerichtet", missing: "Fehlt", unavailable: "Nicht verfügbar" };
-function stateLabel(s: ComponentState | null) { return STATE_LABELS[s?.state ?? ""] ?? "Bitte prüfen"; }
+const labels = (): Record<string, string> => ({
+  backend: tr("Keplura-Server"), database: tr("Datenbank"), providers: tr("KI-Anbieter"),
+  chatModel: tr("Antwortmodell"), embeddingModel: tr("Dokumentsuche"), secretStore: tr("Geschützte Zugangsdaten"),
+});
+const stateLabels = (): Record<string, string> => ({ ok: tr("Bereit"), degraded: tr("Eingeschränkt"), unreachable: tr("Nicht erreichbar"),
+  disabled: tr("Deaktiviert"), not_configured: tr("Nicht eingerichtet"), missing: tr("Fehlt"), unavailable: tr("Nicht verfügbar") });
+function stateLabel(s: ComponentState | null) { return stateLabels()[s?.state ?? ""] ?? tr("Bitte prüfen"); }
 function stateTone(s: ComponentState | null): "ok" | "wait" | "error" | "neutral" {
   if (!s) return "neutral";
   if (s.state === "ok") return "ok";
@@ -40,29 +41,29 @@ function stateTone(s: ComponentState | null): "ok" | "wait" | "error" | "neutral
   if (s.state === "unreachable" || s.state === "missing" || s.state === "unavailable") return "error";
   return "neutral";
 }
-const rows = computed(() => Object.keys(LABELS).map((key) => ({ key, label: LABELS[key], state: status.value?.[key] ?? null })));
+const rows = computed(() => Object.keys(labels()).map((key) => ({ key, label: labels()[key], state: status.value?.[key] ?? null })));
 const problems = computed(() => rows.value.filter((r) => r.state && r.state.state !== "ok").length);
 </script>
 
 <template>
   <section class="connection-page" data-testid="admin-status-section">
     <header class="connection-header">
-      <div class="connection-heading"><h2>Systemstatus</h2><p class="connection-description">Ob Server, Datenbank und KI-Verbindungen bereit sind.</p></div>
-      <div class="connection-actions"><Button variant="icon" size="compact" aria-label="Systemstatus aktualisieren" :disabled="loading" @click="load"><AppIcon name="refresh" :size="16" /></Button></div>
+      <div class="connection-heading"><h2>{{ $t("Systemstatus") }}</h2><p class="connection-description">{{ $t("Ob Server, Datenbank und KI-Verbindungen bereit sind.") }}</p></div>
+      <div class="connection-actions"><Button variant="icon" size="compact" :aria-label="$t('Systemstatus aktualisieren')" :disabled="loading" @click="load"><AppIcon name="refresh" :size="16" /></Button></div>
     </header>
 
-    <p v-if="loading && !status" class="connection-loading" role="status">Status wird geprüft …</p>
-    <div v-if="loadError" class="connection-note error connection-error" role="alert"><p>{{ loadError }}</p><Button size="compact" @click="load">Erneut versuchen</Button></div>
+    <p v-if="loading && !status" class="connection-loading" role="status">{{ $t("Status wird geprüft …") }}</p>
+    <div v-if="loadError" class="connection-note error connection-error" role="alert"><p>{{ loadError }}</p><Button size="compact" @click="load">{{ $t("Erneut versuchen") }}</Button></div>
 
     <template v-if="status">
-      <p class="connection-note" :class="problems ? '' : 'ok'" role="status">{{ problems ? `${problems} ${problems === 1 ? "Bereich braucht" : "Bereiche brauchen"} Aufmerksamkeit.` : "Alle Bereiche sind bereit." }}</p>
+      <p class="connection-note" :class="problems ? '' : 'ok'" role="status">{{ problems ? $t("{0} {1} Aufmerksamkeit.", problems, problems === 1 ? $t("Bereich braucht") : $t("Bereiche brauchen")) : $t("Alle Bereiche sind bereit.") }}</p>
       <div class="connection-list">
         <article v-for="row in rows" :key="row.key" class="connection-record st-row" :data-testid="`admin-status-${row.key}`">
           <h3>{{ row.label }}</h3>
           <StatusPill :tone="stateTone(row.state)">{{ stateLabel(row.state) }}</StatusPill>
         </article>
       </div>
-      <p class="connection-hint">Eine Verbindung kannst du unter „KI-Anbieter“ mit „Verbindung testen“ prüfen. Zugangsschlüssel werden hier niemals angezeigt.</p>
+      <p class="connection-hint">{{ $t("Eine Verbindung kannst du unter „KI-Anbieter“ mit „Verbindung testen“ prüfen. Zugangsschlüssel werden hier niemals angezeigt.") }}</p>
     </template>
   </section>
 </template>

@@ -247,7 +247,7 @@ async function logout(page) {
   /** One fresh browser context (sockets + cookies) per jar boot. */
   async function openPage() {
     if (context) await context.close().catch(() => {});
-    context = await browser.newContext({ viewport: { width: 1200, height: 1500 } });
+    context = await browser.newContext({ locale: 'de-DE', viewport: { width: 1200, height: 1500 } });
     const page = await context.newPage();
     netLog = [];
     page.on("request", (req) => { if (req.method() !== "GET") netLog.push(`REQ ${req.method()} ${new URL(req.url()).pathname}`); });
