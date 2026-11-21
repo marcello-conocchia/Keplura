@@ -169,8 +169,40 @@ export interface ExposureReport {
   truncated: boolean;
   broadGroups: { principal: string; label: string | null; files: number }[];
   folders: { folder: string; broadFiles: number; sensitiveFiles: number }[];
-  findings: { relativePath: string; categories: string[]; broadGroups: string[] }[];
+  findings: ExposureFinding[];
   message: string | null;
+  /** RISK-02 Inhaltsprüfung; null während der Prüfung läuft. */
+  content: { enabled: boolean; checked: number; sensitive: number; notCheckable: number; skipped: number } | null;
+}
+
+export interface ExposureContentHit { category: string; label: string; count: number }
+
+export interface ExposureFinding {
+  relativePath: string;
+  categories: string[];
+  broadGroups: string[];
+  contentState: "CHECKED" | "NOT_CHECKABLE" | null;
+  contentReason: string | null;
+  contentHits: ExposureContentHit[];
+}
+
+/** „enthält 3 IBANs“ — nur Kategorie und Anzahl, nie Werte. */
+export function contentHitText(h: ExposureContentHit): string {
+  const n = h.count;
+  switch (h.category) {
+    case "IBAN": return n === 1 ? tr("enthält 1 IBAN") : tr("enthält {0} IBANs", n);
+    case "CREDIT_CARD": return n === 1 ? tr("enthält 1 Kreditkartennummer") : tr("enthält {0} Kreditkartennummern", n);
+    case "TAX_ID": return n === 1 ? tr("enthält 1 Steuer-ID") : tr("enthält {0} Steuer-IDs", n);
+    case "SOCIAL_SECURITY": return n === 1 ? tr("enthält 1 Sozialversicherungsnummer") : tr("enthält {0} Sozialversicherungsnummern", n);
+    case "HR_TERMS": return tr("{0} Begriffe zu Personal und Gehalt", n);
+    case "HEALTH_TERMS": return tr("{0} Begriffe zu Gesundheit", n);
+    default: return tr("{0}: {1}", h.label, n);
+  }
+}
+
+/** Gründe kommen deutsch vom Server; bekannte Gründe werden hier übersetzt. */
+export function contentReasonText(reason: string | null): string {
+  return reason ? tr(reason) : tr("nicht prüfbar");
 }
 
 export const startExposureScan = (id: number) => call<void>("POST", `${S}/${id}/exposure`, {});
