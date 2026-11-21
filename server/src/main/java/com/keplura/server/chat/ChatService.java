@@ -406,7 +406,24 @@ public class ChatService {
         // transcript first, then the row; the delete re-proves the exact
         // visibility predicate, so a race against another delete answers 404
         messageRepository.deleteAllOf(conversation.getId());
-        if (toolExecution != null) toolExecution.deleteCards(conversation.getId());
+        if (toolExecution != null) {
+            // TU-02 housekeeping after commit: cards of a deleted chat are unreachable anyway
+            // (every read/decision re-proves the conversation), so a failure here must never
+            // abort the delete transaction itself.
+            Long deletedId = conversation.getId();
+            org.springframework.transaction.support.TransactionSynchronizationManager.registerSynchronization(
+                    new org.springframework.transaction.support.TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            try {
+                                toolExecution.deleteCards(deletedId);
+                            } catch (RuntimeException e) {
+                                log.warn("tool call cards not deleted (conversation={}, cause={})",
+                                        deletedId, e.getClass().getSimpleName());
+                            }
+                        }
+                    });
+        }
         int removed = conversationRepository.deleteVisible(conversation.getId(), orgId, userId);
         if (removed != 1) {
             throw new ChatException(HttpStatus.NOT_FOUND, "conversation not found");
