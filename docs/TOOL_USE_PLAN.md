@@ -8,7 +8,7 @@ Diese Reihenfolge ersetzt ältere allgemeine Angaben zur nächsten UI-/Roadmap-A
 
 ## Verbindliche Reihenfolge
 
-**TU-01 ist auf main (PR #15, Merge `1296cdb`, 21.11.2026). TU-02 ist die nächste geplante Aufgabe; TU-02–TU-07 sind noch nicht umgesetzt.** Genau eine aktive Implementierungsaufgabe. Größere Schritte werden bei Bedarf in kleine PRs zerlegt; nur die unmittelbar nächste Implementierungsaufgabe wird konkret angelegt.
+**TU-01 und TU-02 sind auf main (PRs #15/#17, Merges `1296cdb`/`8f6852a`, 21.11.2026). Nächste einzelne Aufgabe ist TU-03a: begrenzte mehrstufige Lesezugriffe als erster Teil von TU-03. TU-03–TU-07 sind noch nicht abgeschlossen.** Genau eine aktive Implementierungsaufgabe. Größere Schritte werden bei Bedarf in kleine PRs zerlegt; nur die unmittelbar nächste Implementierungsaufgabe wird konkret angelegt.
 
 | Schritt | Umfang | Abnahmeziel |
 | --- | --- | --- |
@@ -39,7 +39,7 @@ Nach jedem Merge PROJECT_STATE.md mit tatsächlichem Stand, Belegen und nächste
 
 ## Unmittelbar nächste Aufgabe
 
-**TU-02 — Aufrufkarten und konkrete Bestätigungen**, siehe [Spec](tasks/TU-02-tool-confirmations.md). Implementiert im Draft-PR, nicht gemergt. TU-01 ist abgeschlossen; mehrstufige Ausführung bleibt TU-03.
+**TU-03a — begrenzte mehrstufige Lesezugriffe**, siehe [Spec](tasks/TU-03a-read-loop.md). Geplant, nicht gestartet. Ergebnisse dürfen weitere freigegebene READ-Aufrufe informieren, aber keine neuen Schreibaktionen autorisieren. Automatische Wiederaufnahme nach konkreten Bestätigungen und davon abhängige Aktionsketten bleiben als weiterer TU-03-Umfang offen; TU-03a allein erfüllt nicht die gesamte Phase.
 
 ## Vergleichsquellen (abgerufen am 21.11.2026)
 
