@@ -1,6 +1,6 @@
 # TU-01 — Gemeinsame Tool-Ausführung
 
-Status: **implementiert im Draft-PR, nicht gemergt** (Branch `feat/tool-use-foundation`). Unabhängiges Review/Security, gezielte QA und lokale Linux-CI stehen aus. PO-Auftrag vom 21.11.2026, [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: externe Aufrufe und Berechtigungen.
+Status: **implementiert im Draft-PR #15, nicht gemergt** (Branch `feat/tool-use-foundation`). Code-/Security-Freigabe (Codex) auf `71efc94`, lokale Linux-CI grün auf Produktstand `7c33de9` (`ci/evidence/20261121-104549/`), gezielte Admin-QA bestanden (siehe unten). Merge bleibt Orchestrator-/PO-Schritt. PO-Auftrag vom 21.11.2026, [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: externe Aufrufe und Berechtigungen.
 
 ## Ziel
 
@@ -54,3 +54,16 @@ Auslegung „WRITE standardmäßig aus“: WRITE-Werkzeuge sind wie alle Werkzeu
 - **[major / Security medium] Große Zahlen:** Grenzen werden ohne Konvertierungs-Exception geprüft (ganzzahlig im `long`-Bereich bzw. endliche Dezimalzahl); sonst gesperrt. Validator-Methoden werfen nie (fail closed). Adminliste und Refresh bleiben bei solchen Schemas nutzbar. Argumente mit nicht endlichen Zahlen (z. B. `1e400`) oder Verschachtelung über 64 Ebenen werden abgewiesen.
 - **[minor / info] enum/const:** Vergleich nach JSON-Schema-Wertgleichheit (`1` = `1.0`, rekursiv in Listen/Objekten) — mitbehoben.
 - Regressionen: `McpSchemaFailClosedTest` (Fake-MCP-Server → Refresh → Liste → Klassifizieren/Freigeben → zentraler Dienst; kein `tools/call`, kein Audit-Eintrag; fehlendes Schema separat), zusätzliche Fälle in `ToolArgumentValidatorTest`.
+
+## Gezielte QA Admin-Ablauf (21.11.2026)
+
+Echter Keplura-Server aus dem PR-Stand (Dev-Profil, eigene H2), echte Desktop-Oberfläche im Browser, lokaler MCP-Beispielserver (Streamable HTTP, drei Werkzeuge: lesen/schreiben/kritisch, zählt `tools/call`), geskriptetes OpenAI-kompatibles Gateway statt Modell.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Verbinden → alle Werkzeuge „nicht klassifiziert“, Häkchen gesperrt | bestanden |
+| `lookup_ticket` → Lesen → Häkchen aktiv → freigeben + Arbeitsbereich → Chatfrage | bestanden: nur `lookup_ticket` angeboten, genau 1 `tools/call`, Antwort „Werkzeuge verwendet: lookup_ticket“, Protokoll mit Klasse „Lesen“, erfolgreich |
+| Klassenwechsel Lesen → Schreiben | bestanden: Freigabe aufgehoben (0 von 3), nächste Chatantwort ohne angebotenes Werkzeug, kein weiterer Aufruf |
+| `delete_all_tickets` → Kritisch | bestanden: Häkchen gesperrt mit Hinweis; direkte Freigabe per Admin-API (`PATCH enabledTools`) bleibt wirkungslos, kein Aufruf |
+
+Grenzen: kein echtes Modell (Gateway geskriptet), nicht der offizielle MCP-Beispielserver (kein Download), nur deutsche Oberfläche, kein Dunkelmodus, H2 statt PostgreSQL (V25 auf PostgreSQL hat Codex separat geprüft).
