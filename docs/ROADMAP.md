@@ -16,7 +16,7 @@ be started, decomposed or tasked without explicit PO approval.**
 
 ## Aktuelle Priorität — Tool Use (PO-beschlossen 21.11.2026)
 
-**Arbeitsziel für die nächsten Tage: Kepluras Tool Use mindestens auf den dokumentierten Funktionsumfang von Open WebUI bringen.** Verbindliche Reihenfolge und Abnahmeziele: [TOOL_USE_PLAN.md](TOOL_USE_PLAN.md). Nächste einzelne Implementierungsaufgabe: [TU-01](tasks/TU-01-tool-foundation.md), noch nicht gestartet.
+**Arbeitsziel für die nächsten Tage: Kepluras Tool Use mindestens auf den dokumentierten Funktionsumfang von Open WebUI bringen.** Verbindliche Reihenfolge und Abnahmeziele: [TOOL_USE_PLAN.md](TOOL_USE_PLAN.md). TU-01 ist abgeschlossen (PR #15, Merge 1296cdb). Nächste einzelne Implementierungsaufgabe: [TU-02](tasks/TU-02-tool-confirmations.md), geplant und noch nicht gestartet.
 
 Reihenfolge: gemeinsame Grundlage → Bestätigungen/Aufrufanzeige → mehrstufige Ausführung → Wissen/Anhänge/Web → Auswahl/Tool-Suche/Rückfragen → Adapter/OAuth/Medien → zusätzliche Fähigkeiten einzeln. Eine aktive Implementierung; bestehende Sicherheitsbefunde und Gates bleiben verbindlich. Kein Fertigstellungstermin für den Gesamtumfang zugesagt.
 

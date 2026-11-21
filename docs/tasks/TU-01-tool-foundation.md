@@ -1,6 +1,6 @@
 # TU-01 — Gemeinsame Tool-Ausführung
 
-Status: **implementiert im Draft-PR #15, nicht gemergt** (Branch `feat/tool-use-foundation`). Code-/Security-Freigabe (Codex) auf `71efc94`, lokale Linux-CI grün auf Produktstand `7c33de9` (`ci/evidence/20261121-104549/`), gezielte Admin-QA bestanden (siehe unten). Merge bleibt Orchestrator-/PO-Schritt. PO-Auftrag vom 21.11.2026, [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: externe Aufrufe und Berechtigungen.
+Status: **auf main übernommen**, PR #15, Squash-Merge `1296cdb038cb419918645f15e37d62acccdbe585`, am 21.11.2026 nach Fetch und vollständigem Baumvergleich mit Head `b378109` verifiziert. Code-/Security-Freigabe ausdrücklich auf finalem Head `b378109`; lokale Linux-CI grün auf Produktcommit `7c33de9`, Evidence `ci/evidence/20261121-104549/`; danach nur Nachweise/Dokumentation. Gezielte Admin-QA bestanden mit den unten genannten Grenzen. Kein Release/Deployment. Nächste Aufgabe: [TU-02](TU-02-tool-confirmations.md). PO-Auftrag vom 21.11.2026, [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: externe Aufrufe und Berechtigungen.
 
 ## Ziel
 

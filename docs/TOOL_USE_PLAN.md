@@ -8,7 +8,7 @@ Diese Reihenfolge ersetzt ältere allgemeine Angaben zur nächsten UI-/Roadmap-A
 
 ## Verbindliche Reihenfolge
 
-Alle Schritte sind **geplant, noch nicht umgesetzt**. Genau eine aktive Implementierungsaufgabe. Größere Schritte werden bei Bedarf in kleine PRs zerlegt; nur die unmittelbar nächste Implementierungsaufgabe wird konkret angelegt.
+**TU-01 ist auf main (PR #15, Merge `1296cdb`, 21.11.2026). TU-02 ist die nächste geplante Aufgabe; TU-02–TU-07 sind noch nicht umgesetzt.** Genau eine aktive Implementierungsaufgabe. Größere Schritte werden bei Bedarf in kleine PRs zerlegt; nur die unmittelbar nächste Implementierungsaufgabe wird konkret angelegt.
 
 | Schritt | Umfang | Abnahmeziel |
 | --- | --- | --- |
@@ -39,7 +39,7 @@ Nach jedem Merge PROJECT_STATE.md mit tatsächlichem Stand, Belegen und nächste
 
 ## Unmittelbar nächste Aufgabe
 
-**TU-01 — gemeinsame Tool-Ausführung**, siehe [Spec](tasks/TU-01-tool-foundation.md). Implementiert im Draft-PR, nicht gemergt; Gates offen. Freigabedialoge und mehrstufige Ausführung folgen getrennt.
+**TU-02 — Aufrufkarten und konkrete Bestätigungen**, siehe [Spec](tasks/TU-02-tool-confirmations.md). Geplant, nicht gestartet. TU-01 ist abgeschlossen; mehrstufige Ausführung bleibt TU-03.
 
 ## Vergleichsquellen (abgerufen am 21.11.2026)
 
