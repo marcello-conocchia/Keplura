@@ -1,5 +1,6 @@
 import { ref, watchEffect } from "vue";
 import { EN } from "./i18n-en";
+import { SERVER_EN, SERVER_EN_PATTERNS } from "./i18n-server-en";
 
 /**
  * UI language (German / English). The German text is the key: `tr("Abbrechen")`
@@ -52,4 +53,34 @@ export function tr(german: string, ...args: (string | number | null | undefined)
 /** BCP-47 tag for dates and numbers in the current UI language. */
 export function dateLocale(): string {
   return locale.value === "en" ? "en-GB" : "de-DE";
+}
+
+/** One text from the server (German) in the current UI language. Unknown texts stay as they are. */
+export function serverText(text: string): string {
+  if (locale.value !== "en" || !text) return text;
+  const exact = SERVER_EN[text] ?? EN[text];
+  if (exact !== undefined) return exact;
+  for (const [pattern, english] of SERVER_EN_PATTERNS) {
+    if (pattern.test(text)) return text.replace(pattern, english);
+  }
+  return text;
+}
+
+/**
+ * Translates every string in a parsed API response that is a known server text.
+ * Applied where admin/data-source/productivity responses are read; values that
+ * are user data (names, paths) do not match the keys and stay unchanged.
+ */
+export function translateServer<T>(value: T): T {
+  if (locale.value !== "en") return value;
+  return walk(value, 0) as T;
+}
+
+function walk(v: unknown, depth: number): unknown {
+  if (typeof v === "string") return serverText(v);
+  if (depth > 8 || v === null || typeof v !== "object") return v;
+  if (Array.isArray(v)) return v.map((x) => walk(x, depth + 1));
+  const out: Record<string, unknown> = {};
+  for (const [k, x] of Object.entries(v as Record<string, unknown>)) out[k] = walk(x, depth + 1);
+  return out;
 }
