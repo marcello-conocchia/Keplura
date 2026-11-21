@@ -28,6 +28,13 @@ test("texts with numbers and names", () => {
   assert.equal(en("Linux-Gruppe (GID 100)"), "Linux group (GID 100)");
 });
 
+test("tool risk and schema messages (TU-01)", () => {
+  assert.equal(en("Unbekannte Risikoklasse. Erlaubt sind READ, WRITE und CRITICAL."), "Unknown risk class. Allowed are READ, WRITE and CRITICAL.");
+  assert.equal(en("Das Eingabeschema wird nicht unterstützt (nicht unterstütztes Schlüsselwort: pattern)."),
+    "The input schema is not supported (unsupported keyword: pattern).");
+  assert.equal(en("Das Eingabeschema wird nicht unterstützt (ungültiger Typ: type)."), "The input schema is not supported (invalid value: type).");
+});
+
 test("user data stays as it is", () => {
   for (const s of ["Vertrieb – Angebote", "personal/Gehaltsliste.csv", "Muster GmbH", ""]) assert.equal(en(s), s);
 });

@@ -23,7 +23,7 @@ class McpAdminConcurrencyTest {
 
     private McpAdminController.ServerView create(String name) {
         return (McpAdminController.ServerView) controller.create(new McpAdminController.Input(
-                name, "http://localhost/mcp", null, true, null, null, null)).getBody();
+                name, "http://localhost/mcp", null, true, null, null, null, null)).getBody();
     }
 
     @Test void concurrentCreationReturnsEachOwnNameAndGeneratedId() throws Exception {

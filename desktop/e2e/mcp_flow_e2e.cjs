@@ -34,8 +34,10 @@ fs.mkdirSync(out, { recursive: true });
       assert.equal(await page.getByTestId('admin-mcp-token').inputValue(), '');
       await page.screenshot({ path: path.join(out, 'connected.png'), fullPage: true });
     });
-    await step('Ein Werkzeug und genau einen Arbeitsbereich freigeben; Neuladen erhält Auswahl', async () => {
+    await step('Ein Werkzeug klassifizieren, freigeben und genau einen Arbeitsbereich freigeben; Neuladen erhält Auswahl', async () => {
       const server = page.getByTestId('admin-mcp-server').filter({ hasText: name });
+      assert(await server.getByRole('checkbox', { name: 'echo', exact: true }).isDisabled()); // TU-01: unclassified = blocked
+      await server.getByRole('combobox', { name: 'Risikoklasse für echo', exact: true }).selectOption('READ');
       await server.getByRole('checkbox', { name: 'echo', exact: true }).check();
       await server.getByRole('checkbox', { name: process.env.E2E_MCP_SPACE || 'Abnahme Datenquellen / Pilotbereich', exact: true }).check();
       await page.getByTestId('admin-tab-status').click();

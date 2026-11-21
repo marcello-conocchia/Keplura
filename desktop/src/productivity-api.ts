@@ -83,17 +83,27 @@ export const putWebSearchAdmin = (input: { provider: string; url: string; apiKey
 export const testWebSearchAdmin = () =>
   call<{ ok: boolean; message: string; results: { title: string; url: string; snippet: string }[] }>("POST", "/api/v1/admin/web-search/test", undefined, 30000);
 
+/** TU-01: risk class is set by an admin only; unclassified tools stay blocked. */
+export type ToolRisk = "READ" | "WRITE" | "CRITICAL";
+export interface McpTool {
+  name: string; description: string;
+  /** effectively approved (classified, not CRITICAL, schema supported, ticked) */
+  enabled: boolean;
+  risk: ToolRisk | null; schemaSupported: boolean; schemaProblem: string | null;
+  /** approval from before TU-01 without a risk class — no longer effective */
+  legacyApproval: boolean;
+}
 export interface McpServer {
   id: number; name: string; url: string; hasToken: boolean; enabled: boolean;
-  tools: { name: string; description: string; enabled: boolean }[]; lastCheckedAt: string | null; lastError: string | null;
+  tools: McpTool[]; lastCheckedAt: string | null; lastError: string | null;
   allSpaces: boolean; spaceIds: number[];
 }
 const MCP = "/api/v1/admin/mcp-servers";
 export const listMcpServers = () => call<McpServer[]>("GET", MCP);
 export const createMcpServer = (input: { name: string; url: string; token: string | null }) => call<McpServer>("POST", MCP, input, 60000);
-export const updateMcpServer = (id: number, input: { name?: string; url?: string; token?: string | null; enabled?: boolean; enabledTools?: string[]; allSpaces?: boolean; spaceIds?: number[] }) =>
+export const updateMcpServer = (id: number, input: { name?: string; url?: string; token?: string | null; enabled?: boolean; enabledTools?: string[]; allSpaces?: boolean; spaceIds?: number[]; toolRisks?: Record<string, ToolRisk | ""> }) =>
   call<McpServer>("PATCH", `${MCP}/${id}`, input);
 export const refreshMcpServer = (id: number) => call<McpServer>("POST", `${MCP}/${id}/refresh`, undefined, 60000);
 export const deleteMcpServer = (id: number) => call<void>("DELETE", `${MCP}/${id}`);
 export const listMcpSpaces = () => call<{ id: number; name: string; orgName: string }[]>("GET", `${MCP}/spaces`);
-export const listMcpCalls = () => call<{ called_at: string; server_name: string; tool_name: string; duration_ms: number; ok: boolean; error: string | null; user_id: number }[]>("GET", `${MCP}/calls`);
+export const listMcpCalls = () => call<{ called_at: string; server_name: string; tool_name: string; duration_ms: number; ok: boolean; error: string | null; user_id: number; risk: ToolRisk | null }[]>("GET", `${MCP}/calls`);

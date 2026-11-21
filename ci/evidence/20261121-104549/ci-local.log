@@ -1,0 +1,36 @@
+ci-local gate — run 20261121-104549  (repo: /w)
+head: 7c33de9 | suites: none
+[native reader] 10:45:49: cargo build + cargo test --locked
+[1/4] server  10:45:51: mvn package (skipTests) + chunked surefire, forkCount=1, chunk=12
+  manifest: 83 test classes -> chunks of 12
+  chunk 1 (12 classes) 10:46:04
+  chunk 2 (12 classes) 10:46:42
+  chunk 3 (12 classes) 10:47:14
+  chunk 4 (12 classes) 10:47:57
+  chunk 5 (12 classes) 10:48:25
+  chunk 6 (12 classes) 10:49:03
+  chunk 7 (11 classes) 10:49:36
+[2/4] desktop 10:50:04: npm ci + npm run build (vue-tsc typecheck)
+[3/4] tauri   10:50:22: cargo check --all-targets (src-tauri, Linux)
+all selected stages green — evidence: /w/ci/evidence/20261121-104549
+
+================= RESULT MATRIX =================
+STAGE                        RESULT NOTE
+server:local-reader          PASS   locked Rust build and FD snapshot regressions
+server:package               PASS   compile + fat jar
+server:chunk-1               PASS   12 classes — [INFO] Tests run: 93, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-2               PASS   12 classes — [INFO] Tests run: 88, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-3               PASS   12 classes — [INFO] Tests run: 121, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-4               PASS   12 classes — [INFO] Tests run: 71, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-5               PASS   12 classes — [INFO] Tests run: 95, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-6               PASS   12 classes — [INFO] Tests run: 77, Failures: 0, Errors: 0, Skipped: 1
+server:chunk-7               PASS   11 classes — [INFO] Tests run: 84, Failures: 0, Errors: 0, Skipped: 0
+server:manifest-audit        PASS   83 classes, each exactly once in 7 chunks
+desktop:build                PASS   npm ci + vue-tsc + vite build
+desktop:cargo-check          PASS   cargo check --all-targets
+e2e                          SKIP   no suite selected (--suite/--with-e2e)
+-------------------------------------------------
+failed stages : 0
+exit code     : 0  (0 green / 1 test-fail / 2 gate-integrity / 3 resource-infra)
+evidence      : /w/ci/evidence/20261121-104549
+=================================================

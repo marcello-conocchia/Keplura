@@ -35,6 +35,13 @@ the first tagged release (planned `0.1.0`, see [docs/RELEASING.md](docs/RELEASIN
 
 ### Changed
 
+- **Breaking (admins):** tool calls (MCP) now run through one central,
+  audited execution path. Every MCP tool needs an admin-set risk class
+  (read / write / critical) before it can be approved; unclassified and
+  critical tools stay blocked, and arguments are checked against the tool's
+  input schema before each call. Tools approved before this update are not
+  classified automatically and stop working until an admin classifies and
+  approves them again. See `docs/howto/mcp.md`.
 - New app icon (orbit mark), all desktop icon sizes regenerated from
   `desktop/src-tauri/icons/app-icon.svg`.
 - Security reports go only through GitHub private vulnerability reporting.

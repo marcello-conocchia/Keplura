@@ -169,6 +169,12 @@ export const SERVER_EN: Record<string, string> = {
   "Aufruf begonnen; Abschluss noch nicht bestätigt.": "Call started; completion not confirmed yet.",
   "Das Werkzeug konnte nicht sicher freigegeben und protokolliert werden. Es wurde nicht aufgerufen.": "The tool could not be approved and logged safely. It was not called.",
   "Der Werkzeug-Aufruf ist fehlgeschlagen.": "The tool call failed.",
+  // tools (TU-01)
+  "Unbekannte Risikoklasse. Erlaubt sind READ, WRITE und CRITICAL.": "Unknown risk class. Allowed are READ, WRITE and CRITICAL.",
+  "Das Eingabeschema muss ein Objekt beschreiben.": "The input schema must describe an object.",
+  "Das Eingabeschema ist zu tief verschachtelt.": "The input schema is nested too deeply.",
+  "Das Eingabeschema enthält einen ungültigen Teil.": "The input schema contains an invalid part.",
+  "Das Eingabeschema kann nicht sicher geprüft werden.": "The input schema cannot be checked safely.",
   // chat: fixed answer when no source matches
   "Dazu habe ich nichts gefunden. Bitte ergänze passende Dokumente oder formuliere die Frage genauer.":
     "I found nothing on this. Please add matching documents or ask more precisely.",
@@ -194,6 +200,9 @@ export const SERVER_EN_PATTERNS: [RegExp, string, boolean?][] = [
   [/^(\d+) Treffer gefunden\.$/, "$1 results found."],
   [/^Bitte höchstens (\d+) Dateien auf einmal ausschließen\.$/, "Please exclude at most $1 files at once."],
   [/^Fehler beim Werkzeug-Aufruf: (.*)$/s, "Tool call error: $1"],
+  [/^Das Eingabeschema wird nicht unterstützt \(nicht unterstütztes Schlüsselwort: (.+)\)\.$/, "The input schema is not supported (unsupported keyword: $1)."],
+  [/^Das Eingabeschema wird nicht unterstützt \(Tupel-Schemas werden nicht unterstützt: (.+)\)\.$/, "The input schema is not supported (tuple schemas are not supported: $1)."],
+  [/^Das Eingabeschema wird nicht unterstützt \((ungültiger Typ|ungültige Eigenschaften|ungültige Pflichtfelder|ungültige Werteliste|ungültige Kombination|ungültige Grenze): (.+)\)\.$/, "The input schema is not supported (invalid value: $2)."],
   [/^(.+) ist Mitglied von „(.+)“\.$/, "$1 is a member of “$2”."],
   [/^(.+) ist kein Mitglied von „(.+)“\.$/, "$1 is not a member of “$2”."],
   [/^Aus (.+) mit übernommenen Dateirechten\.$/, "From $1 with mirrored file permissions."],

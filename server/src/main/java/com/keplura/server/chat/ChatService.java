@@ -99,11 +99,12 @@ public class ChatService {
         this.webSearchService = webSearchService;
     }
 
-    private com.keplura.server.mcp.McpToolService mcpToolService;
+    /** TU-01: einziger Weg zu Werkzeugen; MCP & Co. sind Adapter dahinter. */
+    private com.keplura.server.tool.ToolExecutionService toolExecution;
 
     @org.springframework.beans.factory.annotation.Autowired(required = false)
-    public void setMcpToolService(com.keplura.server.mcp.McpToolService mcpToolService) {
-        this.mcpToolService = mcpToolService;
+    public void setToolExecutionService(com.keplura.server.tool.ToolExecutionService toolExecution) {
+        this.toolExecution = toolExecution;
     }
 
     static final int MAX_TOOL_ROUNDS = 1;
@@ -116,13 +117,14 @@ public class ChatService {
      */
     private GatewayClient.UpstreamStream toolTurn(Long userId, Long orgId, TurnContext ctx, String prompt, ChatProperties chat,
                                                   com.keplura.server.gateway.GatewayProperties effective) {
-        if (mcpToolService == null) return null;
-        Long space = mcpToolService.spaceOf(ctx.conversationId());
-        java.util.Map<String, com.keplura.server.mcp.McpToolService.ToolRef> tools = mcpToolService.toolsFor(space);
-        if (tools.isEmpty()) return null;
+        if (toolExecution == null) return null;
+        com.keplura.server.tool.ToolContext toolContext = toolExecution.resolveContext(userId, orgId, ctx.conversationId());
+        if (toolContext == null) return null;
+        com.keplura.server.tool.ToolExecutionService.ToolTurn tools = toolExecution.openTurn(toolContext);
+        if (tools.offered().isEmpty()) return null;
         ObjectNode body = (ObjectNode) mapper.readTree(ctx.canonicalRequestBody());
         body.put("stream", false);
-        body.set("tools", mcpToolService.toolsJson(tools));
+        body.set("tools", tools.toolsJson());
         ArrayNode answerContext = (ArrayNode) body.get("messages");
         ArrayNode messages = mapper.createArrayNode();
         messages.addObject().put("role", "system").put("content",
@@ -132,7 +134,6 @@ public class ChatService {
         messages.addObject().put("role", "user").put("content", prompt);
         body.set("messages", messages);
         List<String> used = new ArrayList<>();
-        int toolCalls = 0;
         String answer = null;
         String modelTag = chat.model();
         for (int round = 0; round <= MAX_TOOL_ROUNDS && answer == null; round++) {
@@ -163,29 +164,15 @@ public class ChatService {
                 a.put("content", msg.path("content").asString(""));
                 a.set("tool_calls", calls);
                 for (JsonNode c : calls) {
-                    var t = tools.get(c.path("function").path("name").asString(""));
-                    String result;
-                    if (++toolCalls > 8) {
-                        result = "Die Höchstzahl von acht Werkzeug-Aufrufen je Antwort ist erreicht.";
-                    } else if (t == null) {
-                        result = "Unbekanntes oder nicht freigegebenes Werkzeug.";
-                    } else {
-                        JsonNode args;
-                        try {
-                            args = mapper.readTree(c.path("function").path("arguments").asString("{}"));
-                        } catch (RuntimeException e) {
-                            args = null;
-                        }
-                        if (args == null || !args.isObject()) {
-                            result = "Die Werkzeugargumente sind kein gültiges JSON-Objekt.";
-                        } else {
-                            var outcome = mcpToolService.call(t, args, userId, orgId, space, ctx.conversationId());
-                            result = outcome.text();
-                            if (outcome.invoked() && !used.contains(t.toolName())) used.add(t.toolName());
-                        }
-                    }
+                    // Limits, schema, context, approval, risk class and audit are
+                    // enforced centrally by ToolExecutionService for every call.
+                    JsonNode rawArgs = c.path("function").path("arguments");
+                    String args = rawArgs.isString() ? rawArgs.asString()
+                            : rawArgs.isMissingNode() || rawArgs.isNull() ? "{}" : mapper.writeValueAsString(rawArgs);
+                    var outcome = tools.call(c.path("function").path("name").asString(""), args);
+                    if (outcome.invoked() && !used.contains(outcome.toolName())) used.add(outcome.toolName());
                     messages.addObject().put("role", "tool").put("tool_call_id", c.path("id").asString(""))
-                            .put("content", result);
+                            .put("content", outcome.text());
                 }
             } else {
                 if (round == 0) return null; // no tool plan: answer using the ordinary evidence context
@@ -597,8 +584,8 @@ public class ChatService {
         if (noEvidence) {
             boolean attachments = contextService != null
                     && !contextService.attachmentTexts(conversation.getId()).isEmpty();
-            boolean tools = mcpToolService != null
-                    && !mcpToolService.toolsFor(conversation.getSpaceId()).isEmpty();
+            boolean tools = toolExecution != null
+                    && toolExecution.hasTools(userId, orgId, conversation.getId());
             noEvidence = !attachments && web.isEmpty() && !tools;
         }
         return new TurnContext(conversation.getId(), citationsJson(hits), canonical, noEvidence);
