@@ -103,8 +103,9 @@ Status at version 0.1.0 (pre-release):
 
 - **No stable release yet.** Versions are `0.x`; updates may need manual steps
   described in the changelog. No long-term support commitment.
-- **UI in English and German.** Server messages (errors, sync and check
-  results) and most operator texts are still German.
+- **UI in English and German.** Server messages are translated in the
+  English interface; scripts, installer output and most operator texts are
+  German.
 - **Single instance.** Sessions live in server memory: a restart signs all
   users out (no data loss). No clustering or high availability.
 - **Desktop app:** server URL fixed at build time; no auto-update; Windows and
