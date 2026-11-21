@@ -29,7 +29,13 @@ class ExposureContentInspectorTest {
     }
 
     /** Share whose files are byte arrays; {@code null} = read error. */
-    record Share(Map<String, byte[]> files) implements SourceConnector {
+    static class Share implements SourceConnector {
+        final Map<String, byte[]> files;
+
+        Share(Map<String, byte[]> files) {
+            this.files = files;
+        }
+
         @Override public List<Entry> list(int limit) {
             return List.of();
         }
@@ -125,5 +131,75 @@ class ExposureContentInspectorTest {
     void unknownTypeIsNotCheckable() {
         var r = inspect("bild.png", new byte[]{1, 2, 3});
         assertThat(r.state()).isEqualTo(ExposureContentInspector.NOT_CHECKABLE);
+    }
+
+    // review findings
+
+    @Test
+    void hangingReadEndsAsNotCheckableWithinTheTimeLimit() {
+        var quick = new ExposureContentInspector(extractor, true, 1024 * 1024, 50, 1, 100);
+        SourceConnector hanging = new Share(Map.of()) {
+            @Override public InputStream open(String relativePath) {
+                return new InputStream() {
+                    @Override public int read() throws IOException {
+                        try {
+                            Thread.sleep(60_000);
+                        } catch (InterruptedException e) {
+                            throw new java.io.InterruptedIOException();
+                        }
+                        return -1;
+                    }
+                };
+            }
+        };
+        try {
+            long t = System.nanoTime();
+            var r = quick.inspect(hanging, new SourceConnector.Entry("slow.txt", 10, Instant.EPOCH));
+            assertThat(r.state()).isEqualTo(ExposureContentInspector.NOT_CHECKABLE);
+            assertThat(r.reason()).isEqualTo("Zeitlimit überschritten");
+            assertThat(java.time.Duration.ofNanos(System.nanoTime() - t)).isLessThan(java.time.Duration.ofSeconds(15));
+        } finally {
+            quick.stop();
+        }
+    }
+
+    @Test
+    void utf16TextIsDecoded() {
+        String text = "Name;IBAN\nA;DE89370400440532013000\n";
+        byte[] le = text.getBytes(StandardCharsets.UTF_16LE);
+        var r = inspect("export.txt", le);
+        assertThat(r.state()).isEqualTo(ExposureContentInspector.CHECKED);
+        assertThat(r.hits()).extracting(ContentPatterns.Hit::category).containsExactly(ContentPatterns.IBAN);
+        byte[] bom = new byte[le.length + 2];
+        bom[0] = (byte) 0xff; bom[1] = (byte) 0xfe;
+        System.arraycopy(le, 0, bom, 2, le.length);
+        assertThat(inspect("export2.txt", bom).hits()).hasSize(1);
+    }
+
+    @Test
+    void windows1252TextIsDecoded() {
+        byte[] b = "Arbeitsunfähig, Krankschreibung, Schwerbehinderung".getBytes(java.nio.charset.Charset.forName("windows-1252"));
+        var r = inspect("notiz.txt", b);
+        assertThat(r.hits()).extracting(ContentPatterns.Hit::category).containsExactly(ContentPatterns.HEALTH_TERMS);
+    }
+
+    @Test
+    void binaryTextFileIsNotCheckable() {
+        var r = inspect("blob.csv", new byte[]{'a', 0, 'b', 'c', 0, 0, 'x', 'y', 'z', 'w'});
+        assertThat(r.state()).isEqualTo(ExposureContentInspector.NOT_CHECKABLE);
+        assertThat(r.reason()).isEqualTo("unbekannte Zeichenkodierung");
+    }
+
+    @Test
+    void textOverTheCharacterLimitIsNotCheckable() {
+        var small = new ExposureContentInspector(extractor, true, 1024 * 1024, 50, 10, 100, 1000, 60);
+        try {
+            var share = new Share(Map.of("long.txt", "a".repeat(1001).getBytes(StandardCharsets.UTF_8)));
+            var r = small.inspect(share, new SourceConnector.Entry("long.txt", 1001, Instant.EPOCH));
+            assertThat(r.state()).isEqualTo(ExposureContentInspector.NOT_CHECKABLE);
+            assertThat(r.reason()).contains("zu groß");
+        } finally {
+            small.stop();
+        }
     }
 }

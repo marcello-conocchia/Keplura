@@ -96,4 +96,33 @@ class ContentPatternsTest {
         assertThat(hits).hasSize(1);
         assertThat(hits.get(0).toString()).doesNotContain("DE89").doesNotContain("3704");
     }
+
+    // review findings
+
+    @Test
+    void nonBreakingSpacesAndLowercaseAreRecognised() {
+        assertThat(counts("IBAN DE89\u00a03704\u00a00044\u00a00532\u00a00130\u00a000")).containsEntry(ContentPatterns.IBAN, 1);
+        assertThat(counts("iban de89 3704 0044 0532 0130 00")).containsEntry(ContentPatterns.IBAN, 1);
+        assertThat(counts("Karte 4111\u202f1111\u202f1111\u202f1111")).containsEntry(ContentPatterns.CREDIT_CARD, 1);
+        assertThat(counts("rv 65170839j003")).containsEntry(ContentPatterns.SOCIAL_SECURITY, 1);
+    }
+
+    @Test
+    void numberRightBeforeACardDoesNotHideIt() {
+        assertThat(counts("Pos 12 4111 1111 1111 1111")).containsEntry(ContentPatterns.CREDIT_CARD, 1);
+        assertThat(counts("Nr 7 86095742719")).containsEntry(ContentPatterns.TAX_ID, 1);
+    }
+
+    @Test
+    void moreCardPrefixes() {
+        assertThat(counts("Discover 6445000000000000, Diners 38120000000002"))
+                .containsEntry(ContentPatterns.CREDIT_CARD, 2);
+    }
+
+    @Test
+    void itTextIsNotHealthData() {
+        assertThat(counts("Please be patient, see the attestation, then diagnose the bug."))
+                .doesNotContainKey(ContentPatterns.HEALTH_TERMS);
+        assertThat(counts("Attest vom Arzt, Diagnose, Arztbrief")).containsEntry(ContentPatterns.HEALTH_TERMS, 3);
+    }
 }

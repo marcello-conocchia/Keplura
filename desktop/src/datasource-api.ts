@@ -173,6 +173,8 @@ export interface ExposureReport {
   message: string | null;
   /** RISK-02 Inhaltsprüfung; null während der Prüfung läuft. */
   content: { enabled: boolean; checked: number; sensitive: number; notCheckable: number; skipped: number } | null;
+  /** Alle Funde (Name, Inhalt oder nicht prüfbar), auch über der Listengrenze. */
+  findingsTotal: number;
 }
 
 export interface ExposureContentHit { category: string; label: string; count: number }

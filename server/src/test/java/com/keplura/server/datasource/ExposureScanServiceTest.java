@@ -232,6 +232,7 @@ class ExposureScanServiceTest {
 
             assertThat(share.reads).doesNotContainKey("gf/Konten.csv");
             assertThat(r.content()).isEqualTo(new ExposureScanService.ContentSummary(true, 2, 1, 1, 0));
+            assertThat(r.findingsTotal()).isEqualTo(2);
             assertThat(r.findings()).extracting(ExposureScanService.Finding::relativePath)
                     .containsExactly("vertrieb/Kaputt.txt", "vertrieb/Liste.csv");
             var liste = r.findings().get(1);

@@ -185,7 +185,7 @@ function when(iso: string | null) {
           <p v-if="report.content?.skipped" class="xp-warn">{{ $t("Der Inhalt von {0} weiteren breit lesbaren Dateien wurde nicht geprüft (Grenze je Prüflauf).", report.content.skipped) }}</p>
           <p v-if="report.findings.length === 0" class="xp-ok">{{ report.content?.enabled ? $t("Keine breit lesbare Datei hat einen auffälligen Namen oder Inhalt.") : $t("Keine Datei mit auffälligem Namen ist breit lesbar.") }}</p>
           <template v-else>
-            <label class="xp-all"><input type="checkbox" :checked="allSelected" data-testid="exposure-select-all" @change="toggleAll" /> {{ $t("Alle auswählen ({0}", report.findings.length) }}<template v-if="report.truncated"> {{ $t("von {0}", report.sensitiveBroadFiles) }}</template>)</label>
+            <label class="xp-all"><input type="checkbox" :checked="allSelected" data-testid="exposure-select-all" @change="toggleAll" /> {{ $t("Alle auswählen ({0}", report.findings.length) }}<template v-if="report.truncated"> {{ $t("von {0}", report.findingsTotal) }}</template>)</label>
             <ul class="xp-findings" data-testid="exposure-findings">
               <li v-for="f in report.findings" :key="f.relativePath">
                 <label><input type="checkbox" :checked="selected.has(f.relativePath)" @change="toggle(f.relativePath)" />

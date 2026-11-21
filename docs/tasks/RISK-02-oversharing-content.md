@@ -35,7 +35,13 @@ selbst. So fallen auch Dateien mit unauffälligem Namen auf („Liste.xlsx“ mi
   geprüft), `contentReason`, `contentHits` [{category, label, count}]; Zusammenfassung `content`
   {enabled, checked, sensitive, notCheckable, skipped}. Funde sind jetzt breit lesbare Dateien mit
   sensiblem Namen **oder** sensiblem Inhalt **oder** nicht prüfbarem Inhalt.
-- Konfiguration `keplura.exposure.content.{enabled,max-bytes,max-pages,timeout-seconds,max-files}`.
+- Konfiguration `keplura.exposure.content.{enabled,max-bytes,max-pages,timeout-seconds,max-files,max-run-minutes}`.
+- Nach unabhängiger Prüfung (Reviewer + Security, 21.11.2026) ergänzt: eigener Parser-Thread für die
+  Inhaltsprüfung (Uploads, Chat-Anhänge und Abgleich behalten ihren Pool), höchstens zwei Lese-Threads,
+  Gesamtzeit je Lauf (Standard 60 min, danach „nicht geprüft“), Zeichengrenze auch für Textdateien,
+  UTF-16/Windows-1252 erkannt, unbekannte Kodierung = nicht prüfbar, geschützte Leerzeichen und
+  Kleinbuchstaben in Kennungen, weitere Kartenpräfixe, „attest“ nur als ganzes Wort, `findingsTotal`
+  im Bericht, Parser-Fehler nur noch mit Klassenname im Debug-Log.
 - Oberfläche: Kennzahl „mit sensiblem Inhalt“, je Datei Inhalts-Etiketten („enthält 3 IBANs“) bzw.
   „Inhalt nicht prüfbar: …“; Texte erklären Name- vs. Inhaltsprüfung.
 

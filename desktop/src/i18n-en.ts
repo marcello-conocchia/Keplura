@@ -1029,4 +1029,5 @@ export const EN: Record<string, string> = {
   "Zugangsdaten": "Credentials",
   "Vertraulich": "Confidential",
   "Bank und Steuern": "Bank and tax",
+  "unbekannte Zeichenkodierung": "unknown character encoding",
 };

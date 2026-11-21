@@ -108,6 +108,12 @@ public class TikaDocumentTextExtractor {
     private final int maxDocxPages;
     private final int timeoutSeconds;
     private final ThreadPoolExecutor parserPool;
+    /**
+     * RISK-02: eigene Spur für die Inhaltsprüfung (ein Thread, ohne Warteschlange). So belegt
+     * der Oversharing-Check nie die Plätze, die Uploads, Chat-Anhänge und Abgleich brauchen —
+     * auch nicht, wenn ein abgebrochener Parse noch nachläuft.
+     */
+    private final ThreadPoolExecutor inspectionPool;
 
     public TikaDocumentTextExtractor(
             @Value("${keplura.parser.extracted-chars:2000000}") int maxExtractedChars,
@@ -136,11 +142,19 @@ public class TikaDocumentTextExtractor {
                     return t;
                 },
                 new ThreadPoolExecutor.AbortPolicy());
+        this.inspectionPool = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new SynchronousQueue<>(),
+                r -> {
+                    Thread t = new Thread(r, "tika-inspection");
+                    t.setDaemon(true);
+                    return t;
+                },
+                new ThreadPoolExecutor.AbortPolicy());
     }
 
     @PreDestroy
     void shutdownPool() {
         parserPool.shutdownNow();
+        inspectionPool.shutdownNow();
     }
 
     /**
@@ -202,8 +216,9 @@ public class TikaDocumentTextExtractor {
 
     /**
      * RISK-02 Inhaltsprüfung (Oversharing-Check): wie {@link #extract(String, Path)}, aber ohne OCR
-     * und mit eigener, höchstens gleich großer Seitengrenze und eigenem Zeitlimit. Zeichen-, Zip- und
-     * Poolgrenzen bleiben dieselben.
+     * und mit eigener, höchstens gleich großer Seitengrenze und eigenem Zeitlimit. Zeichen- und
+     * Zip-Grenzen bleiben dieselben; der Parse läuft auf einem eigenen Thread, nicht im Upload-Pool.
+     * Läuft dort noch ein abgebrochener Parse, kommt {@link ExtractionBusyException}.
      */
     public ExtractedText extractForInspection(String filename, Path file, int maxPages, int timeoutSeconds) {
         String ext = extensionOf(filename);
@@ -212,7 +227,7 @@ public class TikaDocumentTextExtractor {
         }
         int pdfPages = Math.min(maxPages, maxPdfPages);
         int docxPages = Math.min(maxPages, maxDocxPages);
-        Parsed parsed = runBounded(null, () -> parse(ext, file, pdfPages, docxPages),
+        Parsed parsed = runBounded(inspectionPool, null, () -> parse(ext, file, pdfPages, docxPages),
                 Math.min(timeoutSeconds, this.timeoutSeconds));
         if (parsed.text().isBlank()) {
             throw new BlankExtractedTextException("document contains no extractable text layer");
@@ -445,7 +460,7 @@ public class TikaDocumentTextExtractor {
             }
         } catch (IOException e) {
             // unreadable structure — let the real parse produce the classified error
-            log.debug("pdf pre-count could not open the document; continuing to parse", e);
+            log.debug("pdf pre-count could not open the document ({}); continuing to parse", e.getClass().getSimpleName());
         }
     }
 
@@ -555,9 +570,13 @@ public class TikaDocumentTextExtractor {
     }
 
     Parsed runBounded(Long documentId, Callable<Parsed> work, int timeoutSeconds) {
+        return runBounded(parserPool, documentId, work, timeoutSeconds);
+    }
+
+    private Parsed runBounded(ThreadPoolExecutor pool, Long documentId, Callable<Parsed> work, int timeoutSeconds) {
         java.util.concurrent.Future<Parsed> future;
         try {
-            future = parserPool.submit(work);
+            future = pool.submit(work);
         } catch (RejectedExecutionException e) {
             throw new ExtractionBusyException("server is busy extracting documents", e);
         }
@@ -583,7 +602,9 @@ public class TikaDocumentTextExtractor {
                 throw new UnextractableDocumentException(
                         "stored file is not a valid document of its claimed type");
             }
-            log.debug("extraction failed for document {}", documentId, cause);
+            // only the class: parser messages may quote document text
+            log.debug("extraction failed for document {} ({})", documentId,
+                    cause == null ? "unknown" : cause.getClass().getSimpleName());
             throw new UnextractableDocumentException("document could not be parsed");
         }
     }

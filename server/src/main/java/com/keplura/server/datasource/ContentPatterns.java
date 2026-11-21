@@ -101,9 +101,11 @@ public final class ContentPatterns {
         if (d.charAt(0) == '4') return n == 13 || n == 16 || n == 19;                 // Visa
         if ((p2 >= 51 && p2 <= 55) || (p4 >= 2221 && p4 <= 2720)) return n == 16;     // Mastercard
         if (p2 == 34 || p2 == 37) return n == 15;                                      // Amex
-        if (p4 == 6011 || p2 == 65) return n >= 16 && n <= 19;                         // Discover
+        int p3 = Integer.parseInt(d.substring(0, 3));
+        if (p4 == 6011 || p2 == 65 || (p3 >= 644 && p3 <= 649)) return n >= 16 && n <= 19; // Discover
         if (p4 >= 3528 && p4 <= 3589) return n >= 16 && n <= 19;                       // JCB
         if (p2 == 36 || (p2 == 30 && d.charAt(2) <= '5')) return n == 14;              // Diners
+        if (p2 == 38 || p2 == 39) return n == 14 || n == 16;                            // Diners International
         return false;
     }
 
@@ -111,14 +113,14 @@ public final class ContentPatterns {
 
     /** DE-Rentenversicherungsnummer: 2 Ziffern Bereich, TTMMJJ, Buchstabe, 2 Ziffern Serie, Prüfziffer. */
     private static final Pattern RVNR = Pattern.compile(
-            "(?<![A-Za-z0-9])(\\d{2}) ?(\\d{6}) ?([A-Z]) ?(\\d{2}) ?(\\d)(?![A-Za-z0-9])");
+            "(?<![A-Za-z0-9])(\\d{2}) ?(\\d{6}) ?([A-Za-z]) ?(\\d{2}) ?(\\d)(?![A-Za-z0-9])");
 
     static boolean validRvnr(String area, String birth, char letter, String serial, int check) {
         int day = Integer.parseInt(birth.substring(0, 2));
         int month = Integer.parseInt(birth.substring(2, 4));
         // Tag 01–31; bei erschöpften Seriennummern wird 50 addiert (51–81)
         if (!((day >= 1 && day <= 31) || (day >= 51 && day <= 81)) || month < 1 || month > 12) return false;
-        String l = String.format(Locale.ROOT, "%02d", letter - 'A' + 1);
+        String l = String.format(Locale.ROOT, "%02d", Character.toUpperCase(letter) - 'A' + 1);
         String digits = area + birth + l + serial;
         int[] w = {2, 1, 2, 5, 7, 1, 2, 1, 2, 1, 2, 1};
         int sum = 0;
@@ -174,20 +176,27 @@ public final class ContentPatterns {
             "social security", "termination letter", "performance review");
 
     static final List<String> HEALTH_WORDS = List.of(
-            "diagnose", "diagnosis", "krankmeldung", "krankschreibung", "arbeitsunfaehig", "attest", "befund",
+            "diagnose", "diagnosis", "krankmeldung", "krankschreibung", "arbeitsunfaehig", "attest!", "befund",
             "arztbrief", "icd-10", "schwerbehinder", "grad der behinderung", "medikation", "eingliederungsmanagement",
             "betriebsarzt", "medication", "sick leave", "sick note", "medical record", "medical certificate",
-            "disability", "patient");
+            "disability");
 
     private static final Pattern HR = wordsPattern(HR_WORDS);
     private static final Pattern HEALTH = wordsPattern(HEALTH_WORDS);
 
-    /** Wortanfang: „Diagnose“ trifft „Diagnosen“, „Bruttogehalt“ nicht in „xbruttogehalt“. */
+    /**
+     * Wortanfang: „Diagnose“ trifft „Diagnosen“, „Bruttogehalt“ nicht in „xbruttogehalt“.
+     * Endet ein Begriff auf „!“, zählt nur das ganze Wort („attest“, nicht „attestation“).
+     */
     private static Pattern wordsPattern(List<String> words) {
         StringBuilder b = new StringBuilder("(?<![a-z0-9])(?:");
         for (int i = 0; i < words.size(); i++) {
             if (i > 0) b.append('|');
-            b.append(Pattern.quote(words.get(i)).replace(" ", "\\E\\s+\\Q"));
+            String w = words.get(i);
+            boolean whole = w.endsWith("!");
+            if (whole) w = w.substring(0, w.length() - 1);
+            b.append(Pattern.quote(w).replace(" ", "\\E\\s+\\Q"));
+            if (whole) b.append("(?![a-z])");
         }
         return Pattern.compile(b.append(')').toString());
     }
@@ -203,6 +212,7 @@ public final class ContentPatterns {
     public static List<Hit> scan(String text) {
         List<Hit> out = new ArrayList<>();
         if (text == null || text.isEmpty()) return out;
+        text = plainSpaces(text);
         StringBuilder masked = new StringBuilder(text);
 
         add(out, IBAN, "IBAN", ibans(text, masked));
@@ -218,11 +228,24 @@ public final class ContentPatterns {
         return out;
     }
 
+    /** Geschützte und schmale Leerzeichen (häufig in PDF/Excel) wie normale behandeln; Länge bleibt gleich. */
+    static String plainSpaces(String text) {
+        return text.replace('\u00a0', ' ').replace('\u202f', ' ').replace('\u2007', ' ');
+    }
+
+    /** Großbuchstaben Zeichen für Zeichen, damit Positionen gleich bleiben (für „de89 …“). */
+    private static String upperSameLength(String text) {
+        char[] c = text.toCharArray();
+        for (int i = 0; i < c.length; i++) c[i] = Character.toUpperCase(c[i]);
+        return new String(c);
+    }
+
     private static void add(List<Hit> out, String category, String label, int n) {
         if (n > 0) out.add(new Hit(category, label, n));
     }
 
-    private static int ibans(String text, StringBuilder masked) {
+    private static int ibans(String original, StringBuilder masked) {
+        String text = upperSameLength(original);
         Set<String> seen = new HashSet<>();
         Matcher m = IBAN_START.matcher(text);
         int from = 0;
@@ -266,11 +289,15 @@ public final class ContentPatterns {
         Set<String> seen = new HashSet<>();
         Matcher m = p.matcher(masked);
         List<int[]> hits = new ArrayList<>();
-        while (m.find()) {
+        int from = 0;
+        while (from < masked.length() && m.find(from)) {
             String digits = m.group().replaceAll("[^0-9]", "");
             if (check.test(digits)) {
                 seen.add(digits);
                 hits.add(new int[]{m.start(), m.end()});
+                from = m.end();
+            } else {
+                from = m.start() + 1; // „Pos 12 4111 …“: ab der nächsten Ziffernfolge neu versuchen
             }
         }
         for (int[] h : hits) blank(masked, h[0], h[1]);
@@ -283,7 +310,7 @@ public final class ContentPatterns {
         Matcher m = RVNR.matcher(masked);
         while (m.find()) {
             if (validRvnr(m.group(1), m.group(2), m.group(3).charAt(0), m.group(4), m.group(5).charAt(0) - '0')) {
-                seen.add("de:" + m.group(1) + m.group(2) + m.group(3) + m.group(4) + m.group(5));
+                seen.add("de:" + m.group(1) + m.group(2) + m.group(3).toUpperCase(Locale.ROOT) + m.group(4) + m.group(5));
                 hits.add(new int[]{m.start(), m.end()});
             }
         }
