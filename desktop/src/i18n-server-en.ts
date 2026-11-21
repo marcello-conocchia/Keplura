@@ -174,6 +174,7 @@ export const SERVER_EN: Record<string, string> = {
   "Aufruf begonnen; Abschluss noch nicht bestätigt.": "Call started; completion not confirmed yet.",
   "Das Werkzeug konnte nicht sicher freigegeben und protokolliert werden. Es wurde nicht aufgerufen.": "The tool could not be approved and logged safely. It was not called.",
   "Der Werkzeug-Aufruf ist fehlgeschlagen.": "The tool call failed.",
+  "Die Werkzeugausführung ist derzeit belegt. Das Werkzeug wurde nicht aufgerufen.": "Tool execution is currently busy. The tool was not called.",
   // tools (TU-01)
   "Das Werkzeug ist nicht mehr freigegeben oder wurde geändert. Es wurde nicht aufgerufen.": "The tool is no longer approved or was changed. It was not called.",
   "Der Zugriff auf diesen Chat besteht nicht mehr. Das Werkzeug wurde nicht aufgerufen.": "Access to this chat no longer exists. The tool was not called.",

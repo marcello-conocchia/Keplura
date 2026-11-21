@@ -208,19 +208,21 @@ public class ToolExecutionService {
         return new Continuation(turn, state, "Werkzeug „" + row.toolName() + "“: " + decision);
     }
 
+    private static final String EXECUTION_UNAVAILABLE = "Die Werkzeugausführung ist derzeit belegt. Das Werkzeug wurde nicht aufgerufen.";
+
     /** Serialize across processes without holding DB transactions or pool connections over network I/O.
      * A crashed holder leaves the question closed rather than risking a repeated external action. */
-    private <T> T serialized(ToolContext ctx, Long promptId, Supplier<T> action) {
+    private <T> T serialized(ToolContext ctx, Long promptId, Supplier<T> action, Supplier<T> notStarted) {
         if (promptId == null) return action.get();
         try {
             jdbc.update("insert into tool_execution_guard(prompt_message_id,conversation_id) values(?,?)",promptId,ctx.conversationId());
         } catch (org.springframework.dao.DuplicateKeyException existing) { /* same question */ }
         String lease = java.util.UUID.randomUUID().toString();
-        long waitStarted = System.nanoTime();
+        long waitStarted = nanoClock.getAsLong();
         while (jdbc.update("update tool_execution_guard set lease=? where prompt_message_id=? and lease is null",lease,promptId)!=1) {
-            if (System.nanoTime() - waitStarted >= MAX_TOOL_TIME_PER_TURN.toNanos()) throw new IllegalStateException("tool execution unavailable");
+            if (nanoClock.getAsLong() - waitStarted >= MAX_TOOL_TIME_PER_TURN.toNanos()) return notStarted.get();
             try { Thread.sleep(25); }
-            catch (InterruptedException e) { Thread.currentThread().interrupt(); throw new IllegalStateException("tool execution interrupted"); }
+            catch (InterruptedException e) { Thread.currentThread().interrupt(); return notStarted.get(); }
         }
         try {
             return action.get();
@@ -463,7 +465,17 @@ public class ToolExecutionService {
             return new Decision.Conflict(view(reload(row), now));
         }
         // From here the card is consumed: whatever happens, it is never executed again.
-        return serialized(ctx, row.promptMessageId(), () -> executeDecision(ctx, row));
+        return serialized(ctx, row.promptMessageId(), () -> executeDecision(ctx, row), () -> {
+            notStarted(row.id());
+            return new Decision.Done(view(reload(row), wallClock.get()));
+        });
+    }
+
+    /** Only used before acquiring the guard: no adapter or mandatory audit was started. */
+    private Executed notStarted(long cardId) {
+        Executed blocked = new Executed(null, false, false, EXECUTION_UNAVAILABLE, 0);
+        finishCard(cardId, blocked);
+        return blocked;
     }
 
     private Decision executeDecision(ToolContext ctx, ToolCallStore.Row row) {
@@ -703,7 +715,7 @@ public class ToolExecutionService {
                         : new Executed(null, false, false, reason, 0);
                 finishCard(card.id(), result);
                 return result;
-            });
+            }, () -> notStarted(card.id()));
             spentNanos += done.elapsedNanos();
             if (!done.ok()) invocationFailed = true;
             if (!done.ok()) {
