@@ -74,7 +74,8 @@ class FlywayBaselineMigrationTest {
         // PENDING/FAILED for async indexing, constraint swap only — no new table).
         // V14/V15 (PILOT 4e) and V16 (ADR-0012 data sources + ACL tables) — portable.
         // V25 (TU-01: tool_risks column + tool_call_log) — portable.
-        assertThat(result.migrationsExecuted).isEqualTo(25);
+        // V27 (TU-03b: persistent question budgets, execution guard and answer binding).
+        assertThat(result.migrationsExecuted).isEqualTo(26);
 
         JdbcTemplate jdbc = new JdbcTemplate(ds);
         assertThat(jdbc.queryForList("SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name <> 'flyway_schema_history'", String.class))
@@ -87,7 +88,11 @@ class FlywayBaselineMigrationTest {
                         "data_source", "data_source_file",
                         "quality_question", "quality_run", "quality_result", "prompt_template",
                         "chat_conversation_kb", "chat_attachment", "web_search_settings", "mcp_server",
-                        "mcp_server_space", "mcp_call_log", "tool_call_log", "tool_call", "tool_call_stop");
+                        "mcp_server_space", "mcp_call_log", "tool_call_log", "tool_call", "tool_call_stop",
+                        "tool_question", "tool_execution_guard");
+        assertThat(jdbc.queryForObject(
+                "SELECT count(*) FROM information_schema.columns WHERE table_name='chat_message' AND column_name='prompt_message_id' AND is_nullable='YES'",
+                Long.class)).isEqualTo(1L);
         // V4 must stay vendor-free on this leg: no pgvector twin table on H2
         assertThat(jdbc.queryForList("SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name = 'kb_chunk_embedding'", String.class))
                 .isEmpty();
@@ -147,7 +152,7 @@ class FlywayBaselineMigrationTest {
         assertThat(jdbc.queryForList(
                 "SELECT version FROM flyway_schema_history WHERE version IS NOT NULL ORDER BY installed_rank",
                 String.class))
-                .containsExactly("1", "2", "3", "4", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26");
+                .containsExactly("1", "2", "3", "4", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27");
         // M4b: both chat tables have identity PKs, the citation blob and status
         // are NOT NULL (an assistant row without an honest end state must be
         // impossible at the schema level), and the list-read index exists.
