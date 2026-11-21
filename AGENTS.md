@@ -8,8 +8,9 @@ Asking the owner is the exception, not the rule.
 
 Tool Use ist das Arbeitsziel für die nächsten Tage: mindestens der dokumentierte
 Funktionsumfang von Open WebUI. Vor jeder nächsten Aufgabenwahl
-`docs/PROJECT_STATE.md` und `docs/TOOL_USE_PLAN.md` lesen. Beginn mit
-`docs/tasks/TU-01-tool-foundation.md`; genau eine Implementierung gleichzeitig.
+`docs/PROJECT_STATE.md` und `docs/TOOL_USE_PLAN.md` lesen. TU-01 ist auf main
+(PR #15); nächste Aufgabe: `docs/tasks/TU-02-tool-confirmations.md`.
+Genau eine Implementierung gleichzeitig.
 Die Reihenfolge ersetzt ältere allgemeine Folgeaufgaben, nicht offene
 Sicherheitsverpflichtungen. Bestehende Gate-, Provider-/Budget-, Release- und
 Deployregeln bleiben verbindlich. Der Plan ist kein Nachweis fertiger Funktionen.
