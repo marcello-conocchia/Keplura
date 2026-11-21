@@ -64,3 +64,15 @@ selbst. So fallen auch Dateien mit unauffälligem Namen auf („Liste.xlsx“ mi
 - `ExposureContentInspectorTest` (Text, Byte-Grenze, Lesefehler, leerer Text, Office-Datei).
 - `ExposureScanServiceTest` (Inhalt nur bei breit lesbaren Dateien, nicht prüfbar als Fund, keine Werte im JSON).
 - Bestehende RISK-01-Tests bleiben grün. Desktop: `npm run build`.
+
+## Prüfstand (ehrlich)
+
+- Unit: `ContentPatternsTest` 12, `ExposureContentInspectorTest` 9 (Text, Byte-Grenze, falsche Größe in der
+  Liste, Lesefehler, leerer Text, kaputtes PDF, DOCX über Tika, unbekannter Typ),
+  `ExposureScanServiceTest` +3 (Inhalt nur bei breit lesbaren Dateien, Dateigrenze je Lauf, ausgeschaltet
+  = Stufe 1). Serialisierter Bericht enthält keine Werte. `ExposureAdminIntegrationTest`,
+  `TikaDocumentTextExtractorTest` unverändert grün.
+- Lauf gegen echten Server (Dev-Profil, H2) mit Linux-Ordner-Quelle (5 Testdateien, Rechte-Übernahme aus)
+  und gebauter Oberfläche, Deutsch und Englisch: 2 IBANs + 4 Gehaltsbegriffe, 1 Kartennummer, 1 kaputtes
+  PDF als „nicht prüfbar“, 1 Datei nur nach Namen. Bericht-JSON und Server-Log ohne Werte.
+- NICHT geprüft: SMB/SharePoint mit echten Inhalten, große Ablagen (Laufzeit), echte Scans.

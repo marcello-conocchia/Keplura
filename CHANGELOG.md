@@ -12,6 +12,11 @@ the first tagged release (planned `0.1.0`, see [docs/RELEASING.md](docs/RELEASIN
 
 ### Added
 
+- Oversharing check, stage 2: the content of broadly readable files is
+  checked locally for IBANs, card numbers, German tax IDs, social security
+  numbers and HR/health terms. The report shows only type and count, never
+  the values. Files that cannot be read are listed as not checkable.
+  Settings `keplura.exposure.content.*`.
 - English user interface. The desktop app follows the system language and
   can be switched between English and German in the account menu or on the
   sign-in screen. `scripts/check-i18n.cjs` fails the build when an English
