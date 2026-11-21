@@ -174,6 +174,7 @@ export const SERVER_EN: Record<string, string> = {
   "Das Eingabeschema muss ein Objekt beschreiben.": "The input schema must describe an object.",
   "Das Eingabeschema ist zu tief verschachtelt.": "The input schema is nested too deeply.",
   "Das Eingabeschema enthält einen ungültigen Teil.": "The input schema contains an invalid part.",
+  "Das Eingabeschema kann nicht sicher geprüft werden.": "The input schema cannot be checked safely.",
   // chat: fixed answer when no source matches
   "Dazu habe ich nichts gefunden. Bitte ergänze passende Dokumente oder formuliere die Frage genauer.":
     "I found nothing on this. Please add matching documents or ask more precisely.",

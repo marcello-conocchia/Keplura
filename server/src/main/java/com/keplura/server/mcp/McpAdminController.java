@@ -87,8 +87,7 @@ public class McpAdminController {
                         for (JsonNode t : mapper.readTree(json)) {
                             String name = t.path("name").asString("");
                             ToolRisk risk = risks.get(name);
-                            String problem = ToolArgumentValidator.unsupportedReason(
-                                    t.path("inputSchema").isObject() ? t.path("inputSchema") : null);
+                            String problem = ToolArgumentValidator.unsupportedReason(McpToolAdapter.schemaOf(t));
                             boolean effective = on.contains(name) && risk != null && risk != ToolRisk.CRITICAL && problem == null;
                             tools.add(new ToolView(name, t.path("description").asString(""), effective,
                                     risk == null ? null : risk.name(), problem == null, problem,
@@ -261,7 +260,8 @@ public class McpAdminController {
                         java.util.Map<String, Object> m = new java.util.LinkedHashMap<>();
                         m.put("name", t.name());
                         m.put("description", t.description());
-                        if (t.inputSchema() != null && t.inputSchema().isObject()) m.put("inputSchema", t.inputSchema());
+                        // Store every schema the server sent, including invalid ones, so they stay blocked.
+                        if (!ToolArgumentValidator.absent(t.inputSchema())) m.put("inputSchema", t.inputSchema());
                         return m;
                     }).toList());
             if (json.length() > 32000) throw new McpClient.McpException("Der Server bietet zu viele Werkzeuge an.");

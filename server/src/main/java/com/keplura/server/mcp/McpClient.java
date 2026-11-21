@@ -72,8 +72,10 @@ public class McpClient {
             String name = t.path("name").asString("");
             if (name.isEmpty() || name.length() > 128 || (token != null && !token.isEmpty() && name.contains(token))) continue;
             String desc = safe(t.path("description").asString(""), token);
-            JsonNode schema = t.path("inputSchema");
-            if (token != null && !token.isEmpty()) {
+            // Keep whatever the server sent (also invalid shapes like false/[]/"x"): the central
+            // validator must see it to block the tool. Only a missing key means "no schema".
+            JsonNode schema = t.has("inputSchema") ? t.get("inputSchema") : null;
+            if (schema != null && token != null && !token.isEmpty()) {
                 String escaped = mapper.writeValueAsString(token);
                 schema = mapper.readTree(mapper.writeValueAsString(schema)
                         .replace(escaped.substring(1, escaped.length() - 1), "[Zugangsdaten ausgeblendet]"));

@@ -47,3 +47,10 @@ Neuer eigener Worktree auf Branch `feat/tool-use-foundation` (PO 21.11.2026: Bra
 - Anleitung `docs/howto/mcp.md` korrigiert (eine Runde, acht Aufrufe, Risikoklassen, Umstellung bestehender Freigaben).
 
 Auslegung „WRITE standardmäßig aus“: WRITE-Werkzeuge sind wie alle Werkzeuge erst nach eigener ausdrücklicher Adminfreigabe ausführbar; es gibt keinen zusätzlichen globalen Schalter. Bei abweichender PO-Absicht (z. B. globaler Betriebsschalter) nachziehen.
+
+## Korrekturen nach Review-Runde 1 (Codex, PR #15)
+
+- **[major / Security medium] Ungültige Schemas:** `inputSchema` wird nicht mehr zu „kein Schema“ normalisiert. MCP-Client, Refresh, Adminliste und Adapter übernehmen jeden gesendeten Wert; nur ein fehlender Schlüssel heißt „keine Argumente“ (nur `{}` erlaubt). `false`, `true`, JSON-`null`, Liste, Text oder `{}` ohne `"type":"object"` sperren das Werkzeug.
+- **[major / Security medium] Große Zahlen:** Grenzen werden ohne Konvertierungs-Exception geprüft (ganzzahlig im `long`-Bereich bzw. endliche Dezimalzahl); sonst gesperrt. Validator-Methoden werfen nie (fail closed). Adminliste und Refresh bleiben bei solchen Schemas nutzbar. Argumente mit nicht endlichen Zahlen (z. B. `1e400`) oder Verschachtelung über 64 Ebenen werden abgewiesen.
+- **[minor / info] enum/const:** Vergleich nach JSON-Schema-Wertgleichheit (`1` = `1.0`, rekursiv in Listen/Objekten) — mitbehoben.
+- Regressionen: `McpSchemaFailClosedTest` (Fake-MCP-Server → Refresh → Liste → Klassifizieren/Freigeben → zentraler Dienst; kein `tools/call`, kein Audit-Eintrag; fehlendes Schema separat), zusätzliche Fälle in `ToolArgumentValidatorTest`.

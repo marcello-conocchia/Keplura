@@ -86,4 +86,55 @@ class ToolArgumentValidatorTest {
         assertThat(ToolArgumentValidator.validate(s, j("{\"v\":1.5}"))).isNull();
         assertThat(ToolArgumentValidator.validate(s, j("{\"v\":1}"))).isNotNull();
     }
+
+    // --- Review round 1 (PR #15): invalid schemas fail closed, huge numbers never throw ---
+
+    @Test void invalidSchemaShapesAreBlockedNotTreatedAsMissing() {
+        for (String schema : new String[]{"false", "true", "null", "[]", "\"object\"", "42", "{}"}) {
+            JsonNode node = j(schema);
+            assertThat(ToolArgumentValidator.absent(node)).as(schema).isFalse();
+            assertThat(ToolArgumentValidator.unsupportedReason(node)).as(schema).isNotNull();
+            assertThat(ToolArgumentValidator.validate(node, j("{}"))).as(schema).isNotNull();
+        }
+        assertThat(ToolArgumentValidator.absent(M.missingNode())).isTrue();
+        assertThat(ToolArgumentValidator.absent(null)).isTrue();
+    }
+
+    @Test void hugeOrNonFiniteSchemaNumbersBlockWithoutException() {
+        for (String bound : new String[]{
+                "\"minLength\":18446744073709551617", "\"maxItems\":99999999999999999999999",
+                "\"minLength\":-1", "\"maxLength\":1.5", "\"minimum\":1e400", "\"maximum\":-1e400",
+                "\"exclusiveMinimum\":\"1\""}) {
+            String schema = "{\"type\":\"object\",\"properties\":{\"x\":{" + bound + "}}}";
+            assertThat(ToolArgumentValidator.unsupportedReason(j(schema))).as(schema).isNotNull();
+            assertThat(ToolArgumentValidator.validate(j(schema), j("{\"x\":\"a\"}"))).as(schema).isNotNull();
+        }
+        for (String value : new String[]{"[1e400]", "{\"a\":1e400}"}) {
+            assertThat(ToolArgumentValidator.unsupportedReason(j(
+                    "{\"type\":\"object\",\"properties\":{\"x\":{\"enum\":[" + value + "]}}}"))).as(value).isNotNull();
+        }
+    }
+
+    @Test void hugeBigIntegerBoundsStillWorkWhenFinite() {
+        JsonNode s = j("{\"type\":\"object\",\"properties\":{\"x\":{\"type\":\"integer\",\"maximum\":18446744073709551617}}}");
+        assertThat(ToolArgumentValidator.unsupportedReason(s)).isNull();
+        assertThat(ToolArgumentValidator.validate(s, j("{\"x\":18446744073709551616}"))).isNull();
+        assertThat(ToolArgumentValidator.validate(s, j("{\"x\":18446744073709551618}"))).isNotNull();
+    }
+
+    @Test void nonFiniteArgumentsAreRejectedWithoutException() {
+        JsonNode s = j("{\"type\":\"object\",\"properties\":{\"x\":{\"type\":\"number\",\"minimum\":0}}}");
+        assertThat(ToolArgumentValidator.validate(s, j("{\"x\":1e400}"))).isNotNull();
+        assertThat(ToolArgumentValidator.validate(j("{\"type\":\"object\"}"), j("{\"x\":-1e400}"))).isNotNull();
+    }
+
+    @Test void enumAndConstCompareByJsonSchemaValueEquality() {
+        JsonNode e = j("{\"type\":\"object\",\"properties\":{\"x\":{\"enum\":[1, [2, {\"a\":3}]]},\"c\":{\"const\":{\"n\":[1.0]}}}}");
+        assertThat(ToolArgumentValidator.validate(e, j("{\"x\":1.0}"))).isNull();
+        assertThat(ToolArgumentValidator.validate(e, j("{\"x\":[2.0, {\"a\":3.00}]}"))).isNull();
+        assertThat(ToolArgumentValidator.validate(e, j("{\"c\":{\"n\":[1]}}"))).isNull();
+        assertThat(ToolArgumentValidator.validate(e, j("{\"x\":1.5}"))).isNotNull();
+        assertThat(ToolArgumentValidator.validate(e, j("{\"x\":\"1\"}"))).isNotNull();
+        assertThat(ToolArgumentValidator.validate(e, j("{\"c\":{\"n\":[1],\"m\":1}}"))).isNotNull();
+    }
 }

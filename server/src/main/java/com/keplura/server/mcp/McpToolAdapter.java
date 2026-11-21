@@ -68,7 +68,7 @@ public class McpToolAdapter implements ToolAdapter {
             for (JsonNode t : mapper.readTree(json)) {
                 String name = t.path("name").asString("");
                 if (name.isEmpty()) continue;
-                JsonNode schema = t.path("inputSchema").isObject() ? t.path("inputSchema") : null;
+                JsonNode schema = schemaOf(t);
                 out.add(new ToolDefinition(KIND + ":" + serverId + ":" + name, KIND, functionName(serverId, name), name,
                         serverId, rs.getString(2), t.path("description").asString(""), schema, risks.get(name),
                         approved.contains(name), fingerprint));
@@ -101,6 +101,14 @@ public class McpToolAdapter implements ToolAdapter {
         } catch (RuntimeException e) {
             throw new ToolInvocationException("Der Werkzeug-Aufruf ist fehlgeschlagen.");
         }
+    }
+
+    /**
+     * Gespeichertes Eingabeschema unverändert (auch ungültige Formen wie {@code false}, Liste, Text
+     * oder JSON-{@code null}); nur ein fehlender Schlüssel ergibt {@code null} = „kein Schema“.
+     */
+    static JsonNode schemaOf(JsonNode storedTool) {
+        return storedTool.has("inputSchema") ? storedTool.get("inputSchema") : null;
     }
 
     /** OpenAI-Funktionsnamen: ^[a-zA-Z0-9_-]{1,64}$, eindeutig je Server. */
