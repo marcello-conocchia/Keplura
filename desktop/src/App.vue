@@ -204,11 +204,11 @@ const mustChangePassword = computed(() => auth.user?.mustChangePassword === true
   <div class="shell">
     <header v-if="auth.loggedIn && mobile && !auth.restoring && !mustChangePassword" class="mobile-topbar">
       <button ref="menuButton" type="button" :aria-label="$t('Menü öffnen')" :aria-expanded="menuOpen" aria-controls="primary-navigation" data-testid="mobile-menu-open" @click="openMenu"><AppIcon name="overview" :size="15" /><span>{{ $t("Menü") }}</span></button>
-      <span>{{ viewTitle }}</span><strong>{{ $t("Keplura") }}</strong>
+      <span>{{ viewTitle }}</span><strong>Keplura</strong>
     </header>
     <div v-if="auth.loggedIn && mobile && menuOpen" class="mobile-menu-scrim" @click="closeMenu"></div>
     <div v-if="auth.loggedIn && !auth.restoring && !mustChangePassword && (!mobile || menuOpen)" id="primary-navigation" ref="menuPanel" class="navigation-slot" :class="{'mobile-drawer': mobile}" :role="mobile ? 'dialog' : undefined" :aria-modal="mobile || undefined" :aria-label="$t('Navigation')">
-      <div v-if="mobile" class="mobile-menu-head"><strong>{{ $t("Keplura") }}</strong><button type="button" :aria-label="$t('Menü schließen')" data-testid="mobile-menu-close" @click="closeMenu"><AppIcon name="close" :size="15" /></button></div>
+      <div v-if="mobile" class="mobile-menu-head"><strong>Keplura</strong><button type="button" :aria-label="$t('Menü schließen')" data-testid="mobile-menu-close" @click="closeMenu"><AppIcon name="close" :size="15" /></button></div>
     <AppSidebar
       :status="status"
       :model-state="systemInfo?.model ?? ''"

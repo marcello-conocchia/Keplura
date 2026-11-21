@@ -7,7 +7,6 @@ export const EN: Record<string, string> = {
   "Administration": "Administration",
   "Menü öffnen": "Open menu",
   "Menü": "Menu",
-  "Keplura": "Keplura",
   "Navigation": "Navigation",
   "Menü schließen": "Close menu",
   "Sitzung wird geprüft …": "Checking session …",

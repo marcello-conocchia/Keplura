@@ -21,6 +21,7 @@ import { useAuthStore } from "../auth-store";
 import { useThemeStore } from "../theme-store";
 import type { AppView } from "../navigation";
 import AppIcon from "./ui/AppIcon.vue";
+import BrandMark from "./ui/BrandMark.vue";
 import type { IconName } from "./ui/AppIcon.vue";
 import { tr, locale, setLocale } from "../i18n";
 
@@ -120,7 +121,7 @@ function openKb(kbId: number) {
 
 <template>
   <nav class="sb" data-testid="sidebar" :aria-label="$t('Hauptnavigation')">
-    <div class="brand"><span class="brand-symbol" aria-hidden="true"><AppIcon name="book" /></span>{{ $t("Keplura") }}</div>
+    <div class="brand"><BrandMark :size="30" />Keplura</div>
     <!-- Kopf: Organisation + Benutzer -->
     <div class="head">
       <DropdownMenuRoot v-if="auth.orgs.length">
