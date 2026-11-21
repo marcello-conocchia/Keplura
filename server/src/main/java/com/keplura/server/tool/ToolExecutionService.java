@@ -292,6 +292,40 @@ public class ToolExecutionService {
         return cards.listOwned(userId, orgId, conversationId).stream().map(r -> view(r, now)).toList();
     }
 
+    /** Display/persistence signal only; execution checks fail closed in ToolTurn.active(). */
+    public boolean questionStopped(Long conversationId, Long promptMessageId) {
+        if (promptMessageId == null) return false;
+        try {
+            return cards.wasQuestionStopped(conversationId, promptMessageId);
+        } catch (RuntimeException e) {
+            log.warn("tool question status unavailable ({})", e.getClass().getSimpleName());
+            return false;
+        }
+    }
+
+    /** Previous confirmations inform a NEW explicit question's answer, never a tool-enabled request. */
+    public String completedEvidence(Long userId, Long orgId, Long conversationId, Long promptMessageId) {
+        if (promptMessageId == null) return "";
+        StringBuilder out = new StringBuilder();
+        try {
+            ToolContext ctx = resolveContext(userId, orgId, conversationId);
+            if (ctx == null) return "";
+            for (ToolCallStore.Row row : cards.completedBefore(userId, orgId, conversationId, promptMessageId)) {
+                ToolDefinition current = currentById(ctx, row.adapter(), row.toolId());
+                if (row.spaceId() != ctx.spaceId().longValue() || current == null || blockReason(current) != null
+                        || !definitionHash(current).equals(row.definitionHash()) || row.resultText() == null) continue;
+                String part = "Werkzeug „" + row.toolName() + "“ (früher bestätigt):\n" + row.resultText() + "\n\n";
+                int left = 16_000 - out.length();
+                if (left <= 0) break;
+                out.append(part, 0, Math.min(part.length(), left));
+            }
+        } catch (RuntimeException e) {
+            log.warn("confirmed evidence unavailable ({})", e.getClass().getSimpleName());
+            return "";
+        }
+        return out.toString();
+    }
+
     /** Neue Nachricht im Chat: offene Bestätigungen enden sicher (kein Aufruf). */
     public void cancelPending(Long userId, Long conversationId) {
         try {
@@ -415,6 +449,9 @@ public class ToolExecutionService {
         private final Long promptMessageId;
         private int attempts;
         private long spentNanos;
+        private boolean readOnly;
+        private boolean pendingConfirmation;
+        private boolean invocationFailed;
 
         private ToolTurn(ToolContext ctx, Map<String, ToolDefinition> offered, Long promptMessageId) {
             this.ctx = ctx;
@@ -426,10 +463,38 @@ public class ToolExecutionService {
             return offered;
         }
 
+        /** Irreversible: results/history can authorize no new WRITE or CRITICAL actions. */
+        public void readOnlyFollowups() { readOnly = true; }
+
+        public int remainingCalls() { return Math.max(0, MAX_CALLS_PER_TURN - attempts); }
+
+        public boolean mustFinish() {
+            return pendingConfirmation || invocationFailed || remainingCalls() == 0 || timeExhausted();
+        }
+
+        /** Before EACH model round and tool call, including READ/WRITE. */
+        public boolean active() {
+            if (ctx == null) return false;
+            try {
+                return ctx.equals(resolveContext(ctx.userId(), ctx.orgId(), ctx.conversationId()))
+                        && (promptMessageId == null || cards.isCurrentQuestion(ctx.conversationId(), promptMessageId));
+            } catch (RuntimeException e) {
+                return false;
+            }
+        }
+
+        private boolean timeExhausted() {
+            if (spentNanos >= MAX_TOOL_TIME_PER_TURN.toNanos()) return true;
+            return ctx != null && promptMessageId != null
+                    && cards.timeUsed(ctx.conversationId(), promptMessageId, wallClock.get())
+                            .compareTo(MAX_TOOL_TIME_PER_TURN) >= 0;
+        }
+
         /** Werkzeuge im OpenAI-Format; der Server baut sie, nie der Client. */
         public ArrayNode toolsJson() {
             ArrayNode arr = mapper.createArrayNode();
             for (ToolDefinition t : offered.values()) {
+                if (readOnly && t.risk() != ToolRisk.READ) continue;
                 ObjectNode f = arr.addObject().put("type", "function").putObject("function");
                 f.put("name", t.functionName());
                 String hint = t.risk() == ToolRisk.CRITICAL
@@ -458,6 +523,11 @@ public class ToolExecutionService {
                 return blocked("Die Höchstzahl von acht Werkzeug-Aufrufen je Antwort ist erreicht.", t, null);
             }
             if (t == null) return blocked("Unbekanntes oder nicht freigegebenes Werkzeug.", null, null);
+            if (!active()) return blocked("Der Chat wurde weitergeführt oder gestoppt. Das Werkzeug wurde nicht aufgerufen.", t, null);
+            if (invocationFailed) return blocked("Nach dem fehlgeschlagenen Aufruf werden keine weiteren Werkzeuge ausgeführt.", t, null);
+            if (readOnly && t.risk() != ToolRisk.READ) {
+                return blocked("Folgeaufrufe dürfen nur freigegebene Lesewerkzeuge verwenden. Diese Aktion wurde nicht ausgeführt.", t, null);
+            }
             String raw = rawArguments == null || rawArguments.isBlank() ? "{}" : rawArguments;
             if (raw.length() > MAX_ARGUMENT_CHARS) return blocked("Die Werkzeugargumente sind zu groß.", t, null);
             JsonNode args;
@@ -473,7 +543,7 @@ public class ToolExecutionService {
             args = mapper.readTree(canonical);
             String invalid = ToolArgumentValidator.validate(t.inputSchema(), args);
             if (invalid != null) return blocked(invalid + " Das Werkzeug wurde nicht aufgerufen.", t, args);
-            if (spentNanos >= MAX_TOOL_TIME_PER_TURN.toNanos()) {
+            if (timeExhausted()) {
                 return blocked("Das Zeitbudget für Werkzeuge in dieser Antwort ist aufgebraucht.", t, args);
             }
             String hash = definitionHash(t);
@@ -498,6 +568,7 @@ public class ToolExecutionService {
                     return new Outcome("Der Chat wurde inzwischen weitergeführt oder gestoppt. Der Aufruf wurde nicht vorgelegt "
                             + "und nicht ausgeführt.", false, t.toolName());
                 }
+                pendingConfirmation = true;
                 return new Outcome("Der Aufruf des Werkzeugs „" + t.toolName() + "“ wurde der Person zur Bestätigung "
                         + "vorgelegt und ist NOCH NICHT ausgeführt. Sie kann ihn im Chat bestätigen oder ablehnen. "
                         + "Behaupte kein Ergebnis und fordere keine weitere Aktion an.", false, t.toolName());
@@ -511,8 +582,10 @@ public class ToolExecutionService {
                 return new Outcome("Das Werkzeug konnte nicht sicher protokolliert werden. Es wurde nicht aufgerufen.",
                         false, t.toolName());
             }
-            Executed done = execute(ctx, t, args, card.id());
+            Executed done = active() ? execute(ctx, t, args, card.id())
+                    : new Executed(null, false, false, "Der Chat wurde weitergeführt oder gestoppt. Das Werkzeug wurde nicht aufgerufen.", 0);
             spentNanos += done.elapsedNanos();
+            if (!done.ok()) invocationFailed = true;
             finishCard(card.id(), done);
             if (!done.ok()) {
                 return new Outcome(done.invoked() ? "Fehler beim Werkzeug-Aufruf: " + done.error() : done.error(),

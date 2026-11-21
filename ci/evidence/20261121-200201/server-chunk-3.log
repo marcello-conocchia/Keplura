@@ -1,0 +1,415 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------< com.keplura:keplura-server >---------------------
+[INFO] Building Keplura Server 0.1.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-cli) @ keplura-server ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.keplura.server.gateway.GatewayProviderAuthTest
+20:03:28.617 [main] INFO com.keplura.server.gateway.GatewayClient -- gateway chat json: model=m status=200 bytes=96 ms=81
+20:03:28.674 [main] INFO com.keplura.server.gateway.GatewayClient -- gateway chat json: model=m status=200 bytes=96 ms=5
+20:03:28.684 [main] INFO com.keplura.server.gateway.GatewayClient -- gateway chat stream open: model=m status=200 ms=4
+20:03:28.693 [main] INFO com.keplura.server.gateway.GatewayClient -- gateway chat json: model=m status=200 bytes=96 ms=3
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.453 s -- in com.keplura.server.gateway.GatewayProviderAuthTest
+[INFO] Running com.keplura.server.gateway.GatewayClientTest
+20:03:28.711 [main] INFO com.keplura.server.gateway.GatewayClient -- gateway chat stream open: model=m status=200 ms=3
+20:03:30.712 [gateway-stream-guard] WARN com.keplura.server.gateway.GatewayClient -- gateway stream idle timeout (model=m)
+20:03:30.713 [main] WARN com.keplura.server.gateway.GatewayClient -- gateway stream read failed (model=m, cause=IOException)
+20:03:34.724 [main] INFO com.keplura.server.gateway.GatewayClient -- gateway chat stream open: model=m status=200 ms=2
+20:03:38.725 [gateway-stream-guard] WARN com.keplura.server.gateway.GatewayClient -- gateway stream deadline exceeded (model=m)
+20:03:38.726 [main] WARN com.keplura.server.gateway.GatewayClient -- gateway stream read failed (model=m, cause=IOException)
+20:03:38.736 [main] WARN com.keplura.server.gateway.GatewayClient -- gateway upstream unreachable (model=m, stream=false; ConnectException)
+20:03:38.739 [main] WARN com.keplura.server.gateway.GatewayClient -- gateway upstream unreachable (model=m, stream=true; ConnectException)
+20:03:38.756 [main] INFO com.keplura.server.gateway.GatewayClient -- gateway chat json: model=m status=200 bytes=2 ms=3
+20:03:38.759 [main] INFO com.keplura.server.gateway.GatewayClient -- gateway chat json: model=m status=200 bytes=2 ms=2
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 10.06 s -- in com.keplura.server.gateway.GatewayClientTest
+[INFO] Running com.keplura.server.gateway.GatewayChatApiIntegrationTest
+20:03:38.857 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.keplura.server.gateway.GatewayChatApiIntegrationTest]: GatewayChatApiIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+20:03:39.014 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.gateway.GatewayChatApiIntegrationTest
+20:03:39.087 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.keplura.server.gateway.GatewayChatApiIntegrationTest]: GatewayChatApiIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+20:03:39.093 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.gateway.GatewayChatApiIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-11-21T20:03:39.412Z  INFO 1569 --- [keplura-server] [           main] c.k.s.g.GatewayChatApiIntegrationTest    : Starting GatewayChatApiIntegrationTest using Java 21.0.12.1 with PID 1569 (started by ci in /review/repo/server)
+2026-11-21T20:03:39.414Z DEBUG 1569 --- [keplura-server] [           main] c.k.s.g.GatewayChatApiIntegrationTest    : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-21T20:03:39.414Z  INFO 1569 --- [keplura-server] [           main] c.k.s.g.GatewayChatApiIntegrationTest    : The following 1 profile is active: "dev"
+2026-11-21T20:03:40.169Z  INFO 1569 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-21T20:03:40.282Z  INFO 1569 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 102 ms. Found 23 JPA repository interfaces.
+2026-11-21T20:03:40.935Z  INFO 1569 --- [keplura-server] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-11-21T20:03:40.953Z  INFO 1569 --- [keplura-server] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-21T20:03:40.954Z  INFO 1569 --- [keplura-server] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-11-21T20:03:41.005Z  INFO 1569 --- [keplura-server] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1578 ms
+2026-11-21T20:03:41.061Z DEBUG 1569 --- [keplura-server] [           main] c.k.server.auth.SessionLifetimeFilter    : Filter 'sessionLifetimeFilter' configured for use
+2026-11-21T20:03:41.233Z  INFO 1569 --- [keplura-server] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-21T20:03:41.287Z  INFO 1569 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-11-21T20:03:41.634Z  INFO 1569 --- [keplura-server] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-21T20:03:41.658Z  INFO 1569 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-11-21T20:03:41.796Z  INFO 1569 --- [keplura-server] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:gateway-chat-test user=SA
+2026-11-21T20:03:41.798Z  INFO 1569 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-11-21T20:03:41.845Z  INFO 1569 --- [keplura-server] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:gateway-chat-test]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: GATEWAY-CHAT-TEST/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-21T20:03:42.999Z  INFO 1569 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-21T20:03:43.076Z  INFO 1569 --- [keplura-server] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-21T20:03:43.169Z  INFO 1569 --- [keplura-server] [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-11-21T20:03:43.833Z  INFO 1569 --- [keplura-server] [           main] com.keplura.server.admin.SecretCipher    : secret cipher: no KEPLURA_SECRETS_MASTER_KEY — provider secrets cannot be stored (admin surface stays usable without them)
+2026-11-21T20:03:43.848Z  INFO 1569 --- [keplura-server] [           main] c.keplura.server.SystemInfoController    : model provider state: provider=raw configured=true keyPresent=true
+2026-11-21T20:03:46.255Z  INFO 1569 --- [keplura-server] [           main] c.k.s.search.SearchStoreConfiguration    : search store: auto -> memory (pgvector probe not satisfied)
+2026-11-21T20:03:46.331Z  INFO 1569 --- [keplura-server] [           main] c.k.s.knowledge.DocumentIndexingQueue    : document indexing mode: sync
+2026-11-21T20:03:46.432Z  INFO 1569 --- [keplura-server] [           main] c.keplura.server.oidc.OidcConfiguration  : oidc: desktop handoff target fixed to http://localhost:1420/
+2026-11-21T20:03:46.576Z  WARN 1569 --- [keplura-server] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-21T20:03:47.031Z  INFO 1569 --- [keplura-server] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 46335 (http) with context path '/'
+2026-11-21T20:03:47.037Z  INFO 1569 --- [keplura-server] [           main] c.k.s.g.GatewayChatApiIntegrationTest    : Started GatewayChatApiIntegrationTest in 7.89 seconds (process running for 19.725)
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (/home/ci/.m2/repository/net/bytebuddy/byte-buddy-agent/1.18.11/byte-buddy-agent-1.18.11.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+2026-11-21T20:03:47.635Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-21T20:03:47.635Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-11-21T20:03:47.636Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-11-21T20:03:47.650Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/gateway/chat/completions -> 401 (1ms)
+2026-11-21T20:03:47.662Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-2] c.k.server.RequestLoggingInterceptor     : GET /api/v1/gateway/status -> 401 (0ms)
+2026-11-21T20:03:47.905Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (157ms)
+2026-11-21T20:03:47.976Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/gateway/chat/completions -> 429 (51ms)
+2026-11-21T20:03:48.046Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (29ms)
+2026-11-21T20:03:48.115Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (31ms)
+2026-11-21T20:03:48.130Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/gateway/chat/completions -> 404 (6ms)
+2026-11-21T20:03:48.140Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-8] c.k.server.RequestLoggingInterceptor     : POST /api/v1/gateway/chat/completions -> 404 (5ms)
+2026-11-21T20:03:48.228Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-9] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (43ms)
+2026-11-21T20:03:48.250Z  INFO 1569 --- [keplura-server] [-auto-1-exec-10] c.keplura.server.gateway.GatewayClient   : gateway chat stream open: model=ok-model status=200 ms=2
+2026-11-21T20:03:51.251Z  WARN 1569 --- [keplura-server] [ay-stream-guard] c.keplura.server.gateway.GatewayClient   : gateway stream idle timeout (model=ok-model)
+2026-11-21T20:03:51.251Z  WARN 1569 --- [keplura-server] [-auto-1-exec-10] c.keplura.server.gateway.GatewayClient   : gateway stream read failed (model=ok-model, cause=IOException)
+2026-11-21T20:03:51.251Z  WARN 1569 --- [keplura-server] [-auto-1-exec-10] c.k.server.gateway.GatewayController     : gateway stream ended early (model=ok-model, cause=IOException)
+2026-11-21T20:03:51.252Z  INFO 1569 --- [keplura-server] [-auto-1-exec-10] c.k.server.RequestLoggingInterceptor     : POST /api/v1/gateway/chat/completions -> 200 (3015ms)
+2026-11-21T20:03:51.313Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (27ms)
+2026-11-21T20:03:52.250Z  WARN 1569 --- [keplura-server] [o-auto-1-exec-2] c.keplura.server.gateway.GatewayClient   : gateway upstream status 401 (model=ok-model, stream=false, 925ms)
+2026-11-21T20:03:52.251Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/gateway/chat/completions -> 502 (932ms)
+2026-11-21T20:03:52.312Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (27ms)
+2026-11-21T20:03:52.325Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/gateway/chat/completions -> 413 (7ms)
+2026-11-21T20:03:52.336Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/gateway/chat/completions -> 400 (6ms)
+2026-11-21T20:03:52.346Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/gateway/chat/completions -> 400 (6ms)
+2026-11-21T20:03:52.356Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/gateway/chat/completions -> 400 (5ms)
+2026-11-21T20:03:52.368Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-8] c.k.server.RequestLoggingInterceptor     : POST /api/v1/gateway/chat/completions -> 400 (8ms)
+2026-11-21T20:03:52.428Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-9] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (27ms)
+2026-11-21T20:03:52.440Z  INFO 1569 --- [keplura-server] [-auto-1-exec-10] c.k.server.RequestLoggingInterceptor     : GET /api/v1/gateway/status -> 200 (5ms)
+2026-11-21T20:03:52.501Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (27ms)
+2026-11-21T20:03:52.516Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/gateway/chat/completions -> 429 (8ms)
+2026-11-21T20:03:52.577Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (26ms)
+2026-11-21T20:03:52.592Z  WARN 1569 --- [keplura-server] [o-auto-1-exec-4] c.keplura.server.gateway.GatewayClient   : gateway upstream status 500 (model=ok-model, stream=false, 2ms)
+2026-11-21T20:03:52.593Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/gateway/chat/completions -> 502 (9ms)
+2026-11-21T20:03:52.652Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (26ms)
+2026-11-21T20:03:52.667Z  WARN 1569 --- [keplura-server] [o-auto-1-exec-6] c.keplura.server.gateway.GatewayClient   : gateway upstream unreachable (model=ok-model, stream=false; IOException)
+2026-11-21T20:03:52.668Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/gateway/chat/completions -> 502 (9ms)
+2026-11-21T20:03:52.730Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (26ms)
+2026-11-21T20:03:52.743Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-8] c.keplura.server.gateway.GatewayClient   : gateway chat json: model=ok-model status=200 bytes=82 ms=2
+2026-11-21T20:03:52.744Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-8] c.k.server.RequestLoggingInterceptor     : POST /api/v1/gateway/chat/completions -> 200 (7ms)
+2026-11-21T20:03:52.800Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-9] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (26ms)
+2026-11-21T20:03:52.813Z  INFO 1569 --- [keplura-server] [-auto-1-exec-10] c.keplura.server.gateway.GatewayClient   : gateway chat stream open: model=ok-model status=200 ms=1
+2026-11-21T20:03:52.814Z  INFO 1569 --- [keplura-server] [-auto-1-exec-10] c.k.server.RequestLoggingInterceptor     : POST /api/v1/gateway/chat/completions -> 200 (7ms)
+2026-11-21T20:03:52.873Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (26ms)
+2026-11-21T20:03:52.885Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/gateway/chat/completions -> 400 (5ms)
+2026-11-21T20:03:52.945Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (27ms)
+2026-11-21T20:03:52.954Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/gateway/chat/completions -> 400 (2ms)
+2026-11-21T20:03:52.960Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/gateway/chat/completions -> 400 (2ms)
+2026-11-21T20:03:53.019Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (26ms)
+2026-11-21T20:03:53.033Z  INFO 1569 --- [keplura-server] [o-auto-1-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/gateway/chat/completions -> 502 (8ms)
+2026-11-21T20:03:53.039Z  INFO 1569 --- [keplura-server] [           main] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-11-21T20:03:53.041Z  INFO 1569 --- [keplura-server] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-11-21T20:03:53.049Z  INFO 1569 --- [keplura-server] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-21T20:03:53.060Z  INFO 1569 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-11-21T20:03:53.062Z  INFO 1569 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+[INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 14.30 s -- in com.keplura.server.gateway.GatewayChatApiIntegrationTest
+[INFO] Running com.keplura.server.migration.FlywayBaselineMigrationTest
+2026-11-21T20:03:53.142Z  INFO 1569 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:flyway_v1v10 (H2 2.4)
+2026-11-21T20:03:53.168Z  WARN 1569 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T20:03:53.202Z  INFO 1569 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-11-21T20:03:53.205Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 25 migrations (execution time 00:00.022s)
+2026-11-21T20:03:53.211Z  INFO 1569 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "public"."flyway_schema_history" ...
+2026-11-21T20:03:53.233Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-11-21T20:03:53.243Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "1 - baseline"
+2026-11-21T20:03:53.258Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "2 - spaces"
+2026-11-21T20:03:53.265Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "3 - knowledge"
+2026-11-21T20:03:53.273Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "4 - chunks"
+2026-11-21T20:03:53.282Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "6 - chat"
+2026-11-21T20:03:53.288Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "7 - document index status"
+2026-11-21T20:03:53.305Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "8 - org invites"
+2026-11-21T20:03:53.311Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "9 - user role"
+2026-11-21T20:03:53.321Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "10 - ai provider model"
+2026-11-21T20:03:53.330Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "11 - oidc provider"
+2026-11-21T20:03:53.338Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "12 - document index status async"
+2026-11-21T20:03:53.342Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "13 - chunk source location"
+2026-11-21T20:03:53.361Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "14 - chat message feedback"
+2026-11-21T20:03:53.371Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "15 - user must change password"
+2026-11-21T20:03:53.381Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "16 - datasources and access"
+2026-11-21T20:03:53.389Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "17 - quality questions"
+2026-11-21T20:03:53.394Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "18 - data source sharepoint"
+2026-11-21T20:03:53.404Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "19 - prompt templates"
+2026-11-21T20:03:53.409Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "20 - chat kbs attachments"
+2026-11-21T20:03:53.421Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "21 - web search settings"
+2026-11-21T20:03:53.425Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "22 - mcp servers"
+2026-11-21T20:03:53.431Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "23 - mcp stage2"
+2026-11-21T20:03:53.439Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "24 - datasource exclude patterns longer"
+2026-11-21T20:03:53.444Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "25 - tool foundation"
+2026-11-21T20:03:53.453Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "26 - tool call cards"
+2026-11-21T20:03:53.462Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 25 migrations to schema "public", now at version v26 (execution time 00:00.100s)
+2026-11-21T20:03:53.552Z  INFO 1569 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:flyway_vendor_probe (H2 2.4)
+2026-11-21T20:03:53.558Z  WARN 1569 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T20:03:53.568Z  INFO 1569 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-11-21T20:03:53.569Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 25 migrations (execution time 00:00.007s)
+2026-11-21T20:03:53.571Z  INFO 1569 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "public"."flyway_schema_history" ...
+2026-11-21T20:03:53.577Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-11-21T20:03:53.582Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "1 - baseline"
+2026-11-21T20:03:53.589Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "2 - spaces"
+2026-11-21T20:03:53.595Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "3 - knowledge"
+2026-11-21T20:03:53.601Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "4 - chunks"
+2026-11-21T20:03:53.609Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "6 - chat"
+2026-11-21T20:03:53.616Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "7 - document index status"
+2026-11-21T20:03:53.623Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "8 - org invites"
+2026-11-21T20:03:53.629Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "9 - user role"
+2026-11-21T20:03:53.638Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "10 - ai provider model"
+2026-11-21T20:03:53.645Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "11 - oidc provider"
+2026-11-21T20:03:53.654Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "12 - document index status async"
+2026-11-21T20:03:53.660Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "13 - chunk source location"
+2026-11-21T20:03:53.677Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "14 - chat message feedback"
+2026-11-21T20:03:53.685Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "15 - user must change password"
+2026-11-21T20:03:53.692Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "16 - datasources and access"
+2026-11-21T20:03:53.700Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "17 - quality questions"
+2026-11-21T20:03:53.704Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "18 - data source sharepoint"
+2026-11-21T20:03:53.712Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "19 - prompt templates"
+2026-11-21T20:03:53.716Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "20 - chat kbs attachments"
+2026-11-21T20:03:53.722Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "21 - web search settings"
+2026-11-21T20:03:53.726Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "22 - mcp servers"
+2026-11-21T20:03:53.729Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "23 - mcp stage2"
+2026-11-21T20:03:53.735Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "24 - datasource exclude patterns longer"
+2026-11-21T20:03:53.739Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "25 - tool foundation"
+2026-11-21T20:03:53.744Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "26 - tool call cards"
+2026-11-21T20:03:53.748Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 25 migrations to schema "public", now at version v26 (execution time 00:00.075s)
+2026-11-21T20:03:53.758Z  INFO 1569 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:flyway_vendor_probe (H2 2.4)
+2026-11-21T20:03:53.762Z  WARN 1569 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T20:03:53.788Z  INFO 1569 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:flyway_idempotent (H2 2.4)
+2026-11-21T20:03:53.792Z  WARN 1569 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T20:03:53.801Z  INFO 1569 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-11-21T20:03:53.802Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 25 migrations (execution time 00:00.007s)
+2026-11-21T20:03:53.803Z  INFO 1569 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "public"."flyway_schema_history" ...
+2026-11-21T20:03:53.806Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-11-21T20:03:53.808Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "1 - baseline"
+2026-11-21T20:03:53.813Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "2 - spaces"
+2026-11-21T20:03:53.817Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "3 - knowledge"
+2026-11-21T20:03:53.823Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "4 - chunks"
+2026-11-21T20:03:53.827Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "6 - chat"
+2026-11-21T20:03:53.832Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "7 - document index status"
+2026-11-21T20:03:53.837Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "8 - org invites"
+2026-11-21T20:03:53.840Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "9 - user role"
+2026-11-21T20:03:53.845Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "10 - ai provider model"
+2026-11-21T20:03:53.851Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "11 - oidc provider"
+2026-11-21T20:03:53.856Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "12 - document index status async"
+2026-11-21T20:03:53.859Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "13 - chunk source location"
+2026-11-21T20:03:53.871Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "14 - chat message feedback"
+2026-11-21T20:03:53.878Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "15 - user must change password"
+2026-11-21T20:03:53.883Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "16 - datasources and access"
+2026-11-21T20:03:53.891Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "17 - quality questions"
+2026-11-21T20:03:53.896Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "18 - data source sharepoint"
+2026-11-21T20:03:53.904Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "19 - prompt templates"
+2026-11-21T20:03:53.908Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "20 - chat kbs attachments"
+2026-11-21T20:03:53.914Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "21 - web search settings"
+2026-11-21T20:03:53.916Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "22 - mcp servers"
+2026-11-21T20:03:53.919Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "23 - mcp stage2"
+2026-11-21T20:03:53.926Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "24 - datasource exclude patterns longer"
+2026-11-21T20:03:53.929Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "25 - tool foundation"
+2026-11-21T20:03:53.933Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "26 - tool call cards"
+2026-11-21T20:03:53.938Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 25 migrations to schema "public", now at version v26 (execution time 00:00.063s)
+2026-11-21T20:03:53.939Z  INFO 1569 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:flyway_idempotent (H2 2.4)
+2026-11-21T20:03:53.944Z  WARN 1569 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T20:03:53.954Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 25 migrations (execution time 00:00.007s)
+2026-11-21T20:03:53.957Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 26
+2026-11-21T20:03:53.957Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-11-21T20:03:53.959Z  INFO 1569 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:flyway_idempotent (H2 2.4)
+2026-11-21T20:03:53.964Z  WARN 1569 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T20:03:53.977Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 25 migrations (execution time 00:00.009s)
+2026-11-21T20:03:53.992Z  INFO 1569 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:flyway_drift (H2 2.4)
+2026-11-21T20:03:53.995Z  WARN 1569 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T20:03:54.002Z  INFO 1569 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-11-21T20:03:54.002Z  INFO 1569 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 25 migrations (execution time 00:00.005s)
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.933 s -- in com.keplura.server.migration.FlywayBaselineMigrationTest
+[INFO] Running com.keplura.server.search.GatewayEmbeddingServiceTest
+2026-11-21T20:03:54.011Z  INFO 1569 --- [keplura-server] [           main] c.k.s.search.GatewayEmbeddingService     : embedding backend: gateway model 'm' at http://127.0.0.1:1/v1/embeddings
+2026-11-21T20:03:54.018Z  INFO 1569 --- [keplura-server] [           main] c.k.s.search.GatewayEmbeddingService     : embedding backend: gateway model 'test-model' at http://127.0.0.1:45813/v1/embeddings
+2026-11-21T20:03:54.032Z  INFO 1569 --- [keplura-server] [           main] c.k.s.search.GatewayEmbeddingService     : embedding backend: gateway model 'test-model' at http://127.0.0.1:38243/v1/embeddings
+2026-11-21T20:03:54.044Z  INFO 1569 --- [keplura-server] [           main] c.k.s.search.GatewayEmbeddingService     : embedding backend: gateway model 'test-model' at http://127.0.0.1:34317/v1/embeddings
+2026-11-21T20:03:54.053Z  INFO 1569 --- [keplura-server] [           main] c.k.s.search.GatewayEmbeddingService     : embedding backend: gateway model 'test-model' at http://127.0.0.1:46843/v1/embeddings
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.056 s -- in com.keplura.server.search.GatewayEmbeddingServiceTest
+[INFO] Running com.keplura.server.search.EmbeddingDeterminismTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.030 s -- in com.keplura.server.search.EmbeddingDeterminismTest
+[INFO] Running com.keplura.server.knowledge.DocumentUploadPolicyTest
+[INFO] Tests run: 33, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.155 s -- in com.keplura.server.knowledge.DocumentUploadPolicyTest
+[INFO] Running com.keplura.server.knowledge.DocumentStorageTest
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.102 s -- in com.keplura.server.knowledge.DocumentStorageTest
+[INFO] Running com.keplura.server.datasource.ExposureRulesTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 s -- in com.keplura.server.datasource.ExposureRulesTest
+[INFO] Running com.keplura.server.datasource.ExposureContentInspectorTest
+2026-11-21T20:03:54.885Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 105 chars / -1 pages from a docx in 134 ms
+2026-11-21T20:03:54.903Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : pdf pre-count could not open the document (IOException); continuing to parse
+2026-11-21T20:04:00.950Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 9 ms
+2026-11-21T20:04:00.962Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 9 ms
+2026-11-21T20:04:00.971Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 7 ms
+2026-11-21T20:04:00.980Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 7 ms
+2026-11-21T20:04:00.989Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 7 ms
+2026-11-21T20:04:00.997Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 6 ms
+2026-11-21T20:04:01.005Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 7 ms
+2026-11-21T20:04:01.014Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 7 ms
+2026-11-21T20:04:01.023Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 6 ms
+2026-11-21T20:04:01.031Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 6 ms
+2026-11-21T20:04:01.041Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 8 ms
+2026-11-21T20:04:01.048Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 6 ms
+2026-11-21T20:04:01.056Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 5 ms
+2026-11-21T20:04:01.064Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 7 ms
+2026-11-21T20:04:01.072Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 6 ms
+2026-11-21T20:04:01.082Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 7 ms
+2026-11-21T20:04:01.090Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 7 ms
+2026-11-21T20:04:01.100Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 8 ms
+2026-11-21T20:04:01.110Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 8 ms
+2026-11-21T20:04:01.123Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 11 ms
+2026-11-21T20:04:01.131Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 7 ms
+2026-11-21T20:04:01.141Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 7 ms
+2026-11-21T20:04:01.149Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 7 ms
+2026-11-21T20:04:01.158Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 6 ms
+2026-11-21T20:04:01.164Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 5 ms
+2026-11-21T20:04:01.171Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 4 ms
+2026-11-21T20:04:01.179Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 6 ms
+2026-11-21T20:04:01.189Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 7 ms
+2026-11-21T20:04:01.197Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 6 ms
+2026-11-21T20:04:01.206Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 7 ms
+2026-11-21T20:04:01.217Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 9 ms
+2026-11-21T20:04:01.226Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 7 ms
+2026-11-21T20:04:01.236Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 7 ms
+2026-11-21T20:04:01.246Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 7 ms
+2026-11-21T20:04:01.254Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 6 ms
+2026-11-21T20:04:01.262Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 6 ms
+2026-11-21T20:04:01.271Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 7 ms
+2026-11-21T20:04:01.278Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 4 ms
+2026-11-21T20:04:01.286Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 5 ms
+2026-11-21T20:04:01.294Z DEBUG 1569 --- [keplura-server] [tika-inspection] c.k.s.search.TikaDocumentTextExtractor   : extracted 30 chars / -1 pages from a docx in 5 ms
+[INFO] Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.939 s -- in com.keplura.server.datasource.ExposureContentInspectorTest
+[INFO] Running com.keplura.server.datasource.ExposureAdminIntegrationTest
+2026-11-21T20:04:01.311Z  INFO 1569 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.datasource.ExposureAdminIntegrationTest]: ExposureAdminIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-21T20:04:01.333Z  INFO 1569 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.datasource.ExposureAdminIntegrationTest
+2026-11-21T20:04:01.334Z  INFO 1569 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.datasource.ExposureAdminIntegrationTest]: ExposureAdminIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-21T20:04:01.336Z  INFO 1569 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.datasource.ExposureAdminIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-11-21T20:04:01.368Z  INFO 1569 --- [keplura-server] [           main] c.k.s.d.ExposureAdminIntegrationTest     : Starting ExposureAdminIntegrationTest using Java 21.0.12.1 with PID 1569 (started by ci in /review/repo/server)
+2026-11-21T20:04:01.368Z DEBUG 1569 --- [keplura-server] [           main] c.k.s.d.ExposureAdminIntegrationTest     : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-21T20:04:01.368Z  INFO 1569 --- [keplura-server] [           main] c.k.s.d.ExposureAdminIntegrationTest     : The following 1 profile is active: "dev"
+2026-11-21T20:04:01.577Z  INFO 1569 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-21T20:04:01.611Z  INFO 1569 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 32 ms. Found 23 JPA repository interfaces.
+2026-11-21T20:04:01.697Z  INFO 1569 --- [keplura-server] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-11-21T20:04:01.697Z  INFO 1569 --- [keplura-server] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-21T20:04:01.697Z  INFO 1569 --- [keplura-server] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-11-21T20:04:01.719Z  INFO 1569 --- [keplura-server] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 349 ms
+2026-11-21T20:04:01.726Z DEBUG 1569 --- [keplura-server] [           main] c.k.server.auth.SessionLifetimeFilter    : Filter 'sessionLifetimeFilter' configured for use
+2026-11-21T20:04:01.763Z  INFO 1569 --- [keplura-server] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-21T20:04:01.782Z  INFO 1569 --- [keplura-server] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-21T20:04:01.782Z  INFO 1569 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-11-21T20:04:01.785Z  INFO 1569 --- [keplura-server] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection conn57: url=jdbc:h2:mem:exposure-admin-test user=SA
+2026-11-21T20:04:01.785Z  INFO 1569 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-11-21T20:04:01.786Z  INFO 1569 --- [keplura-server] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:exposure-admin-test]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: EXPOSURE-ADMIN-TEST/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-21T20:04:02.006Z  INFO 1569 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-21T20:04:02.024Z  INFO 1569 --- [keplura-server] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-21T20:04:02.072Z  INFO 1569 --- [keplura-server] [           main] com.keplura.server.admin.SecretCipher    : secret cipher: master key loaded (AES-256-GCM, HKDF-derived)
+2026-11-21T20:04:02.073Z  INFO 1569 --- [keplura-server] [           main] c.keplura.server.SystemInfoController    : model provider state: provider=raw configured=false keyPresent=false
+2026-11-21T20:04:02.318Z  INFO 1569 --- [keplura-server] [           main] c.k.s.search.SearchStoreConfiguration    : search store: auto -> memory (pgvector probe not satisfied)
+2026-11-21T20:04:02.336Z  INFO 1569 --- [keplura-server] [           main] c.k.s.knowledge.DocumentIndexingQueue    : document indexing mode: sync
+2026-11-21T20:04:02.364Z  INFO 1569 --- [keplura-server] [           main] c.keplura.server.oidc.OidcConfiguration  : oidc: desktop handoff target fixed to http://localhost:1420/
+2026-11-21T20:04:02.413Z  WARN 1569 --- [keplura-server] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-21T20:04:02.509Z  INFO 1569 --- [keplura-server] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 41123 (http) with context path '/'
+2026-11-21T20:04:02.512Z  INFO 1569 --- [keplura-server] [           main] c.k.s.d.ExposureAdminIntegrationTest     : Started ExposureAdminIntegrationTest in 1.172 seconds (process running for 35.201)
+2026-11-21T20:04:02.578Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-21T20:04:02.579Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-11-21T20:04:02.580Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-11-21T20:04:02.613Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (32ms)
+2026-11-21T20:04:02.643Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (26ms)
+2026-11-21T20:04:02.675Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/admin/datasources/1/exclude -> 200 (24ms)
+2026-11-21T20:04:02.779Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (39ms)
+2026-11-21T20:04:02.809Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (26ms)
+2026-11-21T20:04:02.822Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/admin/datasources/2/exclude -> 400 (6ms)
+2026-11-21T20:04:02.831Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/admin/datasources/2/exclude -> 400 (4ms)
+2026-11-21T20:04:02.839Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : POST /api/v1/admin/datasources/2/exclude -> 400 (4ms)
+2026-11-21T20:04:02.849Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : POST /api/v1/admin/datasources/2/exclude -> 400 (5ms)
+2026-11-21T20:04:02.929Z  INFO 1569 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (27ms)
+2026-11-21T20:04:02.957Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (25ms)
+2026-11-21T20:04:02.968Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/admin/datasources/3/exposure -> 202 (4ms)
+2026-11-21T20:04:02.970Z  INFO 1569 --- [keplura-server] [source-exposure] c.k.s.datasource.ExposureScanService     : datasource 3 exposure scan failed (IOException)
+2026-11-21T20:04:03.034Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : GET /api/v1/admin/datasources/3/exposure -> 200 (13ms)
+2026-11-21T20:04:03.147Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (37ms)
+2026-11-21T20:04:03.181Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (30ms)
+2026-11-21T20:04:03.187Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/admin/datasources/4/exclude -> 403 (0ms)
+2026-11-21T20:04:03.279Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (34ms)
+2026-11-21T20:04:03.309Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (27ms)
+2026-11-21T20:04:03.317Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : GET /api/v1/admin/datasources/5/exposure -> 404 (3ms)
+2026-11-21T20:04:03.323Z  INFO 1569 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : GET /api/v1/admin/datasources/999999/exposure -> 404 (2ms)
+2026-11-21T20:04:03.330Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/admin/datasources/999999/exposure -> 404 (3ms)
+2026-11-21T20:04:03.446Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (28ms)
+2026-11-21T20:04:03.474Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (24ms)
+2026-11-21T20:04:03.483Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/admin/datasources/6/exposure -> 403 (2ms)
+2026-11-21T20:04:03.488Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : GET /api/v1/admin/datasources/6/exposure -> 403 (1ms)
+2026-11-21T20:04:03.494Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/admin/datasources/6/exclude -> 403 (2ms)
+2026-11-21T20:04:03.499Z  INFO 1569 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : GET /api/v1/admin/datasources/6/exposure -> 401 (0ms)
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.200 s -- in com.keplura.server.datasource.ExposureAdminIntegrationTest
+[INFO] Running com.keplura.server.datasource.ExposureScanServiceTest
+2026-11-21T20:04:04.768Z  INFO 1569 --- [keplura-server] [           main] c.k.s.datasource.ExposureScanService     : datasource 7 exposure scan failed (IOException)
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.311 s -- in com.keplura.server.datasource.ExposureScanServiceTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 128, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  39.944 s
+[INFO] Finished at: 2026-11-21T20:04:05Z
+[INFO] ------------------------------------------------------------------------

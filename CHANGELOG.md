@@ -12,6 +12,11 @@ the first tagged release (planned `0.1.0`, see [docs/RELEASING.md](docs/RELEASIN
 
 ### Added
 
+- Bounded multi-step read tools (TU-03a): search, inspect results and read details
+  within one question, with five model requests and eight total tool attempts.
+  Follow-up mutations are blocked server-side; critical confirmations do not
+  resume the loop automatically. Stopped buffered tool answers are marked aborted.
+
 - Tool call cards in the chat (TU-02): every tool call shows tool, connection,
   risk class, inputs, status and the result or a generic error. Critical
   tools can now be approved by admins; each single call then waits for the
