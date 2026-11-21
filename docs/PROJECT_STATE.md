@@ -1,6 +1,6 @@
 # Keplura — PROJECT STATE (autoritative, knappe Projekt-Wahrheit)
 
-**Aktuelle Arbeitspriorität 21.11.2026 — Tool Use:** TU-01 und TU-02 sind auf main (PRs #15/#17). Nächste einzelne Aufgabe: TU-03a, begrenzte mehrstufige Lesezugriffe als erster Teil von TU-03; Spec docs/tasks/TU-03a-read-loop.md; Umsetzung durch Codex auf feat/tool-use-read-loop, nicht gemergt. Claude übernimmt die unabhängige Code-/Security-Prüfung; finale CI und Review noch offen. Folgeaktionen aus Werkzeugergebnissen dürfen keine neuen Schreibrechte erzeugen. Reihenfolge/Grenzen: docs/TOOL_USE_PLAN.md. Genau eine aktive Implementierung; Sicherheitsverpflichtungen und Gates gelten weiter. Kein Release/Deployment.
+**Aktuelle Arbeitspriorität 21.11.2026 — Tool Use:** TU-01 und TU-02 sind auf main (PRs #15/#17). Nächste einzelne Aufgabe: TU-03a, begrenzte mehrstufige Lesezugriffe als erster Teil von TU-03; Spec docs/tasks/TU-03a-read-loop.md; Implementierung durch Codex auf feat/tool-use-read-loop im Draft-PR, nicht gemergt. Linux-CI Exit 0 auf 35fa59f (85 Klassen, 673 Tests, 1 übersprungen; Evidence ci/evidence/20261121-184918/). Unabhängiges Code-/Security-Review durch Claude offen. Folgeaktionen aus Werkzeugergebnissen dürfen keine neuen Schreibrechte erzeugen. Reihenfolge/Grenzen: docs/TOOL_USE_PLAN.md. Genau eine aktive Implementierung; Sicherheitsverpflichtungen und Gates gelten weiter. Kein Release/Deployment.
 
 **PO-Rollentausch 21.11.2026 (Chat):** Codex übernimmt für TU-03a die Implementierung, Claude das unabhängige Code-/Security-Review. Kein Selbst-Approve oder Merge durch den Entwickler.
 
@@ -387,6 +387,8 @@ Dokument (inkl. PDF/DOCX) → RAG-Suche mit Citations → Chat mit SSE-Streaming
    PO-freigegebene Karte; nichts davon 'laeuft'.
 
 ## PO-ENTSCHEIDE (verbindlich, mit Datum + Anker)
+
+- **21.11.2026, Chat — Rollentausch für TU-03a:** PO beauftragt Codex mit der Implementierung und Claude mit dem unabhängigen Code-/Security-Review, anschließend „okay dann starte“. Eigener Worktree/Branch und finale Linux-CI bleiben Pflicht; kein Selbst-Approve oder Merge durch den Entwickler. Keine sonstige Gate-, Budget-, Release- oder Deployment-Ausnahme.
 
 - **21.11.2026, Chat — Tool Use als nächste Arbeitspriorität:** PO fordert mindestens den Tool-Use-Umfang von Open WebUI und beauftragt, den vorgeschlagenen Plan für die nächsten Tage fest zu verankern. Reihenfolge, Umfang und Grenzen: [TOOL_USE_PLAN.md](TOOL_USE_PLAN.md). Erste Aufgabe TU-01; eine aktive Implementierung. Keine pauschale Freigabe aller M5–M9-Visionen, keine Gate-/Provider-/Budget-Ausnahme, kein Release/Deployment.
 

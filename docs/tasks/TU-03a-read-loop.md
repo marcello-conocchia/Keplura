@@ -1,6 +1,6 @@
 # TU-03a — Begrenzte mehrstufige Lesezugriffe
 
-Status: **in Umsetzung durch Codex**, Branch `feat/tool-use-read-loop`, nicht gemergt. Unabhängiges Code-/Security-Review durch Claude und finale Linux-CI offen. Nächste einzelne Aufgabe nach TU-02 (PR #17, Merge `8f6852a`). Erster Umsetzungsschritt von TU-03 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Modell-/Werkzeugschleife, externe Aufrufe und Rechte.
+Status: **implementiert im Draft-PR**, Branch `feat/tool-use-read-loop`, nicht gemergt. Linux-CI Exit 0 auf Produktcommit `35fa59f`, Evidence `ci/evidence/20261121-184918/`; unabhängiges Code-/Security-Review durch Claude offen. Nächste einzelne Aufgabe nach TU-02 (PR #17, Merge `8f6852a`). Erster Umsetzungsschritt von TU-03 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Modell-/Werkzeugschleife, externe Aufrufe und Rechte.
 
 ## Ziel
 
@@ -39,3 +39,12 @@ Geskriptetes Gateway und lokaler Fake-Adapter/MCP-Server mit Aufrufzähler für 
 ## Workspace
 
 Eigener Worktree auf Branch `feat/tool-use-read-loop` ab main `b1c4b08`. PO-Rollentausch vom 21.11.2026: Codex implementiert, Claude prüft unabhängig Code und Sicherheit. Kein bestehender TU-03a-Branch oder Implementierungs-PR beim Start gefunden. Autoritatives Hermes-Kanban von diesem Windows-Host nicht erreichbar (lokales Board `intracore` existiert nicht); kein Ersatzboard angelegt. Genau eine Implementierungsaufgabe. Draft-PR, kein Merge durch den Entwickler; Provider-/Budgetregeln aus AGENTS.md gelten.
+
+## Umsetzung und Nachweise (21.11.2026)
+
+- ChatToolLoop: maximal fünf Modellanfragen, eine gemeinsame ToolTurn-Instanz mit acht Versuchen; Abschluss ohne Werkzeuge. Erster Plan nur aus aktuellem Auftrag, Folgekontext mit Belegen und ausschließlich READ-Angebot. Irreversible READ-Sperre zusätzlich im zentralen Ausführungsdienst, auch gegen vom Modell trotzdem gelieferte WRITE-/CRITICAL-Aufrufe.
+- Stop, neue Frage und Rechteentzug werden vor jeder Runde, nach Modellantwort und vor Werkzeugausführung geprüft. Gepufferte gestoppte Antworten werden als aborted persistiert. Kritische Bestätigungen und fehlgeschlagene Aufrufe schließen die automatische Schleife; keine automatische Wiederaufnahme nach Bestätigung.
+- Höchstens acht frühere bestätigte Ergebnisse (insgesamt 16 000 Zeichen) bei neuer expliziter Frage als Belege, nur bei unverändertem Zugriff/Definition/Ziel. Nicht im ersten Aktionsplan.
+- ChatToolLoopTest: 17 geskriptete Fälle mit echtem zentralem Dienst/Karten/Audit vor gezähltem Fake-Adapter. ChatApiIntegrationTest: HTTP-Regressionen plus Stop vor Relay. ToolConfirmationTest nutzt echte Frage-IDs statt einer ungespeicherten Fixture-ID.
+- Gezielte Windows-Prüfungen grün: betroffene Chat-/Tool-Klassen, zusätzlich Desktop-Build und 13 Node-Tests. Verbindliche Linux-CI auf 35fa59f als ci (UID 1500), acl installiert, Linux-Dateisystem: 85 Klassen genau einmal, 673 Tests, 0 Failures/Errors, 1 Skipped; Rechte-Helfer, Desktop-Build und cargo check PASS. E2E nicht ausgewählt; kein echter Modell-/Browser-/Release-Nachweis.
+- Keine neue Abhängigkeit, Migration oder Produktoberfläche. Weiter offen: unabhängige Prüfung durch Claude, gegebenenfalls vom PO beauftragte gezielte Browser-QA. Nach diesem grünen Produktstand nur Nachweise/Dokumentationsstatus ergänzt; kein erneuter CI-Lauf dafür.
