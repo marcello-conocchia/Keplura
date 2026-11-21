@@ -26,7 +26,7 @@ import TemplateMenu from "./chat/TemplateMenu.vue";
 import ChatContextBar from "./chat/ChatContextBar.vue";
 import { webSearchStatus } from "../productivity-api";
 import type { SourceSelection } from "../source-preview";
-import { tr, dateLocale, serverText } from "../i18n";
+import { tr, dateLocale, serverExact } from "../i18n";
 
 /**
  * Chat panel (M4b; restyled UI-POLISH-1 card §4; DESIGN.md §5 Chat + mockup
@@ -897,7 +897,7 @@ onUnmounted(() => {
 
               <!-- CHAT-POLISH §1: sanitized Markdown (marked+DOMPurify) for
                    the FINAL answer; .acontent stays the E2E text anchor. -->
-              <div class="acontent"><MarkdownAnswer :source="serverText(m.content)" /></div>
+              <div class="acontent"><MarkdownAnswer :source="serverExact(m.content)" /></div>
               <div class="ameta mt-[4px] flex items-center gap-[8px] text-[12px] text-ink-2">
                 <StatusPill v-if="m.status !== 'complete'" :tone="statusTone(m.status)">{{ statusLabel(m.status) }}</StatusPill>
                 <span :title="formatTime(m.createdAt)">{{ formatClock(m.createdAt) }}</span>
