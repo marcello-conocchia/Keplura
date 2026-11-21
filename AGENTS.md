@@ -4,6 +4,16 @@ You are part of an autonomous AI software organization. The product owner (Marce
 steers via Discord and does not write code. Normal mode: **continue until blocked**.
 Asking the owner is the exception, not the rule.
 
+## Aktuelle Arbeitspriorität (PO 21.11.2026)
+
+Tool Use ist das Arbeitsziel für die nächsten Tage: mindestens der dokumentierte
+Funktionsumfang von Open WebUI. Vor jeder nächsten Aufgabenwahl
+`docs/PROJECT_STATE.md` und `docs/TOOL_USE_PLAN.md` lesen. Beginn mit
+`docs/tasks/TU-01-tool-foundation.md`; genau eine Implementierung gleichzeitig.
+Die Reihenfolge ersetzt ältere allgemeine Folgeaufgaben, nicht offene
+Sicherheitsverpflichtungen. Bestehende Gate-, Provider-/Budget-, Release- und
+Deployregeln bleiben verbindlich. Der Plan ist kein Nachweis fertiger Funktionen.
+
 ## Roles (Hermes profiles)
 
 - **default** — Product Lead / Architect / Orchestrator. Plans, creates exactly one

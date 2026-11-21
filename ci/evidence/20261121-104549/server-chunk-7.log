@@ -1,0 +1,887 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------< com.keplura:keplura-server >---------------------
+[INFO] Building Keplura Server 0.1.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-cli) @ keplura-server ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.keplura.server.SystemInfoControllerTest
+10:49:40.881 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.keplura.server.SystemInfoControllerTest]: SystemInfoControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+10:49:41.063 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.SystemInfoControllerTest
+10:49:41.159 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.keplura.server.SystemInfoControllerTest]: SystemInfoControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+10:49:41.165 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.SystemInfoControllerTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-11-21T10:49:41.526Z  INFO 3938 --- [keplura-server] [           main] c.k.server.SystemInfoControllerTest      : Starting SystemInfoControllerTest using Java 21.0.12.1 with PID 3938 (started by ci in /w/server)
+2026-11-21T10:49:41.527Z DEBUG 3938 --- [keplura-server] [           main] c.k.server.SystemInfoControllerTest      : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-21T10:49:41.528Z  INFO 3938 --- [keplura-server] [           main] c.k.server.SystemInfoControllerTest      : The following 1 profile is active: "dev"
+2026-11-21T10:49:42.385Z  INFO 3938 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-21T10:49:42.516Z  INFO 3938 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 120 ms. Found 23 JPA repository interfaces.
+2026-11-21T10:49:43.247Z  INFO 3938 --- [keplura-server] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-21T10:49:43.305Z  INFO 3938 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-11-21T10:49:43.691Z  INFO 3938 --- [keplura-server] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-21T10:49:43.714Z  INFO 3938 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-11-21T10:49:43.855Z  INFO 3938 --- [keplura-server] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:system-info-test user=SA
+2026-11-21T10:49:43.857Z  INFO 3938 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-11-21T10:49:43.904Z  INFO 3938 --- [keplura-server] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:system-info-test]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: SYSTEM-INFO-TEST/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-21T10:49:45.240Z  INFO 3938 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-21T10:49:45.369Z  INFO 3938 --- [keplura-server] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-21T10:49:45.496Z  INFO 3938 --- [keplura-server] [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-11-21T10:49:46.359Z  INFO 3938 --- [keplura-server] [           main] com.keplura.server.admin.SecretCipher    : secret cipher: no KEPLURA_SECRETS_MASTER_KEY — provider secrets cannot be stored (admin surface stays usable without them)
+2026-11-21T10:49:46.374Z  INFO 3938 --- [keplura-server] [           main] c.keplura.server.SystemInfoController    : model provider state: provider=raw configured=false keyPresent=false
+2026-11-21T10:49:50.003Z  INFO 3938 --- [keplura-server] [           main] c.k.s.search.SearchStoreConfiguration    : search store: auto -> memory (pgvector probe not satisfied)
+2026-11-21T10:49:50.121Z  INFO 3938 --- [keplura-server] [           main] c.k.s.knowledge.DocumentIndexingQueue    : document indexing mode: sync
+2026-11-21T10:49:50.273Z  INFO 3938 --- [keplura-server] [           main] c.keplura.server.oidc.OidcConfiguration  : oidc: desktop handoff target fixed to http://localhost:1420/
+2026-11-21T10:49:50.525Z  WARN 3938 --- [keplura-server] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-21T10:49:51.120Z DEBUG 3938 --- [keplura-server] [           main] c.k.server.auth.SessionLifetimeFilter    : Filter 'sessionLifetimeFilter' configured for use
+2026-11-21T10:49:51.122Z  INFO 3938 --- [keplura-server] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-11-21T10:49:51.123Z  INFO 3938 --- [keplura-server] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-11-21T10:49:51.127Z  INFO 3938 --- [keplura-server] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 4 ms
+2026-11-21T10:49:51.172Z  INFO 3938 --- [keplura-server] [           main] c.k.server.SystemInfoControllerTest      : Started SystemInfoControllerTest in 9.941 seconds (process running for 11.673)
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (/home/ci/.m2/repository/net/bytebuddy/byte-buddy-agent/1.18.11/byte-buddy-agent-1.18.11.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+2026-11-21T10:49:51.922Z  INFO 3938 --- [keplura-server] [           main] c.k.server.RequestLoggingInterceptor     : GET /api/v1/system/info -> 200 (140ms)
+2026-11-21T10:49:51.963Z  INFO 3938 --- [keplura-server] [           main] c.k.server.RequestLoggingInterceptor     : GET /api/v1/system/info -> 200 (5ms)
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.39 s -- in com.keplura.server.SystemInfoControllerTest
+[INFO] Running com.keplura.server.space.SpaceRepositoryTest
+2026-11-21T10:49:52.035Z  INFO 3938 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.space.SpaceRepositoryTest]: SpaceRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-21T10:49:52.100Z  INFO 3938 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.space.SpaceRepositoryTest
+2026-11-21T10:49:52.101Z  INFO 3938 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.space.SpaceRepositoryTest]: SpaceRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-21T10:49:52.119Z  INFO 3938 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.space.SpaceRepositoryTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-11-21T10:49:52.173Z  INFO 3938 --- [keplura-server] [           main] c.k.server.space.SpaceRepositoryTest     : Starting SpaceRepositoryTest using Java 21.0.12.1 with PID 3938 (started by ci in /w/server)
+2026-11-21T10:49:52.173Z DEBUG 3938 --- [keplura-server] [           main] c.k.server.space.SpaceRepositoryTest     : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-21T10:49:52.173Z  INFO 3938 --- [keplura-server] [           main] c.k.server.space.SpaceRepositoryTest     : The following 1 profile is active: "dev"
+2026-11-21T10:49:52.440Z  INFO 3938 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-21T10:49:52.508Z  INFO 3938 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 64 ms. Found 23 JPA repository interfaces.
+2026-11-21T10:49:52.542Z  INFO 3938 --- [keplura-server] [           main] beddedDataSourceBeanFactoryPostProcessor : Replacing 'dataSource' DataSource bean with embedded version
+2026-11-21T10:49:52.575Z  INFO 3938 --- [keplura-server] [           main] o.s.j.d.e.EmbeddedDatabaseFactory        : Starting embedded database: url='jdbc:h2:mem:c596612f-4dd2-49f7-95f5-04213f0ac95f;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false', username='sa'
+2026-11-21T10:49:52.618Z  INFO 3938 --- [keplura-server] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-21T10:49:52.657Z  INFO 3938 --- [keplura-server] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-21T10:49:52.661Z  INFO 3938 --- [keplura-server] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:c596612f-4dd2-49f7-95f5-04213f0ac95f]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: C596612F-4DD2-49F7-95F5-04213F0AC95F/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-21T10:49:53.042Z  INFO 3938 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: drop table if exists ai_model cascade 
+Hibernate: drop table if exists ai_provider cascade 
+Hibernate: drop table if exists app_user cascade 
+Hibernate: drop table if exists chat_conversation cascade 
+Hibernate: drop table if exists chat_message cascade 
+Hibernate: drop table if exists data_source cascade 
+Hibernate: drop table if exists data_source_file cascade 
+Hibernate: drop table if exists directory_connection cascade 
+Hibernate: drop table if exists kb_chunk cascade 
+Hibernate: drop table if exists kb_document cascade 
+Hibernate: drop table if exists kb_document_acl cascade 
+Hibernate: drop table if exists knowledge_base cascade 
+Hibernate: drop table if exists membership cascade 
+Hibernate: drop table if exists oidc_account_link cascade 
+Hibernate: drop table if exists oidc_provider cascade 
+Hibernate: drop table if exists org_invite cascade 
+Hibernate: drop table if exists organization cascade 
+Hibernate: drop table if exists prompt_template cascade 
+Hibernate: drop table if exists quality_question cascade 
+Hibernate: drop table if exists quality_result cascade 
+Hibernate: drop table if exists quality_run cascade 
+Hibernate: drop table if exists space cascade 
+Hibernate: drop table if exists user_principal cascade 
+Hibernate: create table ai_model (embedding_dim integer, enabled boolean not null, is_default boolean not null, max_output_tokens integer, temperature numeric(4,3), created_at timestamp(6) with time zone not null, default_slot bigint, id bigint generated by default as identity, provider_id bigint not null, updated_at timestamp(6) with time zone not null, model_type varchar(20) not null, name varchar(200) not null, technical_model_id varchar(300) not null, primary key (id), constraint ai_model_default_slot_key unique (model_type, default_slot))
+Hibernate: create table ai_provider (enabled boolean not null, timeout_seconds integer not null, created_at timestamp(6) with time zone not null, id bigint generated by default as identity, updated_at timestamp(6) with time zone not null, provider_type varchar(20) not null, name varchar(200) not null unique, base_url varchar(500) not null, secret_cipher varchar(1000), primary key (id))
+Hibernate: create table app_user (must_change_password boolean not null, created_at timestamp(6) with time zone not null, id bigint generated by default as identity, role varchar(20) not null, display_name varchar(200) not null, password_hash varchar(200) not null, email varchar(320) not null unique, primary key (id))
+Hibernate: create table chat_conversation (created_at timestamp(6) with time zone not null, created_by bigint not null, id bigint generated by default as identity, knowledge_base_id bigint, org_id bigint not null, space_id bigint not null, updated_at timestamp(6) with time zone not null, title varchar(200) not null, primary key (id))
+Hibernate: create table chat_message (conversation_id bigint not null, created_at timestamp(6) with time zone not null, feedback varchar(8), feedback_at timestamp(6) with time zone, id bigint generated by default as identity, role varchar(16) not null, status varchar(16) not null, model varchar(128) not null, citations_json varchar(16000) not null, content varchar(32000) not null, primary key (id))
+Hibernate: create table data_source (enabled boolean not null, files_failed integer not null, files_indexed integer not null, files_seen integer not null, interval_minutes integer not null, mirror_permissions boolean not null, created_at timestamp(6) with time zone not null, created_by bigint not null, id bigint generated by default as identity, knowledge_base_id bigint not null, last_run_finished_at timestamp(6) with time zone, last_run_started_at timestamp(6) with time zone, max_file_bytes bigint not null, org_id bigint not null, space_id bigint not null, updated_at timestamp(6) with time zone not null, kind varchar(20) not null, last_run_status varchar(20), client_id varchar(100), tenant_id varchar(100), display_name varchar(200) not null, username varchar(300), last_run_message varchar(1000), location varchar(1000) not null, include_patterns varchar(2000) not null, secret_cipher varchar(2000), exclude_patterns varchar(20000) not null, primary key (id))
+Hibernate: create table data_source_file (data_source_id bigint not null, document_id bigint, id bigint generated by default as identity, modified_at timestamp(6) with time zone not null, size_bytes bigint not null, acl_fingerprint varchar(64) not null, last_error varchar(500), relative_path varchar(2000) not null, primary key (id))
+Hibernate: create table directory_connection (allow_plain_ldap boolean not null, auto_provision boolean not null, enabled boolean not null, login_enabled boolean not null, start_tls boolean not null, created_at timestamp(6) with time zone not null, id bigint generated by default as identity, org_id bigint not null, updated_at timestamp(6) with time zone not null, kind varchar(20) not null, display_name varchar(200) not null, base_dn varchar(500) not null, bind_dn varchar(500) not null, url varchar(500) not null, user_filter varchar(500) not null, bind_secret_cipher varchar(2000), primary key (id))
+Hibernate: create table kb_chunk (chunk_idx integer not null, end_offset integer, page_number integer, start_offset integer, created_at timestamp(6) with time zone not null, document_id bigint not null, id bigint generated by default as identity, knowledge_base_id bigint not null, section_title varchar(512), chunk_text varchar(4000) not null, embedding varchar(65536) not null, primary key (id), constraint kb_chunk_document_id_chunk_idx_key unique (document_id, chunk_idx))
+Hibernate: create table kb_document (created_at timestamp(6) with time zone not null, id bigint generated by default as identity, knowledge_base_id bigint not null, size_bytes bigint not null, uploaded_by bigint not null, index_status varchar(20), sha256 varchar(64) not null, content_type varchar(200) not null, stored_path varchar(500) not null, filename varchar(255) not null, primary key (id))
+Hibernate: create table kb_document_acl (allow_read boolean not null, document_id bigint not null, id bigint generated by default as identity, principal varchar(300) not null, primary key (id))
+Hibernate: create table knowledge_base (created_at timestamp(6) with time zone not null, id bigint generated by default as identity, space_id bigint not null, name varchar(200) not null, primary key (id), constraint knowledge_base_space_id_name_key unique (space_id, name))
+Hibernate: create table membership (created_at timestamp(6) with time zone not null, org_id bigint not null, user_id bigint not null, role enum ('MEMBER','OWNER') not null, primary key (org_id, user_id))
+Hibernate: create table oidc_account_link (created_at timestamp(6) with time zone not null, id bigint generated by default as identity, provider_id bigint not null, user_id bigint not null, subject varchar(200) not null, primary key (id))
+Hibernate: create table oidc_provider (active boolean not null, timeout_seconds integer not null, active_slot bigint, created_at timestamp(6) with time zone not null, id bigint generated by default as identity, updated_at timestamp(6) with time zone not null, client_id varchar(200) not null, name varchar(200) not null unique, discovery_url varchar(500) not null, issuer varchar(500) not null, client_secret_cipher varchar(1000), primary key (id))
+Hibernate: create table org_invite (created_at timestamp(6) with time zone not null, expires_at timestamp(6) with time zone not null, id bigint generated by default as identity, inviter_id bigint not null, org_id bigint not null, used_at timestamp(6) with time zone, used_by bigint, token_hash varchar(64) not null, role enum ('MEMBER','OWNER') not null, primary key (id))
+Hibernate: create table organization (created_at timestamp(6) with time zone not null, id bigint generated by default as identity, name varchar(200) not null, primary key (id))
+Hibernate: create table prompt_template (created_at timestamp(6) with time zone not null, created_by bigint not null, id bigint generated by default as identity, org_id bigint not null, space_id bigint, updated_at timestamp(6) with time zone not null, title varchar(120) not null, body varchar(4000) not null, primary key (id))
+Hibernate: create table quality_question (created_at timestamp(6) with time zone not null, created_by bigint not null, id bigint generated by default as identity, knowledge_base_id bigint not null, org_id bigint not null, space_id bigint not null, expected_document varchar(500) not null, expected_phrase varchar(500), question varchar(2000) not null, primary key (id))
+Hibernate: create table quality_result (hit boolean not null, hit_rank integer, id bigint generated by default as identity, question_id bigint not null, run_id bigint not null, top_document varchar(500), primary key (id))
+Hibernate: create table quality_run (hits integer not null, total integer not null, finished_at timestamp(6) with time zone, id bigint generated by default as identity, knowledge_base_id bigint not null, run_by bigint not null, started_at timestamp(6) with time zone not null, primary key (id))
+Hibernate: create table space (created_at timestamp(6) with time zone not null, id bigint generated by default as identity, org_id bigint not null, name varchar(200) not null, primary key (id), constraint space_org_id_name_key unique (org_id, name))
+Hibernate: create table user_principal (id bigint generated by default as identity, refreshed_at timestamp(6) with time zone not null, user_id bigint not null, principal varchar(300) not null, primary key (id))
+Hibernate: create index chat_conversation_org_id_created_by_space_id_idx on chat_conversation (org_id, created_by, space_id)
+Hibernate: create index chat_message_conversation_id_idx on chat_message (conversation_id)
+Hibernate: create index kb_chunk_knowledge_base_id_idx on kb_chunk (knowledge_base_id)
+Hibernate: create index kb_document_knowledge_base_id_idx on kb_document (knowledge_base_id)
+2026-11-21T10:49:53.114Z  INFO 3938 --- [keplura-server] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-21T10:49:53.455Z  INFO 3938 --- [keplura-server] [           main] c.k.server.space.SpaceRepositoryTest     : Started SpaceRepositoryTest in 1.326 seconds (process running for 13.956)
+Hibernate: insert into app_user (created_at,display_name,email,must_change_password,password_hash,role,id) values (?,?,?,?,?,?,default)
+Hibernate: insert into organization (created_at,name,id) values (?,?,default)
+Hibernate: insert into organization (created_at,name,id) values (?,?,default)
+Hibernate: insert into membership (created_at,role,org_id,user_id) values (?,?,?,?)
+Hibernate: insert into membership (created_at,role,org_id,user_id) values (?,?,?,?)
+Hibernate: insert into space (created_at,name,org_id,id) values (?,?,?,default)
+Hibernate: select s1_0.id,s1_0.created_at,s1_0.name,s1_0.org_id from space s1_0 where s1_0.id=? and s1_0.org_id=? and exists(select 1 from membership m1_0 where m1_0.org_id=? and m1_0.user_id=?)
+Hibernate: select s1_0.id,s1_0.created_at,s1_0.name,s1_0.org_id from space s1_0 where s1_0.id=? and s1_0.org_id=? and exists(select 1 from membership m1_0 where m1_0.org_id=? and m1_0.user_id=?)
+Hibernate: select s1_0.id,s1_0.created_at,s1_0.name,s1_0.org_id from space s1_0 where s1_0.id=? and s1_0.org_id=? and exists(select 1 from membership m1_0 where m1_0.org_id=? and m1_0.user_id=?)
+Hibernate: insert into organization (created_at,name,id) values (?,?,default)
+Hibernate: insert into space (created_at,name,org_id,id) values (?,?,?,default)
+Hibernate: insert into app_user (created_at,display_name,email,must_change_password,password_hash,role,id) values (?,?,?,?,?,?,default)
+Hibernate: insert into app_user (created_at,display_name,email,must_change_password,password_hash,role,id) values (?,?,?,?,?,?,default)
+Hibernate: insert into organization (created_at,name,id) values (?,?,default)
+Hibernate: insert into space (created_at,name,org_id,id) values (?,?,?,default)
+Hibernate: select s1_0.id,s1_0.created_at,s1_0.name,s1_0.org_id from space s1_0 where s1_0.org_id=? and exists(select 1 from membership m1_0 where m1_0.org_id=? and m1_0.user_id=?) order by s1_0.id
+Hibernate: insert into membership (created_at,role,org_id,user_id) values (?,?,?,?)
+Hibernate: select s1_0.id,s1_0.created_at,s1_0.name,s1_0.org_id from space s1_0 where s1_0.org_id=? and exists(select 1 from membership m1_0 where m1_0.org_id=? and m1_0.user_id=?) order by s1_0.id
+Hibernate: select s1_0.id,s1_0.created_at,s1_0.name,s1_0.org_id from space s1_0 where s1_0.org_id=? and exists(select 1 from membership m1_0 where m1_0.org_id=? and m1_0.user_id=?) order by s1_0.id
+Hibernate: insert into organization (created_at,name,id) values (?,?,default)
+Hibernate: insert into organization (created_at,name,id) values (?,?,default)
+Hibernate: insert into space (created_at,name,org_id,id) values (?,?,?,default)
+Hibernate: insert into space (created_at,name,org_id,id) values (?,?,?,default)
+Hibernate: insert into space (created_at,name,org_id,id) values (?,?,?,default)
+2026-11-21T10:49:53.830Z  WARN 3938 --- [keplura-server] [           main] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 23505, SQLState: 23505
+2026-11-21T10:49:53.831Z  WARN 3938 --- [keplura-server] [           main] org.hibernate.orm.jdbc.error             : Unique index or primary key violation: "PUBLIC.SPACE_ORG_ID_NAME_KEY INDEX PUBLIC.SPACE_ORG_ID_NAME_KEY_INDEX_4 ON PUBLIC.SPACE(ORG_ID NULLS FIRST, NAME NULLS FIRST) VALUES ( /* key:4 */ CAST(5 AS BIGINT), 'Shared')"; SQL statement:
+insert into space (created_at,name,org_id,id) values (?,?,?,default) [23505-240]
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.815 s -- in com.keplura.server.space.SpaceRepositoryTest
+[INFO] Running com.keplura.server.space.SpaceServiceTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.965 s -- in com.keplura.server.space.SpaceServiceTest
+[INFO] Running com.keplura.server.search.TikaDocumentTextExtractorTest
+2026-11-21T10:49:55.155Z DEBUG 3938 --- [keplura-server] [    tika-parser] c.k.s.search.TikaDocumentTextExtractor   : extracted 2 chars / 1 pages from a pdf in 154 ms
+2026-11-21T10:49:56.290Z  WARN 3938 --- [keplura-server] [    tika-parser] o.apache.poi.openxml4j.opc.ZipPackage    : Error in zip file /tmp/keplura-parse-9385594855076669720.docx - falling back to stream processing (i.e. ignoring zip central directory)
+2026-11-21T10:49:56.293Z DEBUG 3938 --- [keplura-server] [           main] c.k.s.search.TikaDocumentTextExtractor   : extraction failed for document 1 (TikaException)
+2026-11-21T10:49:56.360Z  WARN 3938 --- [keplura-server] [           main] o.a.pdfbox.pdmodel.font.PDType1Font      : Using fallback font LiberationSans for base font Helvetica
+2026-11-21T10:49:56.381Z  WARN 3938 --- [keplura-server] [    tika-parser] o.a.pdfbox.pdmodel.font.PDType1Font      : Using fallback font LiberationSans for Helvetica
+2026-11-21T10:49:56.397Z DEBUG 3938 --- [keplura-server] [    tika-parser] c.k.s.search.TikaDocumentTextExtractor   : extracted 50 chars / 2 pages from a pdf in 25 ms
+2026-11-21T10:49:56.405Z  WARN 3938 --- [keplura-server] [           main] o.a.pdfbox.pdmodel.font.PDType1Font      : Using fallback font LiberationSans for base font Helvetica
+2026-11-21T10:49:56.927Z DEBUG 3938 --- [keplura-server] [    tika-parser] c.k.s.search.TikaDocumentTextExtractor   : extracted 60 chars / -1 pages from a docx in 109 ms
+2026-11-21T10:49:56.934Z DEBUG 3938 --- [keplura-server] [    tika-parser] c.k.s.search.TikaDocumentTextExtractor   : pdf pre-count could not open the document (IOException); continuing to parse
+2026-11-21T10:49:56.976Z DEBUG 3938 --- [keplura-server] [    tika-parser] c.k.s.search.TikaDocumentTextExtractor   : extracted 60 chars / -1 pages from a docx in 16 ms
+2026-11-21T10:49:56.996Z  WARN 3938 --- [keplura-server] [           main] o.a.pdfbox.pdmodel.font.PDType1Font      : Using fallback font LiberationSans for base font Helvetica
+2026-11-21T10:49:57.807Z DEBUG 3938 --- [keplura-server] [    tika-parser] c.k.s.search.TikaDocumentTextExtractor   : extracted 4 chars / -1 pages from a docx in 12 ms
+2026-11-21T10:49:57.810Z  WARN 3938 --- [keplura-server] [           main] o.a.pdfbox.pdmodel.font.PDType1Font      : Using fallback font LiberationSans for base font Helvetica
+2026-11-21T10:49:57.819Z  WARN 3938 --- [keplura-server] [    tika-parser] o.a.pdfbox.pdmodel.font.PDType1Font      : Using fallback font LiberationSans for Helvetica
+2026-11-21T10:49:57.849Z  WARN 3938 --- [keplura-server] [           main] o.a.pdfbox.pdmodel.font.PDType1Font      : Using fallback font LiberationSans for base font Helvetica
+2026-11-21T10:49:57.857Z  WARN 3938 --- [keplura-server] [    tika-parser] o.a.pdfbox.pdmodel.font.PDType1Font      : Using fallback font LiberationSans for Helvetica
+2026-11-21T10:49:57.858Z DEBUG 3938 --- [keplura-server] [    tika-parser] c.k.s.search.TikaDocumentTextExtractor   : extracted 74 chars / 1 pages from a pdf in 3 ms
+2026-11-21T10:49:57.884Z DEBUG 3938 --- [keplura-server] [    tika-parser] c.k.s.search.TikaDocumentTextExtractor   : extracted 24 chars / -1 pages from a docx in 10 ms
+[INFO] Tests run: 18, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.062 s -- in com.keplura.server.search.TikaDocumentTextExtractorTest
+[INFO] Running com.keplura.server.admin.SsrfGuardTest
+2026-11-21T10:49:57.893Z  INFO 3938 --- [keplura-server] [           main] com.keplura.server.admin.SsrfGuard       : SSRF allow-list active with 2 operator CIDR(s)
+2026-11-21T10:49:57.894Z  WARN 3938 --- [keplura-server] [           main] com.keplura.server.admin.SsrfGuard       : SSRF guard refused a dial target (policy veto)
+2026-11-21T10:49:57.901Z  WARN 3938 --- [keplura-server] [           main] com.keplura.server.admin.SsrfGuard       : SSRF guard refused a dial target (policy veto)
+2026-11-21T10:49:57.901Z  INFO 3938 --- [keplura-server] [           main] com.keplura.server.admin.SsrfGuard       : SSRF allow-list active with 1 operator CIDR(s)
+2026-11-21T10:49:57.904Z  WARN 3938 --- [keplura-server] [           main] com.keplura.server.admin.SsrfGuard       : SSRF guard refused a dial target (policy veto)
+2026-11-21T10:49:57.907Z  WARN 3938 --- [keplura-server] [           main] com.keplura.server.admin.SsrfGuard       : SSRF guard refused a dial target (policy veto)
+2026-11-21T10:49:57.907Z  WARN 3938 --- [keplura-server] [           main] com.keplura.server.admin.SsrfGuard       : SSRF guard refused a dial target (policy veto)
+2026-11-21T10:49:57.907Z  WARN 3938 --- [keplura-server] [           main] com.keplura.server.admin.SsrfGuard       : SSRF guard refused a dial target (policy veto)
+2026-11-21T10:49:57.907Z  WARN 3938 --- [keplura-server] [           main] com.keplura.server.admin.SsrfGuard       : SSRF guard refused a dial target (policy veto)
+2026-11-21T10:49:57.908Z  WARN 3938 --- [keplura-server] [           main] com.keplura.server.admin.SsrfGuard       : SSRF guard refused a dial target (policy veto)
+2026-11-21T10:49:57.908Z  WARN 3938 --- [keplura-server] [           main] com.keplura.server.admin.SsrfGuard       : SSRF guard refused a dial target (policy veto)
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.021 s -- in com.keplura.server.admin.SsrfGuardTest
+[INFO] Running com.keplura.server.websearch.WebSearchSettingsTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.244 s -- in com.keplura.server.websearch.WebSearchSettingsTest
+[INFO] Running com.keplura.server.websearch.WebSearchSsrfTest
+2026-11-21T10:49:58.201Z  WARN 3938 --- [keplura-server] [           main] com.keplura.server.admin.SsrfGuard       : SSRF guard refused a dial target (policy veto)
+2026-11-21T10:49:58.201Z  WARN 3938 --- [keplura-server] [           main] c.k.server.websearch.WebSearchService    : web search failed (provider=searxng, cause=AdminException)
+2026-11-21T10:49:58.202Z  INFO 3938 --- [keplura-server] [           main] com.keplura.server.admin.SsrfGuard       : SSRF allow-list active with 1 operator CIDR(s)
+2026-11-21T10:49:58.364Z  INFO 3938 --- [keplura-server] [           main] com.keplura.server.admin.SsrfGuard       : SSRF allow-list active with 1 operator CIDR(s)
+2026-11-21T10:49:58.370Z  WARN 3938 --- [keplura-server] [           main] c.k.server.websearch.WebSearchService    : web search provider answered 302
+2026-11-21T10:49:58.372Z  INFO 3938 --- [keplura-server] [           main] com.keplura.server.admin.SsrfGuard       : SSRF allow-list active with 1 operator CIDR(s)
+2026-11-21T10:49:58.373Z  WARN 3938 --- [keplura-server] [           main] c.k.server.websearch.WebSearchService    : web search failed (provider=searxng, cause=AdminException)
+2026-11-21T10:49:58.374Z  INFO 3938 --- [keplura-server] [           main] com.keplura.server.admin.SsrfGuard       : SSRF allow-list active with 1 operator CIDR(s)
+2026-11-21T10:49:58.376Z  INFO 3938 --- [keplura-server] [           main] com.keplura.server.admin.SsrfGuard       : SSRF allow-list active with 1 operator CIDR(s)
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.219 s -- in com.keplura.server.websearch.WebSearchSsrfTest
+[INFO] Running com.keplura.server.tool.ToolArgumentValidatorTest
+[INFO] Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.099 s -- in com.keplura.server.tool.ToolArgumentValidatorTest
+[INFO] Running com.keplura.server.tool.ToolExecutionServiceTest
+2026-11-21T10:49:58.669Z  INFO 3938 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:tool-exec-808b37f6-004b-45e1-86b8-aaff795e5396 (H2 2.4)
+2026-11-21T10:49:58.759Z  WARN 3938 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T10:49:58.838Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-11-21T10:49:58.844Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 24 migrations (execution time 00:00.045s)
+2026-11-21T10:49:58.851Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2026-11-21T10:49:58.900Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": << Empty Schema >>
+2026-11-21T10:49:58.917Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "1 - baseline"
+2026-11-21T10:49:58.949Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "2 - spaces"
+2026-11-21T10:49:58.964Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "3 - knowledge"
+2026-11-21T10:49:58.981Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "4 - chunks"
+2026-11-21T10:49:58.999Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "6 - chat"
+2026-11-21T10:49:59.011Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "7 - document index status"
+2026-11-21T10:49:59.037Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "8 - org invites"
+2026-11-21T10:49:59.049Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "9 - user role"
+2026-11-21T10:49:59.073Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "10 - ai provider model"
+2026-11-21T10:49:59.091Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "11 - oidc provider"
+2026-11-21T10:49:59.102Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "12 - document index status async"
+2026-11-21T10:49:59.110Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "13 - chunk source location"
+2026-11-21T10:49:59.139Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "14 - chat message feedback"
+2026-11-21T10:49:59.154Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "15 - user must change password"
+2026-11-21T10:49:59.167Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "16 - datasources and access"
+2026-11-21T10:49:59.181Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "17 - quality questions"
+2026-11-21T10:49:59.191Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+2026-11-21T10:49:59.210Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "19 - prompt templates"
+2026-11-21T10:49:59.218Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+2026-11-21T10:49:59.235Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "21 - web search settings"
+2026-11-21T10:49:59.240Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "22 - mcp servers"
+2026-11-21T10:49:59.252Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "23 - mcp stage2"
+2026-11-21T10:49:59.265Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+2026-11-21T10:49:59.273Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "25 - tool foundation"
+2026-11-21T10:49:59.283Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 24 migrations to schema "PUBLIC", now at version v25 (execution time 00:00.180s)
+2026-11-21T10:49:59.331Z  INFO 3938 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:tool-exec-e5dd4da4-7b3a-4391-86c7-2a82d20ec65d (H2 2.4)
+2026-11-21T10:49:59.342Z  WARN 3938 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T10:49:59.359Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-11-21T10:49:59.360Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 24 migrations (execution time 00:00.012s)
+2026-11-21T10:49:59.361Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2026-11-21T10:49:59.365Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": << Empty Schema >>
+2026-11-21T10:49:59.368Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "1 - baseline"
+2026-11-21T10:49:59.374Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "2 - spaces"
+2026-11-21T10:49:59.382Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "3 - knowledge"
+2026-11-21T10:49:59.392Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "4 - chunks"
+2026-11-21T10:49:59.399Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "6 - chat"
+2026-11-21T10:49:59.405Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "7 - document index status"
+2026-11-21T10:49:59.412Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "8 - org invites"
+2026-11-21T10:49:59.417Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "9 - user role"
+2026-11-21T10:49:59.427Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "10 - ai provider model"
+2026-11-21T10:49:59.436Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "11 - oidc provider"
+2026-11-21T10:49:59.442Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "12 - document index status async"
+2026-11-21T10:49:59.447Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "13 - chunk source location"
+2026-11-21T10:49:59.467Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "14 - chat message feedback"
+2026-11-21T10:49:59.479Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "15 - user must change password"
+2026-11-21T10:49:59.486Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "16 - datasources and access"
+2026-11-21T10:49:59.494Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "17 - quality questions"
+2026-11-21T10:49:59.501Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+2026-11-21T10:49:59.515Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "19 - prompt templates"
+2026-11-21T10:49:59.522Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+2026-11-21T10:49:59.533Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "21 - web search settings"
+2026-11-21T10:49:59.538Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "22 - mcp servers"
+2026-11-21T10:49:59.545Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "23 - mcp stage2"
+2026-11-21T10:49:59.560Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+2026-11-21T10:49:59.566Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "25 - tool foundation"
+2026-11-21T10:49:59.575Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 24 migrations to schema "PUBLIC", now at version v25 (execution time 00:00.095s)
+2026-11-21T10:49:59.605Z  INFO 3938 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:tool-exec-be8e81bf-6606-4d45-ad94-7f2d5750ad2c (H2 2.4)
+2026-11-21T10:49:59.613Z  WARN 3938 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T10:49:59.629Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-11-21T10:49:59.630Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 24 migrations (execution time 00:00.011s)
+2026-11-21T10:49:59.633Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2026-11-21T10:49:59.638Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": << Empty Schema >>
+2026-11-21T10:49:59.642Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "1 - baseline"
+2026-11-21T10:49:59.650Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "2 - spaces"
+2026-11-21T10:49:59.659Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "3 - knowledge"
+2026-11-21T10:49:59.665Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "4 - chunks"
+2026-11-21T10:49:59.680Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "6 - chat"
+2026-11-21T10:49:59.685Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "7 - document index status"
+2026-11-21T10:49:59.692Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "8 - org invites"
+2026-11-21T10:49:59.702Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "9 - user role"
+2026-11-21T10:49:59.711Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "10 - ai provider model"
+2026-11-21T10:49:59.718Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "11 - oidc provider"
+2026-11-21T10:49:59.724Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "12 - document index status async"
+2026-11-21T10:49:59.728Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "13 - chunk source location"
+2026-11-21T10:49:59.743Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "14 - chat message feedback"
+2026-11-21T10:49:59.750Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "15 - user must change password"
+2026-11-21T10:49:59.757Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "16 - datasources and access"
+2026-11-21T10:49:59.767Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "17 - quality questions"
+2026-11-21T10:49:59.773Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+2026-11-21T10:49:59.781Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "19 - prompt templates"
+2026-11-21T10:49:59.786Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+2026-11-21T10:49:59.791Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "21 - web search settings"
+2026-11-21T10:49:59.794Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "22 - mcp servers"
+2026-11-21T10:49:59.799Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "23 - mcp stage2"
+2026-11-21T10:49:59.806Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+2026-11-21T10:49:59.809Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "25 - tool foundation"
+2026-11-21T10:49:59.813Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 24 migrations to schema "PUBLIC", now at version v25 (execution time 00:00.074s)
+2026-11-21T10:49:59.830Z  WARN 3938 --- [keplura-server] [           main] c.k.server.tool.ToolExecutionService     : tool not executed: audit unavailable (BadSqlGrammarException)
+2026-11-21T10:49:59.849Z  INFO 3938 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:tool-exec-ad220b02-9cc1-4695-b3a4-999a10791ba2 (H2 2.4)
+2026-11-21T10:49:59.853Z  WARN 3938 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T10:49:59.863Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-11-21T10:49:59.863Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 24 migrations (execution time 00:00.006s)
+2026-11-21T10:49:59.865Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2026-11-21T10:49:59.868Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": << Empty Schema >>
+2026-11-21T10:49:59.870Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "1 - baseline"
+2026-11-21T10:49:59.874Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "2 - spaces"
+2026-11-21T10:49:59.878Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "3 - knowledge"
+2026-11-21T10:49:59.882Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "4 - chunks"
+2026-11-21T10:49:59.887Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "6 - chat"
+2026-11-21T10:49:59.891Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "7 - document index status"
+2026-11-21T10:49:59.898Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "8 - org invites"
+2026-11-21T10:49:59.903Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "9 - user role"
+2026-11-21T10:49:59.910Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "10 - ai provider model"
+2026-11-21T10:49:59.916Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "11 - oidc provider"
+2026-11-21T10:49:59.923Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "12 - document index status async"
+2026-11-21T10:49:59.927Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "13 - chunk source location"
+2026-11-21T10:49:59.940Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "14 - chat message feedback"
+2026-11-21T10:49:59.948Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "15 - user must change password"
+2026-11-21T10:49:59.956Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "16 - datasources and access"
+2026-11-21T10:49:59.965Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "17 - quality questions"
+2026-11-21T10:49:59.971Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+2026-11-21T10:49:59.982Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "19 - prompt templates"
+2026-11-21T10:49:59.986Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+2026-11-21T10:49:59.994Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "21 - web search settings"
+2026-11-21T10:49:59.998Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "22 - mcp servers"
+2026-11-21T10:50:00.003Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "23 - mcp stage2"
+2026-11-21T10:50:00.010Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+2026-11-21T10:50:00.013Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "25 - tool foundation"
+2026-11-21T10:50:00.020Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 24 migrations to schema "PUBLIC", now at version v25 (execution time 00:00.071s)
+2026-11-21T10:50:00.052Z  INFO 3938 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:tool-exec-0dd0ad8c-87cc-41e1-ab35-22f3445ac3fc (H2 2.4)
+2026-11-21T10:50:00.057Z  WARN 3938 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T10:50:00.065Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-11-21T10:50:00.065Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 24 migrations (execution time 00:00.005s)
+2026-11-21T10:50:00.066Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2026-11-21T10:50:00.070Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": << Empty Schema >>
+2026-11-21T10:50:00.071Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "1 - baseline"
+2026-11-21T10:50:00.074Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "2 - spaces"
+2026-11-21T10:50:00.077Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "3 - knowledge"
+2026-11-21T10:50:00.082Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "4 - chunks"
+2026-11-21T10:50:00.085Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "6 - chat"
+2026-11-21T10:50:00.091Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "7 - document index status"
+2026-11-21T10:50:00.096Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "8 - org invites"
+2026-11-21T10:50:00.100Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "9 - user role"
+2026-11-21T10:50:00.106Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "10 - ai provider model"
+2026-11-21T10:50:00.113Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "11 - oidc provider"
+2026-11-21T10:50:00.116Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "12 - document index status async"
+2026-11-21T10:50:00.118Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "13 - chunk source location"
+2026-11-21T10:50:00.128Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "14 - chat message feedback"
+2026-11-21T10:50:00.133Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "15 - user must change password"
+2026-11-21T10:50:00.139Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "16 - datasources and access"
+2026-11-21T10:50:00.146Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "17 - quality questions"
+2026-11-21T10:50:00.150Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+2026-11-21T10:50:00.158Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "19 - prompt templates"
+2026-11-21T10:50:00.161Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+2026-11-21T10:50:00.166Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "21 - web search settings"
+2026-11-21T10:50:00.169Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "22 - mcp servers"
+2026-11-21T10:50:00.172Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "23 - mcp stage2"
+2026-11-21T10:50:00.179Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+2026-11-21T10:50:00.183Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "25 - tool foundation"
+2026-11-21T10:50:00.187Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 24 migrations to schema "PUBLIC", now at version v25 (execution time 00:00.048s)
+2026-11-21T10:50:00.195Z  WARN 3938 --- [keplura-server] [           main] c.k.server.tool.ToolExecutionService     : tool call failed (tool=fake:1:echo, cause=Der Werkzeug-Aufruf ist fehlgeschlagen.)
+2026-11-21T10:50:00.210Z  INFO 3938 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:tool-exec-fb101fcd-2377-45f1-9e65-34b9ff06bf00 (H2 2.4)
+2026-11-21T10:50:00.215Z  WARN 3938 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T10:50:00.225Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-11-21T10:50:00.227Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 24 migrations (execution time 00:00.006s)
+2026-11-21T10:50:00.228Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2026-11-21T10:50:00.231Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": << Empty Schema >>
+2026-11-21T10:50:00.235Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "1 - baseline"
+2026-11-21T10:50:00.238Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "2 - spaces"
+2026-11-21T10:50:00.243Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "3 - knowledge"
+2026-11-21T10:50:00.248Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "4 - chunks"
+2026-11-21T10:50:00.253Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "6 - chat"
+2026-11-21T10:50:00.257Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "7 - document index status"
+2026-11-21T10:50:00.262Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "8 - org invites"
+2026-11-21T10:50:00.265Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "9 - user role"
+2026-11-21T10:50:00.271Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "10 - ai provider model"
+2026-11-21T10:50:00.276Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "11 - oidc provider"
+2026-11-21T10:50:00.280Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "12 - document index status async"
+2026-11-21T10:50:00.283Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "13 - chunk source location"
+2026-11-21T10:50:00.291Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "14 - chat message feedback"
+2026-11-21T10:50:00.295Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "15 - user must change password"
+2026-11-21T10:50:00.300Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "16 - datasources and access"
+2026-11-21T10:50:00.305Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "17 - quality questions"
+2026-11-21T10:50:00.309Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+2026-11-21T10:50:00.315Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "19 - prompt templates"
+2026-11-21T10:50:00.318Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+2026-11-21T10:50:00.324Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "21 - web search settings"
+2026-11-21T10:50:00.327Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "22 - mcp servers"
+2026-11-21T10:50:00.330Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "23 - mcp stage2"
+2026-11-21T10:50:00.335Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+2026-11-21T10:50:00.337Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "25 - tool foundation"
+2026-11-21T10:50:00.341Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 24 migrations to schema "PUBLIC", now at version v25 (execution time 00:00.043s)
+2026-11-21T10:50:00.366Z  INFO 3938 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:tool-exec-d672d2d9-84e3-4a8d-8cc7-1e706ff3980d (H2 2.4)
+2026-11-21T10:50:00.370Z  WARN 3938 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T10:50:00.376Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-11-21T10:50:00.376Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 24 migrations (execution time 00:00.004s)
+2026-11-21T10:50:00.377Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2026-11-21T10:50:00.379Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": << Empty Schema >>
+2026-11-21T10:50:00.381Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "1 - baseline"
+2026-11-21T10:50:00.383Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "2 - spaces"
+2026-11-21T10:50:00.387Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "3 - knowledge"
+2026-11-21T10:50:00.390Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "4 - chunks"
+2026-11-21T10:50:00.393Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "6 - chat"
+2026-11-21T10:50:00.395Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "7 - document index status"
+2026-11-21T10:50:00.399Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "8 - org invites"
+2026-11-21T10:50:00.402Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "9 - user role"
+2026-11-21T10:50:00.406Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "10 - ai provider model"
+2026-11-21T10:50:00.410Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "11 - oidc provider"
+2026-11-21T10:50:00.413Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "12 - document index status async"
+2026-11-21T10:50:00.415Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "13 - chunk source location"
+2026-11-21T10:50:00.421Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "14 - chat message feedback"
+2026-11-21T10:50:00.426Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "15 - user must change password"
+2026-11-21T10:50:00.430Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "16 - datasources and access"
+2026-11-21T10:50:00.436Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "17 - quality questions"
+2026-11-21T10:50:00.439Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+2026-11-21T10:50:00.444Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "19 - prompt templates"
+2026-11-21T10:50:00.446Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+2026-11-21T10:50:00.454Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "21 - web search settings"
+2026-11-21T10:50:00.458Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "22 - mcp servers"
+2026-11-21T10:50:00.460Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "23 - mcp stage2"
+2026-11-21T10:50:00.466Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+2026-11-21T10:50:00.469Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "25 - tool foundation"
+2026-11-21T10:50:00.473Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 24 migrations to schema "PUBLIC", now at version v25 (execution time 00:00.036s)
+2026-11-21T10:50:00.519Z  INFO 3938 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:tool-exec-2468238e-2b0a-4f53-8f59-946a2b870f14 (H2 2.4)
+2026-11-21T10:50:00.522Z  WARN 3938 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T10:50:00.530Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-11-21T10:50:00.531Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 24 migrations (execution time 00:00.006s)
+2026-11-21T10:50:00.532Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2026-11-21T10:50:00.535Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": << Empty Schema >>
+2026-11-21T10:50:00.536Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "1 - baseline"
+2026-11-21T10:50:00.539Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "2 - spaces"
+2026-11-21T10:50:00.542Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "3 - knowledge"
+2026-11-21T10:50:00.546Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "4 - chunks"
+2026-11-21T10:50:00.550Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "6 - chat"
+2026-11-21T10:50:00.553Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "7 - document index status"
+2026-11-21T10:50:00.560Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "8 - org invites"
+2026-11-21T10:50:00.565Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "9 - user role"
+2026-11-21T10:50:00.568Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "10 - ai provider model"
+2026-11-21T10:50:00.573Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "11 - oidc provider"
+2026-11-21T10:50:00.576Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "12 - document index status async"
+2026-11-21T10:50:00.579Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "13 - chunk source location"
+2026-11-21T10:50:00.587Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "14 - chat message feedback"
+2026-11-21T10:50:00.593Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "15 - user must change password"
+2026-11-21T10:50:00.599Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "16 - datasources and access"
+2026-11-21T10:50:00.605Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "17 - quality questions"
+2026-11-21T10:50:00.609Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+2026-11-21T10:50:00.615Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "19 - prompt templates"
+2026-11-21T10:50:00.618Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+2026-11-21T10:50:00.623Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "21 - web search settings"
+2026-11-21T10:50:00.627Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "22 - mcp servers"
+2026-11-21T10:50:00.630Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "23 - mcp stage2"
+2026-11-21T10:50:00.635Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+2026-11-21T10:50:00.638Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "25 - tool foundation"
+2026-11-21T10:50:00.641Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 24 migrations to schema "PUBLIC", now at version v25 (execution time 00:00.042s)
+2026-11-21T10:50:00.647Z  WARN 3938 --- [keplura-server] [           main] c.k.server.tool.ToolExecutionService     : tool call failed (tool=fake:1:echo, cause=Ziel geändert.)
+2026-11-21T10:50:00.665Z  INFO 3938 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:tool-exec-4560b6ef-2c5f-4c52-b5ee-516df5e7e709 (H2 2.4)
+2026-11-21T10:50:00.669Z  WARN 3938 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T10:50:00.678Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-11-21T10:50:00.679Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 24 migrations (execution time 00:00.008s)
+2026-11-21T10:50:00.680Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2026-11-21T10:50:00.683Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": << Empty Schema >>
+2026-11-21T10:50:00.685Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "1 - baseline"
+2026-11-21T10:50:00.691Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "2 - spaces"
+2026-11-21T10:50:00.694Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "3 - knowledge"
+2026-11-21T10:50:00.702Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "4 - chunks"
+2026-11-21T10:50:00.707Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "6 - chat"
+2026-11-21T10:50:00.710Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "7 - document index status"
+2026-11-21T10:50:00.715Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "8 - org invites"
+2026-11-21T10:50:00.720Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "9 - user role"
+2026-11-21T10:50:00.725Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "10 - ai provider model"
+2026-11-21T10:50:00.730Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "11 - oidc provider"
+2026-11-21T10:50:00.735Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "12 - document index status async"
+2026-11-21T10:50:00.740Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "13 - chunk source location"
+2026-11-21T10:50:00.747Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "14 - chat message feedback"
+2026-11-21T10:50:00.753Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "15 - user must change password"
+2026-11-21T10:50:00.760Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "16 - datasources and access"
+2026-11-21T10:50:00.766Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "17 - quality questions"
+2026-11-21T10:50:00.770Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+2026-11-21T10:50:00.775Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "19 - prompt templates"
+2026-11-21T10:50:00.778Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+2026-11-21T10:50:00.784Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "21 - web search settings"
+2026-11-21T10:50:00.788Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "22 - mcp servers"
+2026-11-21T10:50:00.793Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "23 - mcp stage2"
+2026-11-21T10:50:00.798Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+2026-11-21T10:50:00.801Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "25 - tool foundation"
+2026-11-21T10:50:00.805Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 24 migrations to schema "PUBLIC", now at version v25 (execution time 00:00.050s)
+2026-11-21T10:50:00.826Z  INFO 3938 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:tool-exec-588de48a-8de9-4ae3-96e0-0620e89fd127 (H2 2.4)
+2026-11-21T10:50:00.830Z  WARN 3938 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T10:50:00.837Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-11-21T10:50:00.837Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 24 migrations (execution time 00:00.004s)
+2026-11-21T10:50:00.838Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2026-11-21T10:50:00.841Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": << Empty Schema >>
+2026-11-21T10:50:00.843Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "1 - baseline"
+2026-11-21T10:50:00.846Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "2 - spaces"
+2026-11-21T10:50:00.849Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "3 - knowledge"
+2026-11-21T10:50:00.851Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "4 - chunks"
+2026-11-21T10:50:00.855Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "6 - chat"
+2026-11-21T10:50:00.858Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "7 - document index status"
+2026-11-21T10:50:00.862Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "8 - org invites"
+2026-11-21T10:50:00.867Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "9 - user role"
+2026-11-21T10:50:00.872Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "10 - ai provider model"
+2026-11-21T10:50:00.877Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "11 - oidc provider"
+2026-11-21T10:50:00.880Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "12 - document index status async"
+2026-11-21T10:50:00.884Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "13 - chunk source location"
+2026-11-21T10:50:00.889Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "14 - chat message feedback"
+2026-11-21T10:50:00.893Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "15 - user must change password"
+2026-11-21T10:50:00.897Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "16 - datasources and access"
+2026-11-21T10:50:00.900Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "17 - quality questions"
+2026-11-21T10:50:00.905Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+2026-11-21T10:50:00.914Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "19 - prompt templates"
+2026-11-21T10:50:00.917Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+2026-11-21T10:50:00.921Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "21 - web search settings"
+2026-11-21T10:50:00.925Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "22 - mcp servers"
+2026-11-21T10:50:00.929Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "23 - mcp stage2"
+2026-11-21T10:50:00.933Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+2026-11-21T10:50:00.936Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "25 - tool foundation"
+2026-11-21T10:50:00.940Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 24 migrations to schema "PUBLIC", now at version v25 (execution time 00:00.038s)
+2026-11-21T10:50:00.944Z  WARN 3938 --- [keplura-server] [           main] c.k.server.tool.ToolExecutionService     : tool adapter broken unavailable (IllegalStateException)
+2026-11-21T10:50:00.959Z  INFO 3938 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:tool-exec-95f247a1-b04c-4bd7-ac2c-51f147363c01 (H2 2.4)
+2026-11-21T10:50:00.965Z  WARN 3938 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T10:50:00.973Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-11-21T10:50:00.974Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 24 migrations (execution time 00:00.007s)
+2026-11-21T10:50:00.975Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2026-11-21T10:50:00.977Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": << Empty Schema >>
+2026-11-21T10:50:00.979Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "1 - baseline"
+2026-11-21T10:50:00.982Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "2 - spaces"
+2026-11-21T10:50:00.985Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "3 - knowledge"
+2026-11-21T10:50:00.989Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "4 - chunks"
+2026-11-21T10:50:00.995Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "6 - chat"
+2026-11-21T10:50:00.999Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "7 - document index status"
+2026-11-21T10:50:01.002Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "8 - org invites"
+2026-11-21T10:50:01.006Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "9 - user role"
+2026-11-21T10:50:01.010Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "10 - ai provider model"
+2026-11-21T10:50:01.016Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "11 - oidc provider"
+2026-11-21T10:50:01.020Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "12 - document index status async"
+2026-11-21T10:50:01.023Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "13 - chunk source location"
+2026-11-21T10:50:01.032Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "14 - chat message feedback"
+2026-11-21T10:50:01.038Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "15 - user must change password"
+2026-11-21T10:50:01.043Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "16 - datasources and access"
+2026-11-21T10:50:01.049Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "17 - quality questions"
+2026-11-21T10:50:01.055Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+2026-11-21T10:50:01.061Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "19 - prompt templates"
+2026-11-21T10:50:01.065Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+2026-11-21T10:50:01.071Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "21 - web search settings"
+2026-11-21T10:50:01.075Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "22 - mcp servers"
+2026-11-21T10:50:01.077Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "23 - mcp stage2"
+2026-11-21T10:50:01.082Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+2026-11-21T10:50:01.085Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "25 - tool foundation"
+2026-11-21T10:50:01.089Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 24 migrations to schema "PUBLIC", now at version v25 (execution time 00:00.039s)
+2026-11-21T10:50:01.108Z  INFO 3938 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:tool-exec-ce15d93f-e37f-4e12-91ad-3ce3915e0d9c (H2 2.4)
+2026-11-21T10:50:01.113Z  WARN 3938 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T10:50:01.122Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-11-21T10:50:01.122Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 24 migrations (execution time 00:00.006s)
+2026-11-21T10:50:01.123Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2026-11-21T10:50:01.125Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": << Empty Schema >>
+2026-11-21T10:50:01.127Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "1 - baseline"
+2026-11-21T10:50:01.130Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "2 - spaces"
+2026-11-21T10:50:01.134Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "3 - knowledge"
+2026-11-21T10:50:01.136Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "4 - chunks"
+2026-11-21T10:50:01.139Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "6 - chat"
+2026-11-21T10:50:01.142Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "7 - document index status"
+2026-11-21T10:50:01.146Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "8 - org invites"
+2026-11-21T10:50:01.150Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "9 - user role"
+2026-11-21T10:50:01.154Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "10 - ai provider model"
+2026-11-21T10:50:01.161Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "11 - oidc provider"
+2026-11-21T10:50:01.164Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "12 - document index status async"
+2026-11-21T10:50:01.167Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "13 - chunk source location"
+2026-11-21T10:50:01.175Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "14 - chat message feedback"
+2026-11-21T10:50:01.181Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "15 - user must change password"
+2026-11-21T10:50:01.198Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "16 - datasources and access"
+2026-11-21T10:50:01.201Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "17 - quality questions"
+2026-11-21T10:50:01.204Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+2026-11-21T10:50:01.208Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "19 - prompt templates"
+2026-11-21T10:50:01.211Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+2026-11-21T10:50:01.215Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "21 - web search settings"
+2026-11-21T10:50:01.217Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "22 - mcp servers"
+2026-11-21T10:50:01.220Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "23 - mcp stage2"
+2026-11-21T10:50:01.224Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+2026-11-21T10:50:01.226Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "25 - tool foundation"
+2026-11-21T10:50:01.229Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 24 migrations to schema "PUBLIC", now at version v25 (execution time 00:00.033s)
+2026-11-21T10:50:01.247Z  INFO 3938 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:tool-exec-099cb5f6-8b82-4dd8-bf0a-4dab8e12acd0 (H2 2.4)
+2026-11-21T10:50:01.251Z  WARN 3938 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T10:50:01.257Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-11-21T10:50:01.257Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 24 migrations (execution time 00:00.003s)
+2026-11-21T10:50:01.257Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2026-11-21T10:50:01.259Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": << Empty Schema >>
+2026-11-21T10:50:01.260Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "1 - baseline"
+2026-11-21T10:50:01.262Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "2 - spaces"
+2026-11-21T10:50:01.264Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "3 - knowledge"
+2026-11-21T10:50:01.267Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "4 - chunks"
+2026-11-21T10:50:01.270Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "6 - chat"
+2026-11-21T10:50:01.272Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "7 - document index status"
+2026-11-21T10:50:01.274Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "8 - org invites"
+2026-11-21T10:50:01.276Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "9 - user role"
+2026-11-21T10:50:01.279Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "10 - ai provider model"
+2026-11-21T10:50:01.282Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "11 - oidc provider"
+2026-11-21T10:50:01.285Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "12 - document index status async"
+2026-11-21T10:50:01.286Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "13 - chunk source location"
+2026-11-21T10:50:01.290Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "14 - chat message feedback"
+2026-11-21T10:50:01.292Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "15 - user must change password"
+2026-11-21T10:50:01.296Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "16 - datasources and access"
+2026-11-21T10:50:01.300Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "17 - quality questions"
+2026-11-21T10:50:01.303Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+2026-11-21T10:50:01.307Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "19 - prompt templates"
+2026-11-21T10:50:01.309Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+2026-11-21T10:50:01.313Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "21 - web search settings"
+2026-11-21T10:50:01.315Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "22 - mcp servers"
+2026-11-21T10:50:01.316Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "23 - mcp stage2"
+2026-11-21T10:50:01.321Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+2026-11-21T10:50:01.323Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "25 - tool foundation"
+2026-11-21T10:50:01.326Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 24 migrations to schema "PUBLIC", now at version v25 (execution time 00:00.023s)
+2026-11-21T10:50:01.344Z  INFO 3938 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:tool-exec-8aef8b99-f169-4d29-8bf2-af2c1fc87ccd (H2 2.4)
+2026-11-21T10:50:01.348Z  WARN 3938 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T10:50:01.354Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-11-21T10:50:01.354Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 24 migrations (execution time 00:00.004s)
+2026-11-21T10:50:01.355Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2026-11-21T10:50:01.357Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": << Empty Schema >>
+2026-11-21T10:50:01.358Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "1 - baseline"
+2026-11-21T10:50:01.361Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "2 - spaces"
+2026-11-21T10:50:01.363Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "3 - knowledge"
+2026-11-21T10:50:01.366Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "4 - chunks"
+2026-11-21T10:50:01.370Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "6 - chat"
+2026-11-21T10:50:01.372Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "7 - document index status"
+2026-11-21T10:50:01.376Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "8 - org invites"
+2026-11-21T10:50:01.379Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "9 - user role"
+2026-11-21T10:50:01.383Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "10 - ai provider model"
+2026-11-21T10:50:01.386Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "11 - oidc provider"
+2026-11-21T10:50:01.389Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "12 - document index status async"
+2026-11-21T10:50:01.392Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "13 - chunk source location"
+2026-11-21T10:50:01.396Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "14 - chat message feedback"
+2026-11-21T10:50:01.400Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "15 - user must change password"
+2026-11-21T10:50:01.403Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "16 - datasources and access"
+2026-11-21T10:50:01.406Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "17 - quality questions"
+2026-11-21T10:50:01.408Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+2026-11-21T10:50:01.411Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "19 - prompt templates"
+2026-11-21T10:50:01.413Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+2026-11-21T10:50:01.416Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "21 - web search settings"
+2026-11-21T10:50:01.417Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "22 - mcp servers"
+2026-11-21T10:50:01.418Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "23 - mcp stage2"
+2026-11-21T10:50:01.421Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+2026-11-21T10:50:01.423Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "25 - tool foundation"
+2026-11-21T10:50:01.425Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 24 migrations to schema "PUBLIC", now at version v25 (execution time 00:00.021s)
+2026-11-21T10:50:01.443Z  INFO 3938 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:tool-exec-a893986e-9e07-41a8-939f-852bcdbc3974 (H2 2.4)
+2026-11-21T10:50:01.446Z  WARN 3938 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T10:50:01.453Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-11-21T10:50:01.453Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 24 migrations (execution time 00:00.005s)
+2026-11-21T10:50:01.454Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2026-11-21T10:50:01.456Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": << Empty Schema >>
+2026-11-21T10:50:01.457Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "1 - baseline"
+2026-11-21T10:50:01.459Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "2 - spaces"
+2026-11-21T10:50:01.461Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "3 - knowledge"
+2026-11-21T10:50:01.464Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "4 - chunks"
+2026-11-21T10:50:01.466Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "6 - chat"
+2026-11-21T10:50:01.469Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "7 - document index status"
+2026-11-21T10:50:01.472Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "8 - org invites"
+2026-11-21T10:50:01.474Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "9 - user role"
+2026-11-21T10:50:01.478Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "10 - ai provider model"
+2026-11-21T10:50:01.481Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "11 - oidc provider"
+2026-11-21T10:50:01.483Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "12 - document index status async"
+2026-11-21T10:50:01.484Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "13 - chunk source location"
+2026-11-21T10:50:01.489Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "14 - chat message feedback"
+2026-11-21T10:50:01.493Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "15 - user must change password"
+2026-11-21T10:50:01.497Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "16 - datasources and access"
+2026-11-21T10:50:01.501Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "17 - quality questions"
+2026-11-21T10:50:01.504Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+2026-11-21T10:50:01.507Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "19 - prompt templates"
+2026-11-21T10:50:01.509Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+2026-11-21T10:50:01.511Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "21 - web search settings"
+2026-11-21T10:50:01.514Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "22 - mcp servers"
+2026-11-21T10:50:01.515Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "23 - mcp stage2"
+2026-11-21T10:50:01.519Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+2026-11-21T10:50:01.520Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "25 - tool foundation"
+2026-11-21T10:50:01.522Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 24 migrations to schema "PUBLIC", now at version v25 (execution time 00:00.021s)
+2026-11-21T10:50:01.540Z  INFO 3938 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:tool-exec-eb653fd2-3453-4c08-a6ef-ee3c8adeb6fd (H2 2.4)
+2026-11-21T10:50:01.543Z  WARN 3938 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T10:50:01.550Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-11-21T10:50:01.550Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 24 migrations (execution time 00:00.005s)
+2026-11-21T10:50:01.551Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2026-11-21T10:50:01.553Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": << Empty Schema >>
+2026-11-21T10:50:01.554Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "1 - baseline"
+2026-11-21T10:50:01.556Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "2 - spaces"
+2026-11-21T10:50:01.557Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "3 - knowledge"
+2026-11-21T10:50:01.560Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "4 - chunks"
+2026-11-21T10:50:01.562Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "6 - chat"
+2026-11-21T10:50:01.566Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "7 - document index status"
+2026-11-21T10:50:01.569Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "8 - org invites"
+2026-11-21T10:50:01.572Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "9 - user role"
+2026-11-21T10:50:01.574Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "10 - ai provider model"
+2026-11-21T10:50:01.577Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "11 - oidc provider"
+2026-11-21T10:50:01.579Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "12 - document index status async"
+2026-11-21T10:50:01.580Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "13 - chunk source location"
+2026-11-21T10:50:01.585Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "14 - chat message feedback"
+2026-11-21T10:50:01.589Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "15 - user must change password"
+2026-11-21T10:50:01.593Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "16 - datasources and access"
+2026-11-21T10:50:01.596Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "17 - quality questions"
+2026-11-21T10:50:01.597Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+2026-11-21T10:50:01.600Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "19 - prompt templates"
+2026-11-21T10:50:01.602Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+2026-11-21T10:50:01.605Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "21 - web search settings"
+2026-11-21T10:50:01.606Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "22 - mcp servers"
+2026-11-21T10:50:01.609Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "23 - mcp stage2"
+2026-11-21T10:50:01.612Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+2026-11-21T10:50:01.614Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "25 - tool foundation"
+2026-11-21T10:50:01.616Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 24 migrations to schema "PUBLIC", now at version v25 (execution time 00:00.018s)
+2026-11-21T10:50:01.630Z  INFO 3938 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:tool-exec-4aec1e9d-b18a-4ad7-9c49-95701cf7449e (H2 2.4)
+2026-11-21T10:50:01.633Z  WARN 3938 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T10:50:01.637Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-11-21T10:50:01.637Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 24 migrations (execution time 00:00.003s)
+2026-11-21T10:50:01.637Z  INFO 3938 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2026-11-21T10:50:01.638Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": << Empty Schema >>
+2026-11-21T10:50:01.639Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "1 - baseline"
+2026-11-21T10:50:01.640Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "2 - spaces"
+2026-11-21T10:50:01.641Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "3 - knowledge"
+2026-11-21T10:50:01.643Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "4 - chunks"
+2026-11-21T10:50:01.645Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "6 - chat"
+2026-11-21T10:50:01.647Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "7 - document index status"
+2026-11-21T10:50:01.650Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "8 - org invites"
+2026-11-21T10:50:01.652Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "9 - user role"
+2026-11-21T10:50:01.655Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "10 - ai provider model"
+2026-11-21T10:50:01.658Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "11 - oidc provider"
+2026-11-21T10:50:01.660Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "12 - document index status async"
+2026-11-21T10:50:01.662Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "13 - chunk source location"
+2026-11-21T10:50:01.666Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "14 - chat message feedback"
+2026-11-21T10:50:01.670Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "15 - user must change password"
+2026-11-21T10:50:01.673Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "16 - datasources and access"
+2026-11-21T10:50:01.676Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "17 - quality questions"
+2026-11-21T10:50:01.679Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+2026-11-21T10:50:01.683Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "19 - prompt templates"
+2026-11-21T10:50:01.686Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+2026-11-21T10:50:01.690Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "21 - web search settings"
+2026-11-21T10:50:01.692Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "22 - mcp servers"
+2026-11-21T10:50:01.695Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "23 - mcp stage2"
+2026-11-21T10:50:01.700Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+2026-11-21T10:50:01.702Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "25 - tool foundation"
+2026-11-21T10:50:01.704Z  INFO 3938 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 24 migrations to schema "PUBLIC", now at version v25 (execution time 00:00.019s)
+[INFO] Tests run: 17, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.220 s -- in com.keplura.server.tool.ToolExecutionServiceTest
+[INFO] Running com.keplura.server.chat.SseTurnObserverTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.010 s -- in com.keplura.server.chat.SseTurnObserverTest
+[INFO] Running com.keplura.server.identity.UserRepositoryTest
+2026-11-21T10:50:01.736Z  INFO 3938 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.identity.UserRepositoryTest]: UserRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-21T10:50:01.832Z  INFO 3938 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.identity.UserRepositoryTest
+2026-11-21T10:50:01.833Z  INFO 3938 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.identity.UserRepositoryTest]: UserRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-21T10:50:01.851Z  INFO 3938 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.identity.UserRepositoryTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-11-21T10:50:01.938Z  INFO 3938 --- [keplura-server] [           main] c.k.server.identity.UserRepositoryTest   : Starting UserRepositoryTest using Java 21.0.12.1 with PID 3938 (started by ci in /w/server)
+2026-11-21T10:50:01.938Z DEBUG 3938 --- [keplura-server] [           main] c.k.server.identity.UserRepositoryTest   : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-21T10:50:01.939Z  INFO 3938 --- [keplura-server] [           main] c.k.server.identity.UserRepositoryTest   : The following 1 profile is active: "dev"
+2026-11-21T10:50:02.186Z  INFO 3938 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-21T10:50:02.262Z  INFO 3938 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 73 ms. Found 23 JPA repository interfaces.
+2026-11-21T10:50:02.330Z  INFO 3938 --- [keplura-server] [           main] beddedDataSourceBeanFactoryPostProcessor : Replacing 'dataSource' DataSource bean with embedded version
+2026-11-21T10:50:02.365Z  INFO 3938 --- [keplura-server] [           main] o.s.j.d.e.EmbeddedDatabaseFactory        : Starting embedded database: url='jdbc:h2:mem:9cbff752-1827-4cce-a26c-24a2024b03e4;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false', username='sa'
+2026-11-21T10:50:02.427Z  INFO 3938 --- [keplura-server] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-21T10:50:02.474Z  INFO 3938 --- [keplura-server] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-21T10:50:02.478Z  INFO 3938 --- [keplura-server] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:9cbff752-1827-4cce-a26c-24a2024b03e4]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: 9CBFF752-1827-4CCE-A26C-24A2024B03E4/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-21T10:50:02.936Z  INFO 3938 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: drop table if exists ai_model cascade 
+Hibernate: drop table if exists ai_provider cascade 
+Hibernate: drop table if exists app_user cascade 
+Hibernate: drop table if exists chat_conversation cascade 
+Hibernate: drop table if exists chat_message cascade 
+Hibernate: drop table if exists data_source cascade 
+Hibernate: drop table if exists data_source_file cascade 
+Hibernate: drop table if exists directory_connection cascade 
+Hibernate: drop table if exists kb_chunk cascade 
+Hibernate: drop table if exists kb_document cascade 
+Hibernate: drop table if exists kb_document_acl cascade 
+Hibernate: drop table if exists knowledge_base cascade 
+Hibernate: drop table if exists membership cascade 
+Hibernate: drop table if exists oidc_account_link cascade 
+Hibernate: drop table if exists oidc_provider cascade 
+Hibernate: drop table if exists org_invite cascade 
+Hibernate: drop table if exists organization cascade 
+Hibernate: drop table if exists prompt_template cascade 
+Hibernate: drop table if exists quality_question cascade 
+Hibernate: drop table if exists quality_result cascade 
+Hibernate: drop table if exists quality_run cascade 
+Hibernate: drop table if exists space cascade 
+Hibernate: drop table if exists user_principal cascade 
+Hibernate: create table ai_model (embedding_dim integer, enabled boolean not null, is_default boolean not null, max_output_tokens integer, temperature numeric(4,3), created_at timestamp(6) with time zone not null, default_slot bigint, id bigint generated by default as identity, provider_id bigint not null, updated_at timestamp(6) with time zone not null, model_type varchar(20) not null, name varchar(200) not null, technical_model_id varchar(300) not null, primary key (id), constraint ai_model_default_slot_key unique (model_type, default_slot))
+Hibernate: create table ai_provider (enabled boolean not null, timeout_seconds integer not null, created_at timestamp(6) with time zone not null, id bigint generated by default as identity, updated_at timestamp(6) with time zone not null, provider_type varchar(20) not null, name varchar(200) not null unique, base_url varchar(500) not null, secret_cipher varchar(1000), primary key (id))
+Hibernate: create table app_user (must_change_password boolean not null, created_at timestamp(6) with time zone not null, id bigint generated by default as identity, role varchar(20) not null, display_name varchar(200) not null, password_hash varchar(200) not null, email varchar(320) not null unique, primary key (id))
+Hibernate: create table chat_conversation (created_at timestamp(6) with time zone not null, created_by bigint not null, id bigint generated by default as identity, knowledge_base_id bigint, org_id bigint not null, space_id bigint not null, updated_at timestamp(6) with time zone not null, title varchar(200) not null, primary key (id))
+Hibernate: create table chat_message (conversation_id bigint not null, created_at timestamp(6) with time zone not null, feedback varchar(8), feedback_at timestamp(6) with time zone, id bigint generated by default as identity, role varchar(16) not null, status varchar(16) not null, model varchar(128) not null, citations_json varchar(16000) not null, content varchar(32000) not null, primary key (id))
+Hibernate: create table data_source (enabled boolean not null, files_failed integer not null, files_indexed integer not null, files_seen integer not null, interval_minutes integer not null, mirror_permissions boolean not null, created_at timestamp(6) with time zone not null, created_by bigint not null, id bigint generated by default as identity, knowledge_base_id bigint not null, last_run_finished_at timestamp(6) with time zone, last_run_started_at timestamp(6) with time zone, max_file_bytes bigint not null, org_id bigint not null, space_id bigint not null, updated_at timestamp(6) with time zone not null, kind varchar(20) not null, last_run_status varchar(20), client_id varchar(100), tenant_id varchar(100), display_name varchar(200) not null, username varchar(300), last_run_message varchar(1000), location varchar(1000) not null, include_patterns varchar(2000) not null, secret_cipher varchar(2000), exclude_patterns varchar(20000) not null, primary key (id))
+Hibernate: create table data_source_file (data_source_id bigint not null, document_id bigint, id bigint generated by default as identity, modified_at timestamp(6) with time zone not null, size_bytes bigint not null, acl_fingerprint varchar(64) not null, last_error varchar(500), relative_path varchar(2000) not null, primary key (id))
+Hibernate: create table directory_connection (allow_plain_ldap boolean not null, auto_provision boolean not null, enabled boolean not null, login_enabled boolean not null, start_tls boolean not null, created_at timestamp(6) with time zone not null, id bigint generated by default as identity, org_id bigint not null, updated_at timestamp(6) with time zone not null, kind varchar(20) not null, display_name varchar(200) not null, base_dn varchar(500) not null, bind_dn varchar(500) not null, url varchar(500) not null, user_filter varchar(500) not null, bind_secret_cipher varchar(2000), primary key (id))
+Hibernate: create table kb_chunk (chunk_idx integer not null, end_offset integer, page_number integer, start_offset integer, created_at timestamp(6) with time zone not null, document_id bigint not null, id bigint generated by default as identity, knowledge_base_id bigint not null, section_title varchar(512), chunk_text varchar(4000) not null, embedding varchar(65536) not null, primary key (id), constraint kb_chunk_document_id_chunk_idx_key unique (document_id, chunk_idx))
+Hibernate: create table kb_document (created_at timestamp(6) with time zone not null, id bigint generated by default as identity, knowledge_base_id bigint not null, size_bytes bigint not null, uploaded_by bigint not null, index_status varchar(20), sha256 varchar(64) not null, content_type varchar(200) not null, stored_path varchar(500) not null, filename varchar(255) not null, primary key (id))
+Hibernate: create table kb_document_acl (allow_read boolean not null, document_id bigint not null, id bigint generated by default as identity, principal varchar(300) not null, primary key (id))
+Hibernate: create table knowledge_base (created_at timestamp(6) with time zone not null, id bigint generated by default as identity, space_id bigint not null, name varchar(200) not null, primary key (id), constraint knowledge_base_space_id_name_key unique (space_id, name))
+Hibernate: create table membership (created_at timestamp(6) with time zone not null, org_id bigint not null, user_id bigint not null, role enum ('MEMBER','OWNER') not null, primary key (org_id, user_id))
+Hibernate: create table oidc_account_link (created_at timestamp(6) with time zone not null, id bigint generated by default as identity, provider_id bigint not null, user_id bigint not null, subject varchar(200) not null, primary key (id))
+Hibernate: create table oidc_provider (active boolean not null, timeout_seconds integer not null, active_slot bigint, created_at timestamp(6) with time zone not null, id bigint generated by default as identity, updated_at timestamp(6) with time zone not null, client_id varchar(200) not null, name varchar(200) not null unique, discovery_url varchar(500) not null, issuer varchar(500) not null, client_secret_cipher varchar(1000), primary key (id))
+Hibernate: create table org_invite (created_at timestamp(6) with time zone not null, expires_at timestamp(6) with time zone not null, id bigint generated by default as identity, inviter_id bigint not null, org_id bigint not null, used_at timestamp(6) with time zone, used_by bigint, token_hash varchar(64) not null, role enum ('MEMBER','OWNER') not null, primary key (id))
+Hibernate: create table organization (created_at timestamp(6) with time zone not null, id bigint generated by default as identity, name varchar(200) not null, primary key (id))
+Hibernate: create table prompt_template (created_at timestamp(6) with time zone not null, created_by bigint not null, id bigint generated by default as identity, org_id bigint not null, space_id bigint, updated_at timestamp(6) with time zone not null, title varchar(120) not null, body varchar(4000) not null, primary key (id))
+Hibernate: create table quality_question (created_at timestamp(6) with time zone not null, created_by bigint not null, id bigint generated by default as identity, knowledge_base_id bigint not null, org_id bigint not null, space_id bigint not null, expected_document varchar(500) not null, expected_phrase varchar(500), question varchar(2000) not null, primary key (id))
+Hibernate: create table quality_result (hit boolean not null, hit_rank integer, id bigint generated by default as identity, question_id bigint not null, run_id bigint not null, top_document varchar(500), primary key (id))
+Hibernate: create table quality_run (hits integer not null, total integer not null, finished_at timestamp(6) with time zone, id bigint generated by default as identity, knowledge_base_id bigint not null, run_by bigint not null, started_at timestamp(6) with time zone not null, primary key (id))
+Hibernate: create table space (created_at timestamp(6) with time zone not null, id bigint generated by default as identity, org_id bigint not null, name varchar(200) not null, primary key (id), constraint space_org_id_name_key unique (org_id, name))
+Hibernate: create table user_principal (id bigint generated by default as identity, refreshed_at timestamp(6) with time zone not null, user_id bigint not null, principal varchar(300) not null, primary key (id))
+Hibernate: create index chat_conversation_org_id_created_by_space_id_idx on chat_conversation (org_id, created_by, space_id)
+Hibernate: create index chat_message_conversation_id_idx on chat_message (conversation_id)
+Hibernate: create index kb_chunk_knowledge_base_id_idx on kb_chunk (knowledge_base_id)
+Hibernate: create index kb_document_knowledge_base_id_idx on kb_document (knowledge_base_id)
+2026-11-21T10:50:02.954Z  INFO 3938 --- [keplura-server] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-21T10:50:03.551Z  INFO 3938 --- [keplura-server] [           main] c.k.server.identity.UserRepositoryTest   : Started UserRepositoryTest in 1.689 seconds (process running for 24.052)
+Hibernate: insert into app_user (created_at,display_name,email,must_change_password,password_hash,role,id) values (?,?,?,?,?,?,default)
+Hibernate: select u1_0.id,u1_0.created_at,u1_0.display_name,u1_0.email,u1_0.must_change_password,u1_0.password_hash,u1_0.role from app_user u1_0 where u1_0.email=?
+Hibernate: insert into app_user (created_at,display_name,email,must_change_password,password_hash,role,id) values (?,?,?,?,?,?,default)
+Hibernate: insert into app_user (created_at,display_name,email,must_change_password,password_hash,role,id) values (?,?,?,?,?,?,default)
+2026-11-21T10:50:03.810Z  WARN 3938 --- [keplura-server] [           main] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 23505, SQLState: 23505
+2026-11-21T10:50:03.810Z  WARN 3938 --- [keplura-server] [           main] org.hibernate.orm.jdbc.error             : Unique index or primary key violation: "PUBLIC.CONSTRAINT_76 INDEX PUBLIC.CONSTRAINT_INDEX_76 ON PUBLIC.APP_USER(EMAIL NULLS FIRST) VALUES ( /* 2 */ 'bob@example.com' )"; SQL statement:
+insert into app_user (created_at,display_name,email,must_change_password,password_hash,role,id) values (?,?,?,?,?,?,default) [23505-240]
+Hibernate: insert into app_user (created_at,display_name,email,must_change_password,password_hash,role,id) values (?,?,?,?,?,?,default)
+Hibernate: select u1_0.id,u1_0.created_at,u1_0.display_name,u1_0.email,u1_0.must_change_password,u1_0.password_hash,u1_0.role from app_user u1_0 where u1_0.email=?
+Hibernate: select u1_0.id from app_user u1_0 where u1_0.email=? fetch first ? rows only
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.194 s -- in com.keplura.server.identity.UserRepositoryTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 84, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  26.737 s
+[INFO] Finished at: 2026-11-21T10:50:04Z
+[INFO] ------------------------------------------------------------------------

@@ -1,0 +1,603 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------< com.keplura:keplura-server >---------------------
+[INFO] Building Keplura Server 0.1.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-cli) @ keplura-server ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.keplura.server.DesktopCorsIntegrationTest
+10:46:46.748 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.keplura.server.DesktopCorsIntegrationTest]: DesktopCorsIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+10:46:46.898 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.DesktopCorsIntegrationTest
+10:46:46.971 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.keplura.server.DesktopCorsIntegrationTest]: DesktopCorsIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+10:46:46.977 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.DesktopCorsIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-11-21T10:46:47.323Z  INFO 1375 --- [keplura-server] [           main] c.k.server.DesktopCorsIntegrationTest    : Starting DesktopCorsIntegrationTest using Java 21.0.12.1 with PID 1375 (started by ci in /w/server)
+2026-11-21T10:46:47.324Z DEBUG 1375 --- [keplura-server] [           main] c.k.server.DesktopCorsIntegrationTest    : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-21T10:46:47.325Z  INFO 1375 --- [keplura-server] [           main] c.k.server.DesktopCorsIntegrationTest    : The following 1 profile is active: "dev"
+2026-11-21T10:46:48.159Z  INFO 1375 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-21T10:46:48.284Z  INFO 1375 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 108 ms. Found 23 JPA repository interfaces.
+2026-11-21T10:46:49.041Z  INFO 1375 --- [keplura-server] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-11-21T10:46:49.065Z  INFO 1375 --- [keplura-server] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-21T10:46:49.066Z  INFO 1375 --- [keplura-server] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-11-21T10:46:49.128Z  INFO 1375 --- [keplura-server] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1773 ms
+2026-11-21T10:46:49.186Z DEBUG 1375 --- [keplura-server] [           main] c.k.server.auth.SessionLifetimeFilter    : Filter 'sessionLifetimeFilter' configured for use
+2026-11-21T10:46:49.394Z  INFO 1375 --- [keplura-server] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-21T10:46:49.474Z  INFO 1375 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-11-21T10:46:49.923Z  INFO 1375 --- [keplura-server] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-21T10:46:49.951Z  INFO 1375 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-11-21T10:46:50.085Z  INFO 1375 --- [keplura-server] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:desktop-cors-test user=SA
+2026-11-21T10:46:50.087Z  INFO 1375 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-11-21T10:46:50.135Z  INFO 1375 --- [keplura-server] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:desktop-cors-test]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: DESKTOP-CORS-TEST/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-21T10:46:51.346Z  INFO 1375 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-21T10:46:51.422Z  INFO 1375 --- [keplura-server] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-21T10:46:51.536Z  INFO 1375 --- [keplura-server] [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-11-21T10:46:52.206Z  INFO 1375 --- [keplura-server] [           main] com.keplura.server.admin.SecretCipher    : secret cipher: no KEPLURA_SECRETS_MASTER_KEY — provider secrets cannot be stored (admin surface stays usable without them)
+2026-11-21T10:46:52.220Z  INFO 1375 --- [keplura-server] [           main] c.keplura.server.SystemInfoController    : model provider state: provider=raw configured=false keyPresent=false
+2026-11-21T10:46:54.980Z  INFO 1375 --- [keplura-server] [           main] c.k.s.search.SearchStoreConfiguration    : search store: auto -> memory (pgvector probe not satisfied)
+2026-11-21T10:46:55.064Z  INFO 1375 --- [keplura-server] [           main] c.k.s.knowledge.DocumentIndexingQueue    : document indexing mode: sync
+2026-11-21T10:46:55.183Z  INFO 1375 --- [keplura-server] [           main] c.keplura.server.oidc.OidcConfiguration  : oidc: desktop handoff target fixed to http://localhost:1420/
+2026-11-21T10:46:55.354Z  WARN 1375 --- [keplura-server] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-21T10:46:55.824Z  INFO 1375 --- [keplura-server] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 35339 (http) with context path '/'
+2026-11-21T10:46:55.834Z  INFO 1375 --- [keplura-server] [           main] c.k.server.DesktopCorsIntegrationTest    : Started DesktopCorsIntegrationTest in 8.784 seconds (process running for 10.296)
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (/home/ci/.m2/repository/net/bytebuddy/byte-buddy-agent/1.18.11/byte-buddy-agent-1.18.11.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+2026-11-21T10:46:56.415Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-21T10:46:56.416Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-11-21T10:46:56.418Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-11-21T10:46:56.624Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-3] c.k.server.RequestLoggingInterceptor     : OPTIONS /api/v1/admin/providers -> 200 (0ms)
+2026-11-21T10:46:56.640Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-4] c.k.server.RequestLoggingInterceptor     : OPTIONS /api/v1/admin/models/1/default -> 200 (0ms)
+2026-11-21T10:46:56.659Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-6] c.k.server.RequestLoggingInterceptor     : OPTIONS /api/v1/orgs -> 200 (0ms)
+2026-11-21T10:46:56.979Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-9] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (156ms)
+2026-11-21T10:46:57.015Z  INFO 1375 --- [keplura-server] [-auto-1-exec-10] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (21ms)
+2026-11-21T10:46:57.062Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-1] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/1/spaces -> 200 (39ms)
+2026-11-21T10:46:57.148Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-2] com.keplura.server.auth.AuthService      : authentication rejected (invalid credentials)
+2026-11-21T10:46:57.167Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 401 (52ms)
+2026-11-21T10:46:57.210Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-3] com.keplura.server.auth.AuthService      : authentication rejected (invalid credentials)
+2026-11-21T10:46:57.214Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 401 (41ms)
+2026-11-21T10:46:57.252Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-4] com.keplura.server.auth.AuthService      : authentication rejected (invalid credentials)
+2026-11-21T10:46:57.257Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 401 (38ms)
+2026-11-21T10:46:57.299Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-5] com.keplura.server.auth.AuthService      : authentication rejected (invalid credentials)
+2026-11-21T10:46:57.303Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 401 (40ms)
+2026-11-21T10:46:57.350Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-6] com.keplura.server.auth.AuthService      : authentication rejected (invalid credentials)
+2026-11-21T10:46:57.355Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 401 (46ms)
+2026-11-21T10:46:57.400Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-7] com.keplura.server.auth.AuthService      : authentication rejected (invalid credentials)
+2026-11-21T10:46:57.406Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 401 (43ms)
+2026-11-21T10:46:57.444Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-8] com.keplura.server.auth.AuthService      : authentication rejected (invalid credentials)
+2026-11-21T10:46:57.449Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-8] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 401 (38ms)
+2026-11-21T10:46:57.484Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-9] com.keplura.server.auth.AuthService      : authentication rejected (invalid credentials)
+2026-11-21T10:46:57.489Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-9] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 401 (35ms)
+2026-11-21T10:46:57.540Z  INFO 1375 --- [keplura-server] [-auto-1-exec-10] com.keplura.server.auth.AuthService      : authentication rejected (invalid credentials)
+2026-11-21T10:46:57.544Z  INFO 1375 --- [keplura-server] [-auto-1-exec-10] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 401 (51ms)
+2026-11-21T10:46:57.580Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-1] com.keplura.server.auth.AuthService      : authentication rejected (invalid credentials)
+2026-11-21T10:46:57.584Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 401 (35ms)
+2026-11-21T10:46:57.593Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 429 (2ms)
+2026-11-21T10:46:57.618Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-4] c.k.server.RequestLoggingInterceptor     : OPTIONS /api/v1/auth/login -> 200 (0ms)
+2026-11-21T10:46:57.630Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-5] c.k.server.RequestLoggingInterceptor     : OPTIONS /api/v1/auth/login -> 200 (0ms)
+2026-11-21T10:46:57.635Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-6] c.k.server.RequestLoggingInterceptor     : OPTIONS /api/v1/auth/login -> 200 (0ms)
+2026-11-21T10:46:57.647Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-7] c.k.server.RequestLoggingInterceptor     : OPTIONS /api/v1/orgs -> 401 (1ms)
+2026-11-21T10:46:57.657Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-8] c.k.server.RequestLoggingInterceptor     : OPTIONS /api/v1/gateway/chat/completions -> 200 (0ms)
+2026-11-21T10:46:57.756Z  INFO 1375 --- [keplura-server] [-auto-1-exec-10] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (41ms)
+2026-11-21T10:46:57.771Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-1] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs -> 200 (10ms)
+2026-11-21T10:46:57.786Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-2] c.k.server.RequestLoggingInterceptor     : OPTIONS /api/v1/orgs/1/spaces/1/knowledge-bases/1/search -> 200 (2ms)
+2026-11-21T10:46:57.796Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-3] c.k.server.RequestLoggingInterceptor     : OPTIONS /api/v1/orgs/1/spaces/1/knowledge-bases/1/documents -> 200 (0ms)
+2026-11-21T10:46:57.875Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (36ms)
+2026-11-21T10:46:57.888Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (9ms)
+2026-11-21T10:46:57.917Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/2/spaces -> 201 (24ms)
+2026-11-21T10:46:57.937Z  INFO 1375 --- [keplura-server] [o-auto-1-exec-7] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/2/spaces/1/knowledge-bases -> 200 (15ms)
+[INFO] Tests run: 17, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.41 s -- in com.keplura.server.DesktopCorsIntegrationTest
+[INFO] Running com.keplura.server.search.DocumentIndexingStatusTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.744 s -- in com.keplura.server.search.DocumentIndexingStatusTest
+[INFO] Running com.keplura.server.search.DocumentChunkerTest
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.110 s -- in com.keplura.server.search.DocumentChunkerTest
+[INFO] Running com.keplura.server.knowledge.DocumentStorageTest
+2026-11-21T10:46:58.915Z  WARN 1375 --- [keplura-server] [           main] o.j.j.e.e.TempDirectory$CloseablePath    : Deleting symbolic link from location inside of temp dir (/tmp/junit-13385029593104239337/orgs/1/spaces/1/kbs/1/link) to location outside of temp dir (/tmp/keplura-secret-2511135805681370828.txt) but not the target file/directory
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.161 s -- in com.keplura.server.knowledge.DocumentStorageTest
+[INFO] Running com.keplura.server.knowledge.DocumentServiceTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.864 s -- in com.keplura.server.knowledge.DocumentServiceTest
+[INFO] Running com.keplura.server.knowledge.DocumentApiIntegrationTest
+2026-11-21T10:46:59.891Z  INFO 1375 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.knowledge.DocumentApiIntegrationTest]: DocumentApiIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-21T10:47:00.003Z  INFO 1375 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.knowledge.DocumentApiIntegrationTest
+2026-11-21T10:47:00.010Z  INFO 1375 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.knowledge.DocumentApiIntegrationTest]: DocumentApiIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-21T10:47:00.022Z  INFO 1375 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.knowledge.DocumentApiIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-11-21T10:47:00.151Z  INFO 1375 --- [keplura-server] [           main] c.k.s.k.DocumentApiIntegrationTest       : Starting DocumentApiIntegrationTest using Java 21.0.12.1 with PID 1375 (started by ci in /w/server)
+2026-11-21T10:47:00.152Z DEBUG 1375 --- [keplura-server] [           main] c.k.s.k.DocumentApiIntegrationTest       : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-21T10:47:00.153Z  INFO 1375 --- [keplura-server] [           main] c.k.s.k.DocumentApiIntegrationTest       : The following 1 profile is active: "dev"
+2026-11-21T10:47:00.694Z  INFO 1375 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-21T10:47:00.802Z  INFO 1375 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 102 ms. Found 23 JPA repository interfaces.
+2026-11-21T10:47:01.109Z  INFO 1375 --- [keplura-server] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-11-21T10:47:01.110Z  INFO 1375 --- [keplura-server] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-21T10:47:01.111Z  INFO 1375 --- [keplura-server] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-11-21T10:47:01.184Z  INFO 1375 --- [keplura-server] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1023 ms
+2026-11-21T10:47:01.246Z DEBUG 1375 --- [keplura-server] [           main] c.k.server.auth.SessionLifetimeFilter    : Filter 'sessionLifetimeFilter' configured for use
+2026-11-21T10:47:01.374Z  INFO 1375 --- [keplura-server] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-21T10:47:01.441Z  INFO 1375 --- [keplura-server] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-21T10:47:01.443Z  INFO 1375 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-11-21T10:47:01.456Z  INFO 1375 --- [keplura-server] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection conn10: url=jdbc:h2:mem:doc-api-test user=SA
+2026-11-21T10:47:01.457Z  INFO 1375 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-11-21T10:47:01.460Z  INFO 1375 --- [keplura-server] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:doc-api-test]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: DOC-API-TEST/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-21T10:47:02.044Z  INFO 1375 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-21T10:47:02.134Z  INFO 1375 --- [keplura-server] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-21T10:47:02.268Z  INFO 1375 --- [keplura-server] [           main] com.keplura.server.admin.SecretCipher    : secret cipher: no KEPLURA_SECRETS_MASTER_KEY — provider secrets cannot be stored (admin surface stays usable without them)
+2026-11-21T10:47:02.272Z  INFO 1375 --- [keplura-server] [           main] c.keplura.server.SystemInfoController    : model provider state: provider=raw configured=false keyPresent=false
+2026-11-21T10:47:02.743Z  INFO 1375 --- [keplura-server] [           main] c.k.s.search.SearchStoreConfiguration    : search store: auto -> memory (pgvector probe not satisfied)
+2026-11-21T10:47:02.772Z  INFO 1375 --- [keplura-server] [           main] c.k.s.knowledge.DocumentIndexingQueue    : document indexing mode: sync
+2026-11-21T10:47:02.813Z  INFO 1375 --- [keplura-server] [           main] c.keplura.server.oidc.OidcConfiguration  : oidc: desktop handoff target fixed to http://localhost:1420/
+2026-11-21T10:47:02.870Z  WARN 1375 --- [keplura-server] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-21T10:47:03.042Z  INFO 1375 --- [keplura-server] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 40095 (http) with context path '/'
+2026-11-21T10:47:03.048Z  INFO 1375 --- [keplura-server] [           main] c.k.s.k.DocumentApiIntegrationTest       : Started DocumentApiIntegrationTest in 3.003 seconds (process running for 17.511)
+2026-11-21T10:47:03.118Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-1] o.a.c.c.C.[Tomcat-1].[localhost].[/]     : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-21T10:47:03.118Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-11-21T10:47:03.119Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-11-21T10:47:03.164Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (42ms)
+2026-11-21T10:47:03.236Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (32ms)
+2026-11-21T10:47:03.266Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (21ms)
+2026-11-21T10:47:03.282Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (7ms)
+2026-11-21T10:47:03.316Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/1/spaces -> 201 (23ms)
+2026-11-21T10:47:03.357Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/1/spaces/1/knowledge-bases -> 201 (32ms)
+2026-11-21T10:47:03.377Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/2/spaces -> 201 (12ms)
+2026-11-21T10:47:03.395Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/2/spaces/2/knowledge-bases -> 201 (12ms)
+2026-11-21T10:47:03.453Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/1/spaces/1/knowledge-bases/1/documents -> 404 (24ms)
+2026-11-21T10:47:03.497Z  INFO 1375 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/1/spaces/1/knowledge-bases/1/documents -> 200 (38ms)
+2026-11-21T10:47:03.512Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/2/spaces/2/knowledge-bases/2/documents -> 200 (10ms)
+2026-11-21T10:47:03.599Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (38ms)
+2026-11-21T10:47:03.617Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (12ms)
+2026-11-21T10:47:03.636Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/3/spaces -> 201 (14ms)
+2026-11-21T10:47:03.659Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/3/spaces/3/knowledge-bases -> 201 (17ms)
+2026-11-21T10:47:03.674Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/3/spaces/3/knowledge-bases/3/documents -> 400 (6ms)
+2026-11-21T10:47:03.690Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/1/spaces/1/knowledge-bases/1/documents -> 401 (0ms)
+2026-11-21T10:47:03.697Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/1/spaces/1/knowledge-bases/1/documents -> 401 (0ms)
+2026-11-21T10:47:03.702Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/1/spaces/1/knowledge-bases/1/documents/1/download -> 401 (0ms)
+2026-11-21T10:47:03.803Z  INFO 1375 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (33ms)
+2026-11-21T10:47:03.869Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (30ms)
+2026-11-21T10:47:03.881Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (7ms)
+2026-11-21T10:47:03.889Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (4ms)
+2026-11-21T10:47:03.903Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/4/spaces -> 201 (9ms)
+2026-11-21T10:47:03.920Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/5/spaces -> 201 (12ms)
+2026-11-21T10:47:03.935Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/4/spaces/4/knowledge-bases -> 201 (11ms)
+2026-11-21T10:47:03.952Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/5/spaces/5/knowledge-bases -> 201 (9ms)
+2026-11-21T10:47:04.001Z DEBUG 1375 --- [keplura-server] [o-auto-2-exec-8] c.k.s.search.DocumentIndexingService     : indexed document 1 into 1 chunks (model local-hash-64)
+2026-11-21T10:47:04.025Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/4/spaces/4/knowledge-bases/4/documents -> 201 (65ms)
+2026-11-21T10:47:04.031Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/4/spaces/4/knowledge-bases/4/documents -> 404 (2ms)
+2026-11-21T10:47:04.060Z  INFO 1375 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/5/spaces/5/knowledge-bases/5/documents/1/download -> 404 (23ms)
+2026-11-21T10:47:04.067Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/4/spaces/4/knowledge-bases/99999999/documents/1/download -> 404 (3ms)
+2026-11-21T10:47:04.077Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/99999999/spaces/4/knowledge-bases/4/documents/1/download -> 404 (3ms)
+2026-11-21T10:47:04.148Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (30ms)
+2026-11-21T10:47:04.158Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (7ms)
+2026-11-21T10:47:04.179Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/6/spaces -> 201 (15ms)
+2026-11-21T10:47:04.196Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/6/spaces/6/knowledge-bases -> 201 (13ms)
+2026-11-21T10:47:04.222Z DEBUG 1375 --- [keplura-server] [o-auto-2-exec-7] c.k.s.search.DocumentIndexingService     : indexed document 2 into 1 chunks (model local-hash-64)
+2026-11-21T10:47:04.226Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/6/spaces/6/knowledge-bases/6/documents -> 201 (25ms)
+2026-11-21T10:47:04.245Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/6/spaces/6/knowledge-bases/6/documents -> 200 (13ms)
+2026-11-21T10:47:04.263Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/6/spaces/6/knowledge-bases/6/documents/2/download -> 200 (14ms)
+2026-11-21T10:47:04.328Z  INFO 1375 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (30ms)
+2026-11-21T10:47:04.340Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (6ms)
+2026-11-21T10:47:04.353Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/7/spaces -> 201 (9ms)
+2026-11-21T10:47:04.367Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/7/spaces/7/knowledge-bases -> 201 (9ms)
+2026-11-21T10:47:05.182Z DEBUG 1375 --- [keplura-server] [    tika-parser] c.k.s.search.TikaDocumentTextExtractor   : extracted 34 chars / -1 pages from a xlsx in 224 ms
+2026-11-21T10:47:05.190Z DEBUG 1375 --- [keplura-server] [o-auto-2-exec-4] c.k.s.search.DocumentIndexingService     : indexed document 3 into 1 chunks (model local-hash-64)
+2026-11-21T10:47:05.192Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/7/spaces/7/knowledge-bases/7/documents -> 201 (263ms)
+2026-11-21T10:47:05.234Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/7/spaces/7/knowledge-bases/7/documents/3/preview -> 200 (38ms)
+2026-11-21T10:47:05.939Z DEBUG 1375 --- [keplura-server] [    tika-parser] c.k.s.search.TikaDocumentTextExtractor   : extracted 195 chars / 3 pages from a pptx in 140 ms
+2026-11-21T10:47:05.956Z DEBUG 1375 --- [keplura-server] [o-auto-2-exec-6] c.k.s.search.DocumentIndexingService     : indexed document 4 into 3 chunks (model local-hash-64)
+2026-11-21T10:47:05.961Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/7/spaces/7/knowledge-bases/7/documents -> 201 (172ms)
+2026-11-21T10:47:05.983Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/7/spaces/7/knowledge-bases/7/documents/4/preview -> 200 (17ms)
+2026-11-21T10:47:05.998Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/7/spaces/7/knowledge-bases/7/documents/4/preview -> 404 (9ms)
+2026-11-21T10:47:06.074Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (34ms)
+2026-11-21T10:47:06.085Z  INFO 1375 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (6ms)
+2026-11-21T10:47:06.095Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/8/spaces -> 201 (7ms)
+2026-11-21T10:47:06.112Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/8/spaces/8/knowledge-bases -> 201 (13ms)
+2026-11-21T10:47:06.197Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (28ms)
+2026-11-21T10:47:06.208Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (7ms)
+2026-11-21T10:47:06.223Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/9/spaces -> 201 (11ms)
+2026-11-21T10:47:06.237Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/9/spaces/9/knowledge-bases -> 201 (11ms)
+2026-11-21T10:47:06.262Z DEBUG 1375 --- [keplura-server] [o-auto-2-exec-8] c.k.s.search.DocumentIndexingService     : indexed document 5 into 1 chunks (model local-hash-64)
+2026-11-21T10:47:06.266Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/9/spaces/9/knowledge-bases/9/documents -> 201 (24ms)
+2026-11-21T10:47:06.278Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/9/spaces/9/knowledge-bases/9/documents/5/preview -> 200 (9ms)
+2026-11-21T10:47:06.295Z  INFO 1375 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/9/spaces/9/knowledge-bases/9/documents/5/preview -> 404 (12ms)
+2026-11-21T10:47:06.301Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/9/spaces/9/knowledge-bases/9/documents/5/preview -> 400 (2ms)
+2026-11-21T10:47:06.315Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/9/spaces/9/knowledge-bases/9/documents/5/preview -> 404 (10ms)
+2026-11-21T10:47:06.528Z DEBUG 1375 --- [keplura-server] [o-auto-2-exec-3] c.k.s.search.DocumentIndexingService     : indexed document 6 into 70 chunks (model local-hash-64)
+2026-11-21T10:47:06.536Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/9/spaces/9/knowledge-bases/9/documents -> 201 (215ms)
+2026-11-21T10:47:06.561Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/9/spaces/9/knowledge-bases/9/documents/6/preview -> 200 (19ms)
+2026-11-21T10:47:06.645Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (31ms)
+2026-11-21T10:47:06.662Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (13ms)
+2026-11-21T10:47:06.673Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/10/spaces -> 201 (7ms)
+2026-11-21T10:47:06.685Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/10/spaces/10/knowledge-bases -> 201 (9ms)
+2026-11-21T10:47:06.692Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/10/spaces/10/knowledge-bases/10/documents -> 400 (2ms)
+2026-11-21T10:47:06.762Z  INFO 1375 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (31ms)
+2026-11-21T10:47:06.771Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (5ms)
+2026-11-21T10:47:06.782Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/11/spaces -> 201 (6ms)
+2026-11-21T10:47:06.794Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/11/spaces/11/knowledge-bases -> 201 (9ms)
+2026-11-21T10:47:06.812Z DEBUG 1375 --- [keplura-server] [o-auto-2-exec-4] c.k.s.search.DocumentIndexingService     : indexed document 7 into 1 chunks (model local-hash-64)
+2026-11-21T10:47:06.815Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/11/spaces/11/knowledge-bases/11/documents -> 201 (17ms)
+2026-11-21T10:47:06.830Z DEBUG 1375 --- [keplura-server] [o-auto-2-exec-5] c.k.s.search.DocumentIndexingService     : indexed document 8 into 1 chunks (model local-hash-64)
+2026-11-21T10:47:06.831Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/11/spaces/11/knowledge-bases/11/documents -> 201 (11ms)
+2026-11-21T10:47:06.847Z DEBUG 1375 --- [keplura-server] [o-auto-2-exec-6] c.k.s.search.DocumentIndexingService     : indexed document 9 into 1 chunks (model local-hash-64)
+2026-11-21T10:47:06.849Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/11/spaces/11/knowledge-bases/11/documents -> 201 (12ms)
+2026-11-21T10:47:06.958Z  WARN 1375 --- [keplura-server] [           main] o.a.pdfbox.pdmodel.font.PDType1Font      : Using fallback font LiberationSans for base font Helvetica
+2026-11-21T10:47:07.112Z  WARN 1375 --- [keplura-server] [    tika-parser] o.a.pdfbox.pdmodel.font.PDType1Font      : Using fallback font LiberationSans for Helvetica
+2026-11-21T10:47:07.132Z DEBUG 1375 --- [keplura-server] [    tika-parser] c.k.s.search.TikaDocumentTextExtractor   : extracted 74 chars / 1 pages from a pdf in 72 ms
+2026-11-21T10:47:07.138Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-7] com.keplura.server.search.ocr.PdfOcr     : ocr not available — scanned PDFs stay NO_TEXT_LAYER
+2026-11-21T10:47:07.143Z DEBUG 1375 --- [keplura-server] [o-auto-2-exec-7] c.k.s.search.DocumentIndexingService     : indexed document 10 into 1 chunks (model local-hash-64)
+2026-11-21T10:47:07.148Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/11/spaces/11/knowledge-bases/11/documents -> 201 (113ms)
+2026-11-21T10:47:07.168Z  WARN 1375 --- [keplura-server] [    tika-parser] o.a.pdfbox.pdmodel.font.PDType1Font      : Using fallback font LiberationSans for Helvetica
+2026-11-21T10:47:07.179Z DEBUG 1375 --- [keplura-server] [    tika-parser] c.k.s.search.TikaDocumentTextExtractor   : extracted 74 chars / 1 pages from a pdf in 15 ms
+2026-11-21T10:47:07.184Z DEBUG 1375 --- [keplura-server] [o-auto-2-exec-8] c.k.s.search.DocumentIndexingService     : indexed document 11 into 1 chunks (model local-hash-64)
+2026-11-21T10:47:07.187Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/11/spaces/11/knowledge-bases/11/documents -> 201 (34ms)
+2026-11-21T10:47:07.219Z DEBUG 1375 --- [keplura-server] [    tika-parser] c.k.s.search.TikaDocumentTextExtractor   : extracted 60 chars / -1 pages from a docx in 17 ms
+2026-11-21T10:47:07.223Z DEBUG 1375 --- [keplura-server] [o-auto-2-exec-9] c.k.s.search.DocumentIndexingService     : indexed document 12 into 1 chunks (model local-hash-64)
+2026-11-21T10:47:07.226Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/11/spaces/11/knowledge-bases/11/documents -> 201 (31ms)
+2026-11-21T10:47:07.243Z  WARN 1375 --- [keplura-server] [    tika-parser] o.a.pdfbox.pdmodel.font.PDType1Font      : Using fallback font LiberationSans for Helvetica
+2026-11-21T10:47:07.245Z DEBUG 1375 --- [keplura-server] [    tika-parser] c.k.s.search.TikaDocumentTextExtractor   : extracted 74 chars / 1 pages from a pdf in 6 ms
+2026-11-21T10:47:07.248Z DEBUG 1375 --- [keplura-server] [-auto-2-exec-10] c.k.s.search.DocumentIndexingService     : indexed document 13 into 1 chunks (model local-hash-64)
+2026-11-21T10:47:07.250Z  INFO 1375 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/11/spaces/11/knowledge-bases/11/documents -> 201 (20ms)
+2026-11-21T10:47:07.267Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/11/spaces/11/knowledge-bases/11/documents -> 400 (11ms)
+2026-11-21T10:47:07.283Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/11/spaces/11/knowledge-bases/11/documents -> 400 (10ms)
+2026-11-21T10:47:07.294Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/11/spaces/11/knowledge-bases/11/documents -> 400 (6ms)
+2026-11-21T10:47:07.304Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/11/spaces/11/knowledge-bases/11/documents -> 400 (5ms)
+2026-11-21T10:47:07.316Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/11/spaces/11/knowledge-bases/11/documents -> 400 (7ms)
+2026-11-21T10:47:07.333Z DEBUG 1375 --- [keplura-server] [    tika-parser] c.k.s.search.TikaDocumentTextExtractor   : pdf pre-count could not open the document (IOException); continuing to parse
+2026-11-21T10:47:07.336Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/11/spaces/11/knowledge-bases/11/documents -> 400 (14ms)
+2026-11-21T10:47:07.423Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (36ms)
+2026-11-21T10:47:07.433Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (5ms)
+2026-11-21T10:47:07.445Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/12/spaces -> 201 (8ms)
+2026-11-21T10:47:07.456Z  INFO 1375 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/12/spaces/12/knowledge-bases -> 201 (7ms)
+2026-11-21T10:47:07.503Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/12/spaces/12/knowledge-bases/12/documents -> 413 (14ms)
+2026-11-21T10:47:07.624Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (53ms)
+2026-11-21T10:47:07.637Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (7ms)
+2026-11-21T10:47:07.651Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/13/spaces -> 201 (8ms)
+2026-11-21T10:47:07.663Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/13/spaces/13/knowledge-bases -> 201 (8ms)
+2026-11-21T10:47:07.675Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/13/spaces/13/knowledge-bases/13/documents -> 400 (6ms)
+2026-11-21T10:47:07.697Z DEBUG 1375 --- [keplura-server] [o-auto-2-exec-7] c.k.s.search.DocumentIndexingService     : indexed document 15 into 1 chunks (model local-hash-64)
+2026-11-21T10:47:07.700Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/13/spaces/13/knowledge-bases/13/documents -> 201 (20ms)
+2026-11-21T10:47:07.715Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/13/spaces/13/knowledge-bases/13/documents/15/download -> 200 (9ms)
+2026-11-21T10:47:07.729Z DEBUG 1375 --- [keplura-server] [o-auto-2-exec-9] c.k.s.search.DocumentIndexingService     : indexed document 16 into 1 chunks (model local-hash-64)
+2026-11-21T10:47:07.735Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/13/spaces/13/knowledge-bases/13/documents -> 201 (15ms)
+2026-11-21T10:47:07.746Z  INFO 1375 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/13/spaces/13/knowledge-bases/13/documents/16/download -> 200 (7ms)
+2026-11-21T10:47:07.760Z DEBUG 1375 --- [keplura-server] [o-auto-2-exec-1] c.k.s.search.DocumentIndexingService     : indexed document 17 into 1 chunks (model local-hash-64)
+2026-11-21T10:47:07.763Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/13/spaces/13/knowledge-bases/13/documents -> 201 (11ms)
+2026-11-21T10:47:07.775Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/13/spaces/13/knowledge-bases/13/documents/17/download -> 200 (9ms)
+2026-11-21T10:47:07.789Z DEBUG 1375 --- [keplura-server] [o-auto-2-exec-3] c.k.s.search.DocumentIndexingService     : indexed document 18 into 1 chunks (model local-hash-64)
+2026-11-21T10:47:07.792Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/13/spaces/13/knowledge-bases/13/documents -> 201 (13ms)
+2026-11-21T10:47:07.802Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/13/spaces/13/knowledge-bases/13/documents/18/download -> 200 (6ms)
+2026-11-21T10:47:07.885Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (33ms)
+2026-11-21T10:47:07.892Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (4ms)
+2026-11-21T10:47:07.902Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/14/spaces -> 201 (6ms)
+2026-11-21T10:47:07.909Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/14/spaces/14/knowledge-bases -> 201 (4ms)
+2026-11-21T10:47:07.924Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/14/spaces/14/knowledge-bases/14/documents -> 201 (10ms)
+2026-11-21T10:47:07.931Z  INFO 1375 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/14/spaces/14/knowledge-bases/14/documents/19/preview -> 200 (4ms)
+2026-11-21T10:47:08.023Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (47ms)
+2026-11-21T10:47:08.091Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (28ms)
+2026-11-21T10:47:08.098Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (3ms)
+2026-11-21T10:47:08.105Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/15/spaces -> 201 (4ms)
+2026-11-21T10:47:08.113Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/15/spaces/15/knowledge-bases -> 201 (4ms)
+2026-11-21T10:47:08.120Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (3ms)
+2026-11-21T10:47:08.128Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/16/spaces -> 201 (5ms)
+2026-11-21T10:47:08.136Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-8] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/16/spaces/16/knowledge-bases -> 201 (5ms)
+2026-11-21T10:47:08.149Z DEBUG 1375 --- [keplura-server] [o-auto-2-exec-9] c.k.s.search.DocumentIndexingService     : indexed document 20 into 1 chunks (model local-hash-64)
+2026-11-21T10:47:08.151Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-9] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs/15/spaces/15/knowledge-bases/15/documents -> 201 (11ms)
+2026-11-21T10:47:08.154Z  INFO 1375 --- [keplura-server] [-auto-2-exec-10] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/15/spaces/15/knowledge-bases/15/documents/20/preview -> 401 (0ms)
+2026-11-21T10:47:08.158Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-1] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/15/spaces/15/knowledge-bases/15/documents/20/preview -> 404 (1ms)
+2026-11-21T10:47:08.164Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-2] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/16/spaces/16/knowledge-bases/16/documents/20/preview -> 404 (3ms)
+2026-11-21T10:47:08.168Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-3] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/15/spaces/16/knowledge-bases/15/documents/20/preview -> 404 (1ms)
+2026-11-21T10:47:08.175Z  INFO 1375 --- [keplura-server] [o-auto-2-exec-4] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs/15/spaces/15/knowledge-bases/16/documents/20/preview -> 404 (2ms)
+[INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.303 s -- in com.keplura.server.knowledge.DocumentApiIntegrationTest
+[INFO] Running com.keplura.server.knowledge.DocumentPreviewServiceTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in com.keplura.server.knowledge.DocumentPreviewServiceTest
+[INFO] Running com.keplura.server.DevProfileDefaultsTest
+2026-11-21T10:47:08.187Z  INFO 1375 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.DevProfileDefaultsTest]: DevProfileDefaultsTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-21T10:47:08.190Z  INFO 1375 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.DevProfileDefaultsTest
+2026-11-21T10:47:08.191Z  INFO 1375 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.DevProfileDefaultsTest]: DevProfileDefaultsTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-21T10:47:08.192Z  INFO 1375 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.DevProfileDefaultsTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-11-21T10:47:08.225Z  INFO 1375 --- [keplura-server] [           main] c.keplura.server.DevProfileDefaultsTest  : Starting DevProfileDefaultsTest using Java 21.0.12.1 with PID 1375 (started by ci in /w/server)
+2026-11-21T10:47:08.225Z DEBUG 1375 --- [keplura-server] [           main] c.keplura.server.DevProfileDefaultsTest  : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-21T10:47:08.225Z  INFO 1375 --- [keplura-server] [           main] c.keplura.server.DevProfileDefaultsTest  : The following 1 profile is active: "dev"
+2026-11-21T10:47:08.399Z  INFO 1375 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-21T10:47:08.438Z  INFO 1375 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 37 ms. Found 23 JPA repository interfaces.
+2026-11-21T10:47:08.509Z  INFO 1375 --- [keplura-server] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-21T10:47:08.531Z  INFO 1375 --- [keplura-server] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-21T10:47:08.532Z  INFO 1375 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Starting...
+2026-11-21T10:47:08.536Z  INFO 1375 --- [keplura-server] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-3 - Added connection conn20: url=jdbc:h2:mem:dev-profile-defaults-test user=SA
+2026-11-21T10:47:08.536Z  INFO 1375 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Start completed.
+2026-11-21T10:47:08.537Z  INFO 1375 --- [keplura-server] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:dev-profile-defaults-test]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: DEV-PROFILE-DEFAULTS-TEST/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-21T10:47:08.746Z  INFO 1375 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-21T10:47:08.786Z  INFO 1375 --- [keplura-server] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-21T10:47:08.824Z  INFO 1375 --- [keplura-server] [           main] com.keplura.server.admin.SecretCipher    : secret cipher: no KEPLURA_SECRETS_MASTER_KEY — provider secrets cannot be stored (admin surface stays usable without them)
+2026-11-21T10:47:08.824Z  INFO 1375 --- [keplura-server] [           main] c.keplura.server.SystemInfoController    : model provider state: provider=raw configured=false keyPresent=false
+2026-11-21T10:47:09.018Z  INFO 1375 --- [keplura-server] [           main] c.k.s.search.SearchStoreConfiguration    : search store: auto -> memory (pgvector probe not satisfied)
+2026-11-21T10:47:09.035Z  INFO 1375 --- [keplura-server] [           main] c.k.s.knowledge.DocumentIndexingQueue    : document indexing mode: sync
+2026-11-21T10:47:09.064Z  INFO 1375 --- [keplura-server] [           main] c.keplura.server.oidc.OidcConfiguration  : oidc: desktop handoff target fixed to http://localhost:1420/
+2026-11-21T10:47:09.110Z  WARN 1375 --- [keplura-server] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-21T10:47:09.223Z  INFO 1375 --- [keplura-server] [           main] c.keplura.server.DevProfileDefaultsTest  : Started DevProfileDefaultsTest in 1.021 seconds (process running for 23.686)
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.079 s -- in com.keplura.server.DevProfileDefaultsTest
+[INFO] Running com.keplura.server.datasource.DataSourceSyncServiceTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.615 s -- in com.keplura.server.datasource.DataSourceSyncServiceTest
+[INFO] Running com.keplura.server.auth.CsrfEnforcementIntegrationTest
+2026-11-21T10:47:09.883Z  INFO 1375 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.auth.CsrfEnforcementIntegrationTest]: CsrfEnforcementIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-21T10:47:09.897Z  INFO 1375 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.auth.CsrfEnforcementIntegrationTest
+2026-11-21T10:47:09.898Z  INFO 1375 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.auth.CsrfEnforcementIntegrationTest]: CsrfEnforcementIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-21T10:47:09.899Z  INFO 1375 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.auth.CsrfEnforcementIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-11-21T10:47:09.919Z  INFO 1375 --- [keplura-server] [           main] c.k.s.a.CsrfEnforcementIntegrationTest   : Starting CsrfEnforcementIntegrationTest using Java 21.0.12.1 with PID 1375 (started by ci in /w/server)
+2026-11-21T10:47:09.919Z DEBUG 1375 --- [keplura-server] [           main] c.k.s.a.CsrfEnforcementIntegrationTest   : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-21T10:47:09.919Z  INFO 1375 --- [keplura-server] [           main] c.k.s.a.CsrfEnforcementIntegrationTest   : The following 1 profile is active: "dev"
+2026-11-21T10:47:10.071Z  INFO 1375 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-21T10:47:10.105Z  INFO 1375 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 31 ms. Found 23 JPA repository interfaces.
+2026-11-21T10:47:10.161Z  INFO 1375 --- [keplura-server] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-11-21T10:47:10.162Z  INFO 1375 --- [keplura-server] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-21T10:47:10.162Z  INFO 1375 --- [keplura-server] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-11-21T10:47:10.197Z  INFO 1375 --- [keplura-server] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 276 ms
+2026-11-21T10:47:10.208Z DEBUG 1375 --- [keplura-server] [           main] c.k.server.auth.SessionLifetimeFilter    : Filter 'sessionLifetimeFilter' configured for use
+2026-11-21T10:47:10.263Z  INFO 1375 --- [keplura-server] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-21T10:47:10.283Z  INFO 1375 --- [keplura-server] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-21T10:47:10.283Z  INFO 1375 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Starting...
+2026-11-21T10:47:10.286Z  INFO 1375 --- [keplura-server] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-4 - Added connection conn30: url=jdbc:h2:mem:auth-api-test user=SA
+2026-11-21T10:47:10.287Z  INFO 1375 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Start completed.
+2026-11-21T10:47:10.287Z  INFO 1375 --- [keplura-server] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:auth-api-test]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: AUTH-API-TEST/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-21T10:47:10.450Z  INFO 1375 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-21T10:47:10.472Z  INFO 1375 --- [keplura-server] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-21T10:47:10.499Z  INFO 1375 --- [keplura-server] [           main] com.keplura.server.admin.SecretCipher    : secret cipher: no KEPLURA_SECRETS_MASTER_KEY — provider secrets cannot be stored (admin surface stays usable without them)
+2026-11-21T10:47:10.501Z  INFO 1375 --- [keplura-server] [           main] c.keplura.server.SystemInfoController    : model provider state: provider=raw configured=false keyPresent=false
+2026-11-21T10:47:10.676Z  INFO 1375 --- [keplura-server] [           main] c.k.s.search.SearchStoreConfiguration    : search store: auto -> memory (pgvector probe not satisfied)
+2026-11-21T10:47:10.697Z  INFO 1375 --- [keplura-server] [           main] c.k.s.knowledge.DocumentIndexingQueue    : document indexing mode: sync
+2026-11-21T10:47:10.731Z  INFO 1375 --- [keplura-server] [           main] c.keplura.server.oidc.OidcConfiguration  : oidc: desktop handoff target fixed to http://localhost:1420/
+2026-11-21T10:47:10.769Z  WARN 1375 --- [keplura-server] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-21T10:47:10.850Z  INFO 1375 --- [keplura-server] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 45523 (http) with context path '/'
+2026-11-21T10:47:10.853Z  INFO 1375 --- [keplura-server] [           main] c.k.s.a.CsrfEnforcementIntegrationTest   : Started CsrfEnforcementIntegrationTest in 0.95 seconds (process running for 25.316)
+2026-11-21T10:47:10.897Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-1] o.a.c.c.C.[Tomcat-2].[localhost].[/]     : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-21T10:47:10.897Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-11-21T10:47:10.898Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-11-21T10:47:10.931Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (32ms)
+2026-11-21T10:47:10.935Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 403 (0ms)
+2026-11-21T10:47:10.938Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 401 (0ms)
+2026-11-21T10:47:11.011Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (34ms)
+2026-11-21T10:47:11.071Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (27ms)
+2026-11-21T10:47:11.143Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-6] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (36ms)
+2026-11-21T10:47:11.156Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 201 (9ms)
+2026-11-21T10:47:11.217Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-8] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (29ms)
+2026-11-21T10:47:11.220Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-9] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 403 (0ms)
+2026-11-21T10:47:11.289Z  INFO 1375 --- [keplura-server] [-auto-3-exec-10] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (32ms)
+2026-11-21T10:47:11.294Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-1] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/logout -> 403 (1ms)
+2026-11-21T10:47:11.300Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-2] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs -> 200 (4ms)
+2026-11-21T10:47:11.318Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/logout -> 204 (14ms)
+2026-11-21T10:47:11.384Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-4] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (27ms)
+2026-11-21T10:47:11.438Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-5] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (26ms)
+2026-11-21T10:47:11.469Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-6] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/csrf -> 200 (2ms)
+2026-11-21T10:47:11.531Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-7] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (28ms)
+2026-11-21T10:47:11.535Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-8] c.k.server.RequestLoggingInterceptor     : GET /api/v1/auth/csrf -> 401 (0ms)
+2026-11-21T10:47:11.537Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-9] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 401 (0ms)
+2026-11-21T10:47:11.593Z  INFO 1375 --- [keplura-server] [-auto-3-exec-10] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (26ms)
+2026-11-21T10:47:11.596Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-1] c.k.server.RequestLoggingInterceptor     : GET /api/v1/orgs -> 200 (1ms)
+2026-11-21T10:47:11.660Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-2] c.k.server.RequestLoggingInterceptor     : POST /api/v1/auth/login -> 200 (27ms)
+2026-11-21T10:47:11.663Z  INFO 1375 --- [keplura-server] [o-auto-3-exec-3] c.k.server.RequestLoggingInterceptor     : POST /api/v1/orgs -> 403 (0ms)
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.784 s -- in com.keplura.server.auth.CsrfEnforcementIntegrationTest
+[INFO] Running com.keplura.server.DevProfileSchemaTest
+2026-11-21T10:47:11.667Z  INFO 1375 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.DevProfileSchemaTest]: DevProfileSchemaTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-21T10:47:11.669Z  INFO 1375 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.DevProfileSchemaTest
+2026-11-21T10:47:11.670Z  INFO 1375 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.DevProfileSchemaTest]: DevProfileSchemaTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-21T10:47:11.671Z  INFO 1375 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.DevProfileSchemaTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-11-21T10:47:11.695Z  INFO 1375 --- [keplura-server] [           main] c.keplura.server.DevProfileSchemaTest    : Starting DevProfileSchemaTest using Java 21.0.12.1 with PID 1375 (started by ci in /w/server)
+2026-11-21T10:47:11.695Z DEBUG 1375 --- [keplura-server] [           main] c.keplura.server.DevProfileSchemaTest    : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-21T10:47:11.696Z  INFO 1375 --- [keplura-server] [           main] c.keplura.server.DevProfileSchemaTest    : The following 1 profile is active: "dev"
+2026-11-21T10:47:11.877Z  INFO 1375 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-21T10:47:11.908Z  INFO 1375 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 30 ms. Found 23 JPA repository interfaces.
+2026-11-21T10:47:11.999Z  INFO 1375 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Starting...
+2026-11-21T10:47:12.003Z  INFO 1375 --- [keplura-server] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-5 - Added connection conn40: url=jdbc:h2:mem:dev-profile-schema-test user=SA
+2026-11-21T10:47:12.003Z  INFO 1375 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Start completed.
+2026-11-21T10:47:12.095Z  INFO 1375 --- [keplura-server] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:dev-profile-schema-test (H2 2.4)
+2026-11-21T10:47:12.123Z  WARN 1375 --- [keplura-server] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-11-21T10:47:12.154Z  INFO 1375 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-11-21T10:47:12.157Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 24 migrations (execution time 00:00.020s)
+2026-11-21T10:47:12.162Z  INFO 1375 --- [keplura-server] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "public"."flyway_schema_history" ...
+2026-11-21T10:47:12.188Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-11-21T10:47:12.198Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "1 - baseline"
+2026-11-21T10:47:12.211Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "2 - spaces"
+2026-11-21T10:47:12.218Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "3 - knowledge"
+2026-11-21T10:47:12.226Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "4 - chunks"
+2026-11-21T10:47:12.234Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "6 - chat"
+2026-11-21T10:47:12.240Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "7 - document index status"
+2026-11-21T10:47:12.254Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "8 - org invites"
+2026-11-21T10:47:12.260Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "9 - user role"
+2026-11-21T10:47:12.269Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "10 - ai provider model"
+2026-11-21T10:47:12.281Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "11 - oidc provider"
+2026-11-21T10:47:12.287Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "12 - document index status async"
+2026-11-21T10:47:12.292Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "13 - chunk source location"
+2026-11-21T10:47:12.310Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "14 - chat message feedback"
+2026-11-21T10:47:12.320Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "15 - user must change password"
+2026-11-21T10:47:12.329Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "16 - datasources and access"
+2026-11-21T10:47:12.338Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "17 - quality questions"
+2026-11-21T10:47:12.343Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "18 - data source sharepoint"
+2026-11-21T10:47:12.350Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "19 - prompt templates"
+2026-11-21T10:47:12.356Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "20 - chat kbs attachments"
+2026-11-21T10:47:12.366Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "21 - web search settings"
+2026-11-21T10:47:12.370Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "22 - mcp servers"
+2026-11-21T10:47:12.375Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "23 - mcp stage2"
+2026-11-21T10:47:12.384Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "24 - datasource exclude patterns longer"
+2026-11-21T10:47:12.391Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "25 - tool foundation"
+2026-11-21T10:47:12.402Z  INFO 1375 --- [keplura-server] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 24 migrations to schema "public", now at version v25 (execution time 00:00.091s)
+2026-11-21T10:47:12.422Z  INFO 1375 --- [keplura-server] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-21T10:47:12.437Z  INFO 1375 --- [keplura-server] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-21T10:47:12.438Z  INFO 1375 --- [keplura-server] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:dev-profile-schema-test]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: dev-profile-schema-test/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-21T10:47:12.599Z  INFO 1375 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-21T10:47:12.612Z  INFO 1375 --- [keplura-server] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-21T10:47:12.640Z  INFO 1375 --- [keplura-server] [           main] com.keplura.server.admin.SecretCipher    : secret cipher: no KEPLURA_SECRETS_MASTER_KEY — provider secrets cannot be stored (admin surface stays usable without them)
+2026-11-21T10:47:12.640Z  INFO 1375 --- [keplura-server] [           main] c.keplura.server.SystemInfoController    : model provider state: provider=raw configured=false keyPresent=false
+2026-11-21T10:47:12.808Z  INFO 1375 --- [keplura-server] [           main] c.k.s.search.SearchStoreConfiguration    : search store: auto -> memory (pgvector probe not satisfied)
+2026-11-21T10:47:12.826Z  INFO 1375 --- [keplura-server] [           main] c.k.s.knowledge.DocumentIndexingQueue    : document indexing mode: sync
+2026-11-21T10:47:12.848Z  INFO 1375 --- [keplura-server] [           main] c.keplura.server.oidc.OidcConfiguration  : oidc: desktop handoff target fixed to http://localhost:1420/
+2026-11-21T10:47:12.894Z  WARN 1375 --- [keplura-server] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-21T10:47:12.980Z  INFO 1375 --- [keplura-server] [           main] c.keplura.server.DevProfileSchemaTest    : Started DevProfileSchemaTest in 1.307 seconds (process running for 27.444)
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.336 s -- in com.keplura.server.DevProfileSchemaTest
+[INFO] Running com.keplura.server.identity.DevAccountSeederTest
+2026-11-21T10:47:13.005Z  INFO 1375 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.identity.DevAccountSeederTest]: DevAccountSeederTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-21T10:47:13.018Z  INFO 1375 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.identity.DevAccountSeederTest
+2026-11-21T10:47:13.019Z  INFO 1375 --- [keplura-server] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.keplura.server.identity.DevAccountSeederTest]: DevAccountSeederTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-21T10:47:13.019Z  INFO 1375 --- [keplura-server] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.keplura.server.KepluraServerApplication for test class com.keplura.server.identity.DevAccountSeederTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-11-21T10:47:13.040Z  INFO 1375 --- [keplura-server] [           main] c.k.s.identity.DevAccountSeederTest      : Starting DevAccountSeederTest using Java 21.0.12.1 with PID 1375 (started by ci in /w/server)
+2026-11-21T10:47:13.041Z DEBUG 1375 --- [keplura-server] [           main] c.k.s.identity.DevAccountSeederTest      : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-21T10:47:13.041Z  INFO 1375 --- [keplura-server] [           main] c.k.s.identity.DevAccountSeederTest      : The following 1 profile is active: "dev"
+2026-11-21T10:47:13.212Z  INFO 1375 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-21T10:47:13.243Z  INFO 1375 --- [keplura-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 29 ms. Found 23 JPA repository interfaces.
+2026-11-21T10:47:13.309Z  INFO 1375 --- [keplura-server] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-21T10:47:13.324Z  INFO 1375 --- [keplura-server] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-21T10:47:13.325Z  INFO 1375 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-6 - Starting...
+2026-11-21T10:47:13.329Z  INFO 1375 --- [keplura-server] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-6 - Added connection conn50: url=jdbc:h2:mem:seeder-test user=SA
+2026-11-21T10:47:13.329Z  INFO 1375 --- [keplura-server] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-6 - Start completed.
+2026-11-21T10:47:13.329Z  INFO 1375 --- [keplura-server] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:seeder-test]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: SEEDER-TEST/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-21T10:47:13.500Z  INFO 1375 --- [keplura-server] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-21T10:47:13.516Z  INFO 1375 --- [keplura-server] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-21T10:47:13.544Z  INFO 1375 --- [keplura-server] [           main] com.keplura.server.admin.SecretCipher    : secret cipher: no KEPLURA_SECRETS_MASTER_KEY — provider secrets cannot be stored (admin surface stays usable without them)
+2026-11-21T10:47:13.545Z  INFO 1375 --- [keplura-server] [           main] c.keplura.server.SystemInfoController    : model provider state: provider=raw configured=false keyPresent=false
+2026-11-21T10:47:13.716Z  INFO 1375 --- [keplura-server] [           main] c.k.s.search.SearchStoreConfiguration    : search store: auto -> memory (pgvector probe not satisfied)
+2026-11-21T10:47:13.733Z  INFO 1375 --- [keplura-server] [           main] c.k.s.knowledge.DocumentIndexingQueue    : document indexing mode: sync
+2026-11-21T10:47:13.761Z  INFO 1375 --- [keplura-server] [           main] c.keplura.server.oidc.OidcConfiguration  : oidc: desktop handoff target fixed to http://localhost:1420/
+2026-11-21T10:47:13.802Z  WARN 1375 --- [keplura-server] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-21T10:47:13.885Z  INFO 1375 --- [keplura-server] [           main] c.k.s.identity.DevAccountSeederTest      : Started DevAccountSeederTest in 0.863 seconds (process running for 28.349)
+2026-11-21T10:47:13.947Z  INFO 1375 --- [keplura-server] [           main] c.k.server.identity.DevAccountSeeder     : dev account seed created a login account
+2026-11-21T10:47:13.956Z  INFO 1375 --- [keplura-server] [           main] c.k.server.identity.DevAccountSeeder     : dev account seed skipped (user already exists)
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.995 s -- in com.keplura.server.identity.DevAccountSeederTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 88, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  30.720 s
+[INFO] Finished at: 2026-11-21T10:47:14Z
+[INFO] ------------------------------------------------------------------------

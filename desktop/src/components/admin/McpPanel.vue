@@ -1,9 +1,9 @@
 <script setup lang="ts">
-/** Administration → MCP-Server (Stufe 1): eintragen, verbinden, Werkzeuge einzeln freigeben. */
+/** Administration → MCP-Server: eintragen, verbinden, je Werkzeug Risikoklasse setzen und einzeln freigeben (TU-01). */
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import {
   createMcpServer, deleteMcpServer, listMcpCalls, listMcpServers, listMcpSpaces, refreshMcpServer, updateMcpServer,
-  type McpServer,
+  type McpServer, type McpTool, type ToolRisk,
 } from "../../productivity-api";
 import Button from "../ui/Button.vue";
 import ConfirmDialog from "../ui/ConfirmDialog.vue";
@@ -12,7 +12,7 @@ import Input from "../ui/Input.vue";
 import AppIcon from "../ui/AppIcon.vue";
 import StatusPill from "../ui/StatusPill.vue";
 import ActionMenu from "../ui/ActionMenu.vue";
-import { tr, dateLocale } from "../../i18n";
+import { tr, dateLocale, serverText } from "../../i18n";
 
 const servers = ref<McpServer[]>([]);
 const name = ref("");
@@ -32,7 +32,7 @@ function closeConnect(){connectOpen.value=false;token.value="";}
 
 
 const spaces = ref<{ id: number; name: string; orgName: string }[]>([]);
-const calls = ref<{ called_at: string; server_name: string; tool_name: string; duration_ms: number; ok: boolean; error: string | null; user_id: number }[]>([]);
+const calls = ref<{ called_at: string; server_name: string; tool_name: string; duration_ms: number; ok: boolean; error: string | null; user_id: number; risk: ToolRisk | null }[]>([]);
 async function load() {
   loading.value=true;
   const [r,sp,c]=await Promise.all([listMcpServers(),listMcpSpaces(),listMcpCalls()]);
@@ -78,7 +78,7 @@ async function add() {
     connectOpen.value=false;
     await load();
     messageError.value=!!r.value.lastError;
-    message.value = r.value.lastError ? tr("Gespeichert, aber keine Verbindung: {0}", r.value.lastError) : tr("{0} Werkzeuge gefunden. Bitte einzeln freigeben.", r.value.tools.length);
+    message.value = r.value.lastError ? tr("Gespeichert, aber keine Verbindung: {0}", r.value.lastError) : tr("{0} Werkzeuge gefunden. Bitte je Werkzeug eine Risikoklasse wählen und einzeln freigeben.", r.value.tools.length);
   } finally { busy.value = false; }
 }
 async function refresh(s: McpServer) {
@@ -88,6 +88,22 @@ async function refresh(s: McpServer) {
 async function toggleTool(s: McpServer, tool: string, on: boolean) {
   const next = s.tools.filter((t) => (t.name === tool ? on : t.enabled)).map((t) => t.name);
   await patchServer(s, { enabledTools: next });
+}
+const riskLabel = (r: ToolRisk) => ({ READ: tr("Lesen"), WRITE: tr("Schreiben"), CRITICAL: tr("Kritisch") })[r];
+function canApprove(t: McpTool) {
+  return t.schemaSupported && (t.risk === "READ" || t.risk === "WRITE");
+}
+function toolHint(t: McpTool): string {
+  if (!t.schemaSupported) return t.schemaProblem ? serverText(t.schemaProblem) : tr("Das Eingabeschema wird nicht unterstützt. Das Werkzeug bleibt gesperrt.");
+  if (t.legacyApproval) return tr("War vor der Umstellung freigegeben. Bitte Risikoklasse wählen und erneut freigeben.");
+  if (!t.risk) return tr("Erst eine Risikoklasse wählen, dann freigeben. Bis dahin gesperrt.");
+  if (t.risk === "CRITICAL") return tr("Kritische Werkzeuge brauchen eine Bestätigung je Aufruf. Diese folgt in einem späteren Schritt; bis dahin gesperrt.");
+  if (t.risk === "WRITE") return t.enabled ? tr("Schreibend freigegeben: Aufrufe können Daten im angebundenen System ändern.") : tr("Schreibende Werkzeuge sind standardmäßig aus. Nur bewusst freigeben.");
+  return "";
+}
+async function setRisk(s: McpServer, tool: string, value: string) {
+  // A changed class revokes the tool's approval on the server; approve again explicitly.
+  await patchServer(s, { toolRisks: { [tool]: (value as ToolRisk | "") } });
 }
 async function toggleServer(s: McpServer) {
   await patchServer(s, { enabled: !s.enabled });
@@ -132,7 +148,7 @@ async function confirmRemove() {
         <div class="connection-state" style="margin-top:16px"><StatusPill :tone="s.lastError?'error':s.lastCheckedAt?'ok':'neutral'">{{s.lastError?$t("Verbindung fehlgeschlagen"):s.lastCheckedAt?$t("Verbindung geprüft"):$t("Noch nicht geprüft")}}</StatusPill><span v-if="s.lastCheckedAt" class="connection-meta">{{ $t("Zuletzt geprüft {0}", new Date(s.lastCheckedAt).toLocaleString($dateLocale())) }}</span></div>
         <p v-if="s.lastError" class="connection-note error" style="margin-top:12px">{{s.lastError}}</p>
         <details class="connection-details mcp-tools" :open="expandedId===s.id"><summary>{{ $t("Werkzeuge · {0} von {1} freigegeben", s.tools.filter(t=>t.enabled).length, s.tools.length) }}</summary>
-          <div class="connection-options"><p v-if="!s.tools.length" class="connection-hint">{{ $t("Dieser Server hat noch keine Werkzeuge bereitgestellt.") }}</p><div v-for="t in s.tools" :key="t.name" class="connection-option"><label class="connection-check"><input type="checkbox" :checked="t.enabled" :disabled="working.has(s.id)" data-testid="admin-mcp-tool" @change="event=>{(event.target as HTMLInputElement).checked=t.enabled;toggleTool(s,t.name,!t.enabled)}" /><code>{{t.name}}</code></label><p>{{t.description}}</p></div></div>
+          <div class="connection-options"><p v-if="!s.tools.length" class="connection-hint">{{ $t("Dieser Server hat noch keine Werkzeuge bereitgestellt.") }}</p><div v-for="t in s.tools" :key="t.name" class="connection-option" data-testid="admin-mcp-tool-row"><div class="connection-tool-head"><label class="connection-check"><input type="checkbox" :checked="t.enabled" :disabled="working.has(s.id)||!canApprove(t)" data-testid="admin-mcp-tool" @change="event=>{(event.target as HTMLInputElement).checked=t.enabled;toggleTool(s,t.name,!t.enabled)}" /><code>{{t.name}}</code></label><select class="ic-native-control connection-risk" :value="t.risk??''" :disabled="working.has(s.id)" :aria-label="$t('Risikoklasse für {0}', t.name)" data-testid="admin-mcp-tool-risk" @change="event=>{const v=(event.target as HTMLSelectElement).value;(event.target as HTMLSelectElement).value=t.risk??'';setRisk(s,t.name,v)}"><option value="">{{ $t("Nicht klassifiziert") }}</option><option value="READ">{{riskLabel("READ")}}</option><option value="WRITE">{{riskLabel("WRITE")}}</option><option value="CRITICAL">{{riskLabel("CRITICAL")}}</option></select></div><p>{{t.description}}</p><p v-if="toolHint(t)" class="connection-hint" data-testid="admin-mcp-tool-hint">{{toolHint(t)}}</p></div></div>
         </details>
         <details class="connection-details mcp-access" :open="expandedId===s.id"><summary>{{ $t("Arbeitsbereiche · {0}", s.allSpaces?$t("Alle freigegeben"):`${s.spaceIds.length} freigegeben`) }}</summary>
           <div v-if="spacesError" class="connection-note error"><p>{{spacesError}}</p><Button size="compact" @click="load">{{ $t("Erneut versuchen") }}</Button></div>
@@ -140,8 +156,8 @@ async function confirmRemove() {
         </details>
       </article>
     </div>
-    <details class="connection-details log"><summary>{{ $t("Letzte Werkzeugaufrufe") }}<span v-if="calls.length"> · {{calls.length}}</span></summary><p v-if="callsError" class="connection-note error">{{callsError}}</p><p v-else-if="!calls.length" class="connection-hint">{{ $t("Noch keine Aufrufe protokolliert.") }}</p><div v-else class="connection-table-wrap" tabindex="0" role="region" :aria-label="$t('Protokoll der Werkzeugaufrufe')"><table class="connection-table"><thead><tr><th>{{ $t("Zeitpunkt") }}</th><th>{{ $t("Verbindung / Werkzeug") }}</th><th>{{ $t("Person") }}</th><th>{{ $t("Dauer") }}</th><th>{{ $t("Ergebnis") }}</th></tr></thead><tbody><tr v-for="(c,i) in calls" :key="i"><td>{{new Date(c.called_at).toLocaleString($dateLocale())}}</td><td>{{c.server_name}}<br /><code>{{c.tool_name}}</code></td><td>{{ $t("Benutzer {0}", c.user_id) }}</td><td>{{ $t("{0} ms", c.duration_ms) }}</td><td>{{c.ok?$t("Erfolgreich"):c.error||$t("Fehlgeschlagen")}}</td></tr></tbody></table></div></details>
-    <details class="connection-details"><summary>{{ $t("Hinweise zur Einrichtung") }}</summary><p>{{ $t("Verbindungen ins Firmennetz müssen vom Betrieb erlaubt sein. Neue Werkzeuge sind zunächst gesperrt. Gib Werkzeuge und Arbeitsbereiche einzeln frei. Neue Verbindungen und geänderte Zugangsdaten benötigen eine erneute Werkzeugfreigabe. Das verwendete Modell muss Werkzeugaufrufe unterstützen.") }}</p></details>
+    <details class="connection-details log"><summary>{{ $t("Letzte Werkzeugaufrufe") }}<span v-if="calls.length"> · {{calls.length}}</span></summary><p v-if="callsError" class="connection-note error">{{callsError}}</p><p v-else-if="!calls.length" class="connection-hint">{{ $t("Noch keine Aufrufe protokolliert.") }}</p><div v-else class="connection-table-wrap" tabindex="0" role="region" :aria-label="$t('Protokoll der Werkzeugaufrufe')"><table class="connection-table"><thead><tr><th>{{ $t("Zeitpunkt") }}</th><th>{{ $t("Verbindung / Werkzeug") }}</th><th>{{ $t("Person") }}</th><th>{{ $t("Klasse") }}</th><th>{{ $t("Dauer") }}</th><th>{{ $t("Ergebnis") }}</th></tr></thead><tbody><tr v-for="(c,i) in calls" :key="i"><td>{{new Date(c.called_at).toLocaleString($dateLocale())}}</td><td>{{c.server_name}}<br /><code>{{c.tool_name}}</code></td><td>{{ $t("Benutzer {0}", c.user_id) }}</td><td>{{c.risk?riskLabel(c.risk):'–'}}</td><td>{{ $t("{0} ms", c.duration_ms) }}</td><td>{{c.ok?$t("Erfolgreich"):c.error||$t("Fehlgeschlagen")}}</td></tr></tbody></table></div></details>
+    <details class="connection-details"><summary>{{ $t("Hinweise zur Einrichtung") }}</summary><p>{{ $t("Verbindungen ins Firmennetz müssen vom Betrieb erlaubt sein. Neue Werkzeuge sind zunächst gesperrt und nicht klassifiziert. Wähle je Werkzeug eine Risikoklasse (Lesen, Schreiben, Kritisch) und gib es danach einzeln frei; eine geänderte Klasse oder ein geändertes Werkzeug hebt die Freigabe auf. Kritische Werkzeuge bleiben gesperrt, bis Bestätigungen je Aufruf verfügbar sind. Je Antwort gibt es eine Aufrufrunde mit höchstens acht Aufrufen. Neue Verbindungen und geänderte Zugangsdaten benötigen eine erneute Werkzeugfreigabe. Das verwendete Modell muss Werkzeugaufrufe unterstützen.") }}</p></details>
     <AppDialog ref="connectDialog" :open="connectOpen" :title="$t('MCP-Server verbinden')" size="md" :busy="busy" :dirty="!!name||!!url||!!token" :error="connectError" @close="closeConnect">
       <form class="connection-form" @submit.prevent="add"><Input id="mcp-name" v-model="name" :label="$t('Name der Verbindung')" required maxlength="120" :placeholder="$t('z. B. Ticketsystem')" :disabled="busy" data-testid="admin-mcp-name" /><Input id="mcp-url" v-model="url" :label="$t('Server-Adresse')" type="url" required maxlength="500" :placeholder="$t('https://mcp.firma.local/mcp')" :disabled="busy" data-testid="admin-mcp-url" /><Input id="mcp-token" v-model="token" :label="$t('Zugangsschlüssel (optional)')" type="password" autocomplete="off" :hint="$t('Nur falls der Server einen Schlüssel benötigt.')" :disabled="busy" data-testid="admin-mcp-token" /><div class="connection-submit"><Button :disabled="busy" @click="connectDialog?.requestClose()">{{ $t("Abbrechen") }}</Button><Button variant="primary" type="submit" :disabled="busy" :busy="busy" data-testid="admin-mcp-add">{{busy?$t("Verbindung wird geprüft …"):$t("Verbinden")}}</Button></div></form>
     </AppDialog>

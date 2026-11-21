@@ -1,5 +1,7 @@
 # Keplura — PROJECT STATE (autoritative, knappe Projekt-Wahrheit)
 
+**Aktuelle Arbeitspriorität 21.11.2026 — Tool Use:** Der PO beauftragt mindestens den dokumentierten Tool-Use-Umfang von Open WebUI und verankert den besprochenen Plan als Ziel für die nächsten Tage. Verbindlich: [TOOL_USE_PLAN.md](TOOL_USE_PLAN.md). Nächste einzelne Implementierungsaufgabe: [TU-01](tasks/TU-01-tool-foundation.md), **implementiert im Draft-PR (Branch `feat/tool-use-foundation`), nicht gemergt**; unabhängiges Review/Security, gezielte QA und lokale Linux-CI offen. Danach Bestätigungen/Aufrufanzeige, mehrstufige Ausführung, Wissen/Anhänge/Web, Auswahl/Tool-Suche/Rückfragen, weitere Adapter/OAuth/Medien und zusätzliche Fähigkeiten einzeln. Diese Reihenfolge ersetzt ältere allgemeine Angaben zur nächsten Arbeit; offene Sicherheitsbefunde bleiben bestehen. Genau eine aktive Implementierung, unveränderte Gates, kein Release/Deployment und kein Fertigstellungsversprechen für den Gesamtumfang. Produktstand weiterhin wie unten; dieser Eintrag dokumentiert Planung, keine implementierte Funktion. Plan und Spec entstanden am 21.11.2026 im privaten Archiv (Keplura-intern #96) und sind hierher übernommen.
+
 **PO-Entscheidung 21.11.2026 (Chat): weniger testen, Review-Runden begrenzen.** In AGENTS.md unter „Review rounds“ verankert: Schweregrade für jeden Befund; eine Prüfrunde, höchstens eine Nachprüfung nur bei Blocker/Major; Minor/Nit/Info blockieren nicht und lösen weder neue Prüfrunde noch neuen vollen CI-Lauf aus; Nebenbefunde in den nächsten regulären PR; keine Browser-/Praxistests ohne PO-Auftrag (außer vor Release). Anlass: RISK-02 brauchte vier Prüf- und CI-Runden für Kleinigkeiten.
 
 **Stand 21.11.2026: Feinschliff Übersetzung von Servertexten auf main, PR #13, Squash-Merge `fbeecc1` verifiziert.** Letzte Hinweise der Prüfer zu #11/#12: Bezeichnungen (`label`, `categories`, `broadGroups`) nur noch gegen die Liste der Servertexte, nicht gegen das ganze UI-Wörterbuch (eine AD-Gruppe „Dokumente“ bleibt so); `title`/`detail` ohne allgemeine Muster („… fehlt.“); Chat-Antworten nur exakte Treffer (die feste „nichts gefunden“-Antwort). Klasse B. `ci-local.sh` als Nicht-root mit `acl` Exit 0 auf `ecf3dd1`, Evidence `ci/evidence/20261121-093004/`.
@@ -336,6 +338,8 @@ Dokument (inkl. PDF/DOCX) → RAG-Suche mit Citations → Chat mit SSE-Streaming
 
 ## NAECHSTE SCHRITTE (fixede PO-Reihenfolge, t_3b354559 §3)
 
+**Priorität seit 21.11.2026:** [Tool-Use-Plan](TOOL_USE_PLAN.md), beginnend mit TU-01. Die folgenden älteren Reihenfolgen sind historischer Kontext; offene Sicherheits- und Releasepflichten bleiben bestehen.
+
 1. ~~UI-POLISH-1 `t_596e3195`~~ KOMPLETT 2026-09-08 (10d5413, PR #32). **UI-FREEZE
    gilt weiter fuer ALLE anderen Flaechen (Wissen, Chat, Admin, Dokumente, Session):
    keine neuen UI-Flaechen, keine Polish-Tasks — nur echte UX-/Rendering-Bugs
@@ -377,6 +381,8 @@ Dokument (inkl. PDF/DOCX) → RAG-Suche mit Citations → Chat mit SSE-Streaming
    PO-freigegebene Karte; nichts davon 'laeuft'.
 
 ## PO-ENTSCHEIDE (verbindlich, mit Datum + Anker)
+
+- **21.11.2026, Chat — Tool Use als nächste Arbeitspriorität:** PO fordert mindestens den Tool-Use-Umfang von Open WebUI und beauftragt, den vorgeschlagenen Plan für die nächsten Tage fest zu verankern. Reihenfolge, Umfang und Grenzen: [TOOL_USE_PLAN.md](TOOL_USE_PLAN.md). Erste Aufgabe TU-01; eine aktive Implementierung. Keine pauschale Freigabe aller M5–M9-Visionen, keine Gate-/Provider-/Budget-Ausnahme, kein Release/Deployment.
 
 - **18.11.2026, Chat „Angemeldet bleiben ergänzen“:** PO beauftragt Checkbox und Entfernung der 30-Minuten-Abmeldung, erlaubt Codex für diesen Auftrag und ausdrücklich Merge nach main. Angebot, den letzten nativen Check zu überspringen, wurde nicht benötigt: er war vor Abbruch grün fertig. Keine generelle Aufhebung der CI-/Review-Regeln. Umsetzung und Nachweise in PR #80.
 

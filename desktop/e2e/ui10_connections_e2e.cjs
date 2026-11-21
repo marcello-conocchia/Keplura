@@ -15,7 +15,7 @@ fs.mkdirSync(env.E2E_OUT,{recursive:true});const results=[];
   const menu=async(row,name)=>{await row.getByTestId('connection-actions').click();await page.getByRole('menuitem',{name,exact:true}).click();};
   let mock=false,readError=false,writeError=false,webTestError=false,mcpPatchError=false;
   let web={source:'admin',provider:'brave',url:'',hasApiKey:true,results:5,blockedDomains:'werbung.test',enabled:true,secretStorageAvailable:true};
-  let mcps=[{id:-10001,name:'Ticketsystem',url:'https://werkzeuge.example.test/mcp',hasToken:true,enabled:true,tools:[{name:'tickets_lesen',description:'Tickets suchen und lesen.',enabled:true},{name:'ticket_anlegen',description:'Ein neues Ticket anlegen.',enabled:false}],lastCheckedAt:'2026-11-15T12:00:00Z',lastError:null,allSpaces:false,spaceIds:[5]}];
+  let mcps=[{id:-10001,name:'Ticketsystem',url:'https://werkzeuge.example.test/mcp',hasToken:true,enabled:true,tools:[{name:'tickets_lesen',description:'Tickets suchen und lesen.',enabled:true,risk:'READ',schemaSupported:true,schemaProblem:null,legacyApproval:false},{name:'ticket_anlegen',description:'Ein neues Ticket anlegen.',enabled:false,risk:'WRITE',schemaSupported:true,schemaProblem:null,legacyApproval:false}],lastCheckedAt:'2026-11-15T12:00:00Z',lastError:null,allSpaces:false,spaceIds:[5]}];
   let dirs=[{id:-10101,orgId:+env.E2E_ORG_ID,kind:'LDAP',displayName:'Firmenverzeichnis',url:'ldaps://verzeichnis.example.test',baseDn:'dc=example,dc=test',bindDn:'uid=reader,dc=example,dc=test',secretSet:true,userFilter:'',startTls:false,allowPlainLdap:false,loginEnabled:true,autoProvision:false,enabled:true}];
   let webPayload,dirPayload,mcpPayload;
   const wait=()=>new Promise(r=>setTimeout(r,350));
@@ -37,7 +37,7 @@ fs.mkdirSync(env.E2E_OUT,{recursive:true});const results=[];
     if(method==='GET'){if(readError)return r.fulfill({status:503,json:{error:'Prüffehler'}});return r.fulfill({status:200,json:last==='spaces'?[{id:5,name:'Pilotbereich',orgName:'Prüforganisation'}]:[{called_at:'2026-11-15T12:10:00Z',server_name:'Ticketsystem',tool_name:'tickets_lesen',duration_ms:32,ok:true,error:null,user_id:1}]});}
     const id=Number(last);assert(id<0);await wait();if(writeError||mcpPatchError)return r.fulfill({status:503,json:{error:'Prüffehler'}});
     if(method==='DELETE'){mcps=mcps.filter(x=>x.id!==id);return r.fulfill({status:204,body:''});}
-    assert.equal(method,'PATCH');const p=r.request().postDataJSON(),server=mcps.find(x=>x.id===id);if(p.enabledTools)server.tools=server.tools.map(t=>({...t,enabled:p.enabledTools.includes(t.name)}));for(const k of ['enabled','allSpaces','spaceIds'])if(k in p)server[k]=p[k];return r.fulfill({status:200,json:server});
+    assert.equal(method,'PATCH');const p=r.request().postDataJSON(),server=mcps.find(x=>x.id===id);if(p.toolRisks)server.tools=server.tools.map(t=>t.name in p.toolRisks&&(p.toolRisks[t.name]||null)!==t.risk?{...t,risk:p.toolRisks[t.name]||null,enabled:false}:t);if(p.enabledTools)server.tools=server.tools.map(t=>({...t,enabled:p.enabledTools.includes(t.name)&&(t.risk==='READ'||t.risk==='WRITE')}));for(const k of ['enabled','allSpaces','spaceIds'])if(k in p)server[k]=p[k];return r.fulfill({status:200,json:server});
   });
   await page.route('**/api/v1/admin/mcp-servers/*/refresh',async r=>{assert(mock);const id=Number(r.request().url().split('/').at(-2));assert(id<0);await wait();return r.fulfill({status:200,json:mcps.find(x=>x.id===id)});});
   await page.route('**/api/v1/admin/directories',async r=>{
