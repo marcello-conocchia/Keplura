@@ -1,6 +1,6 @@
 # TU-03a — Begrenzte mehrstufige Lesezugriffe
 
-Status: **geplant, nicht gestartet**. Nächste einzelne Aufgabe nach TU-02 (PR #17, Merge `8f6852a`). Erster kleiner Umsetzungsschritt von TU-03 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Modell-/Werkzeugschleife, externe Aufrufe und Rechte.
+Status: **in Umsetzung durch Codex**, Branch `feat/tool-use-read-loop`, nicht gemergt. Unabhängiges Code-/Security-Review durch Claude und finale Linux-CI offen. Nächste einzelne Aufgabe nach TU-02 (PR #17, Merge `8f6852a`). Erster Umsetzungsschritt von TU-03 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Modell-/Werkzeugschleife, externe Aufrufe und Rechte.
 
 ## Ziel
 
@@ -38,4 +38,4 @@ Geskriptetes Gateway und lokaler Fake-Adapter/MCP-Server mit Aufrufzähler für 
 
 ## Workspace
 
-Eigener Worktree auf Branch `feat/tool-use-read-loop` ab aktuellem main. Vor Start autoritatives Kanban auf aktive Implementierung prüfen; genau eine Aufgabe gleichzeitig. Entwickler öffnet Draft-PR, Codex prüft unabhängig. Kein Merge durch den Entwickler; Provider-/Budgetregeln aus AGENTS.md gelten.
+Eigener Worktree auf Branch `feat/tool-use-read-loop` ab main `b1c4b08`. PO-Rollentausch vom 21.11.2026: Codex implementiert, Claude prüft unabhängig Code und Sicherheit. Kein bestehender TU-03a-Branch oder Implementierungs-PR beim Start gefunden. Autoritatives Hermes-Kanban von diesem Windows-Host nicht erreichbar (lokales Board `intracore` existiert nicht); kein Ersatzboard angelegt. Genau eine Implementierungsaufgabe. Draft-PR, kein Merge durch den Entwickler; Provider-/Budgetregeln aus AGENTS.md gelten.

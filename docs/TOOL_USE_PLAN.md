@@ -39,7 +39,7 @@ Nach jedem Merge PROJECT_STATE.md mit tatsächlichem Stand, Belegen und nächste
 
 ## Unmittelbar nächste Aufgabe
 
-**TU-03a — begrenzte mehrstufige Lesezugriffe**, siehe [Spec](tasks/TU-03a-read-loop.md). Geplant, nicht gestartet. Ergebnisse dürfen weitere freigegebene READ-Aufrufe informieren, aber keine neuen Schreibaktionen autorisieren. Automatische Wiederaufnahme nach konkreten Bestätigungen und davon abhängige Aktionsketten bleiben als weiterer TU-03-Umfang offen; TU-03a allein erfüllt nicht die gesamte Phase.
+**TU-03a — begrenzte mehrstufige Lesezugriffe**, siehe [Spec](tasks/TU-03a-read-loop.md). In Umsetzung durch Codex auf feat/tool-use-read-loop, nicht gemergt; unabhängige Prüfung durch Claude offen. Ergebnisse dürfen weitere freigegebene READ-Aufrufe informieren, aber keine neuen Schreibaktionen autorisieren. Automatische Wiederaufnahme nach konkreten Bestätigungen und davon abhängige Aktionsketten bleiben als weiterer TU-03-Umfang offen; TU-03a allein erfüllt nicht die gesamte Phase.
 
 ## Vergleichsquellen (abgerufen am 21.11.2026)
 

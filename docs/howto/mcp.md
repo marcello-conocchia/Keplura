@@ -59,7 +59,8 @@ Der Beginn wird vor der Ausführung protokolliert; ohne verfügbare
 Protokollierung erfolgt kein Aufruf. Das Protokoll enthält keine Argumente
 oder Ergebnisse.
 
-Je Antwort gibt es **eine Aufrufrunde** mit **höchstens acht Aufrufen**
+Je Frage gibt es **höchstens fünf Modellanfragen einschließlich Abschlussantwort**
+und **höchstens acht Werkzeugversuche über alle Runden zusammen**
 (auch abgelehnte Versuche zählen mit). Danach antwortet das Modell ohne
 Werkzeuge; weitere Aufrufwünsche werden nicht ausgeführt. Weitere Grenzen:
 Argumente höchstens 16 000 Zeichen, Ergebnisse werden nach 8 000 Zeichen
@@ -86,3 +87,15 @@ sie ausgeführt werden; die Übersicht darüber kann gekürzt sein. Zu große
 Eingaben werden nicht gespeichert und nicht ausgeführt. Eine neue Frage im
 Chat oder „Stopp“ machen offene Bestätigungen dieses Turns ungültig. Alle
 Aufrufe einer Frage teilen sich die 120 Sekunden Werkzeugzeit.
+
+**Mehrstufige Lesezugriffe (TU-03a):** Das Modell kann nach einem Suchergebnis
+mit freigegebenen Lesewerkzeugen Details nachladen. Folgeaufrufe dürfen keine
+neuen Schreib- oder kritischen Aktionen aus Ergebnissen ableiten; das prüft
+der Server auch dann, wenn das Modell die Einschränkung ignoriert. Der erste
+Aktionsplan sieht ausschließlich den aktuellen Nutzerauftrag, keine früheren
+Ergebnisse oder Dokumentanweisungen. Bei einer offenen kritischen Bestätigung
+endet die Schleife; nach der Entscheidung startet sie nicht automatisch neu.
+Früher bestätigte Ergebnisse können bei einer neuen ausdrücklichen Frage als
+begrenzte Belege dienen, sofern Zugriff, Freigabe und Werkzeugdefinition noch
+passen. Stop, neue Frage und Rechteentzug verhindern weitere Folgeaufrufe.
+Fehler oder unklare Ausgänge lösen keine automatische Wiederholung aus.

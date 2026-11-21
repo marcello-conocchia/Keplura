@@ -71,6 +71,7 @@ class ToolConfirmationTest {
     private final long user = 4711;
     private long orgId;
     private long chat;
+    private Long promptId;
 
     @BeforeEach void setup() {
         var ds = new org.h2.jdbcx.JdbcDataSource();
@@ -94,7 +95,8 @@ class ToolConfirmationTest {
     }
 
     private ToolExecutionService.ToolTurn turn() {
-        return service.openTurn(service.resolveContext(user, orgId, chat), 99L);
+        if (promptId == null) promptId = userMessage("Current question");
+        return service.openTurn(service.resolveContext(user, orgId, chat), promptId);
     }
 
     private long userMessage(String text) {
@@ -136,7 +138,7 @@ class ToolConfirmationTest {
         assertThat(card.status()).isEqualTo("PENDING");
         assertThat(card.needsConfirmation()).isTrue();
         assertThat(card.risk()).isEqualTo("CRITICAL");
-        assertThat(card.promptMessageId()).isEqualTo(99L);
+        assertThat(card.promptMessageId()).isEqualTo(promptId);
         assertThat(card.argumentsText()).isEqualTo("{\"id\":\"T-1\"}");
         assertThat(card.expiresAt()).isEqualTo(now.get().plus(ToolCallStore.CONFIRMATION_TTL));
         assertThat(fake.invocations).hasValue(0);

@@ -158,6 +158,20 @@ public class ToolCallStore {
                 ROWS, userId, orgId, conversationId);
     }
 
+    /** A server-bound question is live only until a newer question or Stop supersedes it. */
+    public boolean isCurrentQuestion(long conversationId, long promptMessageId) {
+        return jdbc.queryForObject("select count(*) from chat_message q where q.id = ? and q.conversation_id = ? and q.role = 'user' and "
+                + CURRENT_GENERATION.formatted("q.conversation_id", "q.id"), Integer.class,
+                promptMessageId, conversationId) == 1;
+    }
+
+    /** Bounded previous confirmed results; authorization is rechecked by ToolExecutionService. */
+    public List<Row> completedBefore(long userId, long orgId, long conversationId, long promptMessageId) {
+        return jdbc.query(SELECT + " where user_id = ? and org_id = ? and conversation_id = ?"
+                + " and prompt_message_id < ? and needs_confirmation = true and status = 'SUCCEEDED'"
+                + " order by id desc limit 8", ROWS, userId, orgId, conversationId, promptMessageId);
+    }
+
     /**
      * Verbraucht eine ausstehende Bestätigung atomar: PENDING → {@code next}, nur wenn noch nicht
      * abgelaufen. {@code true} genau für den einen Aufrufer, der den Wechsel bekommen hat.

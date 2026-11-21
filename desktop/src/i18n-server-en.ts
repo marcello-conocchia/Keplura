@@ -3,6 +3,11 @@
 // Values that are user data (file names, people) never match these keys.
 
 export const SERVER_EN: Record<string, string> = {
+  // TU-03a bounded read followups
+  "Der Chat wurde weitergeführt oder gestoppt. Das Werkzeug wurde nicht aufgerufen.": "The chat continued or was stopped. The tool was not called.",
+  "Nach dem fehlgeschlagenen Aufruf werden keine weiteren Werkzeuge ausgeführt.": "No more tools are run after the failed call.",
+  "Folgeaufrufe dürfen nur freigegebene Lesewerkzeuge verwenden. Diese Aktion wurde nicht ausgeführt.": "Follow-up calls can only use approved read tools. This action was not performed.",
+  "Die Antwort wurde gestoppt oder der Chat inzwischen weitergeführt.": "The answer was stopped or the chat has since continued.",
   // quality
   "Die Liste ist leer oder zu groß.": "The list is empty or too large.",
   "Fehler bei der Suche": "Search failed",
