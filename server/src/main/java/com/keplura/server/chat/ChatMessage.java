@@ -54,6 +54,11 @@ public class ChatMessage {
     @Column(name = "conversation_id", nullable = false, updatable = false)
     private Long conversationId;
 
+    @Column(name = "prompt_message_id", updatable = false)
+    private Long promptMessageId;
+
+    public Long getPromptMessageId() { return promptMessageId; }
+
     /** user | assistant — set only by the two factories below, never free text. */
     @Column(nullable = false, updatable = false, length = 16)
     private String role;
@@ -122,6 +127,13 @@ public class ChatMessage {
         }
         String model = (modelTag == null) ? "" : modelTag.substring(0, Math.min(modelTag.length(), 128));
         return new ChatMessage(conversationId, ROLE_ASSISTANT, safe, model, cites, endStatus);
+    }
+
+    public static ChatMessage assistantAnswer(Long conversationId, String text, String modelTag,
+            String citationsJson, String endStatus, Long promptId) {
+        ChatMessage answer = assistantAnswer(conversationId, text, modelTag, citationsJson, endStatus);
+        answer.promptMessageId = promptId;
+        return answer;
     }
 
     @PrePersist

@@ -189,7 +189,11 @@ public class ChatController {
         }
         var outcome = chatService.decideToolCall(principal.userId(), orgId, conversationId, callId, "confirm".equals(decision));
         return switch (outcome) {
-            case com.keplura.server.tool.ToolExecutionService.Decision.Done d -> ResponseEntity.ok(d.card());
+            case com.keplura.server.tool.ToolExecutionService.Decision.Done d -> {
+                var result = (tools.jackson.databind.node.ObjectNode) mapper.valueToTree(d.card());
+                if (d.continuationToken() != null) result.put("continuationToken", d.continuationToken());
+                yield ResponseEntity.ok(result);
+            }
             case com.keplura.server.tool.ToolExecutionService.Decision.Conflict c -> ResponseEntity.status(HttpStatus.CONFLICT).body(c.card());
             case com.keplura.server.tool.ToolExecutionService.Decision.NotFound n ->
                     ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("tool call not found"));
@@ -239,6 +243,21 @@ public class ChatController {
         // here still owns an uncommitted response → ChatErrorAdvice maps it.
         ChatService.StreamedTurn turn =
                 chatService.beginTurn(principal.userId(), orgId, conversationId, prompt, webSearch);
+
+        relay(turn, conversationId, httpResponse);
+    }
+
+    @PostMapping("/chat/conversations/{conversationId}/tool-calls/{callId}/continue")
+    public void continueToolCall(@PathVariable("orgId") Long orgId,
+            @PathVariable("conversationId") Long conversationId, @PathVariable("callId") String callId,
+            HttpServletRequest request, HttpServletResponse response) throws IOException {
+        var principal = currentPrincipal(request);
+        JsonNode body = readBody(request);
+        var turn = chatService.continueToolTurn(principal.userId(), orgId, conversationId, callId, body.path("token").asString(""));
+        relay(turn, conversationId, response);
+    }
+
+    private void relay(ChatService.StreamedTurn turn, Long conversationId, HttpServletResponse httpResponse) throws IOException {
 
         httpResponse.setStatus(HttpServletResponse.SC_OK);
         httpResponse.setContentType(MediaType.TEXT_EVENT_STREAM_VALUE);

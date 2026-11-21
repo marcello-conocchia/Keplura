@@ -701,6 +701,7 @@ export const EN: Record<string, string> = {
   "Ausgang unklar": "Outcome unclear",
   "Dieser Aufruf wurde bereits entschieden oder ist nicht mehr offen.": "This call was already decided or is no longer open.",
   "Die Entscheidung konnte nicht bestätigt werden. Der Stand wird neu geladen.": "The decision could not be confirmed. Reloading the current state.",
+  "Die Fortsetzung ist nicht mehr verfügbar. Bitte stelle eine neue Frage.": "Continuation is no longer available. Please ask a new question.",
   "{0} freigeben": "Approve {0}",
   "Kritisch freigegeben: Jeder einzelne Aufruf läuft erst, wenn die Person ihn im Chat bestätigt.": "Approved as critical: every single call runs only after the person confirms it in the chat.",
   "Kritische Werkzeuge laufen nach Freigabe nur mit Bestätigung je Aufruf durch die Person.": "Once approved, critical tools run only with the person's confirmation of each call.",

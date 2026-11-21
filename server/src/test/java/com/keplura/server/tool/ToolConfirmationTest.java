@@ -88,6 +88,33 @@ class ToolConfirmationTest {
                 System::nanoTime, now::get);
     }
 
+    @Test void simultaneousDifferentConfirmationsSerializeAndShareTime() throws Exception {
+        var turn = turn();
+        turn.call("f__delete", "{\"id\":\"one\"}");
+        turn.call("f__delete", "{\"id\":\"two\"}");
+        var cards = service.cards(user,orgId,chat);
+        assertThat(cards).hasSize(2);
+        var active = new java.util.concurrent.atomic.AtomicInteger();
+        var maxActive = new java.util.concurrent.atomic.AtomicInteger();
+        fake.onInvoke = () -> {
+            int current=active.incrementAndGet(); maxActive.accumulateAndGet(current,Math::max);
+            try { Thread.sleep(50); } catch(InterruptedException e) { throw new RuntimeException(e); }
+            now.updateAndGet(t -> t.plusSeconds(121));
+            active.decrementAndGet();
+        };
+        try(var pool=java.util.concurrent.Executors.newFixedThreadPool(2)) {
+            var start = new java.util.concurrent.CountDownLatch(1);
+            var first=pool.submit(() -> { start.await(); return service.decide(user,orgId,chat,cards.get(0).id(),true); });
+            var second=pool.submit(() -> { start.await(); return service.decide(user,orgId,chat,cards.get(1).id(),true); });
+            start.countDown();
+            assertThat(first.get()).isInstanceOf(ToolExecutionService.Decision.Done.class);
+            assertThat(second.get()).isInstanceOf(ToolExecutionService.Decision.Done.class);
+        }
+        assertThat(maxActive.get()).isEqualTo(1);
+        assertThat(fake.invocations.get()).isEqualTo(1);
+        assertThat(service.cards(user,orgId,chat)).filteredOn(c -> c.status().equals("BLOCKED")).hasSize(1);
+    }
+
     private long id(String sql) {
         var keys = new org.springframework.jdbc.support.GeneratedKeyHolder();
         jdbc.update(c -> c.prepareStatement(sql, new String[]{"id"}), keys);

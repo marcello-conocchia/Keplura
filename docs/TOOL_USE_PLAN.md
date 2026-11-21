@@ -39,7 +39,7 @@ Nach jedem Merge PROJECT_STATE.md mit tatsächlichem Stand, Belegen und nächste
 
 ## Unmittelbar nächste Aufgabe
 
-**TU-03b — begrenzte Fortsetzung nach konkreter Bestätigung**, siehe [Spec](tasks/TU-03b-confirmed-continuation.md). Geplant, nicht gestartet. Nach einer ausdrücklichen Entscheidung zu einer CRITICAL-Karte setzt der Server dieselbe Frage einmal fort, mit Restbudget, nur READ-Folgeaufrufen und werkzeugloser Abschlussantwort. Erledigt: [TU-03a](tasks/TU-03a-read-loop.md) — Suchen → Detail lesen → Nachsuchen → Antwort mit READ-Folgeaufrufen (PR #19). Danach offen in TU-03: davon abhängige Schreibketten (eine weitere WRITE/CRITICAL-Aktion aus einem bestätigten Ergebnis). TU-03a und TU-03b allein erfüllen nicht die gesamte Phase.
+**TU-03b — begrenzte Fortsetzung nach konkreter Bestätigung**, siehe [Spec](tasks/TU-03b-confirmed-continuation.md). Implementiert auf feat/tool-use-confirmed-continuation; lokale Linux-CI und unabhängige Prüfung durch Claude offen, nicht gemergt. Nach einer ausdrücklichen Entscheidung zu einer CRITICAL-Karte setzt der Server dieselbe Frage einmal fort, mit Restbudget, nur READ-Folgeaufrufen und werkzeugloser Abschlussantwort. Erledigt: [TU-03a](tasks/TU-03a-read-loop.md) — Suchen → Detail lesen → Nachsuchen → Antwort mit READ-Folgeaufrufen (PR #19). Danach offen in TU-03: davon abhängige Schreibketten (eine weitere WRITE/CRITICAL-Aktion aus einem bestätigten Ergebnis). TU-03a und TU-03b allein erfüllen nicht die gesamte Phase.
 
 ## Vergleichsquellen (abgerufen am 21.11.2026)
 
