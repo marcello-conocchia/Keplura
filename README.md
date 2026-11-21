@@ -10,13 +10,14 @@ and questions stay in-house.
 > not reached a beta release yet. Run it as a pilot or for evaluation, not as
 > your only copy of important data. See [Known limitations](#known-limitations).
 >
-> The user interface is currently **German only**.
+> The user interface is available in **English and German**. It follows the
+> system language; switch it in the account menu or on the sign-in screen.
 
 ![Chat answer with source citations (dark mode)](docs/assets/screenshots/chat-dark.png)
 
 <sub>Screenshots use fictitious sample data. Retrieval and citations are real.
 The model answer in the chat screenshot was streamed from a local stand-in, not
-a real language model.</sub>
+a real language model. Recreate them with `desktop/e2e/readme_screenshots.cjs`.</sub>
 
 ## What Keplura does
 
@@ -154,7 +155,8 @@ private repository: pull request numbers up to #95 and evidence paths under
 ## Known limitations
 
 - Pre-release software: no stable release, no long-term support promise yet.
-- User interface in German only.
+- Server messages (errors, sync and check results) are still German in the
+  English interface.
 - One server instance. Sessions are held in server memory, so a restart signs
   everyone out (no data loss). No high-availability setup.
 - The desktop app gets its server URL at build time (`VITE_SERVER_URL`).

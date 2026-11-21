@@ -12,7 +12,7 @@ fs.mkdirSync(out, { recursive: true });
 (async () => {
   const browser = await chromium.launch({ headless: true,
     ...(process.env.E2E_CHROME ? { executablePath: process.env.E2E_CHROME } : {}), args: ['--no-sandbox'] });
-  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  const page = await browser.newPage({ locale: 'de-DE', viewport: { width: 1440, height: 1000 } });
   const step = async (name, fn) => { await fn(); console.log(JSON.stringify({ step: name, ok: true })); };
   try {
     await step('Anmeldung und Verzeichnis-Verbindung', async () => {

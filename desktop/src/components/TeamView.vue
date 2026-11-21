@@ -20,6 +20,7 @@ import ActionMenu from "./ui/ActionMenu.vue";
 import ConfirmDialog from "./ui/ConfirmDialog.vue";
 import { deleteOrg, manageErrorText, renameOrg } from "../api-manage";
 import type { Organization } from "../api";
+import { tr } from "../i18n";
 
 const auth = useAuthStore();
 
@@ -64,20 +65,20 @@ async function submitCreate() {
     case "created":
       orgName.value = "";
       orgFormOpen.value = false;
-      show("ok", `Organisation „${outcome.org.name}“ angelegt. Du verwaltest sie.`);
+      show("ok", tr("Organisation „{0}“ angelegt. Du verwaltest sie.", outcome.org.name));
       break;
     case "invalid-name":
-      orgError.value = `Name ungültig. Bitte 1–${ORG_NAME_MAX_LENGTH} Zeichen.`;
+      orgError.value = tr("Name ungültig. Bitte 1–{0} Zeichen.", ORG_NAME_MAX_LENGTH);
       break;
     case "expired":
-      orgError.value = "Sitzung abgelaufen. Bitte erneut anmelden.";
+      orgError.value = tr("Sitzung abgelaufen. Bitte erneut anmelden.");
       break;
     case "rate-limited":
-      orgError.value = "Zu viele Anfragen. Bitte später erneut versuchen"
-        + (outcome.retryAfterSeconds ? ` (ca. ${outcome.retryAfterSeconds}s warten).` : ".");
+      orgError.value = tr("Zu viele Anfragen. Bitte später erneut versuchen")
+        + (outcome.retryAfterSeconds ? tr(" (ca. {0}s warten).", outcome.retryAfterSeconds) : ".");
       break;
     case "error":
-      orgError.value = "Organisation konnte nicht angelegt werden. Bitte später erneut versuchen.";
+      orgError.value = tr("Organisation konnte nicht angelegt werden. Bitte später erneut versuchen.");
       break;
   }
 }
@@ -105,7 +106,7 @@ async function submitRename() {
   renaming.value = false;
   if (r.kind === "ok") {
     renameTarget.value = null;
-    show("ok", "Organisation umbenannt.");
+    show("ok", tr("Organisation umbenannt."));
     await auth.loadOrgs();
   } else if (r.kind === "expired") {
     renameTarget.value = null;
@@ -132,7 +133,7 @@ async function confirmDelete() {
   deleting.value = false;
   if (r.kind === "ok" || r.kind === "not-found") {
     deleteTarget.value = null;
-    show("ok", `Organisation „${org.name}“ gelöscht.`);
+    show("ok", tr("Organisation „{0}“ gelöscht.", org.name));
     await auth.loadOrgs();
     await auth.loadKnowledge();
   } else if (r.kind === "expired") {
@@ -152,18 +153,18 @@ function rowAction(org: Organization, action: string) {
 <template>
   <PageContainer width="narrow">
     <template #header>
-      <PageHeader title="Team" description="Organisationen, Mitglieder und Einladungen" />
+      <PageHeader :title="$t('Team')" :description="$t('Organisationen, Mitglieder und Einladungen')" />
     </template>
     <section class="connection-page team" data-testid="team-view">
       <section class="connection-section" aria-labelledby="team-orgs-title">
         <header class="connection-header">
           <div class="connection-heading">
-            <h2 id="team-orgs-title">Deine Organisationen <span class="team-count ic-num" data-testid="org-count">{{ auth.orgs.length }}</span></h2>
-            <p class="connection-description">Wähle aus, in welcher Organisation du arbeitest. Wissen, Chats und Mitglieder gehören immer zu genau einer Organisation.</p>
+            <h2 id="team-orgs-title">{{ $t("Deine Organisationen") }} <span class="team-count ic-num" data-testid="org-count">{{ auth.orgs.length }}</span></h2>
+            <p class="connection-description">{{ $t("Wähle aus, in welcher Organisation du arbeitest. Wissen, Chats und Mitglieder gehören immer zu genau einer Organisation.") }}</p>
           </div>
           <div class="connection-actions">
             <Button variant="primary" data-testid="org-create-new" @click="openOrgForm()">
-              <AppIcon name="plus" :size="16" />Organisation anlegen
+              <AppIcon name="plus" :size="16" />{{ $t("Organisation anlegen") }}
             </Button>
           </div>
         </header>
@@ -182,18 +183,18 @@ function rowAction(org: Organization, action: string) {
             <span class="team-logo" aria-hidden="true">{{ initials(org.name) }}</span>
             <div class="connection-heading">
               <h3>{{ org.name }}</h3>
-              <p class="connection-meta">{{ org.role === "OWNER" ? "Du verwaltest diese Organisation" : "Du bist Mitglied" }}</p>
+              <p class="connection-meta">{{ org.role === "OWNER" ? $t("Du verwaltest diese Organisation") : $t("Du bist Mitglied") }}</p>
             </div>
             <div class="connection-actions">
-              <StatusPill :tone="org.role === 'OWNER' ? 'ok' : 'neutral'" data-testid="org-role">{{ org.role === "OWNER" ? "Verwalter:in" : "Mitglied" }}</StatusPill>
-              <StatusPill v-if="org.id === auth.selectedOrgId" tone="info" data-testid="org-current">Ausgewählt</StatusPill>
-              <Button v-else size="compact" :data-testid="`org-select-${org.id}`" @click="auth.selectOrg(org.id)">Auswählen</Button>
+              <StatusPill :tone="org.role === 'OWNER' ? 'ok' : 'neutral'" data-testid="org-role">{{ org.role === "OWNER" ? $t("Verwalter:in") : $t("Mitglied") }}</StatusPill>
+              <StatusPill v-if="org.id === auth.selectedOrgId" tone="info" data-testid="org-current">{{ $t("Ausgewählt") }}</StatusPill>
+              <Button v-else size="compact" :data-testid="`org-select-${org.id}`" @click="auth.selectOrg(org.id)">{{ $t("Auswählen") }}</Button>
               <ActionMenu
                 v-if="org.role === 'OWNER'"
-                :label="`Aktionen für ${org.name}`"
+                :label="$t('Aktionen für {0}', org.name)"
                 :items="[
-                  { id: 'rename', label: 'Umbenennen', testId: `org-rename-${org.id}` },
-                  { id: 'delete', label: 'Organisation löschen', danger: true, testId: `org-delete-${org.id}` },
+                  { id: 'rename', label: $t('Umbenennen'), testId: `org-rename-${org.id}` },
+                  { id: 'delete', label: $t('Organisation löschen'), danger: true, testId: `org-delete-${org.id}` },
                 ]"
                 @select="(a) => rowAction(org, a)"
               />
@@ -201,43 +202,43 @@ function rowAction(org: Organization, action: string) {
           </article>
         </div>
         <div v-else-if="auth.orgsError" class="connection-note error connection-error" role="alert" data-testid="org-error">
-          <p>Organisationen konnten nicht geladen werden.</p>
-          <Button size="compact" data-testid="org-retry" @click="auth.loadOrgs()">Erneut versuchen</Button>
+          <p>{{ $t("Organisationen konnten nicht geladen werden.") }}</p>
+          <Button size="compact" data-testid="org-retry" @click="auth.loadOrgs()">{{ $t("Erneut versuchen") }}</Button>
         </div>
         <p v-else class="connection-empty" data-testid="org-empty">
-          Du gehörst noch zu keiner Organisation. Lege eine an oder löse unten einen Einladungscode ein.
+          {{ $t("Du gehörst noch zu keiner Organisation. Lege eine an oder löse unten einen Einladungscode ein.") }}
         </p>
       </section>
 
       <MembersPanel />
     </section>
 
-    <AppDialog ref="createDialog" :open="orgFormOpen" title="Organisation anlegen" :error="orgError" :busy="creating" :dirty="orgName.trim() !== ''" @close="orgFormOpen = false">
+    <AppDialog ref="createDialog" :open="orgFormOpen" :title="$t('Organisation anlegen')" :error="orgError" :busy="creating" :dirty="orgName.trim() !== ''" @close="orgFormOpen = false">
       <form class="connection-form" data-testid="org-create-form" @submit.prevent="submitCreate">
-        <Input id="org-name" v-model="orgName" label="Name der Organisation" data-testid="org-create-name" :maxlength="ORG_NAME_MAX_LENGTH" autocomplete="off" :disabled="creating" required />
-        <p class="connection-hint">Du wirst automatisch Verwalter:in und kannst danach Mitglieder hinzufügen oder einladen.</p>
+        <Input id="org-name" v-model="orgName" :label="$t('Name der Organisation')" data-testid="org-create-name" :maxlength="ORG_NAME_MAX_LENGTH" autocomplete="off" :disabled="creating" required />
+        <p class="connection-hint">{{ $t("Du wirst automatisch Verwalter:in und kannst danach Mitglieder hinzufügen oder einladen.") }}</p>
         <div class="connection-submit">
-          <Button variant="ghost" type="button" @click="createDialog?.requestClose()">Abbrechen</Button>
-          <Button type="submit" variant="primary" data-testid="org-create-submit" :busy="creating" :disabled="!canCreate">Anlegen</Button>
+          <Button variant="ghost" type="button" @click="createDialog?.requestClose()">{{ $t("Abbrechen") }}</Button>
+          <Button type="submit" variant="primary" data-testid="org-create-submit" :busy="creating" :disabled="!canCreate">{{ $t("Anlegen") }}</Button>
         </div>
       </form>
     </AppDialog>
 
-    <AppDialog ref="renameDialog" :open="renameTarget !== null" title="Organisation umbenennen" :error="renameError" :busy="renaming" :dirty="renameDirty" @close="renameTarget = null">
+    <AppDialog ref="renameDialog" :open="renameTarget !== null" :title="$t('Organisation umbenennen')" :error="renameError" :busy="renaming" :dirty="renameDirty" @close="renameTarget = null">
       <form class="connection-form" data-testid="org-rename-form" @submit.prevent="submitRename">
-        <Input id="org-rename" v-model="renameValue" label="Neuer Name" data-testid="org-rename-name" :maxlength="ORG_NAME_MAX_LENGTH" autocomplete="off" :disabled="renaming" required />
+        <Input id="org-rename" v-model="renameValue" :label="$t('Neuer Name')" data-testid="org-rename-name" :maxlength="ORG_NAME_MAX_LENGTH" autocomplete="off" :disabled="renaming" required />
         <div class="connection-submit">
-          <Button variant="ghost" type="button" @click="renameDialog?.requestClose()">Abbrechen</Button>
-          <Button type="submit" variant="primary" data-testid="org-rename-save" :busy="renaming" :disabled="renameValue.trim() === '' || !renameDirty">Speichern</Button>
+          <Button variant="ghost" type="button" @click="renameDialog?.requestClose()">{{ $t("Abbrechen") }}</Button>
+          <Button type="submit" variant="primary" data-testid="org-rename-save" :busy="renaming" :disabled="renameValue.trim() === '' || !renameDirty">{{ $t("Speichern") }}</Button>
         </div>
       </form>
     </AppDialog>
 
     <ConfirmDialog
       :open="deleteTarget !== null"
-      title="Organisation löschen?"
-      :message="`„${deleteTarget?.name ?? ''}“ wird mit allen Arbeitsbereichen, Wissensbasen, Dokumenten, Chats und Einladungen endgültig gelöscht. Das lässt sich nicht rückgängig machen. Benutzerkonten bleiben erhalten.`"
-      confirm-label="Endgültig löschen"
+      :title="$t('Organisation löschen?')"
+      :message="$t('„{0}“ wird mit allen Arbeitsbereichen, Wissensbasen, Dokumenten, Chats und Einladungen endgültig gelöscht. Das lässt sich nicht rückgängig machen. Benutzerkonten bleiben erhalten.', deleteTarget?.name ?? '')"
+      :confirm-label="$t('Endgültig löschen')"
       :busy="deleting"
       :error="deleteError"
       @confirm="confirmDelete"

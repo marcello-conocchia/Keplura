@@ -14,6 +14,7 @@ import {
   deleteChatAttachment, getChatContext, setChatKnowledgeBases, uploadChatAttachment, type ChatAttachment,
 } from "../../productivity-api";
 import AppIcon from "../ui/AppIcon.vue";
+import { tr } from "../../i18n";
 
 const props = defineProps<{
   conversationId: number | null;
@@ -44,17 +45,17 @@ watch(() => props.conversationId, load, { immediate: true });
 const otherKbs = computed(() => auth.kbs.filter((k) => k.id !== props.primaryKbId));
 const extraKbs = computed(() => auth.kbs.filter((k) => extraKbIds.value.includes(k.id)));
 
-const MESSAGES: Record<string, string> = {
-  "unsupported file type (pdf, docx, xlsx, pptx, txt, md, csv)": "Dieser Dateityp wird nicht unterstützt (PDF, Word, Excel, PowerPoint, TXT, Markdown, CSV).",
-  "file contains no readable text": "Die Datei enthält keinen lesbaren Text.",
-  "file contains no readable text (scan?)": "Die Datei enthält keinen lesbaren Text – vermutlich ein Scan.",
-  "text file is not valid UTF-8": "Die Textdatei ist nicht UTF-8-kodiert.",
-  "file could not be read": "Die Datei konnte nicht gelesen werden.",
-  "file is empty": "Die Datei ist leer.",
-  "at most 5 attachments per chat": "Pro Chat sind höchstens 5 Dateien möglich.",
-  "at most 5 additional knowledge bases": "Höchstens 5 zusätzliche Wissensbasen.",
-};
-const german = (m: string) => MESSAGES[m] ?? m;
+const messages = (): Record<string, string> => ({
+  "unsupported file type (pdf, docx, xlsx, pptx, txt, md, csv)": tr("Dieser Dateityp wird nicht unterstützt (PDF, Word, Excel, PowerPoint, TXT, Markdown, CSV)."),
+  "file contains no readable text": tr("Die Datei enthält keinen lesbaren Text."),
+  "file contains no readable text (scan?)": tr("Die Datei enthält keinen lesbaren Text – vermutlich ein Scan."),
+  "text file is not valid UTF-8": tr("Die Textdatei ist nicht UTF-8-kodiert."),
+  "file could not be read": tr("Die Datei konnte nicht gelesen werden."),
+  "file is empty": tr("Die Datei ist leer."),
+  "at most 5 attachments per chat": tr("Pro Chat sind höchstens 5 Dateien möglich."),
+  "at most 5 additional knowledge bases": tr("Höchstens 5 zusätzliche Wissensbasen."),
+});
+const german = (m: string) => messages()[m] ?? m;
 
 async function toggleKb(id: number, on: boolean) {
   const cid = props.conversationId ?? (await props.ensureConversation());
@@ -62,7 +63,7 @@ async function toggleKb(id: number, on: boolean) {
   const next = on ? [...new Set([...extraKbIds.value, id])] : extraKbIds.value.filter((x) => x !== id);
   const r = await setChatKnowledgeBases(auth.selectedOrgId, cid, next);
   if (r.kind === "ok") extraKbIds.value = r.value.extraKnowledgeBaseIds;
-  else emit("error", r.kind === "error" ? german(r.message) : "Deine Sitzung ist abgelaufen.");
+  else emit("error", r.kind === "error" ? german(r.message) : tr("Deine Sitzung ist abgelaufen."));
 }
 
 async function onFile(e: Event) {
@@ -71,7 +72,7 @@ async function onFile(e: Event) {
   input.value = "";
   if (!file) return;
   if (file.size > 10 * 1024 * 1024) {
-    emit("error", "Die Datei ist zu groß (höchstens 10 MB).");
+    emit("error", tr("Die Datei ist zu groß (höchstens 10 MB)."));
     return;
   }
   uploading.value = true;
@@ -80,7 +81,7 @@ async function onFile(e: Event) {
     if (cid === null || auth.selectedOrgId === null) return;
     const r = await uploadChatAttachment(auth.selectedOrgId, cid, file);
     if (r.kind === "ok") attachments.value = [...attachments.value, r.value];
-    else emit("error", r.kind === "error" ? german(r.message) : "Deine Sitzung ist abgelaufen.");
+    else emit("error", r.kind === "error" ? german(r.message) : tr("Deine Sitzung ist abgelaufen."));
   } finally {
     uploading.value = false;
   }
@@ -96,17 +97,17 @@ async function removeAttachment(a: ChatAttachment) {
 <template>
   <DropdownMenuRoot>
     <DropdownMenuTrigger class="cx-btn cx-add" :disabled="disabled || uploading" data-testid="chat-context-add"
-      aria-label="Datei oder weiteres Wissen hinzufügen" title="Datei oder weiteres Wissen hinzufügen"><AppIcon name="plus" :size="20" /></DropdownMenuTrigger>
+      :aria-label="$t('Datei oder weiteres Wissen hinzufügen')" :title="$t('Datei oder weiteres Wissen hinzufügen')"><AppIcon name="plus" :size="20" /></DropdownMenuTrigger>
     <DropdownMenuPortal>
       <DropdownMenuContent class="ic-menu" :side-offset="8" align="start" side="top">
         <DropdownMenuItem class="ic-menu-item" data-testid="chat-attach" :disabled="uploading" @select="fileInput?.click()">
-          <AppIcon name="upload" :size="16" /><span>{{ uploading ? "Datei wird gelesen …" : "Datei anhängen" }}</span>
+          <AppIcon name="upload" :size="16" /><span>{{ uploading ? $t("Datei wird gelesen …") : $t("Datei anhängen") }}</span>
         </DropdownMenuItem>
         <DropdownMenuSub v-if="otherKbs.length">
-          <DropdownMenuSubTrigger class="ic-menu-item" data-testid="chat-extra-kbs"><AppIcon name="book" :size="16" /><span class="ic-menu-text">Weiteres Wissen hinzufügen</span><AppIcon name="chevron" :size="13" /></DropdownMenuSubTrigger>
+          <DropdownMenuSubTrigger class="ic-menu-item" data-testid="chat-extra-kbs"><AppIcon name="book" :size="16" /><span class="ic-menu-text">{{ $t("Weiteres Wissen hinzufügen") }}</span><AppIcon name="chevron" :size="13" /></DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent class="ic-menu" :side-offset="6" :collision-padding="12">
-              <DropdownMenuLabel class="ic-menu-label">Zusätzlich durchsuchen</DropdownMenuLabel>
+              <DropdownMenuLabel class="ic-menu-label">{{ $t("Zusätzlich durchsuchen") }}</DropdownMenuLabel>
               <DropdownMenuCheckboxItem v-for="k in otherKbs" :key="k.id" class="ic-menu-item"
                 :model-value="extraKbIds.includes(k.id)" data-testid="chat-extra-kb-item"
                 @update:model-value="(v: boolean | 'indeterminate') => toggleKb(k.id, v === true)" @select.prevent>
@@ -125,8 +126,8 @@ async function removeAttachment(a: ChatAttachment) {
     <button type="button" :aria-label="`${k.name} entfernen`" @click="toggleKb(k.id, false)"><AppIcon name="close" :size="13" /></button>
   </span>
   <span v-for="a in attachments" :key="`a${a.id}`" class="cx-chip" data-testid="chat-attachment-chip"
-    :title="a.truncated ? 'Nur der Anfang der Datei wird verwendet.' : undefined">
-    <AppIcon name="doc" :size="13" />{{ a.filename }}<small v-if="a.truncated">(gekürzt)</small>
+    :title="a.truncated ? $t('Nur der Anfang der Datei wird verwendet.') : undefined">
+    <AppIcon name="doc" :size="13" />{{ a.filename }}<small v-if="a.truncated">{{ $t("(gekürzt)") }}</small>
     <button type="button" :aria-label="`${a.filename} entfernen`" @click="removeAttachment(a)"><AppIcon name="close" :size="13" /></button>
   </span>
 </template>

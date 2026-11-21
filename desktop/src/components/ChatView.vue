@@ -26,6 +26,7 @@ import TemplateMenu from "./chat/TemplateMenu.vue";
 import ChatContextBar from "./chat/ChatContextBar.vue";
 import { webSearchStatus } from "../productivity-api";
 import type { SourceSelection } from "../source-preview";
+import { tr, dateLocale } from "../i18n";
 
 /**
  * Chat panel (M4b; restyled UI-POLISH-1 card §4; DESIGN.md §5 Chat + mockup
@@ -167,7 +168,7 @@ async function loadList(keepActive = true) {
     activeId.value = null;
     resetTranscript();
   } else {
-    listError.value = "Unterhaltungen konnten nicht geladen werden.";
+    listError.value = tr("Unterhaltungen konnten nicht geladen werden.");
   }
 }
 
@@ -198,7 +199,7 @@ async function openConversation(id: number | null) {
     activeId.value = null;
     resetTranscript();
   } else {
-    notice.value = "Unterhaltung konnte nicht geladen werden.";
+    notice.value = tr("Unterhaltung konnte nicht geladen werden.");
   }
 }
 
@@ -257,14 +258,14 @@ async function newConversation(withKb: boolean): Promise<boolean> {
     resetTranscript();
     return true;
   } else if (outcome.kind === "parent-gone") {
-    notice.value = "Bereich nicht verfügbar — bitte Organisation/Bereich wählen.";
+    notice.value = tr("Bereich nicht verfügbar — bitte Organisation/Bereich wählen.");
     await loadList(false);
   } else if (outcome.kind === "expired") {
     auth.dropExpiredSession(); // -> login view (M3e pattern, see openConversation)
     activeId.value = null;
     resetTranscript();
   } else {
-    notice.value = "Unterhaltung konnte nicht angelegt werden.";
+    notice.value = tr("Unterhaltung konnte nicht angelegt werden.");
   }
   return false;
 }
@@ -345,12 +346,12 @@ async function send() {
   switch (outcome.kind) {
     case "not-configured":
       notice.value =
-        "Es ist noch kein KI-Modell eingerichtet. Bitte wende dich an deine Administration.";
+        tr("Es ist noch kein KI-Modell eingerichtet. Bitte wende dich an deine Administration.");
       break;
     case "rate-limited":
       notice.value =
-        "Gerade sind zu viele Anfragen unterwegs. Bitte versuche es gleich noch einmal" +
-        (outcome.retryAfterSeconds ? ` (ca. ${outcome.retryAfterSeconds}s warten).` : ".");
+        tr("Gerade sind zu viele Anfragen unterwegs. Bitte versuche es gleich noch einmal") +
+        (outcome.retryAfterSeconds ? tr(" (ca. {0}s warten).", outcome.retryAfterSeconds) : ".");
       break;
     case "unauthorized":
       // 401 mid-turn: the session died — same teardown as every expired
@@ -358,14 +359,14 @@ async function send() {
       auth.dropExpiredSession();
       return;
     case "gone":
-      notice.value = "Diese Unterhaltung gibt es nicht mehr.";
+      notice.value = tr("Diese Unterhaltung gibt es nicht mehr.");
       await loadList(false);
       return;
     case "stopped":
-      notice.value = "Antwort angehalten. Der bisherige Text bleibt gespeichert.";
+      notice.value = tr("Antwort angehalten. Der bisherige Text bleibt gespeichert.");
       break;
     case "error":
-      notice.value = "Die Antwort konnte nicht erstellt werden. Bitte versuche es erneut.";
+      notice.value = tr("Die Antwort konnte nicht erstellt werden. Bitte versuche es erneut.");
       break;
     case "closed":
       break;
@@ -487,7 +488,7 @@ function openSource(c: ChatCitation) {
   const s = scoped();
   const kbId = active.value?.knowledgeBaseId ?? null;
   if (!s || kbId === null || c.documentId === null) {
-    notice.value = "Das Quelldokument ist nicht mehr verfügbar.";
+    notice.value = tr("Das Quelldokument ist nicht mehr verfügbar.");
     return;
   }
   previewSource.value = {...s, kbId, documentId:c.documentId, chunkIdx:c.chunkIdx,
@@ -515,8 +516,8 @@ function decorateCodeBlocks() {
     btn.className = "code-copy";
     btn.setAttribute("data-copy-code", "");
     btn.setAttribute("data-testid", "chat-code-copy");
-    btn.setAttribute("aria-label", "Code kopieren");
-    btn.textContent = "Kopieren";
+    btn.setAttribute("aria-label", tr("Code kopieren"));
+    btn.textContent = tr("Kopieren");
     pre.appendChild(btn);
   }
 }
@@ -543,18 +544,18 @@ async function onTranscriptClick(event: MouseEvent) {
     const code = btn.closest("pre")?.querySelector("code")?.textContent ?? "";
     const ok = await copyText(code);
     btn.setAttribute("data-copied", ok ? "1" : "0");
-    btn.textContent = ok ? "Kopiert" : "Kopieren";
+    btn.textContent = ok ? tr("Kopiert") : tr("Kopieren");
     setTimeout(() => {
       btn.removeAttribute("data-copied");
-      btn.textContent = "Kopieren";
+      btn.textContent = tr("Kopieren");
     }, 1600);
   }
 }
 
 function showLinkHint(href: string) {
   linkHint.value = href
-    ? `Links öffnen hier keinen Browser — Adresse: ${href}`
-    : "Links öffnen hier keinen Browser.";
+    ? tr("Links öffnen hier keinen Browser — Adresse: {0}", href)
+    : tr("Links öffnen hier keinen Browser.");
   if (linkHintTimer) clearTimeout(linkHintTimer);
   linkHintTimer = setTimeout(() => {
     linkHint.value = "";
@@ -574,8 +575,8 @@ async function scrollToBottom() {
  * button (no new backend behaviour), prefills the composer and focuses it —
  * the user still presses Senden; nothing here streams or sends on its own. */
 const examplePrompts = [
-  "Hilf mir, eine Aufgabe zu planen",
-  "Formuliere eine freundliche E-Mail",
+  tr("Hilf mir, eine Aufgabe zu planen"),
+  tr("Formuliere eine freundliche E-Mail"),
 ] as const;
 
 async function useExample(text: string) {
@@ -595,10 +596,10 @@ const groupedConversations = computed(() => {
   const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
   const day = 86400000;
   const buckets: { label: string; items: typeof conversations.value }[] = [
-    { label: "Heute", items: [] },
-    { label: "Gestern", items: [] },
-    { label: "Letzte 7 Tage", items: [] },
-    { label: "Älter", items: [] },
+    { label: tr("Heute"), items: [] },
+    { label: tr("Gestern"), items: [] },
+    { label: tr("Letzte 7 Tage"), items: [] },
+    { label: tr("Älter"), items: [] },
   ];
   for (const c of conversations.value) {
     const t = new Date(c.updatedAt).getTime();
@@ -610,7 +611,7 @@ const groupedConversations = computed(() => {
 
 function formatClock(iso: string): string {
   try {
-    return new Intl.DateTimeFormat("de-DE", { hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+    return new Intl.DateTimeFormat(dateLocale(), { hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
   } catch {
     return "";
   }
@@ -619,7 +620,7 @@ function formatClock(iso: string): string {
 const greeting = computed(() => {
   const h = new Date().getHours();
   const first = (auth.user?.displayName ?? "").split(/\s+/)[0];
-  const base = h < 11 ? "Guten Morgen" : h < 18 ? "Guten Tag" : "Guten Abend";
+  const base = h < 11 ? tr("Guten Morgen") : h < 18 ? tr("Guten Tag") : tr("Guten Abend");
   return first ? `${base}, ${first}` : base;
 });
 
@@ -642,11 +643,11 @@ async function exportAnswer(m: ChatMessageDto, format: "docx" | "pdf") {
     const url = URL.createObjectURL(await res.blob());
     const a = document.createElement("a");
     a.href = url;
-    a.download = `Keplura-Antwort.${format}`;
+    a.download = tr("Keplura-Antwort.{0}", format);
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 10000);
   } catch {
-    notice.value = "Der Export hat nicht geklappt. Bitte versuche es erneut.";
+    notice.value = tr("Der Export hat nicht geklappt. Bitte versuche es erneut.");
   }
 }
 
@@ -658,7 +659,7 @@ async function copyForEmail(m: ChatMessageDto) {
   const html = `<div style="font-family:Calibri,Arial,sans-serif;font-size:11pt">${rendered?.innerHTML ?? esc(m.content)}`
     + (sources.length ? `<p style="color:#666;font-size:9pt">Quellen:<br>${sources.map(esc).join("<br>")}</p>` : "")
     + "</div>";
-  const plain = m.content + (sources.length ? `\n\nQuellen:\n${sources.join("\n")}` : "");
+  const plain = m.content + (sources.length ? tr("\n\nQuellen:\n{0}", sources.join("\n")) : "");
   try {
     if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
       await navigator.clipboard.write([new ClipboardItem({
@@ -671,7 +672,7 @@ async function copyForEmail(m: ChatMessageDto) {
     copiedKey.value = `a:${m.id}`;
     setTimeout(() => { if (copiedKey.value === `a:${m.id}`) copiedKey.value = null; }, 1500);
   } catch {
-    notice.value = "Kopieren wurde vom Browser blockiert. Bitte markiere den Text und kopiere ihn manuell.";
+    notice.value = tr("Kopieren wurde vom Browser blockiert. Bitte markiere den Text und kopiere ihn manuell.");
   }
 }
 
@@ -686,14 +687,14 @@ async function rate(m: ChatMessageDto, rating: "up" | "down") {
   if (r.kind !== "ok") {
     m.feedback = previous;
     notice.value = r.kind === "expired"
-      ? "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an."
-      : "Die Bewertung konnte nicht gespeichert werden. Bitte versuche es erneut.";
+      ? tr("Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.")
+      : tr("Die Bewertung konnte nicht gespeichert werden. Bitte versuche es erneut.");
   }
 }
 
 function formatTime(iso: string): string {
   try {
-    return new Intl.DateTimeFormat("de-DE", {
+    return new Intl.DateTimeFormat(dateLocale(), {
       dateStyle: "medium",
       timeStyle: "short",
     }).format(new Date(iso));
@@ -711,7 +712,7 @@ function statusLabel(status: ChatMessageDto["status"]): string {
     case "failed":
       return "fehlgeschlagen";
     default:
-      return "unvollständig";
+      return tr("unvollständig");
   }
 }
 
@@ -765,13 +766,13 @@ onUnmounted(() => {
   >
     <header class="flex min-h-[48px] items-center justify-between gap-4 border-b border-separator py-[6px] pr-6 pl-6">
       <div class="min-w-0">
-        <h1 class="m-0 inline text-[15px] font-semibold tracking-[-0.01em] text-ink">Chat</h1>
+        <h1 class="m-0 inline text-[15px] font-semibold tracking-[-0.01em] text-ink">{{ $t("Chat") }}</h1>
         <p class="m-0 ml-3 inline text-[13px] text-ink-3">
           <template v-if="auth.selectedSpace">
             {{ auth.selectedSpace.name }}
           </template>
-          <template v-else-if="auth.orgs.length === 0">Lege unter „Team“ zuerst eine Organisation an.</template>
-          <template v-else>Lege unter „Wissen“ zuerst einen Arbeitsbereich an.</template>
+          <template v-else-if="auth.orgs.length === 0">{{ $t("Lege unter „Team“ zuerst eine Organisation an.") }}</template>
+          <template v-else>{{ $t("Lege unter „Wissen“ zuerst einen Arbeitsbereich an.") }}</template>
         </p>
       </div>
       <div class="chat-head-actions">
@@ -781,7 +782,7 @@ onUnmounted(() => {
           :disabled="!scoped() || streaming"
           @click="newConversation(false)"
         >
-          Neuer Chat
+          {{ $t("Neuer Chat") }}
         </Button>
       </div>
     </header>
@@ -796,7 +797,7 @@ onUnmounted(() => {
         v-if="false"
         class="chat-list w-[232px] flex-none overflow-y-auto border-r border-separator py-[6px]"
         data-testid="chat-conv-list"
-        aria-label="Unterhaltungen"
+        :aria-label="$t('Unterhaltungen')"
       >
         <p v-if="listError" class="chat-list-hint">{{ listError }}</p>
         <template v-for="g in groupedConversations" :key="g.label">
@@ -811,7 +812,7 @@ onUnmounted(() => {
               @click="openConversation(c.id)"
             >
               <span class="conv-title">{{ c.title }}</span>
-              <span v-if="c.knowledgeBaseId !== null" class="conv-kb" title="Mit Wissen" aria-label="Mit Wissen"><AppIcon name="book" :size="13" /></span>
+              <span v-if="c.knowledgeBaseId !== null" class="conv-kb" :title="$t('Mit Wissen')" :aria-label="$t('Mit Wissen')"><AppIcon name="book" :size="13" /></span>
             </button>
             <button
               type="button"
@@ -819,8 +820,8 @@ onUnmounted(() => {
               data-testid="chat-conv-delete"
               :data-conv-id="c.id"
               :disabled="streaming"
-              title="Unterhaltung löschen"
-              aria-label="Unterhaltung löschen"
+              :title="$t('Unterhaltung löschen')"
+              :aria-label="$t('Unterhaltung löschen')"
               @click="removeConversation(c.id)"
             >
               <AppIcon name="trash" :size="13" />
@@ -842,16 +843,16 @@ onUnmounted(() => {
           <div v-if="messages.length === 0 && !streaming" class="empty-state mx-auto my-auto flex max-w-[480px] flex-col gap-[6px] p-6 text-center" :data-testid="activeId === null ? 'chat-no-selection' : 'chat-ready'">
             <span class="welcome-symbol" aria-hidden="true"><AppIcon name="chat" /></span>
             <p class="welcome-greeting">{{ greeting }}</p>
-            <p class="es-lead m-0 text-[24px] font-semibold tracking-[-0.02em] text-ink">Wie kann ich dir helfen?</p>
+            <p class="es-lead m-0 text-[24px] font-semibold tracking-[-0.02em] text-ink">{{ $t("Wie kann ich dir helfen?") }}</p>
             <p class="es-sub m-0 text-[13px] leading-[1.6] text-ink-2">
-              Für Fragen, Ideen und alles, was du vorhast.
+              {{ $t("Für Fragen, Ideen und alles, was du vorhast.") }}
             </p>
             <p
               v-if="conversations.length === 0 && !listError"
               class="es-sub m-0 text-[13px] leading-[1.6] text-ink-2"
               data-testid="chat-conv-empty"
             >
-              Starte einfach mit deiner ersten Nachricht.
+              {{ $t("Starte einfach mit deiner ersten Nachricht.") }}
             </p>
             <div class="es-examples mt-[14px] flex flex-col items-center gap-[8px]">
               <button
@@ -872,7 +873,7 @@ onUnmounted(() => {
               <!-- CHAT-POLISH §4: short sender marker + the block's 7 % tint
                    carry the user-vs-AI separation; content stays plain text
                    (user input is not Markdown-authored). -->
-              <p class="sr-only-x">Du</p>
+              <p class="sr-only-x">{{ $t("Du") }}</p>
               <!-- ucontent: E2E-Anker (chat_flow_e2e text-Selektor) — Name
                    bleibt byte-identisch. -->
               <p class="ucontent m-0 max-w-[min(72ch,100%)] self-end rounded-[14px] bg-msg-tint px-3 py-2 text-[14px] leading-[1.6] text-ink break-anywhere whitespace-pre-wrap">{{ m.content }}</p>
@@ -882,8 +883,8 @@ onUnmounted(() => {
                   class="msg-action"
                   data-testid="chat-copy-user"
                   :data-copied="copiedKey === `u:${m.id}` ? '1' : null"
-                  :aria-label="copiedKey === `u:${m.id}` ? 'Kopiert' : 'Nachricht kopieren'"
-                  :title="copiedKey === `u:${m.id}` ? 'Kopiert' : 'Kopieren'"
+                  :aria-label="copiedKey === `u:${m.id}` ? $t('Kopiert') : $t('Nachricht kopieren')"
+                  :title="copiedKey === `u:${m.id}` ? $t('Kopiert') : $t('Kopieren')"
                   @click="copyUser(m)"
                 >
                   <AppIcon name="copy" :size="13" />
@@ -909,26 +910,26 @@ onUnmounted(() => {
                     class="msg-action"
                     data-testid="chat-msg-copy"
                     :data-copied="copiedKey === `a:${m.id}` ? '1' : null"
-                    :aria-label="copiedKey === `a:${m.id}` ? 'Kopiert' : 'Antwort kopieren'"
-                    :title="copiedKey === `a:${m.id}` ? 'Kopiert' : 'Kopieren'"
+                    :aria-label="copiedKey === `a:${m.id}` ? $t('Kopiert') : $t('Antwort kopieren')"
+                    :title="copiedKey === `a:${m.id}` ? $t('Kopiert') : $t('Kopieren')"
                     @click="copyAssistant(m)"
                   >
                     <AppIcon name="copy" :size="13" />
                   </button>
                   <DropdownMenuRoot v-if="m.status === 'complete'">
-                    <DropdownMenuTrigger class="msg-action" data-testid="chat-msg-export" aria-label="Antwort exportieren" title="Exportieren">
+                    <DropdownMenuTrigger class="msg-action" data-testid="chat-msg-export" :aria-label="$t('Antwort exportieren')" :title="$t('Exportieren')">
                       <AppIcon name="download" :size="13" />
                     </DropdownMenuTrigger>
                     <DropdownMenuPortal>
                       <DropdownMenuContent class="ic-menu" :side-offset="4" align="start">
                         <DropdownMenuItem class="ic-menu-item" data-testid="chat-export-email" @select="copyForEmail(m)">
-                          <AppIcon name="copy" :size="13" /><span class="ic-menu-text">Für E-Mail kopieren</span>
+                          <AppIcon name="copy" :size="13" /><span class="ic-menu-text">{{ $t("Für E-Mail kopieren") }}</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem class="ic-menu-item" data-testid="chat-export-docx" @select="exportAnswer(m, 'docx')">
-                          <AppIcon name="doc" :size="13" /><span class="ic-menu-text">Als Word-Datei</span>
+                          <AppIcon name="doc" :size="13" /><span class="ic-menu-text">{{ $t("Als Word-Datei") }}</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem class="ic-menu-item" data-testid="chat-export-pdf" @select="exportAnswer(m, 'pdf')">
-                          <AppIcon name="doc" :size="13" /><span class="ic-menu-text">Als PDF</span>
+                          <AppIcon name="doc" :size="13" /><span class="ic-menu-text">{{ $t("Als PDF") }}</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenuPortal>
@@ -938,8 +939,8 @@ onUnmounted(() => {
                     type="button"
                     class="msg-action"
                     data-testid="chat-msg-retry"
-                    aria-label="Letzte Frage erneut senden"
-                    title="Neu versuchen"
+                    :aria-label="$t('Letzte Frage erneut senden')"
+                    :title="$t('Neu versuchen')"
                     @click="retryLastAssistant"
                   >
                     <AppIcon name="refresh" :size="13" />
@@ -951,8 +952,8 @@ onUnmounted(() => {
                       :class="{ on: m.feedback === 'up' }"
                       data-testid="chat-feedback-up"
                       :aria-pressed="m.feedback === 'up'"
-                      aria-label="Hilfreiche Antwort"
-                      title="Hilfreich"
+                      :aria-label="$t('Hilfreiche Antwort')"
+                      :title="$t('Hilfreich')"
                       @click="rate(m, 'up')"
                     >
                       <AppIcon name="thumb-up" :size="13" />
@@ -963,8 +964,8 @@ onUnmounted(() => {
                       :class="{ on: m.feedback === 'down' }"
                       data-testid="chat-feedback-down"
                       :aria-pressed="m.feedback === 'down'"
-                      aria-label="Nicht hilfreiche Antwort"
-                      title="Nicht hilfreich"
+                      :aria-label="$t('Nicht hilfreiche Antwort')"
+                      :title="$t('Nicht hilfreich')"
                       @click="rate(m, 'down')"
                     >
                       <AppIcon name="thumb-down" :size="13" />
@@ -974,7 +975,7 @@ onUnmounted(() => {
               </div>
               <!-- Quelle und Stand zuerst; Seiten-/Abschnittsdetails stehen in der Vorschau. -->
               <div v-if="m.citations.length" class="src-block src-x" data-testid="chat-sources">
-                <p class="src-cap-x">Quellen</p>
+                <p class="src-cap-x">{{ $t("Quellen") }}</p>
                 <div v-for="(c, ci) in m.citations" :key="citationKey(m, c)" class="src-row">
                   <button
                     type="button"
@@ -1002,7 +1003,7 @@ onUnmounted(() => {
               {{ streamedText }}<i class="caret" aria-hidden="true"></i>
             </p>
             <div v-if="streamCitations.length" class="src-block src-x" data-testid="chat-sources-live">
-              <p class="src-cap-x">Quellen</p>
+              <p class="src-cap-x">{{ $t("Quellen") }}</p>
               <div v-for="(c, ci) in streamCitations" :key="'live:' + c.documentId + ':' + c.chunkIdx" class="src-row">
                 <button type="button" class="src-chip" aria-controls="document-source-preview" :aria-expanded="previewSource?.documentId === c.documentId && previewSource?.chunkIdx === c.chunkIdx" @click="openSource(c)">
                   <span class="source-reference ic-num">{{ ci + 1 }}</span>
@@ -1019,12 +1020,12 @@ onUnmounted(() => {
         <div v-if="notice" class="msg-notice" data-testid="chat-notice">{{ notice }}</div>
         <div v-if="linkHint" class="msg-notice msg-notice-info" data-testid="chat-link-hint">{{ linkHint }}</div>
 
-        <footer class="msg-composer" aria-label="Nachricht verfassen">
-          <p id="chat-input-help" class="composer-hint">Enter sendet. Umschalt und Enter fügt eine neue Zeile ein.
-            <span v-if="activeHasKb">Antworten mit Quellen aus „{{ knowledgeLabel }}“.</span>
+        <footer class="msg-composer" :aria-label="$t('Nachricht verfassen')">
+          <p id="chat-input-help" class="composer-hint">{{ $t("Enter sendet. Umschalt und Enter fügt eine neue Zeile ein.") }}
+            <span v-if="activeHasKb">{{ $t("Antworten mit Quellen aus „{0}“.", knowledgeLabel) }}</span>
           </p>
           <textarea ref="composerEl" v-model="prompt" class="composer-input" rows="1" maxlength="4000"
-            placeholder="Frag Keplura …" aria-label="Nachricht an Keplura" aria-describedby="chat-input-help"
+            :placeholder="$t('Frag Keplura …')" :aria-label="$t('Nachricht an Keplura')" aria-describedby="chat-input-help"
             data-testid="chat-prompt" @keydown="composerKeydown"></textarea>
           <div class="composer-bar">
             <div class="composer-tools">
@@ -1033,23 +1034,23 @@ onUnmounted(() => {
                 @error="(m: string) => (notice = m)" />
               <TemplateMenu compact :current-prompt="prompt" :disabled="!scoped()" @insert="insertTemplate" />
               <button v-if="webAvailable" type="button" class="web-toggle" :class="{ on: webOn }" :aria-pressed="webOn"
-                :disabled="streaming || contextBusy" title="Im Web suchen" aria-label="Im Web suchen"
-                data-testid="chat-web-toggle" @click="webOn = !webOn"><AppIcon name="globe" :size="16" /><span v-if="webOn">Web</span></button>
+                :disabled="streaming || contextBusy" :title="$t('Im Web suchen')" :aria-label="$t('Im Web suchen')"
+                data-testid="chat-web-toggle" @click="webOn = !webOn"><AppIcon name="globe" :size="16" /><span v-if="webOn">{{ $t("Web") }}</span></button>
               <label class="composer-knowledge" :class="{ selected: composerKb !== null, disabled: streaming || contextBusy || !scoped() }"
-                :title="activeId !== null ? 'Wissensbasis wählen. Ein Wechsel öffnet einen neuen Chat und erhält deinen Entwurf.' : 'Optional Wissen aus deinen Dokumenten verwenden'">
-                <AppIcon name="book" :size="16" /><span class="composer-kb-name" :data-testid="composerKb !== null ? 'chat-ctx-kb' : undefined">{{ knowledgeLabel || 'Wissen hinzufügen' }}</span>
+                :title="activeId !== null ? $t('Wissensbasis wählen. Ein Wechsel öffnet einen neuen Chat und erhält deinen Entwurf.') : $t('Optional Wissen aus deinen Dokumenten verwenden')">
+                <AppIcon name="book" :size="16" /><span class="composer-kb-name" :data-testid="composerKb !== null ? 'chat-ctx-kb' : undefined">{{ knowledgeLabel || $t("Wissen hinzufügen") }}</span>
                 <AppIcon name="chevron" :size="13" />
-                <select id="chat-knowledge-base" v-model="composerKb" aria-label="Wissensbasis auswählen" data-testid="chat-kb-select"
+                <select id="chat-knowledge-base" v-model="composerKb" :aria-label="$t('Wissensbasis auswählen')" data-testid="chat-kb-select"
                   :disabled="streaming || contextBusy || !scoped()" @change="changeKnowledgeContext">
-                  <option :value="null">Ohne Wissensbasis</option>
+                  <option :value="null">{{ $t("Ohne Wissensbasis") }}</option>
                   <option v-for="kb in auth.kbs" :key="kb.id" :value="kb.id">{{ kb.name }}</option>
                 </select>
               </label>
             </div>
-            <span v-if="contextBusy" role="status" class="composer-hint">Neuer Chat wird geöffnet …</span>
+            <span v-if="contextBusy" role="status" class="composer-hint">{{ $t("Neuer Chat wird geöffnet …") }}</span>
             <span v-if="prompt.length > CHAT_PROMPT_MAX_LENGTH - 200" class="composer-counter ic-num">{{ prompt.length }}/{{ CHAT_PROMPT_MAX_LENGTH }}</span>
-            <Button v-if="streaming" class="composer-send" variant="secondary" data-testid="chat-stop" aria-label="Antwort stoppen" title="Antwort stoppen" @click="stop"><AppIcon name="stop" :size="16" /></Button>
-            <Button v-else class="composer-send" variant="primary" data-testid="chat-send" :disabled="!canSend" aria-label="Nachricht senden" title="Nachricht senden" @click="send"><AppIcon name="arrow-up" :size="20" /></Button>
+            <Button v-if="streaming" class="composer-send" variant="secondary" data-testid="chat-stop" :aria-label="$t('Antwort stoppen')" :title="$t('Antwort stoppen')" @click="stop"><AppIcon name="stop" :size="16" /></Button>
+            <Button v-else class="composer-send" variant="primary" data-testid="chat-send" :disabled="!canSend" :aria-label="$t('Nachricht senden')" :title="$t('Nachricht senden')" @click="send"><AppIcon name="arrow-up" :size="20" /></Button>
           </div>
         </footer>
       </div>

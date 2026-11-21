@@ -10,7 +10,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE });
-  const page = await browser.newPage({ viewport: { width: 1200, height: 1400 } });
+  const page = await browser.newPage({ locale: 'de-DE', viewport: { width: 1200, height: 1400 } });
   const probe = (sel) => page.evaluate((s) => {
     const el = document.querySelector(s);
     if (!el) return null;

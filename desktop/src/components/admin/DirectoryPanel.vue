@@ -17,6 +17,7 @@ import Button from "../ui/Button.vue";
 import ConfirmDialog from "../ui/ConfirmDialog.vue";
 import StatusPill from "../ui/StatusPill.vue";
 import ActionMenu from "../ui/ActionMenu.vue";
+import { tr } from "../../i18n";
 
 const auth = useAuthStore();
 const items = ref<DirectoryConnection[]>([]);
@@ -37,7 +38,7 @@ function show(kind: "ok" | "error", text: string) {
 }
 
 function orgName(id: number) {
-  return auth.orgs.find((o) => o.id === id)?.name ?? `Organisation ${id}`;
+  return auth.orgs.find((o) => o.id === id)?.name ?? tr("Organisation {0}", id);
 }
 
 /* ---------- Formular ---------- */
@@ -66,14 +67,14 @@ const f = ref({
 
 const placeholders = computed(() =>
   f.value.kind === "AD"
-    ? { url: "ldaps://dc01.firma.local", baseDn: "DC=firma,DC=local", bindDn: "CN=svc-keplura,OU=Dienste,DC=firma,DC=local" }
-    : { url: "ldaps://ldap.firma.local", baseDn: "dc=firma,dc=local", bindDn: "uid=keplura,ou=services,dc=firma,dc=local" },
+    ? { url: "ldaps://dc01.firma.local", baseDn: tr("DC=firma,DC=local"), bindDn: tr("CN=svc-keplura,OU=Dienste,DC=firma,DC=local") }
+    : { url: "ldaps://ldap.firma.local", baseDn: tr("dc=firma,dc=local"), bindDn: tr("uid=keplura,ou=services,dc=firma,dc=local") },
 );
 
 function openCreate() {
   editing.value = null;
   formError.value = "";
-  f.value = { kind: "AD", displayName: "Active Directory", url: "", baseDn: "", bindDn: "", bindPassword: "",
+  f.value = { kind: "AD", displayName: tr("Active Directory"), url: "", baseDn: "", bindDn: "", bindPassword: "",
     userFilter: "", startTls: false, allowPlainLdap: false, loginEnabled: true, autoProvision: true };
   savedForm.value=JSON.stringify(f.value);
   formOpen.value = true;
@@ -92,7 +93,7 @@ function openEdit(d: DirectoryConnection) {
 async function save() {
   if(saving.value)return;
   if (auth.selectedOrgId === null && !editing.value) {
-    formError.value = "Bitte zuerst oben links eine Organisation wählen.";
+    formError.value = tr("Bitte zuerst oben links eine Organisation wählen.");
     return;
   }
   saving.value = true;
@@ -108,7 +109,7 @@ async function save() {
     return;
   }
   closeForm();
-  show("ok", editing.value ? "Verbindung gespeichert." : "Verbindung angelegt. Teste sie jetzt.");
+  show("ok", editing.value ? tr("Verbindung gespeichert.") : tr("Verbindung angelegt. Teste sie jetzt."));
   await load();
 }
 
@@ -155,7 +156,7 @@ function askDelete(d:DirectoryConnection){deleteError.value="";deleteTarget.valu
 async function confirmDelete() {
   const d=deleteTarget.value;if(!d||deleting.value)return;
   deleting.value=true;deleteError.value="";
-  try{const r=await deleteDirectory(d.id);if(r.kind==="ok"){deleteTarget.value=null;show("ok","Verbindung entfernt. Bereits angelegte Konten bleiben bestehen.");await load();}else deleteError.value=resultText(r);}finally{deleting.value=false;}
+  try{const r=await deleteDirectory(d.id);if(r.kind==="ok"){deleteTarget.value=null;show("ok",tr("Verbindung entfernt. Bereits angelegte Konten bleiben bestehen."));await load();}else deleteError.value=resultText(r);}finally{deleting.value=false;}
 }
 function rowAction(d:DirectoryConnection,action:string){if(action==='edit')openEdit(d);else if(action==='lookup')openLookup(d);else askDelete(d);}
 
@@ -163,66 +164,66 @@ function rowAction(d:DirectoryConnection,action:string){if(action==='edit')openE
 
 <template>
   <section class="connection-page" data-testid="admin-directory-section">
-    <header class="connection-header"><div class="connection-heading"><h2>Verzeichnis</h2><p class="connection-description">Verbinde Firmenkonten und Gruppen aus Active Directory oder LDAP.</p></div><div class="connection-actions"><Button variant="icon" size="compact" aria-label="Verzeichnisse aktualisieren" :disabled="loading" @click="load"><AppIcon name="refresh" :size="16" /></Button><Button variant="primary" data-testid="directory-create" @click="openCreate"><AppIcon name="plus" :size="16" />Verbindung hinzufügen</Button></div></header>
-    <p v-if="loading&&!loaded" class="connection-loading" role="status">Verbindungen werden geladen …</p>
-    <div v-if="loadError" class="connection-note error connection-error" role="alert"><p>{{loadError}}</p><Button size="compact" @click="load">Erneut versuchen</Button></div>
+    <header class="connection-header"><div class="connection-heading"><h2>{{ $t("Verzeichnis") }}</h2><p class="connection-description">{{ $t("Verbinde Firmenkonten und Gruppen aus Active Directory oder LDAP.") }}</p></div><div class="connection-actions"><Button variant="icon" size="compact" :aria-label="$t('Verzeichnisse aktualisieren')" :disabled="loading" @click="load"><AppIcon name="refresh" :size="16" /></Button><Button variant="primary" data-testid="directory-create" @click="openCreate"><AppIcon name="plus" :size="16" />{{ $t("Verbindung hinzufügen") }}</Button></div></header>
+    <p v-if="loading&&!loaded" class="connection-loading" role="status">{{ $t("Verbindungen werden geladen …") }}</p>
+    <div v-if="loadError" class="connection-note error connection-error" role="alert"><p>{{loadError}}</p><Button size="compact" @click="load">{{ $t("Erneut versuchen") }}</Button></div>
     <p v-if="note" class="connection-note" :class="noteKind" :role="noteKind==='error'?'alert':'status'" data-testid="directory-note">{{note}}</p>
     <div v-if="loaded" class="connection-list">
-      <p v-if="!items.length" class="connection-empty" data-testid="directory-empty">Noch kein Verzeichnis verbunden. Lokale Keplura-Konten bleiben wie bisher verfügbar.</p>
+      <p v-if="!items.length" class="connection-empty" data-testid="directory-empty">{{ $t("Noch kein Verzeichnis verbunden. Lokale Keplura-Konten bleiben wie bisher verfügbar.") }}</p>
       <article v-for="d in items" :key="d.id" class="connection-record" data-testid="directory-item">
-        <header class="connection-record-header"><div class="connection-heading"><h3>{{d.displayName}}</h3><code class="connection-address">{{d.url}}</code><p class="connection-meta">{{d.kind==='AD'?'Active Directory':'LDAP'}} · {{orgName(d.orgId)}}</p></div>
-          <div class="connection-actions"><StatusPill :tone="d.enabled?'info':'neutral'">{{d.enabled?'Aktiv':'Deaktiviert'}}</StatusPill><Button size="compact" :disabled="testing!==null" :busy="testing===d.id" data-testid="directory-test" @click="runTest(d)">{{testing===d.id?'Wird geprüft …':'Verbindung testen'}}</Button><ActionMenu :label="`Aktionen für ${d.displayName}`" :items="[{id:'lookup',label:'Benutzer nachschlagen',testId:'directory-lookup'},{id:'edit',label:'Bearbeiten',testId:'directory-edit'},{id:'remove',label:'Entfernen',danger:true,testId:'directory-remove'}]" @select="action=>rowAction(d,action)" /></div>
+        <header class="connection-record-header"><div class="connection-heading"><h3>{{d.displayName}}</h3><code class="connection-address">{{d.url}}</code><p class="connection-meta">{{d.kind==='AD'?$t("Active Directory"):'LDAP'}} · {{orgName(d.orgId)}}</p></div>
+          <div class="connection-actions"><StatusPill :tone="d.enabled?'info':'neutral'">{{d.enabled?$t("Aktiv"):$t("Deaktiviert")}}</StatusPill><Button size="compact" :disabled="testing!==null" :busy="testing===d.id" data-testid="directory-test" @click="runTest(d)">{{testing===d.id?$t("Wird geprüft …"):$t("Verbindung testen")}}</Button><ActionMenu :label="$t('Aktionen für {0}', d.displayName)" :items="[{id:'lookup',label:$t('Benutzer nachschlagen'),testId:'directory-lookup'},{id:'edit',label:$t('Bearbeiten'),testId:'directory-edit'},{id:'remove',label:$t('Entfernen'),danger:true,testId:'directory-remove'}]" @select="action=>rowAction(d,action)" /></div>
         </header>
-        <p class="connection-meta">{{d.enabled&&d.loginEnabled?'Anmeldung mit Firmenkonto erlaubt':!d.enabled?'Verbindung deaktiviert': 'Nur Gruppenabgleich – keine Anmeldung'}} · {{d.autoProvision?'Neue Konten beim ersten Anmelden anlegen':'Neue Konten werden nicht automatisch angelegt'}}</p>
+        <p class="connection-meta">{{d.enabled&&d.loginEnabled?$t("Anmeldung mit Firmenkonto erlaubt"):!d.enabled?$t("Verbindung deaktiviert"): $t("Nur Gruppenabgleich – keine Anmeldung")}} · {{d.autoProvision?$t("Neue Konten beim ersten Anmelden anlegen"):$t("Neue Konten werden nicht automatisch angelegt")}}</p>
         <p v-if="testResult[d.id]" class="connection-note" style="margin-top:16px" :class="testResult[d.id].ok?'ok':'error'" :role="testResult[d.id].ok?'status':'alert'" data-testid="directory-test-result">{{testResult[d.id].message}}</p>
       </article>
     </div>
-    <details class="connection-details"><summary>Firmenkonten und Zugriffsrechte</summary><p>Mit einem Verzeichnis können Mitarbeiter ihre bestehenden Firmenkonten verwenden. Die erkannten Konten und Gruppen bestimmen den Zugriff auf übernommene Dateien. Lokale Konten bleiben weiterhin verfügbar.</p></details>
+    <details class="connection-details"><summary>{{ $t("Firmenkonten und Zugriffsrechte") }}</summary><p>{{ $t("Mit einem Verzeichnis können Mitarbeiter ihre bestehenden Firmenkonten verwenden. Die erkannten Konten und Gruppen bestimmen den Zugriff auf übernommene Dateien. Lokale Konten bleiben weiterhin verfügbar.") }}</p></details>
 
-    <AppDialog ref="formDialog" size="md" :busy="saving" :dirty="formDirty" :open="formOpen" :title="editing ? 'Verbindung bearbeiten' : 'Verzeichnis verbinden'" :error="formError" @close="closeForm">
+    <AppDialog ref="formDialog" size="md" :busy="saving" :dirty="formDirty" :open="formOpen" :title="editing ? $t('Verbindung bearbeiten') : $t('Verzeichnis verbinden')" :error="formError" @close="closeForm">
       <form class="connection-form dp-form" data-testid="directory-form" @submit.prevent="save">
         <fieldset class="dp-kinds">
-          <legend>Art des Verzeichnisses</legend>
-          <label><input v-model="f.kind" name="directory-kind" type="radio" value="AD" /> Active Directory (Windows)</label>
-          <label><input v-model="f.kind" name="directory-kind" type="radio" value="LDAP" /> LDAP (z. B. OpenLDAP, FreeIPA)</label>
+          <legend>{{ $t("Art des Verzeichnisses") }}</legend>
+          <label><input v-model="f.kind" name="directory-kind" type="radio" value="AD" /> {{ $t("Active Directory (Windows)") }}</label>
+          <label><input v-model="f.kind" name="directory-kind" type="radio" value="LDAP" /> {{ $t("LDAP (z. B. OpenLDAP, FreeIPA)") }}</label>
         </fieldset>
-        <label>Name <input class="ic-native-control" v-model="f.displayName" required maxlength="200" /></label>
-        <label>Adresse des Servers <input class="ic-native-control" v-model="f.url" required :placeholder="placeholders.url" data-testid="directory-url" /></label>
-        <label class="dp-check"><input v-model="f.startTls" type="checkbox" /> StartTLS verwenden (bei ldap:// statt ldaps://)</label>
-        <label>Suchbasis (Base DN) <input class="ic-native-control" v-model="f.baseDn" required :placeholder="placeholders.baseDn" /></label>
-        <label>Dienstkonto (nur Lesen) <input class="ic-native-control" v-model="f.bindDn" required :placeholder="placeholders.bindDn" /></label>
-        <label>Passwort des Dienstkontos
+        <label>{{ $t("Name") }} <input class="ic-native-control" v-model="f.displayName" required maxlength="200" /></label>
+        <label>{{ $t("Adresse des Servers") }} <input class="ic-native-control" v-model="f.url" required :placeholder="placeholders.url" data-testid="directory-url" /></label>
+        <label class="dp-check"><input v-model="f.startTls" type="checkbox" /> {{ $t("StartTLS verwenden (bei ldap:// statt ldaps://)") }}</label>
+        <label>{{ $t("Suchbasis (Base DN)") }} <input class="ic-native-control" v-model="f.baseDn" required :placeholder="placeholders.baseDn" /></label>
+        <label>{{ $t("Dienstkonto (nur Lesen)") }} <input class="ic-native-control" v-model="f.bindDn" required :placeholder="placeholders.bindDn" /></label>
+        <label>{{ $t("Passwort des Dienstkontos") }}
           <input class="ic-native-control" v-model="f.bindPassword" type="password" autocomplete="new-password"
-                 :placeholder="editing?.secretSet ? 'bleibt gespeichert – nur zum Ändern eingeben' : ''" />
+                 :placeholder="editing?.secretSet ? $t('bleibt gespeichert – nur zum Ändern eingeben') : ''" />
         </label>
-        <label class="dp-check"><input v-model="f.loginEnabled" type="checkbox" /> Mitarbeiter dürfen sich mit diesem Konto anmelden</label>
-        <label class="dp-check"><input v-model="f.autoProvision" type="checkbox" /> Beim ersten Anmelden automatisch als Mitglied aufnehmen</label>
+        <label class="dp-check"><input v-model="f.loginEnabled" type="checkbox" /> {{ $t("Mitarbeiter dürfen sich mit diesem Konto anmelden") }}</label>
+        <label class="dp-check"><input v-model="f.autoProvision" type="checkbox" /> {{ $t("Beim ersten Anmelden automatisch als Mitglied aufnehmen") }}</label>
         <details class="dp-more">
-          <summary>Erweitert</summary>
-          <label>Benutzerfilter (Platzhalter {login})
-            <input class="ic-native-control" v-model="f.userFilter" placeholder="leer lassen für die passende Vorgabe" />
+          <summary>{{ $t("Erweitert") }}</summary>
+          <label>{{ $t("Benutzerfilter (Platzhalter {login})") }}
+            <input class="ic-native-control" v-model="f.userFilter" :placeholder="$t('leer lassen für die passende Vorgabe')" />
           </label>
-          <label class="dp-check"><input v-model="f.allowPlainLdap" type="checkbox" /> Unverschlüsselte Verbindung erlauben (nicht empfohlen)</label>
+          <label class="dp-check"><input v-model="f.allowPlainLdap" type="checkbox" /> {{ $t("Unverschlüsselte Verbindung erlauben (nicht empfohlen)") }}</label>
         </details>
         <div class="dp-actions">
-          <Button variant="ghost" type="button" @click="formDialog?.requestClose()">Abbrechen</Button>
-          <Button variant="primary" type="submit" :disabled="saving" data-testid="directory-save">{{ saving ? "Speichere …" : "Speichern" }}</Button>
+          <Button variant="ghost" type="button" @click="formDialog?.requestClose()">{{ $t("Abbrechen") }}</Button>
+          <Button variant="primary" type="submit" :disabled="saving" data-testid="directory-save">{{ saving ? $t("Speichere …") : $t("Speichern") }}</Button>
         </div>
       </form>
     </AppDialog>
 
-    <AppDialog size="md" :open="lookupFor !== null" title="Benutzer nachschlagen" :error="lookupError" @close="closeLookup">
+    <AppDialog size="md" :open="lookupFor !== null" :title="$t('Benutzer nachschlagen')" :error="lookupError" @close="closeLookup">
       <form class="connection-form dp-form" @submit.prevent="runLookup">
-        <label>Benutzername oder E-Mail <input class="ic-native-control" v-model="lookupLogin" required data-testid="directory-lookup-login" /></label>
+        <label>{{ $t("Benutzername oder E-Mail") }} <input class="ic-native-control" v-model="lookupLogin" required data-testid="directory-lookup-login" /></label>
         <div class="dp-actions">
-          <Button variant="primary" type="submit" :disabled="lookupBusy">{{ lookupBusy ? "Suche …" : "Nachschlagen" }}</Button>
+          <Button variant="primary" type="submit" :disabled="lookupBusy">{{ lookupBusy ? $t("Suche …") : $t("Nachschlagen") }}</Button>
         </div>
       </form>
       <div v-if="lookupResult" class="dp-lookup" data-testid="directory-lookup-result">
         <p v-if="!lookupResult.found" class="dp-test error">{{ lookupResult.message }}</p>
         <template v-else>
-          <p><strong>{{ lookupResult.displayName }}</strong> · {{ lookupResult.email ?? "keine E-Mail im Verzeichnis" }}</p>
-          <p class="dp-meta">{{ lookupResult.principals.length }} Konten und Gruppen erkannt – danach richtet sich, welche Dateien die Person sieht:</p>
+          <p><strong>{{ lookupResult.displayName }}</strong> · {{ lookupResult.email ?? $t("keine E-Mail im Verzeichnis") }}</p>
+          <p class="dp-meta">{{ $t("{0} Konten und Gruppen erkannt – danach richtet sich, welche Dateien die Person sieht:", lookupResult.principals.length) }}</p>
           <ul><li v-for="p in lookupResult.principals.slice(0, 40)" :key="p">{{ principalLabel(p) }}</li></ul>
         </template>
       </div>
@@ -230,11 +231,11 @@ function rowAction(d:DirectoryConnection,action:string){if(action==='edit')openE
 
     <ConfirmDialog
       :open="deleteTarget !== null"
-      title="Verbindung entfernen?"
+      :title="$t('Verbindung entfernen?')"
       :busy="deleting"
       :error="deleteError"
-      :message="`„${deleteTarget?.displayName ?? ''}“ wird entfernt. Anmeldungen über dieses Verzeichnis sind danach nicht mehr möglich; bestehende Konten bleiben.`"
-      confirm-label="Entfernen"
+      :message="$t('„{0}“ wird entfernt. Anmeldungen über dieses Verzeichnis sind danach nicht mehr möglich; bestehende Konten bleiben.', deleteTarget?.displayName ?? '')"
+      :confirm-label="$t('Entfernen')"
       @confirm="confirmDelete"
       @close="deleteTarget = null"
     />

@@ -11,6 +11,7 @@ import {
 } from "../../datasource-api";
 import Input from "../ui/Input.vue";
 import StatusPill from "../ui/StatusPill.vue";
+import { tr, dateLocale } from "../../i18n";
 
 const userQuery = ref(""), docQuery = ref("");
 const userHits = ref<AccessUser[]>([]), docHits = ref<AccessDocument[]>([]);
@@ -71,11 +72,11 @@ async function run() {
 
 const matchingGroups = computed(() => explanation.value?.userGroups.filter(g => g.matchesUser) ?? []);
 function when(iso: string | null) {
-  if (!iso) return "noch nie";
+  if (!iso) return tr("noch nie");
   const minutes = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
-  if (minutes < 1) return "gerade eben";
-  if (minutes < 120) return `vor ${minutes} Min.`;
-  return new Date(iso).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" });
+  if (minutes < 1) return tr("gerade eben");
+  if (minutes < 120) return tr("vor {0} Min.", minutes);
+  return new Date(iso).toLocaleString(dateLocale(), { dateStyle: "short", timeStyle: "short" });
 }
 function mark(ok: boolean | null) { return ok === true ? "✓" : ok === false ? "✕" : "i"; }
 </script>
@@ -83,34 +84,33 @@ function mark(ok: boolean | null) { return ok === true ? "✓" : ok === false ? 
 <template>
   <section class="ax" data-testid="admin-access-section">
     <header>
-      <h2>Zugriff prüfen</h2>
-      <p class="ax-lead">Warum findet eine Person ein Dokument, oder warum nicht? Das Ergebnis kommt aus derselben Prüfung,
-        die auch Suche und Chat verwenden. Hier wird nur gelesen, nichts verändert.</p>
+      <h2>{{ $t("Zugriff prüfen") }}</h2>
+      <p class="ax-lead">{{ $t("Warum findet eine Person ein Dokument, oder warum nicht? Das Ergebnis kommt aus derselben Prüfung, die auch Suche und Chat verwenden. Hier wird nur gelesen, nichts verändert.") }}</p>
     </header>
     <p v-if="error" class="ax-error" role="alert">{{ error }}</p>
 
     <div class="ax-pickers">
       <div class="ax-picker">
-        <Input id="access-user" v-model="userQuery" label="Person" icon="users" placeholder="Name oder E-Mail …" data-testid="access-user-search" />
-        <ul v-if="userHits.length" class="ax-hits" role="listbox" aria-label="Gefundene Personen">
+        <Input id="access-user" v-model="userQuery" :label="$t('Person')" icon="users" :placeholder="$t('Name oder E-Mail …')" data-testid="access-user-search" />
+        <ul v-if="userHits.length" class="ax-hits" role="listbox" :aria-label="$t('Gefundene Personen')">
           <li v-for="u in userHits" :key="u.id"><button type="button" role="option" :aria-selected="user?.id === u.id" @click="pickUser(u)">
-            <strong>{{ u.displayName }}</strong><span>{{ u.email }} · {{ u.groups }} {{ u.groups === 1 ? 'Gruppe' : 'Gruppen' }}</span></button></li>
+            <strong>{{ u.displayName }}</strong><span>{{ u.email }} · {{ u.groups }} {{ u.groups === 1 ? $t("Gruppe") : $t("Gruppen") }}</span></button></li>
         </ul>
       </div>
       <div class="ax-picker">
-        <Input id="access-doc" v-model="docQuery" label="Dokument" icon="doc" placeholder="Dateiname …" data-testid="access-doc-search" />
-        <ul v-if="docHits.length" class="ax-hits" role="listbox" aria-label="Gefundene Dokumente">
+        <Input id="access-doc" v-model="docQuery" :label="$t('Dokument')" icon="doc" :placeholder="$t('Dateiname …')" data-testid="access-doc-search" />
+        <ul v-if="docHits.length" class="ax-hits" role="listbox" :aria-label="$t('Gefundene Dokumente')">
           <li v-for="d in docHits" :key="d.id"><button type="button" role="option" :aria-selected="doc?.id === d.id" @click="pickDoc(d)">
             <strong>{{ d.filename }}</strong><span>{{ d.location }} · {{ d.origin }}</span></button></li>
         </ul>
       </div>
     </div>
 
-    <p v-if="loading" role="status" class="ax-muted">Wird geprüft …</p>
+    <p v-if="loading" role="status" class="ax-muted">{{ $t("Wird geprüft …") }}</p>
 
     <article v-if="explanation" class="ax-card" data-testid="access-explanation">
       <div class="ax-verdict">
-        <StatusPill :tone="explanation.visible ? 'ok' : 'error'" data-testid="access-verdict">{{ explanation.visible ? 'Sichtbar' : 'Nicht sichtbar' }}</StatusPill>
+        <StatusPill :tone="explanation.visible ? 'ok' : 'error'" data-testid="access-verdict">{{ explanation.visible ? $t("Sichtbar") : $t("Nicht sichtbar") }}</StatusPill>
         <div><strong>{{ explanation.userName }}</strong> → <strong>{{ explanation.filename }}</strong><span class="ax-muted">{{ explanation.location }}</span></div>
       </div>
       <ol class="ax-steps" data-testid="access-steps">
@@ -119,34 +119,34 @@ function mark(ok: boolean | null) { return ok === true ? "✓" : ok === false ? 
           <div><p>{{ s.title }}</p><p v-if="s.detail" class="ax-muted">{{ s.detail }}</p></div>
         </li>
       </ol>
-      <p v-if="!explanation.consistent" class="ax-warn">Die Begründung passt nicht zum tatsächlichen Ergebnis. Maßgeblich ist das Ergebnis oben; bitte als Fehler melden.</p>
+      <p v-if="!explanation.consistent" class="ax-warn">{{ $t("Die Begründung passt nicht zum tatsächlichen Ergebnis. Maßgeblich ist das Ergebnis oben; bitte als Fehler melden.") }}</p>
 
       <template v-if="explanation.acl.length">
-        <h3>Rechte der Datei</h3>
+        <h3>{{ $t("Rechte der Datei") }}</h3>
         <div class="ax-table-wrap"><table class="ax-table">
-          <thead><tr><th scope="col">Person oder Gruppe</th><th scope="col">Recht</th><th scope="col">Betrifft {{ explanation.userName }}</th></tr></thead>
+          <thead><tr><th scope="col">{{ $t("Person oder Gruppe") }}</th><th scope="col">{{ $t("Recht") }}</th><th scope="col">{{ $t("Betrifft {0}", explanation.userName) }}</th></tr></thead>
           <tbody><tr v-for="a in explanation.acl" :key="a.principal + a.allow" :class="{ hit: a.matchesUser }">
             <td :title="a.principal">{{ principalLabel(a.principal, a.label) }}</td>
-            <td>{{ a.allow ? 'Lesen erlaubt' : 'Verweigert' }}</td>
-            <td>{{ a.matchesUser ? 'Ja' : '–' }}</td></tr></tbody>
+            <td>{{ a.allow ? $t("Lesen erlaubt") : $t("Verweigert") }}</td>
+            <td>{{ a.matchesUser ? $t("Ja") : '–' }}</td></tr></tbody>
         </table></div>
       </template>
-      <p class="ax-muted">Gruppen von {{ explanation.userName }} zuletzt abgeglichen: {{ when(explanation.groupsRefreshedAt) }}
-        <template v-if="matchingGroups.length"> · relevant hier: {{ matchingGroups.map(g => principalLabel(g.principal, g.label)).join(', ') }}</template></p>
+      <p class="ax-muted">{{ $t("Gruppen von {0} zuletzt abgeglichen: {1}", explanation.userName, when(explanation.groupsRefreshedAt)) }}
+        <template v-if="matchingGroups.length"> {{ $t("· relevant hier: {0}", matchingGroups.map(g => principalLabel(g.principal, g.label)).join(', ')) }}</template></p>
     </article>
 
     <article v-if="overview" class="ax-card" data-testid="access-overview">
-      <h3>Was findet {{ overview.userName }} insgesamt?</h3>
+      <h3>{{ $t("Was findet {0} insgesamt?", overview.userName) }}</h3>
       <div v-if="overview.knowledgeBases.length" class="ax-table-wrap"><table class="ax-table">
-        <thead><tr><th scope="col">Wissensbasis</th><th scope="col" class="n">Sichtbar</th><th scope="col" class="n">Dokumente</th></tr></thead>
+        <thead><tr><th scope="col">{{ $t("Wissensbasis") }}</th><th scope="col" class="n">{{ $t("Sichtbar") }}</th><th scope="col" class="n">{{ $t("Dokumente") }}</th></tr></thead>
         <tbody><tr v-for="k in overview.knowledgeBases" :key="k.kbId"><td>{{ k.location }}</td>
           <td class="n ic-num">{{ k.visible }}</td><td class="n ic-num">{{ k.total }}</td></tr></tbody>
       </table></div>
-      <p v-else class="ax-muted">{{ overview.userName }} ist in keiner Organisation Mitglied und findet daher keine Dokumente.</p>
-      <p class="ax-muted">Gruppen zuletzt abgeglichen: {{ when(overview.groupsRefreshedAt) }}</p>
+      <p v-else class="ax-muted">{{ $t("{0} ist in keiner Organisation Mitglied und findet daher keine Dokumente.", overview.userName) }}</p>
+      <p class="ax-muted">{{ $t("Gruppen zuletzt abgeglichen: {0}", when(overview.groupsRefreshedAt)) }}</p>
     </article>
 
-    <p v-if="!user && !doc" class="ax-muted">Wähle eine Person, um zu sehen, was sie findet, und zusätzlich ein Dokument für die genaue Begründung.</p>
+    <p v-if="!user && !doc" class="ax-muted">{{ $t("Wähle eine Person, um zu sehen, was sie findet, und zusätzlich ein Dokument für die genaue Begründung.") }}</p>
   </section>
 </template>
 

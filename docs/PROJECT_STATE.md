@@ -1,5 +1,7 @@
 # Keplura — PROJECT STATE (autoritative, knappe Projekt-Wahrheit)
 
+**Stand 21.11.2026: Oberfläche Englisch/Deutsch (Branch `feat/i18n-en`).** PO-Auftrag: englische Übersetzung und englische README-Screenshots zuerst. Deutscher Text bleibt Schlüssel, Englisch in `desktop/src/i18n-en.ts`, eigene kleine Hilfe ohne neue Abhängigkeit; Sprache folgt dem System, umschaltbar im Kontomenü und auf der Anmeldeseite. `scripts/check-i18n.cjs` läuft vor jedem Build. Offizielles Keplura-Zeichen statt Buch-Symbol in Seitenleiste/Anmeldung. Screenshots neu mit `desktop/e2e/readme_screenshots.cjs`. E2E-Suiten laufen weiter auf `de-DE`. Klasse B. `ci-local.sh` als Nicht-root mit `acl` Exit 0 auf `f88b876` (Evidence `ci/evidence/20261121-002709/`) und nach Korrektur von `check-i18n.cjs` erneut auf `9b77f41` (543 Server-Tests, 1 übersprungen; Desktop-Build, cargo check; E2E nicht ausgewählt), Evidence `ci/evidence/20261121-003606/`. Ein erster Lauf scheiterte nur an fehlender UTF-8-Locale des CI-Nutzers (Umlaute in Testdateinamen), nicht am Code. Offen: Servermeldungen sind in der englischen Oberfläche noch deutsch. Parallel: RISK-02 Inhaltsprüfung auf `feat/oversharing-content` (Server fertig, Oberfläche offen).
+
 **Umzug 20.11.2026:** Dieses Repository (`marcello-conocchia/Keplura`) ist seit
 20.11.2026 das Hauptrepo mit sauberem Start (ein Commit). Die bisherige
 Historie, alle PRs bis #95 und die Prüfprotokolle (`ci/evidence/`,

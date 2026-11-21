@@ -12,6 +12,7 @@ import {
 import AppDialog from "../ui/AppDialog.vue";
 import AppIcon from "../ui/AppIcon.vue";
 import Button from "../ui/Button.vue";
+import { tr, dateLocale } from "../../i18n";
 
 const auth = useAuthStore();
 const kbId = ref<number | null>(auth.selectedKbId ?? auth.kbs[0]?.id ?? null);
@@ -52,7 +53,7 @@ async function runCheck() {
   note.value = "";
   const r = await runQualityCheck(target.value);
   running.value = false;
-  if (r.kind === "ok") show("ok", `Prüfung abgeschlossen: ${r.value.hits} von ${r.value.total} Fragen finden die richtige Quelle.`);
+  if (r.kind === "ok") show("ok", tr("Prüfung abgeschlossen: {0} von {1} Fragen finden die richtige Quelle.", r.value.hits, r.value.total));
   else show("error", resultText(r));
   await load();
 }
@@ -89,7 +90,7 @@ async function submitImport() {
   importOpen.value = false;
   csv.value = "";
   show(r.value.skipped ? "error" : "ok",
-    `${r.value.imported} Fragen übernommen${r.value.skipped ? `, ${r.value.skipped} übersprungen: ${r.value.problems.join(" ")}` : "."}`);
+    tr("{0} Fragen übernommen{1}", r.value.imported, r.value.skipped ? tr(", {0} übersprungen: {1}", r.value.skipped, r.value.problems.join(" ")) : "."));
   await load();
 }
 
@@ -99,25 +100,24 @@ async function remove(id: number) {
 }
 
 function day(iso: string) {
-  return new Date(iso).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" });
+  return new Date(iso).toLocaleDateString(dateLocale(), { day: "2-digit", month: "2-digit" });
 }
 </script>
 
 <template>
   <section class="qp" data-testid="admin-quality-section">
     <p class="qp-lead">
-      Hinterlege typische Fragen deiner Kolleginnen und Kollegen und die Datei, in der die Antwort steht.
-      Keplura prüft dann, ob es die richtige Stelle findet – vor dem Pilot und nach jeder größeren Änderung.
+      {{ $t("Hinterlege typische Fragen deiner Kolleginnen und Kollegen und die Datei, in der die Antwort steht. Keplura prüft dann, ob es die richtige Stelle findet – vor dem Pilot und nach jeder größeren Änderung.") }}
     </p>
 
     <div class="qp-bar">
-      <label class="qp-kb">Wissensbasis
+      <label class="qp-kb">{{ $t("Wissensbasis") }}
         <select class="ic-native-control" v-model="kbId" data-testid="quality-kb">
           <option v-for="k in auth.kbs" :key="k.id" :value="k.id">{{ k.name }}</option>
         </select>
       </label>
       <Button variant="primary" :disabled="running || !data?.questions.length" data-testid="quality-run" @click="runCheck">
-        {{ running ? "Prüfung läuft …" : "Prüfung starten" }}
+        {{ running ? $t("Prüfung läuft …") : $t("Prüfung starten") }}
       </Button>
     </div>
     <p v-if="note" class="qp-note" :class="noteKind" role="status">{{ note }}</p>
@@ -125,9 +125,9 @@ function day(iso: string) {
     <div class="qp-cards">
       <div class="qp-card" data-testid="quality-score">
         <span class="qp-big ic-num">{{ latest ? latest.percent + " %" : "–" }}</span>
-        <span class="qp-sub">{{ latest ? `${latest.hits} von ${latest.total} Fragen finden die richtige Quelle` : "Noch keine Prüfung" }}</span>
+        <span class="qp-sub">{{ latest ? $t("{0} von {1} Fragen finden die richtige Quelle", latest.hits, latest.total) : $t("Noch keine Prüfung") }}</span>
         <span v-if="data && data.runs.length > 1" class="qp-trend">
-          Verlauf: <span v-for="r in [...data.runs].reverse()" :key="r.id" class="ic-num">{{ day(r.startedAt) }} {{ r.percent }} % · </span>
+          {{ $t("Verlauf:") }} <span v-for="r in [...data.runs].reverse()" :key="r.id" class="ic-num">{{ day(r.startedAt) }} {{ r.percent }} % · </span>
         </span>
       </div>
       <div class="qp-card" data-testid="quality-feedback">
@@ -135,52 +135,52 @@ function day(iso: string) {
           <AppIcon name="thumb-up" :size="15" /> {{ stats?.up ?? 0 }}
           <AppIcon name="thumb-down" :size="15" /> {{ stats?.down ?? 0 }}
         </span>
-        <span class="qp-sub">Bewertungen der letzten 30 Tage bei {{ stats?.answersLast30Days ?? 0 }} Antworten (nur Zahlen, keine Inhalte)</span>
+        <span class="qp-sub">{{ $t("Bewertungen der letzten 30 Tage bei {0} Antworten (nur Zahlen, keine Inhalte)", stats?.answersLast30Days ?? 0) }}</span>
       </div>
     </div>
 
     <div class="qp-list">
       <div class="qp-head">
-        <span>Testfragen</span>
+        <span>{{ $t("Testfragen") }}</span>
         <span class="qp-count ic-num">{{ data?.questions.length ?? 0 }}</span>
         <span class="qp-head-actions">
-          <Button variant="ghost" data-testid="quality-import" @click="importOpen = true">Liste einfügen</Button>
-          <Button variant="secondary" data-testid="quality-add" @click="addOpen = true"><AppIcon name="plus" :size="13" /> Frage</Button>
+          <Button variant="ghost" data-testid="quality-import" @click="importOpen = true">{{ $t("Liste einfügen") }}</Button>
+          <Button variant="secondary" data-testid="quality-add" @click="addOpen = true"><AppIcon name="plus" :size="13" /> {{ $t("Frage") }}</Button>
         </span>
       </div>
       <div v-for="item in data?.questions ?? []" :key="item.id" class="qp-row" data-testid="quality-question">
         <span class="qp-ring" :class="item.lastHit === null ? 'none' : item.lastHit ? 'ok' : 'error'"
-              :title="item.lastHit === null ? 'noch nicht geprüft' : item.lastHit ? 'gefunden' : 'nicht gefunden'"></span>
+              :title="item.lastHit === null ? $t('noch nicht geprüft') : item.lastHit ? 'gefunden' : $t('nicht gefunden')"></span>
         <div class="qp-main">
           <span class="qp-q">{{ item.question }}</span>
-          <span class="qp-meta">Erwartet: {{ item.expectedDocument }}<template v-if="item.expectedPhrase"> · „{{ item.expectedPhrase }}“</template>
-            <template v-if="item.lastHit === true"> · gefunden an Stelle {{ item.lastRank }}</template>
-            <template v-else-if="item.lastHit === false"> · nicht gefunden<template v-if="item.lastTopDocument">, stattdessen: {{ item.lastTopDocument }}</template></template>
+          <span class="qp-meta">{{ $t("Erwartet: {0}", item.expectedDocument) }}<template v-if="item.expectedPhrase"> · „{{ item.expectedPhrase }}“</template>
+            <template v-if="item.lastHit === true"> {{ $t("· gefunden an Stelle {0}", item.lastRank) }}</template>
+            <template v-else-if="item.lastHit === false"> {{ $t("· nicht gefunden") }}<template v-if="item.lastTopDocument">{{ $t(", stattdessen: {0}", item.lastTopDocument) }}</template></template>
           </span>
         </div>
-        <button type="button" class="qp-del" :aria-label="`Frage löschen: ${item.question}`" title="Löschen" @click="remove(item.id)">
+        <button type="button" class="qp-del" :aria-label="$t('Frage löschen: {0}', item.question)" :title="$t('Löschen')" @click="remove(item.id)">
           <AppIcon name="trash" :size="13" />
         </button>
       </div>
       <p v-if="!data?.questions.length" class="qp-empty">
-        Noch keine Testfragen. Empfehlung: 30–50 echte Fragen aus dem Arbeitsalltag, je mit der Datei, in der die Antwort steht.
+        {{ $t("Noch keine Testfragen. Empfehlung: 30–50 echte Fragen aus dem Arbeitsalltag, je mit der Datei, in der die Antwort steht.") }}
       </p>
     </div>
 
-    <AppDialog :open="addOpen" title="Testfrage hinzufügen" :error="addError" @close="addOpen = false">
+    <AppDialog :open="addOpen" :title="$t('Testfrage hinzufügen')" :error="addError" @close="addOpen = false">
       <form class="qp-form" @submit.prevent="submitAdd">
-        <label>Frage <input class="ic-native-control" v-model="q.question" required maxlength="2000" placeholder="Bis zu welchem Betrag werden Hotels erstattet?" /></label>
-        <label>Datei mit der Antwort (Name oder Teil davon) <input class="ic-native-control" v-model="q.doc" required maxlength="500" placeholder="Reisekostenrichtlinie" /></label>
-        <label>Stichwort in der Fundstelle (optional) <input class="ic-native-control" v-model="q.phrase" maxlength="500" placeholder="120 Euro" /></label>
-        <div class="qp-actions"><Button variant="primary" type="submit">Hinzufügen</Button></div>
+        <label>{{ $t("Frage") }} <input class="ic-native-control" v-model="q.question" required maxlength="2000" :placeholder="$t('Bis zu welchem Betrag werden Hotels erstattet?')" /></label>
+        <label>{{ $t("Datei mit der Antwort (Name oder Teil davon)") }} <input class="ic-native-control" v-model="q.doc" required maxlength="500" :placeholder="$t('Reisekostenrichtlinie')" /></label>
+        <label>{{ $t("Stichwort in der Fundstelle (optional)") }} <input class="ic-native-control" v-model="q.phrase" maxlength="500" :placeholder="$t('120 Euro')" /></label>
+        <div class="qp-actions"><Button variant="primary" type="submit">{{ $t("Hinzufügen") }}</Button></div>
       </form>
     </AppDialog>
 
-    <AppDialog :open="importOpen" title="Liste einfügen" :error="importError" @close="importOpen = false">
+    <AppDialog :open="importOpen" :title="$t('Liste einfügen')" :error="importError" @close="importOpen = false">
       <form class="qp-form" @submit.prevent="submitImport">
-        <p class="qp-sub">Je Zeile: Frage; Datei; Stichwort (optional). Aus Excel kopierte Spalten (Tabulator) funktionieren auch.</p>
-        <textarea class="ic-native-control" v-model="csv" rows="10" placeholder="Wie viele Urlaubstage habe ich?;Urlaubsregelung;30 Tage"></textarea>
-        <div class="qp-actions"><Button variant="primary" type="submit" :disabled="!csv.trim()">Übernehmen</Button></div>
+        <p class="qp-sub">{{ $t("Je Zeile: Frage; Datei; Stichwort (optional). Aus Excel kopierte Spalten (Tabulator) funktionieren auch.") }}</p>
+        <textarea class="ic-native-control" v-model="csv" rows="10" :placeholder="$t('Wie viele Urlaubstage habe ich?;Urlaubsregelung;30 Tage')"></textarea>
+        <div class="qp-actions"><Button variant="primary" type="submit" :disabled="!csv.trim()">{{ $t("Übernehmen") }}</Button></div>
       </form>
     </AppDialog>
   </section>

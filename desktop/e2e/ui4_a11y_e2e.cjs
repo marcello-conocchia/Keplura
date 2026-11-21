@@ -69,7 +69,7 @@ function targetAudit(min) {
 
 (async () => {
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'], ...(env.E2E_CHROME ? { executablePath: env.E2E_CHROME } : {}) });
-  const ctx = await browser.newContext({ viewport: { width: 1440, height: 1000 }, locale: 'de-DE' });
+  const ctx = await browser.newContext({ locale: 'de-DE', viewport: { width: 1440, height: 1000 }, locale: 'de-DE' });
   const page = await ctx.newPage();
   const shot = name => page.screenshot({ path: path.join(out, `${name}.png`) });
   async function point(id, name, fn, mode = 'echt') {
@@ -157,7 +157,7 @@ function targetAudit(min) {
 
     for (const [label, w, h] of [['200 % von 1440×1000', 720, 500], ['400 % von 1280×1024 (WCAG 1.4.10, 320 CSS px)', 320, 256]]) {
       await point('V13', `Zoom-Reflow ${label}: Chat und Quelle ohne horizontalen Seitenüberlauf`, async () => {
-        const z = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 2, locale: 'de-DE', storageState: await ctx.storageState() });
+        const z = await browser.newContext({ locale: 'de-DE', viewport: { width: w, height: h }, deviceScaleFactor: 2, locale: 'de-DE', storageState: await ctx.storageState() });
         const p = await z.newPage();
         try {
           await p.goto(env.E2E_BASE || 'http://localhost:1420');

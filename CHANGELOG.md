@@ -12,6 +12,11 @@ the first tagged release (planned `0.1.0`, see [docs/RELEASING.md](docs/RELEASIN
 
 ### Added
 
+- English user interface. The desktop app follows the system language and
+  can be switched between English and German in the account menu or on the
+  sign-in screen. `scripts/check-i18n.cjs` fails the build when an English
+  text is missing. README screenshots now show the English interface
+  (`desktop/e2e/readme_screenshots.cjs`).
 - Licensed under the Apache License 2.0 (`LICENSE`, `NOTICE`, license
   metadata in `server/pom.xml`, `desktop/package.json` and both `Cargo.toml`).
 - Open-source preparation: public README with screenshots, installation and

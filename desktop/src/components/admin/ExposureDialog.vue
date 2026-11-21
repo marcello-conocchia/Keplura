@@ -13,6 +13,7 @@ import {
 import AppDialog from "../ui/AppDialog.vue";
 import Button from "../ui/Button.vue";
 import StatusPill from "../ui/StatusPill.vue";
+import { tr, dateLocale } from "../../i18n";
 
 const props = defineProps<{ source: DataSource | null }>();
 const emit = defineEmits<{ close: []; updated: [source: DataSource] }>();
@@ -94,21 +95,21 @@ async function exclude() {
     report.value = { ...report.value, findings: report.value.findings.filter(f => !gone.has(f.relativePath)) };
   }
   selected.value = new Set([...selected.value].filter(p => !paths.includes(p)));
-  note.value = `${paths.length} ${paths.length === 1 ? "Datei wird" : "Dateien werden"} nicht übernommen. `
-    + (s.lastRunStatus ? "Bereits übernommene Fassungen entfernt der nächste Abgleich aus Keplura." : "")
-    + " Die Originale in der Ablage bleiben unverändert.";
+  note.value = tr("{0} {1} nicht übernommen. ", paths.length, paths.length === 1 ? tr("Datei wird") : tr("Dateien werden"))
+    + (s.lastRunStatus ? tr("Bereits übernommene Fassungen entfernt der nächste Abgleich aus Keplura.") : "")
+    + tr(" Die Originale in der Ablage bleiben unverändert.");
 }
 
 const copied = ref(false);
 function listText(): string {
   const r = report.value;
   if (!r || !props.source) return "";
-  const lines = [`Oversharing-Check „${props.source.displayName}“ (${props.source.location})`,
-    `${r.broadFiles} von ${r.filesChecked} Dateien sind für praktisch alle lesbar.`, "", "Ordner mit breiten Leserechten:"];
-  for (const f of r.folders) lines.push(`  ${f.folder}: ${f.broadFiles} Dateien${f.sensitiveFiles ? `, davon ${f.sensitiveFiles} sensibel wirkend` : ""}`);
+  const lines = [tr("Oversharing-Check „{0}“ ({1})", props.source.displayName, props.source.location),
+    tr("{0} von {1} Dateien sind für praktisch alle lesbar.", r.broadFiles, r.filesChecked), "", tr("Ordner mit breiten Leserechten:")];
+  for (const f of r.folders) lines.push(tr("  {0}: {1} Dateien{2}", f.folder, f.broadFiles, f.sensitiveFiles ? tr(", davon {0} sensibel wirkend", f.sensitiveFiles) : ""));
   if (r.findings.length) {
-    lines.push("", "Sensibel wirkende Dateien mit breiten Leserechten:");
-    for (const f of r.findings) lines.push(`  ${f.relativePath} — ${f.categories.join(", ")} — lesbar für ${f.broadGroups.join(", ")}`);
+    lines.push("", tr("Sensibel wirkende Dateien mit breiten Leserechten:"));
+    for (const f of r.findings) lines.push(tr("  {0} — {1} — lesbar für {2}", f.relativePath, f.categories.join(", "), f.broadGroups.join(", ")));
   }
   return lines.join("\n");
 }
@@ -118,75 +119,72 @@ async function copyList() {
     copied.value = true;
     setTimeout(() => { copied.value = false; }, 2500);
   } catch {
-    error.value = "Kopieren ist hier nicht möglich. Markiere die Liste und kopiere sie von Hand.";
+    error.value = tr("Kopieren ist hier nicht möglich. Markiere die Liste und kopiere sie von Hand.");
   }
 }
 
 function pct(n: number, of: number) { return of ? Math.round((n / of) * 100) : 0; }
 function when(iso: string | null) {
-  return iso ? new Date(iso).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" }) : "";
+  return iso ? new Date(iso).toLocaleString(dateLocale(), { dateStyle: "short", timeStyle: "short" }) : "";
 }
 </script>
 
 <template>
-  <AppDialog :open="source !== null" title="Oversharing-Check" size="lg" :error="error" :busy="excluding" initial-focus="title" @close="emit('close')">
+  <AppDialog :open="source !== null" :title="$t('Oversharing-Check')" size="lg" :error="error" :busy="excluding" initial-focus="title" @close="emit('close')">
     <div class="xp" data-testid="exposure-dialog">
       <p class="xp-source">{{ source?.displayName }} <span>{{ source?.location }}</span></p>
-      <p class="xp-lead">Bevor Keplura Dateien übernimmt: Welche sind für praktisch alle Mitarbeitenden lesbar, und welche davon wirken sensibel?
-        Geprüft werden nur Dateiliste und Zugriffsrechte, keine Inhalte. Die Ablage wird nicht verändert.</p>
+      <p class="xp-lead">{{ $t("Bevor Keplura Dateien übernimmt: Welche sind für praktisch alle Mitarbeitenden lesbar, und welche davon wirken sensibel? Geprüft werden nur Dateiliste und Zugriffsrechte, keine Inhalte. Die Ablage wird nicht verändert.") }}</p>
 
       <div v-if="running || starting" class="xp-progress" role="status" data-testid="exposure-running">
-        <StatusPill tone="wait">Prüfung läuft</StatusPill>
-        <span v-if="report && report.filesTotal">{{ report.filesChecked }} von {{ report.filesTotal }} Dateien geprüft</span>
-        <span v-else>Dateiliste wird gelesen …</span>
-        <progress v-if="report && report.filesTotal" :max="report.filesTotal" :value="report.filesChecked" aria-label="Fortschritt"></progress>
+        <StatusPill tone="wait">{{ $t("Prüfung läuft") }}</StatusPill>
+        <span v-if="report && report.filesTotal">{{ $t("{0} von {1} Dateien geprüft", report.filesChecked, report.filesTotal) }}</span>
+        <span v-else>{{ $t("Dateiliste wird gelesen …") }}</span>
+        <progress v-if="report && report.filesTotal" :max="report.filesTotal" :value="report.filesChecked" :aria-label="$t('Fortschritt')"></progress>
       </div>
 
       <div v-else-if="report?.state === 'FAILED'" class="xp-failed" data-testid="exposure-failed">
-        <StatusPill tone="error">Prüfung fehlgeschlagen</StatusPill>
+        <StatusPill tone="error">{{ $t("Prüfung fehlgeschlagen") }}</StatusPill>
         <p>{{ report.message }}</p>
       </div>
 
       <template v-else-if="done && report">
         <p v-if="report.message" class="xp-warn">{{ report.message }}</p>
         <div class="xp-summary" data-testid="exposure-summary">
-          <div><strong class="ic-num">{{ report.filesChecked }}</strong><span>Dateien geprüft</span></div>
-          <div :class="{ hot: report.broadFiles }"><strong class="ic-num">{{ report.broadFiles }}</strong><span>für praktisch alle lesbar ({{ pct(report.broadFiles, report.filesChecked) }} %)</span></div>
-          <div :class="{ hot: report.sensitiveBroadFiles }"><strong class="ic-num">{{ report.sensitiveBroadFiles }}</strong><span>davon sensibel wirkend</span></div>
-          <div v-if="report.unreadable"><strong class="ic-num">{{ report.unreadable }}</strong><span>ohne lesbare Rechte (für niemanden sichtbar)</span></div>
+          <div><strong class="ic-num">{{ report.filesChecked }}</strong><span>{{ $t("Dateien geprüft") }}</span></div>
+          <div :class="{ hot: report.broadFiles }"><strong class="ic-num">{{ report.broadFiles }}</strong><span>{{ $t("für praktisch alle lesbar ({0} %)", pct(report.broadFiles, report.filesChecked)) }}</span></div>
+          <div :class="{ hot: report.sensitiveBroadFiles }"><strong class="ic-num">{{ report.sensitiveBroadFiles }}</strong><span>{{ $t("davon sensibel wirkend") }}</span></div>
+          <div v-if="report.unreadable"><strong class="ic-num">{{ report.unreadable }}</strong><span>{{ $t("ohne lesbare Rechte (für niemanden sichtbar)") }}</span></div>
         </div>
-        <p class="xp-meta">Geprüft {{ when(report.finishedAt) }}</p>
+        <p class="xp-meta">{{ $t("Geprüft {0}", when(report.finishedAt)) }}</p>
 
-        <p v-if="report.broadFiles === 0" class="xp-ok" data-testid="exposure-clean">Keine Datei ist für alle lesbar. Die Rechte dieser Quelle sind eng gefasst.</p>
+        <p v-if="report.broadFiles === 0" class="xp-ok" data-testid="exposure-clean">{{ $t("Keine Datei ist für alle lesbar. Die Rechte dieser Quelle sind eng gefasst.") }}</p>
 
         <template v-else>
-          <h4>Wer hat breite Leserechte?</h4>
+          <h4>{{ $t("Wer hat breite Leserechte?") }}</h4>
           <ul class="xp-groups">
-            <li v-for="g in report.broadGroups" :key="g.principal"><span :title="g.principal">{{ g.label ?? principalLabel(g.principal) }}</span><span class="ic-num">{{ g.files }} Dateien</span></li>
+            <li v-for="g in report.broadGroups" :key="g.principal"><span :title="g.principal">{{ g.label ?? principalLabel(g.principal) }}</span><span class="ic-num">{{ $t("{0} Dateien", g.files) }}</span></li>
           </ul>
 
-          <h4>Ordner mit den meisten breit lesbaren Dateien</h4>
+          <h4>{{ $t("Ordner mit den meisten breit lesbaren Dateien") }}</h4>
           <div class="xp-table-wrap"><table class="xp-table" data-testid="exposure-folders">
-            <thead><tr><th scope="col">Ordner</th><th scope="col" class="n">Breit lesbar</th><th scope="col" class="n">Sensibel wirkend</th></tr></thead>
+            <thead><tr><th scope="col">{{ $t("Ordner") }}</th><th scope="col" class="n">{{ $t("Breit lesbar") }}</th><th scope="col" class="n">{{ $t("Sensibel wirkend") }}</th></tr></thead>
             <tbody><tr v-for="f in report.folders" :key="f.folder"><td><code>{{ f.folder }}</code></td><td class="n ic-num">{{ f.broadFiles }}</td><td class="n ic-num">{{ f.sensitiveFiles || "–" }}</td></tr></tbody>
           </table></div>
 
-          <h4>Sensibel wirkende Dateien mit breiten Leserechten</h4>
-          <p class="xp-hint">Hinweis aus Ordner- und Dateinamen (z. B. Gehalt, Personalakte, Kündigung, Diagnose, Passwort, Bankverbindung), keine Inhaltsprüfung.
-            Dateien mit unauffälligem Namen können trotzdem sensibel sein; prüfe dafür die Ordnerliste oben.</p>
-          <p v-if="report.findings.length === 0" class="xp-ok">Keine Datei mit auffälligem Namen ist breit lesbar.</p>
+          <h4>{{ $t("Sensibel wirkende Dateien mit breiten Leserechten") }}</h4>
+          <p class="xp-hint">{{ $t("Hinweis aus Ordner- und Dateinamen (z. B. Gehalt, Personalakte, Kündigung, Diagnose, Passwort, Bankverbindung), keine Inhaltsprüfung. Dateien mit unauffälligem Namen können trotzdem sensibel sein; prüfe dafür die Ordnerliste oben.") }}</p>
+          <p v-if="report.findings.length === 0" class="xp-ok">{{ $t("Keine Datei mit auffälligem Namen ist breit lesbar.") }}</p>
           <template v-else>
-            <label class="xp-all"><input type="checkbox" :checked="allSelected" data-testid="exposure-select-all" @change="toggleAll" /> Alle auswählen ({{ report.findings.length }}<template v-if="report.truncated"> von {{ report.sensitiveBroadFiles }}</template>)</label>
+            <label class="xp-all"><input type="checkbox" :checked="allSelected" data-testid="exposure-select-all" @change="toggleAll" /> {{ $t("Alle auswählen ({0}", report.findings.length) }}<template v-if="report.truncated"> {{ $t("von {0}", report.sensitiveBroadFiles) }}</template>)</label>
             <ul class="xp-findings" data-testid="exposure-findings">
               <li v-for="f in report.findings" :key="f.relativePath">
                 <label><input type="checkbox" :checked="selected.has(f.relativePath)" @change="toggle(f.relativePath)" />
                   <span class="xp-path">{{ f.relativePath }}</span></label>
-                <span class="xp-tags"><span v-for="c in f.categories" :key="c" class="xp-tag">{{ c }}</span><span class="xp-who">lesbar für {{ f.broadGroups.join(", ") }}</span></span>
+                <span class="xp-tags"><span v-for="c in f.categories" :key="c" class="xp-tag">{{ c }}</span><span class="xp-who">{{ $t("lesbar für {0}", f.broadGroups.join(", ")) }}</span></span>
               </li>
             </ul>
           </template>
-          <p class="xp-hint">Besser als Ausschließen: die Rechte in der Ablage korrigieren. Keplura übernimmt die neuen Rechte beim nächsten Abgleich automatisch.
-            Ganze Ordner schließt du in den Einstellungen der Quelle unter „Auswahl“ aus (z. B. <code>personal/**</code>).</p>
+          <p class="xp-hint">{{ $t("Besser als Ausschließen: die Rechte in der Ablage korrigieren. Keplura übernimmt die neuen Rechte beim nächsten Abgleich automatisch. Ganze Ordner schließt du in den Einstellungen der Quelle unter „Auswahl“ aus (z. B.") }} <code>{{ $t("personal/**") }}</code>).</p>
         </template>
       </template>
 
@@ -194,13 +192,13 @@ function when(iso: string | null) {
     </div>
     <template #footer>
       <div class="xp-actions">
-        <Button variant="ghost" :disabled="running || starting || excluding" data-testid="exposure-rescan" @click="start">Erneut prüfen</Button>
-        <Button v-if="done && report && report.broadFiles" variant="ghost" data-testid="exposure-copy" @click="copyList">{{ copied ? "Kopiert" : "Liste für Fileserver-Admin kopieren" }}</Button>
+        <Button variant="ghost" :disabled="running || starting || excluding" data-testid="exposure-rescan" @click="start">{{ $t("Erneut prüfen") }}</Button>
+        <Button v-if="done && report && report.broadFiles" variant="ghost" data-testid="exposure-copy" @click="copyList">{{ copied ? $t("Kopiert") : $t("Liste für Fileserver-Admin kopieren") }}</Button>
         <span class="xp-spacer"></span>
         <Button v-if="done && report?.findings.length" variant="primary" :disabled="selected.size === 0 || excluding" :busy="excluding" data-testid="exposure-exclude" @click="exclude">
-          {{ selected.size ? `${selected.size} von der Übernahme ausschließen` : "Dateien auswählen" }}
+          {{ selected.size ? $t("{0} von der Übernahme ausschließen", selected.size) : $t("Dateien auswählen") }}
         </Button>
-        <Button v-else @click="emit('close')">Schließen</Button>
+        <Button v-else @click="emit('close')">{{ $t("Schließen") }}</Button>
       </div>
     </template>
   </AppDialog>

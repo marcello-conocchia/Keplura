@@ -2,6 +2,7 @@
 // Gleicher Transport/CSRF wie api.ts; verständliche Ergebnisse statt roher Statuscodes.
 import { desktopFetch } from "./transport";
 import { serverUrl } from "./api";
+import { tr } from "./i18n";
 
 export type Result<T> =
   | { kind: "ok"; value: T }
@@ -26,7 +27,7 @@ async function call<T>(method: string, path: string, body?: unknown, timeoutMs =
   if (r.status === 401) return { kind: "expired" };
   if (r.status === 403) return { kind: "forbidden" };
   if (r.status === 400 || r.status === 404 || r.status === 409) {
-    let message = r.status === 404 ? "Der Eintrag existiert nicht mehr." : "Ungültige Eingabe.";
+    let message = r.status === 404 ? tr("Der Eintrag existiert nicht mehr.") : tr("Ungültige Eingabe.");
     try {
       const e = (await r.json()) as { error?: string };
       if (e.error && r.status !== 404) message = e.error;
@@ -50,11 +51,11 @@ export function resultText(r: Exclude<Result<unknown>, { kind: "ok" }>): string 
     case "busy":
       return r.message;
     case "forbidden":
-      return "Dafür sind Administrationsrechte nötig.";
+      return tr("Dafür sind Administrationsrechte nötig.");
     case "expired":
-      return "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.";
+      return tr("Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.");
     default:
-      return "Der Server hat nicht geantwortet. Bitte versuche es erneut.";
+      return tr("Der Server hat nicht geantwortet. Bitte versuche es erneut.");
   }
 }
 
@@ -179,24 +180,24 @@ export const excludeFromSource = (id: number, paths: string[]) =>
   call<DataSource>("POST", `${S}/${id}/exclude`, { paths });
 
 /** Lesbare Bezeichnung eines Prinzipals für die Rechte-Vorschau. */
-const WELL_KNOWN_SIDS: Record<string, string> = {
-  "S-1-5-18": "SYSTEM (Windows-Dienst)",
-  "S-1-5-32-544": "Administratoren (lokal)",
-  "S-1-5-32-545": "Benutzer (lokal)",
-  "S-1-5-32-549": "Server-Operatoren",
-  "S-1-3-0": "Ersteller-Besitzer",
-};
+const wellKnownSids = (): Record<string, string> => ({
+  "S-1-5-18": tr("SYSTEM (Windows-Dienst)"),
+  "S-1-5-32-544": tr("Administratoren (lokal)"),
+  "S-1-5-32-545": tr("Benutzer (lokal)"),
+  "S-1-5-32-549": tr("Server-Operatoren"),
+  "S-1-3-0": tr("Ersteller-Besitzer"),
+});
 
 export function principalLabel(p: string, resolved?: string | null): string {
   if (resolved) return resolved;
-  if (p === "everyone") return "Alle angemeldeten Personen";
-  if (p.startsWith("sid:") && WELL_KNOWN_SIDS[p.slice(4)]) return WELL_KNOWN_SIDS[p.slice(4)];
-  if (p.startsWith("sid:")) return `Windows-Konto/-Gruppe ${p.slice(4)}`;
-  if (p.startsWith("posix-uid:")) return `Linux-Benutzer (UID ${p.slice(10)})`;
-  if (p.startsWith("posix-gid:")) return `Linux-Gruppe (GID ${p.slice(10)})`;
+  if (p === "everyone") return tr("Alle angemeldeten Personen");
+  if (p.startsWith("sid:") && wellKnownSids()[p.slice(4)]) return wellKnownSids()[p.slice(4)];
+  if (p.startsWith("sid:")) return tr("Windows-Konto/-Gruppe {0}", p.slice(4));
+  if (p.startsWith("posix-uid:")) return tr("Linux-Benutzer (UID {0})", p.slice(10));
+  if (p.startsWith("posix-gid:")) return tr("Linux-Gruppe (GID {0})", p.slice(10));
   if (p.startsWith("ldap-dn:")) return p.slice(8);
-  if (p.startsWith("entra-tenant:")) return "Alle Personen der Microsoft-365-Organisation";
-  if (p.startsWith("entra:")) return `Microsoft-365-Benutzer/-Gruppe (${p.slice(6, 14)}…)`;
+  if (p.startsWith("entra-tenant:")) return tr("Alle Personen der Microsoft-365-Organisation");
+  if (p.startsWith("entra:")) return tr("Microsoft-365-Benutzer/-Gruppe ({0}…)", p.slice(6, 14));
   return p;
 }
 

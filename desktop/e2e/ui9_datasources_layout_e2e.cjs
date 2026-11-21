@@ -17,7 +17,7 @@ let fixtures=[
 ];
 (async()=>{
   const browser=await chromium.launch({headless:true,args:['--no-sandbox'],...(env.E2E_CHROME?{executablePath:env.E2E_CHROME}:{})});
-  const page=await browser.newPage({viewport:{width:1440,height:1000},locale:'de-DE'});
+  const page=await browser.newPage({ locale: 'de-DE',viewport:{width:1440,height:1000},locale:'de-DE'});
   const row=id=>page.locator(`[data-source-id="${id}"]`), dialog=()=>page.locator('dialog[open]');
   const shot=n=>page.screenshot({path:path.join(env.E2E_OUT,`${n}.png`)});
   async function point(name,fn,mode='simulierte Datenquellen/HTTP-Antworten'){

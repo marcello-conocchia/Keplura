@@ -11,6 +11,7 @@ import { changePassword, manageErrorText } from "../api-manage";
 import AccessShell from "./layout/AccessShell.vue";
 import Button from "./ui/Button.vue";
 import Input from "./ui/Input.vue";
+import { tr } from "../i18n";
 
 const auth = useAuthStore();
 const current = ref("");
@@ -23,9 +24,9 @@ const error = ref("");
 onBeforeUnmount(() => { current.value = next.value = repeat.value = ""; });
 
 const rules = computed(() => [
-  { ok: next.value.length >= 12, text: "Mindestens 12 Zeichen" },
-  { ok: next.value.length > 0 && next.value !== current.value, text: "Anders als das Startpasswort" },
-  { ok: next.value.length > 0 && next.value === repeat.value, text: "Beide Eingaben stimmen überein" },
+  { ok: next.value.length >= 12, text: tr("Mindestens 12 Zeichen") },
+  { ok: next.value.length > 0 && next.value !== current.value, text: tr("Anders als das Startpasswort") },
+  { ok: next.value.length > 0 && next.value === repeat.value, text: tr("Beide Eingaben stimmen überein") },
 ]);
 const canSubmit = computed(() => current.value !== "" && rules.value.every((r) => r.ok) && !busy.value);
 
@@ -46,7 +47,7 @@ async function submit() {
   }
   error.value =
     r.kind === "invalid"
-      ? "Das Startpasswort stimmt nicht, oder das neue Passwort erfüllt die Regeln nicht."
+      ? tr("Das Startpasswort stimmt nicht, oder das neue Passwort erfüllt die Regeln nicht.")
       : manageErrorText(r.kind);
 }
 </script>
@@ -54,27 +55,27 @@ async function submit() {
 <template>
   <AccessShell
     data-testid="change-password-view"
-    title="Eigenes Passwort festlegen"
-    :intro="`Hallo ${auth.user?.displayName ?? ''}, du hast dich mit einem Startpasswort angemeldet. Lege jetzt ein eigenes Passwort fest – danach geht es direkt weiter.`"
+    :title="$t('Eigenes Passwort festlegen')"
+    :intro="$t('Hallo {0}, du hast dich mit einem Startpasswort angemeldet. Lege jetzt ein eigenes Passwort fest – danach geht es direkt weiter.', auth.user?.displayName ?? '')"
   >
     <form class="cp-form" @submit.prevent="submit">
-      <Input id="cp-current" v-model="current" label="Startpasswort" type="password" autocomplete="current-password" data-testid="cp-current" :disabled="busy" required />
-      <Input id="cp-new" v-model="next" label="Neues Passwort" type="password" autocomplete="new-password" data-testid="cp-new" :disabled="busy" required />
-      <Input id="cp-repeat" v-model="repeat" label="Neues Passwort wiederholen" type="password" autocomplete="new-password" data-testid="cp-repeat" :disabled="busy" required />
+      <Input id="cp-current" v-model="current" :label="$t('Startpasswort')" type="password" autocomplete="current-password" data-testid="cp-current" :disabled="busy" required />
+      <Input id="cp-new" v-model="next" :label="$t('Neues Passwort')" type="password" autocomplete="new-password" data-testid="cp-new" :disabled="busy" required />
+      <Input id="cp-repeat" v-model="repeat" :label="$t('Neues Passwort wiederholen')" type="password" autocomplete="new-password" data-testid="cp-repeat" :disabled="busy" required />
 
-      <ul class="cp-rules" aria-label="Passwortregeln">
+      <ul class="cp-rules" :aria-label="$t('Passwortregeln')">
         <li v-for="r in rules" :key="r.text" :class="{ ok: r.ok }">
           <span class="cp-rule-mark" aria-hidden="true">{{ r.ok ? "✓" : "" }}</span>
-          {{ r.text }}<span class="sr-only">{{ r.ok ? " – erfüllt" : " – noch offen" }}</span>
+          {{ r.text }}<span class="sr-only">{{ r.ok ? $t(" – erfüllt") : $t(" – noch offen") }}</span>
         </li>
       </ul>
 
       <p v-if="error" class="connection-note error" role="alert" data-testid="cp-error">{{ error }}</p>
 
       <div class="cp-actions">
-        <Button variant="ghost" type="button" data-testid="cp-logout" :disabled="busy" @click="auth.logout()">Abmelden</Button>
+        <Button variant="ghost" type="button" data-testid="cp-logout" :disabled="busy" @click="auth.logout()">{{ $t("Abmelden") }}</Button>
         <Button variant="primary" type="submit" data-testid="cp-submit" :busy="busy" :disabled="!canSubmit">
-          {{ busy ? "Wird gespeichert …" : "Passwort speichern" }}
+          {{ busy ? $t("Wird gespeichert …") : $t("Passwort speichern") }}
         </Button>
       </div>
     </form>
