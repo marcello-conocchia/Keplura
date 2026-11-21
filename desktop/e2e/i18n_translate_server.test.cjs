@@ -50,3 +50,13 @@ test("German UI leaves everything as it is", () => {
   assert.equal(i18n.translateServer({ message: "Verbunden." }).message, "Verbunden.");
   i18n.setLocale("en");
 });
+
+test("titles and details get no catch-all patterns, chat gets exact matches only", () => {
+  assert.equal(i18n.translateServer({ title: "Der Beleg fehlt." }).title, "Der Beleg fehlt.");
+  assert.equal(i18n.translateServer({ steps: [{ title: "Anna ist Mitglied von „Muster GmbH“." }] }).steps[0].title,
+    "Anna is a member of “Muster GmbH”.");
+  assert.equal(i18n.serverExact("Der Beleg fehlt."), "Der Beleg fehlt.");
+  assert.equal(i18n.translateServer({ label: "Gesundheit" }).label, "Health");
+  assert.equal(i18n.translateServer({ label: "Dokumente" }).label, "Dokumente"); // UI word, not a server label
+  assert.equal(i18n.translateServer({ contentReason: "kein Text (z. B. Scan)" }).contentReason, "no text (e.g. scan)");
+});
