@@ -208,8 +208,8 @@ public final class ContentPatterns {
         add(out, IBAN, "IBAN", ibans(text, masked));
         add(out, CREDIT_CARD, "Kreditkartennummer", digitIds(CARD, masked,
                 d -> d.length() >= 13 && d.length() <= 19 && cardPrefix(d) && luhn(d)));
-        add(out, TAX_ID, "Steuer-ID", digitIds(TAX, masked, ContentPatterns::validTaxId));
         add(out, SOCIAL_SECURITY, "Sozialversicherungsnummer", socialSecurity(masked));
+        add(out, TAX_ID, "Steuer-ID", digitIds(TAX, masked, ContentPatterns::validTaxId));
         String norm = normalize(text);
         int hr = count(HR, norm);
         if (hr >= MIN_TERM_HITS) add(out, HR_TERMS, "Begriffe zu Personal und Gehalt", hr);
@@ -245,8 +245,8 @@ public final class ContentPatterns {
                         break;
                     }
                 }
-                boolean boundary = i >= text.length() || !Character.isLetterOrDigit(text.charAt(i))
-                        || text.charAt(i - 1) != ' ' && text.charAt(i - 1) != text.charAt(i) && endsGroup(text, i);
+                // direkt danach darf kein weiteres Zeichen der Kennung folgen
+                boolean boundary = i >= text.length() || !Character.isLetterOrDigit(text.charAt(i));
                 if (compact.length() == len && boundary && validIban(compact.toString())) {
                     seen.add(compact.toString());
                     blank(masked, m.start(), i);
@@ -256,11 +256,6 @@ public final class ContentPatterns {
             from = Math.max(end, m.start() + 1);
         }
         return seen.size();
-    }
-
-    /** Nach einer vollständigen IBAN darf direkt (ohne Leerzeichen) kein weiteres Zeichen folgen. */
-    private static boolean endsGroup(String text, int i) {
-        return !Character.isLetterOrDigit(text.charAt(i));
     }
 
     private interface DigitCheck {
