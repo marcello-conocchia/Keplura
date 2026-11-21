@@ -125,4 +125,11 @@ class ContentPatternsTest {
                 .doesNotContainKey(ContentPatterns.HEALTH_TERMS);
         assertThat(counts("Attest vom Arzt, Diagnose, Arztbrief")).containsEntry(ContentPatterns.HEALTH_TERMS, 3);
     }
+
+    @Test
+    void tailOfALongerGroupedNumberDoesNotCount() {
+        assertThat(counts("Ref 1234 5678 4111 1111 1111 1111")).doesNotContainKey(ContentPatterns.CREDIT_CARD);
+        assertThat(counts("Ref 4111 1111 1111 1111 2222")).doesNotContainKey(ContentPatterns.CREDIT_CARD);
+        assertThat(counts("Atteste liegen vor, Arztbrief und Diagnose")).containsEntry(ContentPatterns.HEALTH_TERMS, 3);
+    }
 }

@@ -215,4 +215,11 @@ class ExposureContentInspectorTest {
             assertThat(r.state()).as("file %d: %s", i, r.reason()).isEqualTo(ExposureContentInspector.CHECKED);
         }
     }
+
+    @Test
+    void utf16WithoutMarkAndMostlyNonLatinIsNotCheckable() {
+        byte[] b = "Привет мир, это проверка текста без отметки".getBytes(StandardCharsets.UTF_16LE);
+        var r = inspect("ru.txt", b);
+        assertThat(r.state()).isEqualTo(ExposureContentInspector.NOT_CHECKABLE);
+    }
 }

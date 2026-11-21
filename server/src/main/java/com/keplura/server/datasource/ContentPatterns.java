@@ -176,7 +176,7 @@ public final class ContentPatterns {
             "social security", "termination letter", "performance review");
 
     static final List<String> HEALTH_WORDS = List.of(
-            "diagnose", "diagnosis", "krankmeldung", "krankschreibung", "arbeitsunfaehig", "attest!", "befund",
+            "diagnose", "diagnosis", "krankmeldung", "krankschreibung", "arbeitsunfaehig", "attest!", "atteste", "befund",
             "arztbrief", "icd-10", "schwerbehinder", "grad der behinderung", "medikation", "eingliederungsmanagement",
             "betriebsarzt", "medication", "sick leave", "sick note", "medical record", "medical certificate",
             "disability");
@@ -292,7 +292,7 @@ public final class ContentPatterns {
         int from = 0;
         while (from < masked.length() && m.find(from)) {
             String digits = m.group().replaceAll("[^0-9]", "");
-            if (check.test(digits)) {
+            if (check.test(digits) && standsAlone(masked, m.start(), m.end())) {
                 seen.add(digits);
                 hits.add(new int[]{m.start(), m.end()});
                 from = m.end();
@@ -302,6 +302,25 @@ public final class ContentPatterns {
         }
         for (int[] h : hits) blank(masked, h[0], h[1]);
         return seen.size();
+    }
+
+    /**
+     * Treffer zählt nur, wenn er nicht Teil einer längeren gruppierten Nummer ist: direkt davor oder
+     * danach (getrennt durch Leerzeichen/Bindestrich) steht keine Gruppe mit 4 oder mehr Ziffern.
+     * Kurze Zahlen daneben („Pos 12“, Ablaufdatum „12/27“) stören nicht.
+     */
+    private static boolean standsAlone(CharSequence s, int start, int end) {
+        if (end + 1 < s.length() && (s.charAt(end) == ' ' || s.charAt(end) == '-')) {
+            int n = 0;
+            for (int i = end + 1; i < s.length() && Character.isDigit(s.charAt(i)); i++) n++;
+            if (n >= 4) return false;
+        }
+        if (start >= 2 && (s.charAt(start - 1) == ' ' || s.charAt(start - 1) == '-')) {
+            int n = 0;
+            for (int i = start - 2; i >= 0 && Character.isDigit(s.charAt(i)); i--) n++;
+            if (n >= 4) return false;
+        }
+        return true;
     }
 
     private static int socialSecurity(StringBuilder masked) {

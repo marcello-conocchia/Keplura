@@ -218,7 +218,11 @@ public class ExposureContentInspector {
                     .onUnmappableCharacter(CodingErrorAction.REPORT)
                     .decode(java.nio.ByteBuffer.wrap(b)).toString();
         } catch (java.nio.charset.CharacterCodingException e) {
-            return new String(b, java.nio.charset.Charset.forName("windows-1252"));
+            String s = new String(b, java.nio.charset.Charset.forName("windows-1252"));
+            // überwiegend Zeichen jenseits von ASCII: eher UTF-16 ohne Kennung o. Ä. als Windows-Text
+            int high = 0, n = Math.min(s.length(), 4096);
+            for (int i = 0; i < n; i++) if (s.charAt(i) >= 0x80) high++;
+            return high * 10 > n * 3 ? null : s;
         }
     }
 
