@@ -1,0 +1,51 @@
+# Dependabot: only security fixes, bundled.
+#
+# Version updates are switched off (open-pull-requests-limit: 0), so Dependabot
+# does not open a PR for every new release. Security updates are not affected
+# by that limit; they still arrive when an advisory hits one of our
+# dependencies, but grouped into ONE pull request per ecosystem/directory
+# instead of one per package. A `schedule` is required by the file format; it
+# only applies to the (disabled) version updates.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /desktop
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 0
+    groups:
+      security:
+        applies-to: security-updates
+        patterns: ["*"]
+
+  - package-ecosystem: cargo
+    directories:
+      - /desktop/src-tauri
+      - /server/native/local-reader
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 0
+    groups:
+      security:
+        applies-to: security-updates
+        patterns: ["*"]
+
+  - package-ecosystem: maven
+    directory: /server
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 0
+    groups:
+      security:
+        applies-to: security-updates
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 0
+    groups:
+      security:
+        applies-to: security-updates
+        patterns: ["*"]
