@@ -297,11 +297,31 @@ public final class ContentPatterns {
                 hits.add(new int[]{m.start(), m.end()});
                 from = m.end();
             } else {
-                from = m.start() + 1; // „Pos 12 4111 …“: ab der nächsten Ziffernfolge neu versuchen
+                int prefixEnd = validPrefix(masked, m.start(), m.end(), check);
+                if (prefixEnd > 0) { // „4111 1111 1111 1111 12/27“: kürzerer Treffer an einer Gruppengrenze
+                    String d = masked.subSequence(m.start(), prefixEnd).toString().replaceAll("[^0-9]", "");
+                    seen.add(d);
+                    hits.add(new int[]{m.start(), prefixEnd});
+                    from = prefixEnd;
+                } else {
+                    from = m.start() + 1; // „Pos 12 4111 …“: ab der nächsten Ziffernfolge neu versuchen
+                }
             }
         }
         for (int[] h : hits) blank(masked, h[0], h[1]);
         return seen.size();
+    }
+
+    /** Kürzester gültiger Anfang des Treffers, der an einer Gruppengrenze endet; sonst -1. */
+    private static int validPrefix(CharSequence s, int start, int end, DigitCheck check) {
+        for (int i = start + 1; i < end; i++) {
+            char c = s.charAt(i);
+            if ((c == ' ' || c == '-') && Character.isDigit(s.charAt(i - 1))) {
+                String d = s.subSequence(start, i).toString().replaceAll("[^0-9]", "");
+                if (check.test(d) && standsAlone(s, start, i)) return i;
+            }
+        }
+        return -1;
     }
 
     /**

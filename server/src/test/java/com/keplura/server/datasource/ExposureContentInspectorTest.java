@@ -218,7 +218,8 @@ class ExposureContentInspectorTest {
 
     @Test
     void utf16WithoutMarkAndMostlyNonLatinIsNotCheckable() {
-        byte[] b = "Привет мир, это проверка текста без отметки".getBytes(StandardCharsets.UTF_16LE);
+        byte[] b = "中文测试文本内容没有标记的文件示例".getBytes(StandardCharsets.UTF_16LE);
+        for (byte x : b) assertThat(x).isNotEqualTo((byte) 0); // keine Nullbytes: prüft den cp1252-Zweig
         var r = inspect("ru.txt", b);
         assertThat(r.state()).isEqualTo(ExposureContentInspector.NOT_CHECKABLE);
     }

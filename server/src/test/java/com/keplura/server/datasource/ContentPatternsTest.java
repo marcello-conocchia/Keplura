@@ -132,4 +132,9 @@ class ContentPatternsTest {
         assertThat(counts("Ref 4111 1111 1111 1111 2222")).doesNotContainKey(ContentPatterns.CREDIT_CARD);
         assertThat(counts("Atteste liegen vor, Arztbrief und Diagnose")).containsEntry(ContentPatterns.HEALTH_TERMS, 3);
     }
+
+    @Test
+    void cardFollowedByExpiryIsFound() {
+        assertThat(counts("Karte 4111 1111 1111 1111 12/27")).containsEntry(ContentPatterns.CREDIT_CARD, 1);
+    }
 }
