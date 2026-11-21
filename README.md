@@ -35,7 +35,8 @@ a real language model. Recreate them with `desktop/e2e/readme_screenshots.cjs`.<
   with OWNER/MEMBER roles, invitations, and local accounts, LDAP/Active
   Directory or OIDC single sign-on.
 - **Optional extras.** Web search, MCP tool servers and an "oversharing check"
-  that flags broadly readable or sensitive-looking files before import.
+  that flags broadly readable files before import and checks their content
+  for IBANs, card numbers, tax IDs and similar data (counts only, no values).
 - **Operations included.** One-command installer, backup/restore scripts,
   health endpoint, answer-quality check.
 

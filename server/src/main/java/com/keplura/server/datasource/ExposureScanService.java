@@ -24,8 +24,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * RISK-01 — Oversharing-Check: prüft VOR der Übernahme für jede Datei einer
  * Quelle, ob sie für (praktisch) alle lesbar ist und ob Pfad/Name auf sensible
- * Inhalte hindeutet. Liest nur Dateiliste und Rechte, keine Inhalte, und
- * schreibt nichts — weder in Keplura noch in die Ablage.
+ * Inhalte hindeutet. Liest Dateiliste und Rechte und schreibt nichts — weder
+ * in Keplura noch in die Ablage.
+ *
+ * <p>RISK-02: Ist der {@link ExposureContentInspector} aktiv, wird zusätzlich der Inhalt
+ * breit lesbarer Dateien auf sensible Muster geprüft. Dabei werden diese Dateien
+ * gelesen (nur sie); im Bericht stehen nur Kategorie und Anzahl, nie Werte.
  *
  * <p>Ergebnisse liegen nur im Speicher (je Quelle das letzte); nach einem
  * Neustart wird neu geprüft. Pfade sind Admin-Daten und werden nicht geloggt.
@@ -43,17 +47,35 @@ public class ExposureScanService {
     public record Folder(String folder, int broadFiles, int sensitiveFiles) {
     }
 
-    public record Finding(String relativePath, List<String> categories, List<String> broadGroups) {
+    /**
+     * {@code contentState}: {@code CHECKED}, {@code NOT_CHECKABLE} oder {@code null} (Inhalt nicht geprüft).
+     * {@code contentHits}: nur Kategorie + Anzahl.
+     */
+    public record Finding(String relativePath, List<String> categories, List<String> broadGroups,
+                          String contentState, String contentReason, List<ContentPatterns.Hit> contentHits) {
+        Finding(String relativePath, List<String> categories, List<String> broadGroups) {
+            this(relativePath, categories, broadGroups, null, null, List.of());
+        }
+    }
+
+    /** RISK-02: Inhaltsprüfung der breit lesbaren Dateien. {@code skipped} = über der Dateigrenze. */
+    public record ContentSummary(boolean enabled, int checked, int sensitive, int notCheckable, int skipped) {
+        static final ContentSummary OFF = new ContentSummary(false, 0, 0, 0, 0);
     }
 
     public record Report(String state, Instant startedAt, Instant finishedAt, int filesTotal, int filesChecked,
                          int broadFiles, int sensitiveBroadFiles, int sensitiveFiles, int unreadable,
                          boolean mirrorPermissions, boolean truncated, List<Group> broadGroups,
-                         List<Folder> folders, List<Finding> findings, String message) {
+                         List<Folder> folders, List<Finding> findings, String message, ContentSummary content,
+                         int findingsTotal) {
 
         static Report running(Instant started, int total, int checked, boolean mirror) {
+            return running(started, total, checked, mirror, null);
+        }
+
+        static Report running(Instant started, int total, int checked, boolean mirror, ContentSummary content) {
             return new Report("RUNNING", started, null, total, checked, 0, 0, 0, 0, mirror, false,
-                    List.of(), List.of(), List.of(), null);
+                    List.of(), List.of(), List.of(), null, content, 0);
         }
     }
 
@@ -67,6 +89,7 @@ public class ExposureScanService {
         return t;
     });
     private com.keplura.server.directory.DirectoryService directoryService;
+    private ExposureContentInspector contentInspector;
 
     public ExposureScanService(DataSourceSyncService sync, DataSourceRepository sources) {
         this.sync = sync;
@@ -76,6 +99,11 @@ public class ExposureScanService {
     @Autowired(required = false)
     void setDirectoryService(com.keplura.server.directory.DirectoryService directoryService) {
         this.directoryService = directoryService;
+    }
+
+    @Autowired(required = false)
+    void setContentInspector(ExposureContentInspector contentInspector) {
+        this.contentInspector = contentInspector;
     }
 
     @PreDestroy
@@ -114,7 +142,7 @@ public class ExposureScanService {
                 r.filesTotal(), r.filesChecked(), r.broadFiles(), r.sensitiveBroadFiles(), r.sensitiveFiles(),
                 r.unreadable(), r.mirrorPermissions(), r.truncated(), r.broadGroups(), r.folders(),
                 r.findings().stream().filter(f -> !relativePaths.contains(f.relativePath())).toList(),
-                r.message()));
+                r.message(), r.content(), r.findingsTotal()));
     }
 
     public void discard(Long dataSourceId) {
@@ -131,12 +159,17 @@ public class ExposureScanService {
             DataSourceSyncService.Filter filter = sync.new Filter(ds);
             List<SourceConnector.Entry> accepted = all.stream()
                     .filter(e -> filter.check(e) == DataSourceSyncService.Verdict.OK).toList();
-            reports.put(ds.getId(), Report.running(started, accepted.size(), 0, mirror));
+            boolean inspectEnabled = contentInspector != null && contentInspector.enabled();
+            ContentSummary runningContent = inspectEnabled ? new ContentSummary(true, 0, 0, 0, 0) : ContentSummary.OFF;
+            reports.put(ds.getId(), Report.running(started, accepted.size(), 0, mirror, runningContent));
 
             Map<String, Integer> groupCounts = new HashMap<>();
             Map<String, int[]> folderCounts = new HashMap<>();
             List<Finding> findings = new ArrayList<>();
-            int broad = 0, sensitiveBroad = 0, sensitive = 0, unreadable = 0;
+            int broad = 0, sensitiveBroad = 0, sensitive = 0, unreadable = 0, candidates = 0;
+            boolean inspect = inspectEnabled;
+            long contentDeadline = inspect ? System.currentTimeMillis() + contentInspector.maxRunMillis() : 0;
+            int cChecked = 0, cSensitive = 0, cNotCheckable = 0, cSkipped = 0;
             AtomicInteger checked = new AtomicInteger();
             for (SourceConnector.Entry e : accepted) {
                 if (Thread.currentThread().isInterrupted()) break;
@@ -151,7 +184,8 @@ public class ExposureScanService {
                     }
                 }
                 int n = checked.incrementAndGet();
-                if (n % 200 == 0) reports.put(ds.getId(), Report.running(started, accepted.size(), n, mirror));
+                if (n % (inspect ? 10 : 200) == 0) reports.put(ds.getId(), Report.running(started, accepted.size(), n, mirror,
+                        runningContent));
                 Set<String> categories = ExposureRules.sensitiveCategories(e.relativePath());
                 if (!categories.isEmpty()) sensitive++;
                 if (acl == null) { // fail-closed beim Abgleich: für niemanden sichtbar
@@ -164,12 +198,33 @@ public class ExposureScanService {
                 for (String p : broadHere) groupCounts.merge(p, 1, Integer::sum);
                 int[] fc = folderCounts.computeIfAbsent(ExposureRules.folderOf(e.relativePath()), k -> new int[2]);
                 fc[0]++;
-                if (!categories.isEmpty()) {
-                    sensitiveBroad++;
-                    fc[1]++;
+                if (!categories.isEmpty()) sensitiveBroad++;
+                ExposureContentInspector.Result content = null;
+                if (inspect) {
+                    if (cChecked + cNotCheckable < contentInspector.maxFiles()
+                            && System.currentTimeMillis() < contentDeadline) {
+                        content = contentInspector.inspect(c, e);
+                        if (ExposureContentInspector.CHECKED.equals(content.state())) {
+                            cChecked++;
+                            if (!content.hits().isEmpty()) cSensitive++;
+                        } else {
+                            cNotCheckable++;
+                        }
+                    } else {
+                        cSkipped++;
+                    }
+                }
+                boolean contentHit = content != null && !content.hits().isEmpty();
+                boolean notCheckable = content != null && ExposureContentInspector.NOT_CHECKABLE.equals(content.state());
+                if (!categories.isEmpty() || contentHit) fc[1]++;
+                if (!categories.isEmpty() || contentHit || notCheckable) {
+                    candidates++;
                     if (findings.size() < MAX_FINDINGS) {
                         findings.add(new Finding(e.relativePath(), List.copyOf(categories),
-                                broadHere.stream().map(ExposureRules::broadLabel).distinct().toList()));
+                                broadHere.stream().map(ExposureRules::broadLabel).distinct().toList(),
+                                content == null ? null : content.state(),
+                                content == null ? null : content.reason(),
+                                content == null ? List.of() : List.copyOf(content.hits())));
                     }
                 }
             }
@@ -182,18 +237,21 @@ public class ExposureScanService {
                     .limit(MAX_FOLDERS)
                     .map(en -> new Folder(en.getKey(), en.getValue()[0], en.getValue()[1])).toList();
             findings.sort(Comparator.comparing(Finding::relativePath));
-            boolean truncated = all.size() >= DataSourceSyncService.MAX_FILES || sensitiveBroad > findings.size();
+            boolean truncated = all.size() >= DataSourceSyncService.MAX_FILES || candidates > findings.size();
+            ContentSummary contentSummary = inspect
+                    ? new ContentSummary(true, cChecked, cSensitive, cNotCheckable, cSkipped) : ContentSummary.OFF;
             String message = !mirror
                     ? "Die Rechte-Übernahme ist ausgeschaltet: Alle Mitglieder der Wissensbasis sehen alle Dateien."
                     : all.size() >= DataSourceSyncService.MAX_FILES
                     ? "Mehr als " + DataSourceSyncService.MAX_FILES + " Dateien – nur die ersten wurden geprüft."
                     : null;
             return new Report("DONE", started, Instant.now(), accepted.size(), checked.get(), broad, sensitiveBroad,
-                    sensitive, unreadable, mirror, truncated, groups, folders, List.copyOf(findings), message);
+                    sensitive, unreadable, mirror, truncated, groups, folders, List.copyOf(findings), message,
+                    contentSummary, candidates);
         } catch (IOException | RuntimeException e) {
             log.info("datasource {} exposure scan failed ({})", ds.getId(), e.getClass().getSimpleName());
             return new Report("FAILED", started, Instant.now(), 0, 0, 0, 0, 0, 0, mirror, false,
-                    List.of(), List.of(), List.of(), DataSourceSyncService.message(e));
+                    List.of(), List.of(), List.of(), DataSourceSyncService.message(e), null, 0);
         }
     }
 

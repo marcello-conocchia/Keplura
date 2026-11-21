@@ -108,6 +108,12 @@ public class TikaDocumentTextExtractor {
     private final int maxDocxPages;
     private final int timeoutSeconds;
     private final ThreadPoolExecutor parserPool;
+    /**
+     * RISK-02: eigene Spur für die Inhaltsprüfung (ein Thread, ein Warteplatz). So belegt
+     * der Oversharing-Check nie die Plätze, die Uploads, Chat-Anhänge und Abgleich brauchen —
+     * auch nicht, wenn ein abgebrochener Parse noch nachläuft.
+     */
+    private final ThreadPoolExecutor inspectionPool;
 
     public TikaDocumentTextExtractor(
             @Value("${keplura.parser.extracted-chars:2000000}") int maxExtractedChars,
@@ -136,11 +142,22 @@ public class TikaDocumentTextExtractor {
                     return t;
                 },
                 new ThreadPoolExecutor.AbortPolicy());
+        // One running parse plus one waiting slot: a direct hand-off (SynchronousQueue) races
+        // with the worker returning to the queue and rejects back-to-back files spuriously.
+        this.inspectionPool = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
+                new java.util.concurrent.ArrayBlockingQueue<>(1),
+                r -> {
+                    Thread t = new Thread(r, "tika-inspection");
+                    t.setDaemon(true);
+                    return t;
+                },
+                new ThreadPoolExecutor.AbortPolicy());
     }
 
     @PreDestroy
     void shutdownPool() {
         parserPool.shutdownNow();
+        inspectionPool.shutdownNow();
     }
 
     /**
@@ -198,6 +215,27 @@ public class TikaDocumentTextExtractor {
             throw new BlankExtractedTextException("document contains no extractable text layer");
         }
         return new ExtractedText(parsed.text(), parsed.pages(), ocrPages);
+    }
+
+    /**
+     * RISK-02 Inhaltsprüfung (Oversharing-Check): wie {@link #extract(String, Path)}, aber ohne OCR
+     * und mit eigener, höchstens gleich großer Seitengrenze und eigenem Zeitlimit. Zeichen- und
+     * Zip-Grenzen bleiben dieselben; der Parse läuft auf einem eigenen Thread, nicht im Upload-Pool.
+     * Läuft dort noch ein abgebrochener Parse, kommt {@link ExtractionBusyException}.
+     */
+    public ExtractedText extractForInspection(String filename, Path file, int maxPages, int timeoutSeconds) {
+        String ext = extensionOf(filename);
+        if (!PARSED_EXTENSIONS.contains(ext)) {
+            throw new UnextractableDocumentException("unsupported document type");
+        }
+        int pdfPages = Math.min(maxPages, maxPdfPages);
+        int docxPages = Math.min(maxPages, maxDocxPages);
+        Parsed parsed = runBounded(inspectionPool, null, () -> parse(ext, file, pdfPages, docxPages),
+                Math.min(timeoutSeconds, this.timeoutSeconds));
+        if (parsed.text().isBlank()) {
+            throw new BlankExtractedTextException("document contains no extractable text layer");
+        }
+        return new ExtractedText(parsed.text(), parsed.pages(), 0);
     }
 
     /**
@@ -291,6 +329,10 @@ public class TikaDocumentTextExtractor {
     }
 
     private Parsed parse(String ext, Path storedFile) throws Exception {
+        return parse(ext, storedFile, maxPdfPages, maxDocxPages);
+    }
+
+    private Parsed parse(String ext, Path storedFile, int pdfPageLimit, int docxPageLimit) throws Exception {
         // The parse works on a temp copy, never the stored original:
         // (1) PDFBox memory-maps path-backed input, so an abandoned
         // (timed-out) worker could keep the LIVE upload file open — a copy
@@ -303,7 +345,7 @@ public class TikaDocumentTextExtractor {
             boolean slides = "pptx".equals(ext);
             boolean workbook = "xlsx".equals(ext);
             if (pdf) {
-                preCheckPdfPages(tmp); // structural reject BEFORE text extraction
+                preCheckPdfPages(tmp, pdfPageLimit); // structural reject BEFORE text extraction
             }
             Metadata metadata = new Metadata();
             ParseContext context = new ParseContext();
@@ -311,7 +353,7 @@ public class TikaDocumentTextExtractor {
             if (pdf) {
                 // defence in depth: even if the structural count below were
                 // bypassed, the parser never extracts beyond the window
-                context.set(PageRangeRequest.class, new PageRangeRequest(1, maxPdfPages));
+                context.set(PageRangeRequest.class, new PageRangeRequest(1, pdfPageLimit));
             }
             if (slides || workbook) {
                 var office = new org.apache.tika.parser.microsoft.OfficeParserConfig();
@@ -393,8 +435,8 @@ public class TikaDocumentTextExtractor {
             }
             String text = handler.toString();
             int pages = slides ? officeSections : parsePages(metadata.get(PagedText.N_PAGES));
-            int pageLimit = pdf ? maxPdfPages : slides ? OfficePackagePolicy.MAX_SLIDES
-                    : workbook ? Integer.MAX_VALUE : maxDocxPages;
+            int pageLimit = pdf ? pdfPageLimit : slides ? OfficePackagePolicy.MAX_SLIDES
+                    : workbook ? Integer.MAX_VALUE : docxPageLimit;
             if (pages > pageLimit) {
                 throw new TruncatedExtractionException("document exceeds the page limit ("
                         + pages + " pages > " + pageLimit + ")");
@@ -412,16 +454,16 @@ public class TikaDocumentTextExtractor {
     }
 
     /** Structural page pre-count: a page bomb is rejected before any text work. */
-    private void preCheckPdfPages(Path tmp) throws IOException {
+    private void preCheckPdfPages(Path tmp, int limit) throws IOException {
         try (PDDocument doc = Loader.loadPDF(tmp.toFile())) {
             int pages = doc.getNumberOfPages();
-            if (pages > maxPdfPages) {
+            if (pages > limit) {
                 throw new TruncatedExtractionException("pdf exceeds the page limit ("
-                        + pages + " pages > " + maxPdfPages + ")");
+                        + pages + " pages > " + limit + ")");
             }
         } catch (IOException e) {
             // unreadable structure — let the real parse produce the classified error
-            log.debug("pdf pre-count could not open the document; continuing to parse", e);
+            log.debug("pdf pre-count could not open the document ({}); continuing to parse", e.getClass().getSimpleName());
         }
     }
 
@@ -527,9 +569,17 @@ public class TikaDocumentTextExtractor {
      * speed.
      */
     Parsed runBounded(Long documentId, Callable<Parsed> work) {
+        return runBounded(documentId, work, timeoutSeconds);
+    }
+
+    Parsed runBounded(Long documentId, Callable<Parsed> work, int timeoutSeconds) {
+        return runBounded(parserPool, documentId, work, timeoutSeconds);
+    }
+
+    private Parsed runBounded(ThreadPoolExecutor pool, Long documentId, Callable<Parsed> work, int timeoutSeconds) {
         java.util.concurrent.Future<Parsed> future;
         try {
-            future = parserPool.submit(work);
+            future = pool.submit(work);
         } catch (RejectedExecutionException e) {
             throw new ExtractionBusyException("server is busy extracting documents", e);
         }
@@ -555,7 +605,9 @@ public class TikaDocumentTextExtractor {
                 throw new UnextractableDocumentException(
                         "stored file is not a valid document of its claimed type");
             }
-            log.debug("extraction failed for document {}", documentId, cause);
+            // only the class: parser messages may quote document text
+            log.debug("extraction failed for document {} ({})", documentId,
+                    cause == null ? "unknown" : cause.getClass().getSimpleName());
             throw new UnextractableDocumentException("document could not be parsed");
         }
     }

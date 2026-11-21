@@ -7,8 +7,8 @@
  */
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import {
-  excludeFromSource, exposureReport, principalLabel, resultText, startExposureScan,
-  type DataSource, type ExposureReport,
+  contentHitText, contentReasonText, excludeFromSource, exposureReport, principalLabel, resultText, startExposureScan,
+  type DataSource, type ExposureFinding, type ExposureReport,
 } from "../../datasource-api";
 import AppDialog from "../ui/AppDialog.vue";
 import Button from "../ui/Button.vue";
@@ -109,7 +109,7 @@ function listText(): string {
   for (const f of r.folders) lines.push(tr("  {0}: {1} Dateien{2}", f.folder, f.broadFiles, f.sensitiveFiles ? tr(", davon {0} sensibel wirkend", f.sensitiveFiles) : ""));
   if (r.findings.length) {
     lines.push("", tr("Sensibel wirkende Dateien mit breiten Leserechten:"));
-    for (const f of r.findings) lines.push(tr("  {0} — {1} — lesbar für {2}", f.relativePath, f.categories.join(", "), f.broadGroups.join(", ")));
+    for (const f of r.findings) lines.push(tr("  {0} — {1} — lesbar für {2}", f.relativePath, reasons(f).join(", "), f.broadGroups.join(", ")));
   }
   return lines.join("\n");
 }
@@ -123,6 +123,13 @@ async function copyList() {
   }
 }
 
+/** Name-Kategorien, Inhaltstreffer und „nicht prüfbar“ als kurze Etiketten. */
+function reasons(f: ExposureFinding): string[] {
+  const out = [...f.categories.map((c) => tr(c)), ...f.contentHits.map(contentHitText)];
+  if (f.contentState === "NOT_CHECKABLE") out.push(tr("Inhalt nicht prüfbar: {0}", contentReasonText(f.contentReason)));
+  return out;
+}
+
 function pct(n: number, of: number) { return of ? Math.round((n / of) * 100) : 0; }
 function when(iso: string | null) {
   return iso ? new Date(iso).toLocaleString(dateLocale(), { dateStyle: "short", timeStyle: "short" }) : "";
@@ -133,7 +140,7 @@ function when(iso: string | null) {
   <AppDialog :open="source !== null" :title="$t('Oversharing-Check')" size="lg" :error="error" :busy="excluding" initial-focus="title" @close="emit('close')">
     <div class="xp" data-testid="exposure-dialog">
       <p class="xp-source">{{ source?.displayName }} <span>{{ source?.location }}</span></p>
-      <p class="xp-lead">{{ $t("Bevor Keplura Dateien übernimmt: Welche sind für praktisch alle Mitarbeitenden lesbar, und welche davon wirken sensibel? Geprüft werden nur Dateiliste und Zugriffsrechte, keine Inhalte. Die Ablage wird nicht verändert.") }}</p>
+      <p class="xp-lead">{{ report?.content?.enabled === false ? $t("Bevor Keplura Dateien übernimmt: Welche sind für praktisch alle Mitarbeitenden lesbar, und welche davon wirken sensibel? Geprüft werden nur Dateiliste und Zugriffsrechte, keine Inhalte. Die Ablage wird nicht verändert.") : $t("Bevor Keplura Dateien übernimmt: Welche sind für praktisch alle Mitarbeitenden lesbar, und welche davon sind sensibel? Geprüft werden Dateiliste, Zugriffsrechte und bei breit lesbaren Dateien der Inhalt, z. B. auf IBAN, Steuer-ID oder Gehaltsangaben. Gefundene Werte werden weder angezeigt noch gespeichert. Die Ablage wird nicht verändert.") }}</p>
 
       <div v-if="running || starting" class="xp-progress" role="status" data-testid="exposure-running">
         <StatusPill tone="wait">{{ $t("Prüfung läuft") }}</StatusPill>
@@ -152,7 +159,9 @@ function when(iso: string | null) {
         <div class="xp-summary" data-testid="exposure-summary">
           <div><strong class="ic-num">{{ report.filesChecked }}</strong><span>{{ $t("Dateien geprüft") }}</span></div>
           <div :class="{ hot: report.broadFiles }"><strong class="ic-num">{{ report.broadFiles }}</strong><span>{{ $t("für praktisch alle lesbar ({0} %)", pct(report.broadFiles, report.filesChecked)) }}</span></div>
-          <div :class="{ hot: report.sensitiveBroadFiles }"><strong class="ic-num">{{ report.sensitiveBroadFiles }}</strong><span>{{ $t("davon sensibel wirkend") }}</span></div>
+          <div :class="{ hot: report.sensitiveBroadFiles }"><strong class="ic-num">{{ report.sensitiveBroadFiles }}</strong><span>{{ $t("davon mit sensiblem Namen") }}</span></div>
+          <div v-if="report.content?.enabled" :class="{ hot: report.content.sensitive }" data-testid="exposure-content-sensitive"><strong class="ic-num">{{ report.content.sensitive }}</strong><span>{{ $t("davon mit sensiblem Inhalt") }}</span></div>
+          <div v-if="report.content?.notCheckable" data-testid="exposure-content-unchecked"><strong class="ic-num">{{ report.content.notCheckable }}</strong><span>{{ $t("Inhalt nicht prüfbar") }}</span></div>
           <div v-if="report.unreadable"><strong class="ic-num">{{ report.unreadable }}</strong><span>{{ $t("ohne lesbare Rechte (für niemanden sichtbar)") }}</span></div>
         </div>
         <p class="xp-meta">{{ $t("Geprüft {0}", when(report.finishedAt)) }}</p>
@@ -172,15 +181,16 @@ function when(iso: string | null) {
           </table></div>
 
           <h4>{{ $t("Sensibel wirkende Dateien mit breiten Leserechten") }}</h4>
-          <p class="xp-hint">{{ $t("Hinweis aus Ordner- und Dateinamen (z. B. Gehalt, Personalakte, Kündigung, Diagnose, Passwort, Bankverbindung), keine Inhaltsprüfung. Dateien mit unauffälligem Namen können trotzdem sensibel sein; prüfe dafür die Ordnerliste oben.") }}</p>
-          <p v-if="report.findings.length === 0" class="xp-ok">{{ $t("Keine Datei mit auffälligem Namen ist breit lesbar.") }}</p>
+          <p class="xp-hint">{{ report.content?.enabled ? $t("Hinweis aus Ordner- und Dateinamen (z. B. Gehalt, Personalakte, Diagnose, Passwort) und aus dem Inhalt (z. B. IBAN, Kreditkarte, Steuer-ID, Sozialversicherungsnummer, Gehalts- oder Gesundheitsangaben). Angezeigt werden nur Art und Anzahl, nie die Werte. Nicht prüfbare Dateien (zu groß, Scan, verschlüsselt) stehen ebenfalls hier.") : $t("Hinweis aus Ordner- und Dateinamen (z. B. Gehalt, Personalakte, Kündigung, Diagnose, Passwort, Bankverbindung), keine Inhaltsprüfung. Dateien mit unauffälligem Namen können trotzdem sensibel sein; prüfe dafür die Ordnerliste oben.") }}</p>
+          <p v-if="report.content?.skipped" class="xp-warn">{{ $t("Der Inhalt von {0} weiteren breit lesbaren Dateien wurde nicht geprüft (Grenze je Prüflauf).", report.content.skipped) }}</p>
+          <p v-if="report.findings.length === 0" class="xp-ok">{{ report.content?.enabled ? $t("Keine breit lesbare Datei hat einen auffälligen Namen oder Inhalt.") : $t("Keine Datei mit auffälligem Namen ist breit lesbar.") }}</p>
           <template v-else>
-            <label class="xp-all"><input type="checkbox" :checked="allSelected" data-testid="exposure-select-all" @change="toggleAll" /> {{ $t("Alle auswählen ({0}", report.findings.length) }}<template v-if="report.truncated"> {{ $t("von {0}", report.sensitiveBroadFiles) }}</template>)</label>
+            <label class="xp-all"><input type="checkbox" :checked="allSelected" data-testid="exposure-select-all" @change="toggleAll" /> {{ $t("Alle auswählen ({0}", report.findings.length) }}<template v-if="report.truncated"> {{ $t("von {0}", report.findingsTotal) }}</template>)</label>
             <ul class="xp-findings" data-testid="exposure-findings">
               <li v-for="f in report.findings" :key="f.relativePath">
                 <label><input type="checkbox" :checked="selected.has(f.relativePath)" @change="toggle(f.relativePath)" />
                   <span class="xp-path">{{ f.relativePath }}</span></label>
-                <span class="xp-tags"><span v-for="c in f.categories" :key="c" class="xp-tag">{{ c }}</span><span class="xp-who">{{ $t("lesbar für {0}", f.broadGroups.join(", ")) }}</span></span>
+                <span class="xp-tags"><span v-for="c in f.categories" :key="c" class="xp-tag">{{ $t(c) }}</span><span v-for="h in f.contentHits" :key="h.category" class="xp-tag" data-testid="exposure-content-hit">{{ contentHitText(h) }}</span><span v-if="f.contentState === 'NOT_CHECKABLE'" class="xp-tag muted" :title="$t('Fail-closed: lieber ausschließen oder von Hand prüfen.')">{{ $t("Inhalt nicht prüfbar: {0}", contentReasonText(f.contentReason)) }}</span><span class="xp-who">{{ $t("lesbar für {0}", f.broadGroups.join(", ")) }}</span></span>
               </li>
             </ul>
           </template>
@@ -237,6 +247,7 @@ function when(iso: string | null) {
 .xp-findings input,.xp-all input { accent-color:var(--ic-accent); margin-top:3px; flex:none; }
 .xp-tags { display:flex; flex-wrap:wrap; gap:6px; padding-left:24px; }
 .xp-tag { padding:0 8px; border-radius:999px; background:var(--ic-status-error-bg); color:var(--ic-status-error); font:500 12px/20px var(--ic-font); }
+.xp-tag.muted { background:var(--ic-status-wait-bg); color:var(--ic-status-wait); }
 .xp-who { color:var(--ic-text-2); font:400 12px/20px var(--ic-font); }
 .xp-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; width:100%; }
 .xp-spacer { flex:1; }

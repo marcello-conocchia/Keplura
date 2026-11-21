@@ -177,4 +177,114 @@ class ExposureScanServiceTest {
             service.stop();
         }
     }
+
+    // ------------------------------------------------------------ RISK-02
+
+    /** Share with contents; counts reads per path. */
+    static final class ContentShare implements SourceConnector {
+        final Map<String, SourceConnector.FileAcl> acls;
+        final Map<String, String> contents;
+        final Map<String, Integer> reads = new java.util.concurrent.ConcurrentHashMap<>();
+
+        ContentShare(Map<String, SourceConnector.FileAcl> acls, Map<String, String> contents) {
+            this.acls = acls;
+            this.contents = contents;
+        }
+        @Override public List<Entry> list(int limit) {
+            return acls.keySet().stream().sorted().map(p -> new Entry(p, 100, Instant.EPOCH)).toList();
+        }
+        @Override public InputStream open(String relativePath) throws IOException {
+            reads.merge(relativePath, 1, Integer::sum);
+            String c = contents.get(relativePath);
+            if (c == null) throw new IOException("access denied");
+            return new java.io.ByteArrayInputStream(c.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        }
+        @Override public FileAcl acl(String relativePath) {
+            return acls.get(relativePath);
+        }
+        @Override public void close() {
+        }
+    }
+
+    private ExposureScanService withInspector(ExposureContentInspector inspector) {
+        var service = new ExposureScanService(sync, mock(DataSourceRepository.class));
+        service.setContentInspector(inspector);
+        return service;
+    }
+
+    @Test
+    void contentOfBroadFilesIsCheckedAndOnlyCountsAreReported() throws Exception {
+        var acls = new java.util.HashMap<String, SourceConnector.FileAcl>();
+        acls.put("vertrieb/Liste.csv", allow(DOMAIN_USERS));          // unauffälliger Name, IBANs im Inhalt
+        acls.put("vertrieb/Notizen.txt", allow(DOMAIN_USERS));        // breit, unauffällig
+        acls.put("vertrieb/Kaputt.txt", allow(DOMAIN_USERS));         // breit, nicht lesbar
+        acls.put("gf/Konten.csv", allow(SALES));                      // eng: Inhalt wird nicht gelesen
+        var contents = Map.of(
+                "vertrieb/Liste.csv", "Kunde;IBAN\nA;DE89370400440532013000\nB;GB82WEST12345698765432\nC;DE89370400440532013000",
+                "vertrieb/Notizen.txt", "Termin am Montag.",
+                "gf/Konten.csv", "DE89370400440532013000");
+        var share = new ContentShare(acls, contents);
+        DataSource ds = source(true, "");
+        doReturn(share).when(sync).connect(ds);
+        var inspector = new ExposureContentInspector(null, true, 1024 * 1024, 50, 10, 100);
+        try {
+            var r = withInspector(inspector).scan(ds);
+
+            assertThat(share.reads).doesNotContainKey("gf/Konten.csv");
+            assertThat(r.content()).isEqualTo(new ExposureScanService.ContentSummary(true, 2, 1, 1, 0));
+            assertThat(r.findingsTotal()).isEqualTo(2);
+            assertThat(r.findings()).extracting(ExposureScanService.Finding::relativePath)
+                    .containsExactly("vertrieb/Kaputt.txt", "vertrieb/Liste.csv");
+            var liste = r.findings().get(1);
+            assertThat(liste.categories()).isEmpty();
+            assertThat(liste.contentState()).isEqualTo(ExposureContentInspector.CHECKED);
+            assertThat(liste.contentHits()).containsExactly(new ContentPatterns.Hit(ContentPatterns.IBAN, "IBAN", 2));
+            var kaputt = r.findings().get(0);
+            assertThat(kaputt.contentState()).isEqualTo(ExposureContentInspector.NOT_CHECKABLE);
+            assertThat(kaputt.contentReason()).isEqualTo("Datei konnte nicht gelesen werden");
+            assertThat(r.folders().get(0)).isEqualTo(new ExposureScanService.Folder("vertrieb", 3, 1));
+
+            String json = tools.jackson.databind.json.JsonMapper.builder().build().writeValueAsString(r);
+            assertThat(json).doesNotContain("DE89").doesNotContain("3704").doesNotContain("WEST")
+                    .contains("\"contentHits\"").contains("\"count\":2");
+        } finally {
+            inspector.stop();
+        }
+    }
+
+    @Test
+    void contentChecksStopAtTheFileLimit() throws Exception {
+        var acls = new java.util.HashMap<String, SourceConnector.FileAcl>();
+        var contents = new java.util.HashMap<String, String>();
+        for (int i = 0; i < 5; i++) {
+            acls.put("a/f" + i + ".txt", allow("everyone"));
+            contents.put("a/f" + i + ".txt", "nichts");
+        }
+        DataSource ds = source(true, "");
+        doReturn(new ContentShare(acls, contents)).when(sync).connect(ds);
+        var inspector = new ExposureContentInspector(null, true, 1024, 50, 10, 3);
+        try {
+            var r = withInspector(inspector).scan(ds);
+            assertThat(r.content()).isEqualTo(new ExposureScanService.ContentSummary(true, 3, 0, 0, 2));
+            assertThat(r.findings()).isEmpty();
+        } finally {
+            inspector.stop();
+        }
+    }
+
+    @Test
+    void disabledInspectorBehavesLikeStageOne() throws Exception {
+        var files = Map.of("personal/Gehaltsliste.csv", allow(DOMAIN_USERS));
+        DataSource ds = source(true, "");
+        doReturn(new FakeShare(files)).when(sync).connect(ds); // open() would throw AssertionError
+        var inspector = new ExposureContentInspector(null, false, 1024, 50, 10, 3);
+        try {
+            var r = withInspector(inspector).scan(ds);
+            assertThat(r.content().enabled()).isFalse();
+            assertThat(r.findings()).hasSize(1);
+            assertThat(r.findings().get(0).contentState()).isNull();
+        } finally {
+            inspector.stop();
+        }
+    }
 }
