@@ -33,7 +33,9 @@ Asking the owner is the exception, not the rule.
      final commit SHA of the PR; its evidence run under
      `ci/evidence/<timestamp>/` (MATRIX.md + ci-local.log) is referenced in
      the PR body,
-  2. reviewer approval on the final commit SHA of the PR (not an earlier push),
+  2. reviewer approval on the final commit SHA of the PR (not an earlier push;
+     fixes of nit/minor findings after an approval keep it valid, see
+     "Review rounds" below),
   3. security / QA approval where their reviews are required,
   4. no open findings from reviewer / security / QA,
   5. no secrets or policy violations in the diff,
@@ -88,6 +90,28 @@ Asking the owner is the exception, not the rule.
      package installed. As root, rights tests fail by design (root bypasses
      file permissions) — that is an environment error, not a product bug.
      See docs/development.md "Local CI gate".
+- Review rounds (PO decision 2026-11-21, Chat: „wir müssen weniger testen es
+  dauert länger als das entwickeln selber“ → best-practice proposal → „ja mach
+  das so und verankere es in AGENTS.md“). Binding for every agent:
+  1. **Every finding has a severity:** blocker / major / minor / nit / info
+     (security: high / medium / low / info).
+  2. **One review round, at most one re-review.** Only blocker/major (security:
+     high/medium) block the merge and trigger a re-review of the fix. A second
+     re-review needs a new blocker/major found in the fix itself.
+  3. **Approve with comments.** Minor, nit and low findings do NOT block. The
+     author fixes them before merge without a new review round, or records
+     them as a follow-up task (kanban / PR note). The approval stays valid;
+     the PR body lists what was fixed after the approval.
+  4. **Info findings are noted, not worked off** — at most a follow-up task.
+  5. **No new full CI run for nit/minor fixes.** After such fixes run only the
+     targeted tests of the touched area; the green `ci-local.sh` run on the
+     approved product commit stays the gate. A full re-run is needed only if
+     a blocker/major fix changed product code.
+  6. **Review side findings go into the next regular PR**, not into an extra
+     PR with its own full CI and review run — unless they are a real bug on
+     `main` (then one small fix PR, one CI run).
+  7. **No browser or field tests without PO request**, except before a
+     Beta/Release (rule 3 of "Lean verification" applies unchanged).
 - Cross-platform: Windows/macOS builds and tests are NOT a per-PR gate — they
   form a RELEASE gate: required green before Beta/Release, not on every merge.
   The Linux run of `scripts/ci-local.sh` is the per-PR standard on this host.
