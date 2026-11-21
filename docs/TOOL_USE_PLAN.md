@@ -39,7 +39,7 @@ Nach jedem Merge PROJECT_STATE.md mit tatsächlichem Stand, Belegen und nächste
 
 ## Unmittelbar nächste Aufgabe
 
-**TU-02 — Aufrufkarten und konkrete Bestätigungen**, siehe [Spec](tasks/TU-02-tool-confirmations.md). Geplant, nicht gestartet. TU-01 ist abgeschlossen; mehrstufige Ausführung bleibt TU-03.
+**TU-02 — Aufrufkarten und konkrete Bestätigungen**, siehe [Spec](tasks/TU-02-tool-confirmations.md). Implementiert im Draft-PR, nicht gemergt. TU-01 ist abgeschlossen; mehrstufige Ausführung bleibt TU-03.
 
 ## Vergleichsquellen (abgerufen am 21.11.2026)
 

@@ -36,16 +36,16 @@ fs.mkdirSync(out, { recursive: true });
     });
     await step('Ein Werkzeug klassifizieren, freigeben und genau einen Arbeitsbereich freigeben; Neuladen erhält Auswahl', async () => {
       const server = page.getByTestId('admin-mcp-server').filter({ hasText: name });
-      assert(await server.getByRole('checkbox', { name: 'echo', exact: true }).isDisabled()); // TU-01: unclassified = blocked
+      assert(await server.getByRole('checkbox', { name: 'echo freigeben', exact: true }).isDisabled()); // TU-01: unclassified = blocked
       await server.getByRole('combobox', { name: 'Risikoklasse für echo', exact: true }).selectOption('READ');
-      await server.getByRole('checkbox', { name: 'echo', exact: true }).check();
+      await server.getByRole('checkbox', { name: 'echo freigeben', exact: true }).check();
       await server.getByRole('checkbox', { name: process.env.E2E_MCP_SPACE || 'Abnahme Datenquellen / Pilotbereich', exact: true }).check();
       await page.getByTestId('admin-tab-status').click();
       await page.getByTestId('admin-tab-mcp').click();
       await server.locator('.mcp-tools > summary').click();
       await server.locator('.mcp-access > summary').click();
-      await server.getByRole('checkbox', { name: 'echo', exact: true }).waitFor();
-      assert(await server.getByRole('checkbox', { name: 'echo', exact: true }).isChecked());
+      await server.getByRole('checkbox', { name: 'echo freigeben', exact: true }).waitFor();
+      assert(await server.getByRole('checkbox', { name: 'echo freigeben', exact: true }).isChecked());
       assert(await server.getByRole('checkbox', { name: process.env.E2E_MCP_SPACE || 'Abnahme Datenquellen / Pilotbereich', exact: true }).isChecked());
       assert(!(await server.getByTestId('admin-mcp-all-spaces').isChecked()));
     });

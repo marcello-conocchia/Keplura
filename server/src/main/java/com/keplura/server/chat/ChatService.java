@@ -110,6 +110,16 @@ public class ChatService {
     static final int MAX_TOOL_ROUNDS = 1;
 
     /**
+     * TU-02: the person's decision on one pending tool call of their own chat. Executes no model
+     * turn; the bound call runs at most once inside ToolExecutionService.
+     */
+    public com.keplura.server.tool.ToolExecutionService.Decision decideToolCall(Long userId, Long orgId, Long conversationId,
+                                                                               String callId, boolean confirm) {
+        if (toolExecution == null) return new com.keplura.server.tool.ToolExecutionService.Decision.NotFound();
+        return toolExecution.decide(userId, orgId, conversationId, callId, confirm);
+    }
+
+    /**
      * Plan a single batch from the CURRENT user instruction only. Retrieved text,
      * history and tool results can inform the answer, never authorize an action.
      * Once results are available the answer request has no tools, and any returned
@@ -120,7 +130,7 @@ public class ChatService {
         if (toolExecution == null) return null;
         com.keplura.server.tool.ToolContext toolContext = toolExecution.resolveContext(userId, orgId, ctx.conversationId());
         if (toolContext == null) return null;
-        com.keplura.server.tool.ToolExecutionService.ToolTurn tools = toolExecution.openTurn(toolContext);
+        com.keplura.server.tool.ToolExecutionService.ToolTurn tools = toolExecution.openTurn(toolContext, ctx.promptMessageId());
         if (tools.offered().isEmpty()) return null;
         ObjectNode body = (ObjectNode) mapper.readTree(ctx.canonicalRequestBody());
         body.put("stream", false);
@@ -268,7 +278,12 @@ public class ChatService {
                              String feedback) {
     }
 
-    public record TranscriptDto(Long conversationId, List<MessageDto> messages) {
+    /** TU-02: toolCalls = Aufrufkarten dieser Person im Chat (je Karte die zugehörige Frage). */
+    public record TranscriptDto(Long conversationId, List<MessageDto> messages,
+                                List<com.keplura.server.tool.ToolExecutionService.ToolCallView> toolCalls) {
+        public TranscriptDto(Long conversationId, List<MessageDto> messages) {
+            this(conversationId, messages, List.of());
+        }
     }
 
     /**
@@ -284,9 +299,9 @@ public class ChatService {
 
     /** What the end-of-stream persistence needs; created committed by beginTurn. */
     public record TurnContext(Long conversationId, String citationsJson,
-                              byte[] canonicalRequestBody, boolean noEvidence) {
+                              byte[] canonicalRequestBody, boolean noEvidence, Long promptMessageId) {
         public TurnContext(Long conversationId, String citationsJson, byte[] canonicalRequestBody) {
-            this(conversationId, citationsJson, canonicalRequestBody, false);
+            this(conversationId, citationsJson, canonicalRequestBody, false, null);
         }
     }
 
@@ -332,7 +347,16 @@ public class ChatService {
         List<MessageDto> messages = messageRepository.findTranscript(conversation.getId()).stream()
                 .map(this::toDto)
                 .toList();
-        return new TranscriptDto(conversation.getId(), messages);
+        List<com.keplura.server.tool.ToolExecutionService.ToolCallView> toolCalls = List.of();
+        if (toolExecution != null) {
+            try {
+                toolCalls = toolExecution.cards(userId, orgId, conversation.getId());
+            } catch (RuntimeException e) {
+                // cards are display state; the transcript itself must stay readable
+                log.warn("tool call cards unreadable (conversation={})", conversation.getId());
+            }
+        }
+        return new TranscriptDto(conversation.getId(), messages, toolCalls);
     }
 
     /**
@@ -382,6 +406,7 @@ public class ChatService {
         // transcript first, then the row; the delete re-proves the exact
         // visibility predicate, so a race against another delete answers 404
         messageRepository.deleteAllOf(conversation.getId());
+        if (toolExecution != null) toolExecution.deleteCards(conversation.getId());
         int removed = conversationRepository.deleteVisible(conversation.getId(), orgId, userId);
         if (removed != 1) {
             throw new ChatException(HttpStatus.NOT_FOUND, "conversation not found");
@@ -570,6 +595,8 @@ public class ChatService {
 
         ChatMessage userRow = ChatMessage.userMessage(conversation.getId(), truncate(clean));
         messageRepository.saveAndFlush(userRow);
+        // TU-02: a new message ends every still-pending confirmation of this chat (never executed).
+        if (toolExecution != null) toolExecution.cancelPending(userId, conversation.getId());
         Instant now = Instant.now();
         if (Conversation.DEFAULT_TITLE.equals(conversation.getTitle())) {
             // first prompt of an untitled thread names it (guarded bulk update)
@@ -588,7 +615,7 @@ public class ChatService {
                     && toolExecution.hasTools(userId, orgId, conversation.getId());
             noEvidence = !attachments && web.isEmpty() && !tools;
         }
-        return new TurnContext(conversation.getId(), citationsJson(hits), canonical, noEvidence);
+        return new TurnContext(conversation.getId(), citationsJson(hits), canonical, noEvidence, userRow.getId());
     }
 
     /**

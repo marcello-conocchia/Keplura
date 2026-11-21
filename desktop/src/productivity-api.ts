@@ -87,7 +87,7 @@ export const testWebSearchAdmin = () =>
 export type ToolRisk = "READ" | "WRITE" | "CRITICAL";
 export interface McpTool {
   name: string; description: string;
-  /** effectively approved (classified, not CRITICAL, schema supported, ticked) */
+  /** effectively approved (classified, schema supported, ticked); CRITICAL still needs a per-call confirmation */
   enabled: boolean;
   risk: ToolRisk | null; schemaSupported: boolean; schemaProblem: string | null;
   /** approval from before TU-01 without a risk class — no longer effective */

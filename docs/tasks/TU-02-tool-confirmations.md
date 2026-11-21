@@ -1,6 +1,6 @@
 # TU-02 — Aufrufkarten und konkrete Bestätigungen
 
-Status: **geplant, nicht gestartet**. Nächste einzelne Implementierungsaufgabe nach TU-01 (PR #15, Merge `1296cdb`). PO-Auftrag und Reihenfolge: [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Werkzeugausführung, Freigaben und Nutzerablauf.
+Status: **implementiert im Draft-PR, nicht gemergt** (Branch `feat/tool-use-confirmations`); unabhängige Code-/Security-Prüfung offen. Nächste einzelne Implementierungsaufgabe nach TU-01 (PR #15, Merge `1296cdb`). PO-Auftrag und Reihenfolge: [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Werkzeugausführung, Freigaben und Nutzerablauf.
 
 ## Ziel
 
@@ -43,3 +43,13 @@ Eigener Worktree auf Branch `feat/tool-use-confirmations` ab aktuellem main. Vor
 ## Bestehende Folgepunkte
 
 Die MCP-Werkzeug-Häkchen tragen laut TU-01-QA im Accessibility-Baum den Namen „on“. Bei Arbeit an derselben Oberfläche im nächsten regulären UI-PR beheben oder als Folgepunkt beibehalten; keine separate Test-/PR-Kampagne. Nicht unterstützte Schemas (`pattern`, `$ref`) bleiben gesperrt; 120 s bleiben ein zwischen Aufrufen geprüftes Budget, kein harter Abbruch eines laufenden Aufrufs.
+
+## Umsetzung (Draft-PR, 21.11.2026)
+
+- **Karten:** Tabelle `tool_call` (Migration V26), je geplantem Aufruf eine Zeile an der Frage des Turns; `tool_call_log.tool_call_id` verknüpft das Audit. Zustände PENDING, RUNNING, SUCCEEDED, FAILED, REJECTED, BLOCKED (Server hat nicht ausgeführt), EXPIRED, CANCELLED, UNKNOWN (hängendes RUNNING > 5 min, nur Anzeige). Karten kommen mit dem Transkript (`toolCalls`), nur für die Person des Chats; ohne Fingerprint, Hash oder interne IDs (öffentliche ID = zufällige UUID).
+- **CRITICAL:** nach Adminfreigabe anbietbar; im Turn entsteht nur eine PENDING-Karte (Frist 10 min) mit Definitions-Hash (ID, Name, Quelle, Beschreibung, Schema, Klasse, Freigabe, Ziel-/Token-Fingerprint) und den exakt geplanten Argumenten. Das Modell erfährt nur „noch nicht ausgeführt“. Kein neuer Modell-Turn nach der Bestätigung.
+- **Entscheidung:** `POST /api/v1/orgs/{org}/chat/conversations/{id}/tool-calls/{callId}/decision` mit `{"decision":"confirm"|"reject"}` (Session + CSRF). Nur der Wert `decision` wird gelesen. Atomarer Verbrauch per bedingtem UPDATE (PENDING → RUNNING/REJECTED, nur vor Ablauf); danach Kontext/Mitgliedschaft/Bereich, aktuelle Definition (Hash), Klasse und Argumente gegen das aktuelle Schema erneut prüfen, Audit vor dem Aufruf, genau ein Adapteraufruf. Verloren/entschieden/abgelaufen → 409 mit aktuellem Stand; fremd/unbekannt → 404.
+- **Ende ohne Aufruf:** Ablehnen, Fristablauf, neue Nachricht im Chat (PENDING → CANCELLED), Löschen des Chats.
+- **READ/WRITE:** unverändert direkt nach Adminfreigabe, jetzt mit Karte. Limits unverändert (eine Runde, 8 Versuche inkl. geplanter, Größen, Zeitbudget).
+- **Admin:** CRITICAL ist freigebbar; Hinweis in der Oberfläche. Häkchen tragen jetzt den Namen „<Werkzeug> freigeben“ (Folgepunkt aus TU-01-QA behoben).
+- **Desktop:** `ToolCallCard.vue` unter der Antwort, Deutsch/Englisch, Ergebnis nur als Text, Bestätigen/Ablehnen mit Busy-Sperre, bei unklarer Antwort kein Wiederholen, sondern Neuladen des Stands. Logik in `tool-cards.ts`, getestet mit `e2e/tool_cards.test.cjs`.

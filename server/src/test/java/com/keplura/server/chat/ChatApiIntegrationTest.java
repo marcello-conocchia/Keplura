@@ -248,6 +248,7 @@ class ChatApiIntegrationTest {
      */
     static final class FixtureAdapter implements com.keplura.server.tool.ToolAdapter {
         final AtomicInteger invocations = new AtomicInteger();
+        final AtomicReference<String> lastArguments = new AtomicReference<>();
         volatile String result = "Werkzeugantwort";
         volatile com.keplura.server.tool.ToolRisk risk = com.keplura.server.tool.ToolRisk.READ;
         volatile boolean approved = true;
@@ -262,6 +263,7 @@ class ChatApiIntegrationTest {
 
         @Override public String invoke(com.keplura.server.tool.ToolDefinition tool, tools.jackson.databind.JsonNode arguments) {
             invocations.incrementAndGet();
+            lastArguments.set(arguments.toString());
             return result;
         }
     }
@@ -345,14 +347,13 @@ class ChatApiIntegrationTest {
                 Integer.class, Long.valueOf(chat))).isEqualTo(1);
     }
 
-    @Test void unclassifiedOrCriticalOrUnapprovedToolsAreNeverOfferedNorExecuted() {
+    @Test void unclassifiedOrUnapprovedToolsAreNeverOfferedNorExecuted() {
         String[] scope = fixtureChain(false);
         var tools = enableFixtureTools();
         String chat = createConversation(scope[0], scope[1], scope[2], Map.of());
         stubToolMode = "injection";
         java.util.List<Runnable> blocked = java.util.List.of(
                 () -> { tools.risk = null; tools.approved = true; },
-                () -> { tools.risk = com.keplura.server.tool.ToolRisk.CRITICAL; tools.approved = true; },
                 () -> { tools.risk = com.keplura.server.tool.ToolRisk.WRITE; tools.approved = false; });
         for (Runnable setup : blocked) {
             setup.run();
@@ -362,6 +363,68 @@ class ChatApiIntegrationTest {
             assertThat(toolBodies).isEmpty(); // no tools offered → ordinary streaming turn
         }
         assertThat(tools.invocations.get()).isZero();
+    }
+
+    /** TU-02 over HTTP: pending card in the transcript, CSRF + owner-only decision, exactly one call. */
+    @Test void criticalToolWaitsForConcreteConfirmationOverHttp() throws Exception {
+        String[] scope = fixtureChain(false);
+        var fixture = enableFixtureTools();
+        fixture.risk = com.keplura.server.tool.ToolRisk.CRITICAL;
+        String chat = createConversation(scope[0], scope[1], scope[2], Map.of());
+        stubToolMode = "injection";
+        var turn = exchange("POST", streamPath(scope[1], chat), scope[0], Map.of("prompt", "Use echo once"));
+        assertThat(turn.getStatusCode().value()).isEqualTo(200);
+        assertThat(fixture.invocations.get()).isZero();
+        assertThat(toolBodies.getLast()).contains("NOCH NICHT ausgef");
+
+        var json = tools.jackson.databind.json.JsonMapper.builder().build();
+        var transcript = json.readTree(exchange("GET", transcriptPath(scope[1], chat), scope[0], null).getBody());
+        var card = transcript.path("toolCalls").get(0);
+        assertThat(card.path("status").asString()).isEqualTo("PENDING");
+        assertThat(card.path("risk").asString()).isEqualTo("CRITICAL");
+        assertThat(card.toString()).doesNotContain("fingerprint", "definitionHash", "fp");
+        String decisionPath = transcriptPath(scope[1], chat) + "/tool-calls/" + card.path("id").asString() + "/decision";
+
+        // no CSRF header → refused, no call
+        var noCsrf = rest.exchange(RequestEntity.post(URI.create(decisionPath)).header(HttpHeaders.COOKIE, scope[0])
+                .contentType(MediaType.APPLICATION_JSON).body(Map.of("decision", "confirm")), String.class);
+        assertThat(noCsrf.getStatusCode().value()).isEqualTo(403);
+        // another person → 404, no call
+        String stranger = loginFreshUser("stranger");
+        assertThat(exchange("POST", decisionPath, stranger, Map.of("decision", "confirm")).getStatusCode().value()).isIn(403, 404);
+        // invalid decision / smuggled arguments are not accepted
+        assertThat(exchange("POST", decisionPath, scope[0], Map.of("decision", "maybe")).getStatusCode().value()).isEqualTo(400);
+        assertThat(fixture.invocations.get()).isZero();
+
+        var confirmed = exchange("POST", decisionPath, scope[0], Map.of("decision", "confirm", "arguments", Map.of("x", 1)));
+        assertThat(confirmed.getStatusCode().value()).isEqualTo(200);
+        assertThat(json.readTree(confirmed.getBody()).path("status").asString()).isEqualTo("SUCCEEDED");
+        assertThat(fixture.invocations.get()).isEqualTo(1);
+        assertThat(fixture.lastArguments.get()).isEqualTo("{}");
+
+        var replay = exchange("POST", decisionPath, scope[0], Map.of("decision", "confirm"));
+        assertThat(replay.getStatusCode().value()).isEqualTo(409);
+        assertThat(fixture.invocations.get()).isEqualTo(1);
+
+        // deleting the conversation removes its cards
+        assertThat(exchange("DELETE", transcriptPath(scope[1], chat), scope[0], null).getStatusCode().value()).isEqualTo(204);
+        assertThat(jdbc.queryForObject("select count(*) from tool_call where conversation_id = ?", Integer.class,
+                Long.valueOf(chat))).isZero();
+    }
+
+    @Test void aNewMessageCancelsPendingConfirmations() {
+        String[] scope = fixtureChain(false);
+        var fixture = enableFixtureTools();
+        fixture.risk = com.keplura.server.tool.ToolRisk.CRITICAL;
+        String chat = createConversation(scope[0], scope[1], scope[2], Map.of());
+        stubToolMode = "injection";
+        exchange("POST", streamPath(scope[1], chat), scope[0], Map.of("prompt", "Use echo once"));
+        stubToolMode = "";
+        fixture.approved = false; // next turn has no tools → plain streaming answer
+        exchange("POST", streamPath(scope[1], chat), scope[0], Map.of("prompt", "Never mind"));
+        assertThat(jdbc.queryForObject("select status from tool_call where conversation_id = ?", String.class,
+                Long.valueOf(chat))).isEqualTo("CANCELLED");
+        assertThat(fixture.invocations.get()).isZero();
     }
 
     @Test void foreignConversationContextNeverReachesTheTool() {
