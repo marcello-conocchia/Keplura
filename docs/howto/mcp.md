@@ -10,10 +10,33 @@
    bei den Verbindungstests für KI-Anbieter.
 3. Administration → MCP-Server: Name, HTTP(S)-Adresse und gegebenenfalls
    Token eintragen. Zugangsdaten gehören in das Token-Feld, nicht in die URL.
-4. Die Verbindung lädt nur die Werkzeugliste. Jedes benötigte Werkzeug
-   ausdrücklich anhaken und die erlaubten Arbeitsbereiche auswählen.
-5. Nach Änderung von Adresse oder Token bleiben alte Werkzeugfreigaben
-   gesperrt. Erneut laden, Liste prüfen und gezielt neu freigeben.
+4. Die Verbindung lädt nur die Werkzeugliste. Jedes neue Werkzeug ist
+   **nicht klassifiziert und gesperrt**. Für jedes benötigte Werkzeug zuerst
+   eine Risikoklasse wählen, dann ausdrücklich anhaken und die erlaubten
+   Arbeitsbereiche auswählen:
+   - **Lesen** – liest nur. Läuft nach Freigabe.
+   - **Schreiben** – kann Daten im angebundenen System ändern. Standardmäßig
+     aus; nur bewusst freigeben.
+   - **Kritisch** – folgenreiche Aktion. Bleibt gesperrt, bis Keplura eine
+     Bestätigung je Aufruf anbietet (geplanter nächster Schritt TU-02).
+   Die Klasse setzt nur ein Admin. Angaben des MCP-Servers (z. B.
+   `readOnlyHint`) werden dafür nicht übernommen.
+5. Eine geänderte Risikoklasse hebt die Freigabe dieses Werkzeugs auf. Ändert
+   der Server beim Neu-Laden Beschreibung oder Eingabeschema eines Werkzeugs,
+   entfallen Klasse und Freigabe ebenfalls. Nach Änderung von Adresse oder
+   Token entfallen alle Klassen und Freigaben. Erneut laden, Liste prüfen und
+   gezielt neu klassifizieren und freigeben.
+6. Werkzeuge, deren Eingabeschema Keplura nicht vollständig prüfen kann
+   (z. B. `$ref`, `pattern`, `if`/`then`, Tupel-Listen), bleiben gesperrt und
+   sind entsprechend markiert. Argumente des Modells werden vor jedem Aufruf
+   gegen das Schema geprüft; passen sie nicht, findet kein Aufruf statt.
+
+**Umstellung bestehender Installationen (TU-01):** Werkzeuge, die vor dem
+Update freigegeben waren, haben noch keine Risikoklasse. Sie werden nicht
+automatisch als „Lesen“ eingestuft und laufen nach dem Update **nicht mehr**,
+bis ein Admin sie klassifiziert und erneut anhakt. Die Oberfläche zeigt sie
+als „War vor der Umstellung freigegeben“. Das bisherige Aufrufprotokoll wird
+in das neue zentrale Protokoll übernommen.
 
 Keplura spricht Streamable HTTP mit Protokollversion `2025-06-18`:
 JSON- und SSE-Antworten, Sitzungskennung und `202` für Benachrichtigungen.
@@ -25,10 +48,20 @@ Protokollgrundlage: [MCP Streamable HTTP](https://modelcontextprotocol.io/specif
 Werkzeuge laufen mit dem Dienst-Token und den Rechten des MCP-Servers.
 Die Freigabe gilt pro Arbeitsbereich, nicht pro Mitarbeiter. Deshalb nur
 passende Werkzeuge und ein möglichst eingeschränktes Dienstkonto verwenden.
-Keplura prüft Freigaben vor jedem Aufruf erneut und protokolliert den Beginn
-vor der Ausführung. Ohne verfügbare Protokollierung erfolgt kein Aufruf.
-Bis zu drei Modellrunden und acht Werkzeugaufrufe je Antwort; Ergebnisse
-werden gekürzt und als fremder Inhalt gekennzeichnet.
+Alle Werkzeugaufrufe laufen über einen gemeinsamen Ausführungsweg im Server.
+Vor jedem Aufruf prüft Keplura erneut: Chat gehört der Person in ihrer
+Organisation, sie ist noch Mitglied, Arbeitsbereich passt, Werkzeug ist noch
+klassifiziert, freigegeben und unverändert, Verbindungsziel unverändert.
+Der Beginn wird vor der Ausführung protokolliert; ohne verfügbare
+Protokollierung erfolgt kein Aufruf. Das Protokoll enthält keine Argumente
+oder Ergebnisse.
+
+Je Antwort gibt es **eine Aufrufrunde** mit **höchstens acht Aufrufen**
+(auch abgelehnte Versuche zählen mit). Danach antwortet das Modell ohne
+Werkzeuge; weitere Aufrufwünsche werden nicht ausgeführt. Weitere Grenzen:
+Argumente höchstens 16 000 Zeichen, Ergebnisse werden nach 8 000 Zeichen
+gekürzt und als fremder Inhalt gekennzeichnet, nach insgesamt 120 Sekunden
+Werkzeugzeit startet in dieser Antwort kein weiterer Aufruf.
 
 Modelle ohne Tool-Calling können den normalen Chat weiterverwenden. Nur eine
 ausdrückliche Ablehnung dieser Fähigkeit vor dem ersten Werkzeugaufruf löst

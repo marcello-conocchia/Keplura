@@ -14,6 +14,14 @@ Login → Organisation → Space → Dokument → RAG → Chat mit Quellen.
 M3 and M4 outrank everything below; nothing under "IDEA / NOT APPROVED" may
 be started, decomposed or tasked without explicit PO approval.**
 
+## Aktuelle Priorität — Tool Use (PO-beschlossen 21.11.2026)
+
+**Arbeitsziel für die nächsten Tage: Kepluras Tool Use mindestens auf den dokumentierten Funktionsumfang von Open WebUI bringen.** Verbindliche Reihenfolge und Abnahmeziele: [TOOL_USE_PLAN.md](TOOL_USE_PLAN.md). Nächste einzelne Implementierungsaufgabe: [TU-01](tasks/TU-01-tool-foundation.md), noch nicht gestartet.
+
+Reihenfolge: gemeinsame Grundlage → Bestätigungen/Aufrufanzeige → mehrstufige Ausführung → Wissen/Anhänge/Web → Auswahl/Tool-Suche/Rückfragen → Adapter/OAuth/Medien → zusätzliche Fähigkeiten einzeln. Eine aktive Implementierung; bestehende Sicherheitsbefunde und Gates bleiben verbindlich. Kein Fertigstellungstermin für den Gesamtumfang zugesagt.
+
+Dieser explizite Auftrag ersetzt ältere allgemeine Folgeprioritäten. Er genehmigt nicht pauschal die unten weiterhin als IDEA geführten Meilensteine M5–M9. Grenzen und weiterhin nötige PO-Entscheidungen stehen im Plan.
+
 ## M0 — Foundation (completed 2026-09-03, CI included)
 
 Minimal verifiable vertical slice: desktop + server exist, build, test, talk.

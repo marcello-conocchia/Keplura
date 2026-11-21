@@ -1,6 +1,8 @@
 package com.keplura.server.mcp;
 
 import com.keplura.server.admin.SecretCipher;
+import com.keplura.server.tool.ToolArgumentValidator;
+import com.keplura.server.tool.ToolRisk;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -22,27 +24,38 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
- * Administration → MCP-Server (Stufe 1). Unter {@code /api/v1/admin/**} (Session + CSRF + ADMIN).
+ * Administration → MCP-Server. Unter {@code /api/v1/admin/**} (Session + CSRF + ADMIN).
  * Token write-only, mit {@link SecretCipher} verschlüsselt. Werkzeuge sind standardmäßig NICHT
- * freigegeben — der Admin hakt jedes einzeln an (ROADMAP: ein MCP-Server entscheidet nie selbst).
+ * freigegeben und unklassifiziert — der Admin setzt je Werkzeug eine Risikoklasse und hakt es einzeln an
+ * (ROADMAP: ein MCP-Server entscheidet nie selbst). Ausführung nur über ToolExecutionService (TU-01).
  */
 @RestController
 @RequestMapping("/api/v1/admin/mcp-servers")
 public class McpAdminController {
 
-    public record ToolView(String name, String description, boolean enabled) {
+    /**
+     * enabled = wirksam freigegeben (klassifiziert, nicht CRITICAL, Schema prüfbar und angehakt).
+     * legacyApproval = Freigabe aus der Zeit vor TU-01 ohne Risikoklasse — wirkt NICHT mehr.
+     */
+    public record ToolView(String name, String description, boolean enabled, String risk, boolean schemaSupported,
+                           String schemaProblem, boolean legacyApproval) {
     }
 
     public record ServerView(Long id, String name, String url, boolean hasToken, boolean enabled, List<ToolView> tools,
                              Instant lastCheckedAt, String lastError, boolean allSpaces, List<Long> spaceIds) {
     }
 
-    /** token: null = unverändert, "" = löschen. enabledTools: null = unverändert. */
+    /**
+     * token: null = unverändert, "" = löschen. enabledTools: null = unverändert. toolRisks: null = unverändert;
+     * je Werkzeug READ/WRITE/CRITICAL oder ""/null = unklassifiziert. Eine geänderte Risikoklasse hebt die
+     * bisherige Freigabe dieses Werkzeugs auf (nur eine ausdrückliche Freigabe in derselben Anfrage zählt).
+     */
     public record Input(String name, String url, String token, Boolean enabled, List<String> enabledTools,
-                        Boolean allSpaces, List<Long> spaceIds) {
+                        Boolean allSpaces, List<Long> spaceIds, Map<String, String> toolRisks) {
     }
 
     public record ErrorResponse(String error) {
@@ -64,15 +77,22 @@ public class McpAdminController {
 
     @GetMapping
     public List<ServerView> list() {
-        return jdbc.query("select id, name, url, token_enc, enabled, tools_json, enabled_tools, last_checked_at, last_error, all_spaces from mcp_server order by name",
+        return jdbc.query("select id, name, url, token_enc, enabled, tools_json, enabled_tools, last_checked_at, last_error, all_spaces, tool_risks from mcp_server order by name",
                 (rs, n) -> {
                     Set<String> on = names(rs.getString(7));
+                    Map<String, ToolRisk> risks = McpToolAdapter.risks(rs.getString(11));
                     List<ToolView> tools = new ArrayList<>();
                     String json = rs.getString(6);
                     if (json != null && !json.isBlank()) {
                         for (JsonNode t : mapper.readTree(json)) {
                             String name = t.path("name").asString("");
-                            tools.add(new ToolView(name, t.path("description").asString(""), on.contains(name)));
+                            ToolRisk risk = risks.get(name);
+                            String problem = ToolArgumentValidator.unsupportedReason(
+                                    t.path("inputSchema").isObject() ? t.path("inputSchema") : null);
+                            boolean effective = on.contains(name) && risk != null && risk != ToolRisk.CRITICAL && problem == null;
+                            tools.add(new ToolView(name, t.path("description").asString(""), effective,
+                                    risk == null ? null : risk.name(), problem == null, problem,
+                                    on.contains(name) && risk == null));
                         }
                     }
                     Timestamp ts = rs.getTimestamp(8);
@@ -120,6 +140,13 @@ public class McpAdminController {
         String url = in.url() == null ? cur.url() : in.url();
         String err = validate(name, url);
         if (err != null) return bad(err);
+        if (in.toolRisks() != null) {
+            for (String v : in.toolRisks().values()) {
+                if (v != null && !v.isBlank() && ToolRisk.parse(v) == null) {
+                    return bad("Unbekannte Risikoklasse. Erlaubt sind READ, WRITE und CRITICAL.");
+                }
+            }
+        }
         if (in.token() != null) {
             String enc = null;
             if (!in.token().isBlank()) {
@@ -134,13 +161,34 @@ public class McpAdminController {
         if (changedTarget) {
             // A changed endpoint/token is a new trust boundary: never carry
             // old approvals to another server or identity.
-            jdbc.update("update mcp_server set tools_json = null, enabled_tools = null, last_checked_at = null, last_error = null where id = ?", id);
+            jdbc.update("update mcp_server set tools_json = null, enabled_tools = null, tool_risks = null, last_checked_at = null, last_error = null where id = ?", id);
         }
-        if (!changedTarget && in.enabledTools() != null) {
-            Set<String> known = new LinkedHashSet<>();
-            cur.tools().forEach(t -> known.add(t.name()));
-            List<String> on = in.enabledTools().stream().filter(known::contains).distinct().toList();
-            jdbc.update("update mcp_server set enabled_tools = ? where id = ?", String.join("\n", on), id);
+        if (!changedTarget && (in.enabledTools() != null || in.toolRisks() != null)) {
+            Map<String, ToolView> known = new java.util.LinkedHashMap<>();
+            cur.tools().forEach(t -> known.put(t.name(), t));
+            Map<String, ToolRisk> risks = McpToolAdapter.risks(
+                    jdbc.queryForObject("select tool_risks from mcp_server where id = ?", String.class, id));
+            Set<String> approved = new LinkedHashSet<>(names(
+                    jdbc.queryForObject("select enabled_tools from mcp_server where id = ?", String.class, id)));
+            if (in.toolRisks() != null) {
+                for (var e : in.toolRisks().entrySet()) {
+                    if (!known.containsKey(e.getKey())) continue;
+                    String raw = e.getValue() == null ? "" : e.getValue().strip();
+                    ToolRisk risk = ToolRisk.parse(raw);
+                    if (java.util.Objects.equals(risks.get(e.getKey()), risk)) continue;
+                    // New class = new decision: never carry an approval across a class change.
+                    approved.remove(e.getKey());
+                    if (risk == null) risks.remove(e.getKey()); else risks.put(e.getKey(), risk);
+                }
+            }
+            if (in.enabledTools() != null) {
+                approved = new LinkedHashSet<>(in.enabledTools().stream().filter(known::containsKey).distinct().toList());
+            }
+            // Only classified, non-CRITICAL tools with a supported schema can hold an approval.
+            approved.removeIf(t -> !known.containsKey(t) || risks.get(t) == null || risks.get(t) == ToolRisk.CRITICAL
+                    || !known.get(t).schemaSupported());
+            jdbc.update("update mcp_server set enabled_tools = ?, tool_risks = ? where id = ?",
+                    String.join("\n", approved), McpToolAdapter.risksJson(risks), id);
         }
         if (in.allSpaces() != null) jdbc.update("update mcp_server set all_spaces = ? where id = ?", in.allSpaces(), id);
         if (in.spaceIds() != null) {
@@ -169,8 +217,8 @@ public class McpAdminController {
     @GetMapping("/calls")
     public List<java.util.Map<String, Object>> calls() {
         return jdbc.query("""
-                select called_at, user_id, org_id, space_id, server_name, tool_name, duration_ms, ok, error
-                from mcp_call_log order by called_at desc limit 100""", (rs, n) -> {
+                select called_at, user_id, org_id, space_id, source_name, tool_name, duration_ms, ok, error, risk
+                from tool_call_log where adapter = 'mcp' order by called_at desc limit 100""", (rs, n) -> {
             java.util.Map<String, Object> row = new java.util.LinkedHashMap<>();
             row.put("called_at", rs.getTimestamp(1).toInstant().toString());
             row.put("user_id", rs.getLong(2));
@@ -181,6 +229,7 @@ public class McpAdminController {
             row.put("duration_ms", rs.getLong(7));
             row.put("ok", rs.getBoolean(8));
             row.put("error", rs.getString(9) == null ? null : "Der Werkzeug-Aufruf ist fehlgeschlagen oder sein Abschluss wurde nicht bestätigt.");
+            row.put("risk", rs.getString(10));
             return row;
         });
     }
@@ -217,15 +266,27 @@ public class McpAdminController {
                     }).toList());
             if (json.length() > 32000) throw new McpClient.McpException("Der Server bietet zu viele Werkzeuge an.");
             tx.executeWithoutResult(status -> {
-                var current = jdbc.queryForList("select url, token_enc, enabled_tools from mcp_server where id = ? for update", id);
+                var current = jdbc.queryForList("select url, token_enc, enabled_tools, tools_json, tool_risks from mcp_server where id = ? for update", id);
                 if (current.isEmpty() || !java.util.Objects.equals(current.getFirst().get("url"), row.get("url"))
                         || !java.util.Objects.equals(current.getFirst().get("token_enc"), enc)) return;
-                Set<String> available = new LinkedHashSet<>();
-                tools.forEach(t -> available.add(t.name()));
+                // A tool keeps class and approval only if it still exists with the SAME
+                // description and input schema; a changed definition is a new decision.
+                Map<String, JsonNode> before = new java.util.HashMap<>();
+                Object prevJson = current.getFirst().get("tools_json");
+                if (prevJson != null && !prevJson.toString().isBlank()) {
+                    for (JsonNode t : mapper.readTree(prevJson.toString())) before.put(t.path("name").asString(""), t);
+                }
+                Set<String> unchanged = new LinkedHashSet<>();
+                for (JsonNode t : mapper.readTree(json)) {
+                    if (t.equals(before.get(t.path("name").asString("")))) unchanged.add(t.path("name").asString(""));
+                }
                 Object prev = current.getFirst().get("enabled_tools");
-                List<String> kept = names(prev == null ? null : prev.toString()).stream().filter(available::contains).toList();
-                jdbc.update("update mcp_server set tools_json = ?, enabled_tools = ?, last_checked_at = ?, last_error = null where id = ?",
-                        json, String.join("\n", kept), now, id);
+                List<String> kept = names(prev == null ? null : prev.toString()).stream().filter(unchanged::contains).toList();
+                Object prevRisks = current.getFirst().get("tool_risks");
+                Map<String, ToolRisk> risks = McpToolAdapter.risks(prevRisks == null ? null : prevRisks.toString());
+                risks.keySet().retainAll(unchanged);
+                jdbc.update("update mcp_server set tools_json = ?, enabled_tools = ?, tool_risks = ?, last_checked_at = ?, last_error = null where id = ?",
+                        json, String.join("\n", kept), McpToolAdapter.risksJson(risks), now, id);
             });
         } catch (RuntimeException e) {
             String msg = e instanceof McpClient.McpException ? e.getMessage() : "Die Verbindung ist fehlgeschlagen.";
