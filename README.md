@@ -183,9 +183,4 @@ their own licenses, listed in
 The license covers the code, not the name: it grants no rights to use the
 "Keplura" name or logo (Apache License 2.0, section 6).
 
-## Name
 
-Keplura was formerly called IntraCore. Some data-bearing names (Compose project
-and volume names, database names, historical evidence) keep the old name so
-existing installations upgrade in place; see
-[ADR-0013](docs/adr/0013-umbenennung-keplura.md).
