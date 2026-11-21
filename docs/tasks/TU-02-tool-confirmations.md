@@ -62,3 +62,23 @@ Die MCP-Werkzeug-Häkchen tragen laut TU-01-QA im Accessibility-Baum den Namen �
 - **[minor / low] Zeitbudget:** Bestätigte Aufrufe teilen die 120 s mit allen Aufrufen derselben Frage (Summe aus `started_at`/`finished_at`); ist es aufgebraucht, endet die Bestätigung als BLOCKED ohne Aufruf. Grenze: zwei exakt gleichzeitige Bestätigungen derselben Frage können das Budget gemeinsam überschreiten (je Aufruf weiter durch Adapter-Zeitlimits begrenzt).
 - **[minor / low] Stopp:** Der vorhandene Stopp-Knopf meldet den Abbruch jetzt an `POST …/tool-calls/stop`; offene Karten bis zur neuesten Frage werden CANCELLED, und der gestoppte Turn kann keine bestätigbare Karte mehr anlegen. Grenze: Wird gestoppt, bevor der Server die neue Frage gespeichert hat, deckt die Markierung nur die vorherigen Fragen ab; die neue Frage selbst bleibt dann bis zur nächsten Nachricht/Frist bestätigbar.
 - Regressionen: `ToolConfirmationTest` +7 (inflationierende Argumente → BLOCKED ohne `{}`, Karte = Adapter-Eingabe inkl. 9007199254740993, 22 Felder und Suffix nach 450 Zeichen im exakten Text, langsamer Plan nach neuer Frage, neuere Frage ohne cancelPending, Stopp vor/nach Plan, geteiltes Budget), `ChatApiIntegrationTest` +1 (Stopp-Endpunkt, nur Eigentümer:in), `tool_cards.test.cjs` (verlustfreie Übersicht, Kürzungskennzeichnung).
+
+## Gezielte Browser-QA (PO-Auftrag) (Produktstand `5b31a1a`, 21.11.2026)
+
+Echter Keplura-Server aus diesem Branch (Dev-Profil, eigene H2-Datei, SSRF-Freigabe nur `127.0.0.1/32`), echte Desktop-Oberfläche im Browser (Deutsch, Systemdarstellung dunkel), lokaler MCP-Beispielserver mit einem Werkzeug `wipe_tickets` (vom Admin als **Kritisch** klassifiziert und freigegeben; zählt jeden `tools/call` und speichert den **Rohtext** der empfangenen Argumente), **geskriptetes** OpenAI-kompatibles Gateway statt Modell. Ersteinrichtung und MCP-Freigabe per Admin-API im angemeldeten Browser (nicht Prüfgegenstand), alle Chat-Schritte in der Oberfläche.
+
+| Prüfung | Ergebnis |
+|---|---|
+| **1 Vollständige Eingaben** — Plan mit 23 Feldern (`k0`…`k19`, `cmd` = 450 × „x“ + `; delete_all`, `id` = `9007199254740993`, `delete_all: true`) | ✅ Karte „Kritisch / Wartet auf Bestätigung“; Übersicht zeigt 20 Felder + „3 weitere Eingaben nicht in der Übersicht“ + „Die Übersicht ist gekürzt. Maßgeblich sind die vollständigen Eingaben.“; darunter **immer sichtbar** „Vollständige Eingaben – genau so wird ausgeführt“ mit dem kompletten Text inkl. `; delete_all`, `"id":9007199254740993` (exakt) und `"delete_all":true`. MCP-Zähler 0. |
+| **2 Bestätigen** — Doppelklick auf „Ausführen“ | ✅ Genau **1** `tools/call`; Karte „Erfolgreich“ mit Ergebnis als Text. Angezeigter und beim MCP-Server angekommener Argumenttext **byte-gleich** (SHA-256 `d2dda9a3…ab823`, je 672 Zeichen, `9007199254740993` exakt). |
+| **2 Wiederholung** — dieselbe Entscheidung per API erneut: bestätigen, bestätigen, ablehnen | ✅ dreimal **409** (Stand SUCCEEDED), Zähler bleibt **1**. |
+| **3a Ablehnen** — neue Frage T-2 → „Ablehnen“ | ✅ Karte „Abgelehnt“, ohne Knöpfe; nachträgliche Bestätigung per API → **409 REJECTED**; kein Aufruf. |
+| **3b Neue Frage** — offene Karte T-3, dann neue Frage („doch lieber T-5“) | ✅ T-3 sofort „Abgebrochen“, ohne Knöpfe; nachträgliche Bestätigung → **409 CANCELLED**; nur die neue T-5-Karte ist offen. Kein Aufruf. |
+| **3c Stoppen während des Planens** — Frage „QA-SLOW“ (Gateway plant 12 s), nach 2 s „Antwort stoppen“ | ✅ Offene T-5-Karte sofort „Abgebrochen“; der verspätete Plan (`T-SLOW`) kam nach 12 s an und wurde **direkt als „Abgebrochen“** angelegt, nicht als offen. Bestätigung von T-3/T-5/T-SLOW → jeweils **409 CANCELLED**. |
+| Endstand nach Neuladen | ✅ 5 Karten: Erfolgreich, Abgelehnt, 3 × Abgebrochen — keine mit Knöpfen. **MCP-Zähler gesamt: 1.** |
+
+Keine Codeänderung nötig → kein neuer CI-Lauf.
+
+**Grenzen:** kein echtes Modell (Gateway geskriptet; es ignoriert die Rückmeldung „nicht vorgelegt“), eigener minimaler MCP-Beispielserver, H2 statt PostgreSQL, nur deutsche Oberfläche im Dunkelmodus, keine Handy-Breite, eine einzelne Browser-Sitzung (parallele Entscheidungen sind durch `ToolConfirmationTest` abgedeckt, nicht durch diese QA). Wiederholungen über die API im angemeldeten Browser, nicht über einen zweiten Client.
+
+**Beobachtung (Folgepunkt, nicht durch TU-02 entstanden):** Nach „Antwort stoppen“ während eines Werkzeug-Turns wird die Modellantwort dieses Turns trotzdem als vollständige Antwort gespeichert (kein Hinweis „gestoppt“), weil der Werkzeugweg nicht gestreamt wird und erst am Ende schreibt. Ausgeführt wurde nichts; die Karte ist korrekt abgebrochen. Empfehlung: im nächsten regulären Chat-PR den Stopp-Status auch für Werkzeug-Turns übernehmen.
