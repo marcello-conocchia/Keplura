@@ -314,11 +314,13 @@ public final class ContentPatterns {
 
     /** Kürzester gültiger Anfang des Treffers, der an einer Gruppengrenze endet; sonst -1. */
     private static int validPrefix(CharSequence s, int start, int end, DigitCheck check) {
-        for (int i = start + 1; i < end; i++) {
+        StringBuilder digits = new StringBuilder(end - start);
+        for (int i = start; i < end; i++) {
             char c = s.charAt(i);
-            if ((c == ' ' || c == '-') && Character.isDigit(s.charAt(i - 1))) {
-                String d = s.subSequence(start, i).toString().replaceAll("[^0-9]", "");
-                if (check.test(d) && standsAlone(s, start, i)) return i;
+            if (c >= '0' && c <= '9') {
+                digits.append(c);
+            } else if (digits.length() >= 11 && check.test(digits.toString()) && standsAlone(s, start, i)) {
+                return i; // erst ab 11 Ziffern (kürzeste Kennung) testen
             }
         }
         return -1;
