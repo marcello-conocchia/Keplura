@@ -1,6 +1,6 @@
 # TU-03a — Begrenzte mehrstufige Lesezugriffe
 
-Status: **Review-Korrektur im Draft-PR #19**, Branch `feat/tool-use-read-loop`, nicht gemergt. Claude hat auf `ca14bc7` einen major/medium-Befund und zwei minor-Befunde gemeldet; keine Freigabe. Korrekturen, erneute Linux-CI und gezielte Re-Review erforderlich. Frühere CI: `35fa59f`, Evidence `ci/evidence/20261121-184918/`. Nächste einzelne Aufgabe nach TU-02 (PR #17, Merge `8f6852a`). Erster Umsetzungsschritt von TU-03 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Modell-/Werkzeugschleife, externe Aufrufe und Rechte.
+Status: **Review-Korrektur im Draft-PR #19**, Branch `feat/tool-use-read-loop`, nicht gemergt. Claude hat auf `ca14bc7` einen major/medium-Befund und zwei minor-Befunde gemeldet; keine Freigabe. Alle drei in Produktcommit `15e3b63` korrigiert; erneute Linux-CI darauf Exit 0, Evidence `ci/evidence/20261121-200201/`. Gezielte unabhängige Re-Review durch Claude offen. Nächste einzelne Aufgabe nach TU-02 (PR #17, Merge `8f6852a`). Erster Umsetzungsschritt von TU-03 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Modell-/Werkzeugschleife, externe Aufrufe und Rechte.
 
 ## Ziel
 
@@ -51,6 +51,7 @@ Eigener Worktree auf Branch `feat/tool-use-read-loop` ab main `b1c4b08`. PO-Roll
 
 ## Review-Korrekturen (21.11.2026)
 
+- Erneute verbindliche Linux-CI auf `15e3b63` wegen major-Korrektur: Exit 0, Nicht-root ci (UID 1500) mit acl, Linux-Dateisystem; 85 Klassen genau einmal, 677 Tests, 0 Failures/Errors, 1 Skipped. Rechte-Helfer, Desktop-Build und cargo check PASS; E2E nicht ausgewählt. Evidence `ci/evidence/20261121-200201/`. Danach nur Nachweise/Dokumentationsstatus ergänzt; kein weiterer CI-Lauf nötig.
 - Major/medium: private Belege aus allen werkzeugfähigen Folgerunden entfernt. Nach einer Antwort ohne weitere Aufrufe wird innerhalb desselben Fünf-Anfragen-Limits einmal ohne Werkzeuge mit vollständigen Belegen abgeschlossen. Auch dort vom Modell trotzdem zurückgegebene Aufrufe werden nie ausgeführt. Regression mit simuliertem Gehaltsabfluss über READ und HTTP-Anhangsfall, zusätzlich bestehende WRITE-Sperre.
 - Minor: Für Antwortstatus zählt nur ein ausdrücklicher Stop oder der Abbruch der Werkzeugschleife. Eine neuere Frage verhindert weiterhin weitere Werkzeugaufrufe, markiert eine vollständig gelieferte normale Antwort aber nicht als gestoppt.
 - Minor: Fehlende initiale Werkzeugkontextauflösung deaktiviert Werkzeuge; normale Chats können weiterhin antworten. Kein Fallback nach bereits gestarteter Werkzeugausführung.

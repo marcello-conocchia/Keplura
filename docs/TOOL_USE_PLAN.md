@@ -39,7 +39,7 @@ Nach jedem Merge PROJECT_STATE.md mit tatsächlichem Stand, Belegen und nächste
 
 ## Unmittelbar nächste Aufgabe
 
-**TU-03a — begrenzte mehrstufige Lesezugriffe**, siehe [Spec](tasks/TU-03a-read-loop.md). Implementiert im Draft-PR auf feat/tool-use-read-loop, nicht gemergt; Linux-CI auf 35fa59f grün, unabhängige Prüfung durch Claude offen. Ergebnisse dürfen weitere freigegebene READ-Aufrufe informieren, aber keine neuen Schreibaktionen autorisieren. Automatische Wiederaufnahme nach konkreten Bestätigungen und davon abhängige Aktionsketten bleiben als weiterer TU-03-Umfang offen; TU-03a allein erfüllt nicht die gesamte Phase.
+**TU-03a — begrenzte mehrstufige Lesezugriffe**, siehe [Spec](tasks/TU-03a-read-loop.md). Implementiert im Draft-PR auf feat/tool-use-read-loop, nicht gemergt; major/medium-Review-Befund und zwei minor-Befunde in 15e3b63 korrigiert, erneute Linux-CI darauf grün (Evidence ci/evidence/20261121-200201/), gezielte Re-Review durch Claude offen. Werkzeugfähige Runden sehen nur die aktuelle Frage und eigene Schleifenergebnisse; private Belege ausschließlich in der Abschlussanfrage ohne Werkzeuge. Ergebnisse dürfen weitere freigegebene READ-Aufrufe informieren, aber keine neuen Schreibaktionen autorisieren. Automatische Wiederaufnahme nach konkreten Bestätigungen und davon abhängige Aktionsketten bleiben als weiterer TU-03-Umfang offen; TU-03a allein erfüllt nicht die gesamte Phase.
 
 ## Vergleichsquellen (abgerufen am 21.11.2026)
 
