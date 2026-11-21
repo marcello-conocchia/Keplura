@@ -117,6 +117,17 @@ export const SERVER_EN: Record<string, string> = {
   "Zugangsdaten": "Credentials",
   "Vertraulich": "Confidential",
   "Bank und Steuern": "Bank and tax",
+  // oversharing check: content check reasons
+  "zu groß für die Inhaltsprüfung": "too large for the content check",
+  "Zeitlimit überschritten": "time limit exceeded",
+  "Prüfung abgebrochen": "check cancelled",
+  "Datei konnte nicht gelesen werden": "file could not be read",
+  "Dateityp wird nicht geprüft": "file type is not checked",
+  "kein Text (z. B. Scan)": "no text (e.g. scan)",
+  "zu viele Seiten für die Inhaltsprüfung": "too many pages for the content check",
+  "Server ausgelastet, bitte erneut prüfen": "server busy, please check again",
+  "beschädigt oder verschlüsselt": "damaged or encrypted",
+  "unbekannte Zeichenkodierung": "unknown character encoding",
   // directory
   "Die Adresse ist ungültig.": "The address is invalid.",
   "Die Adresse muss mit ldaps:// oder ldap:// beginnen und einen Server nennen.": "The address must start with ldaps:// or ldap:// and name a server.",
@@ -166,8 +177,8 @@ export const SERVER_EN: Record<string, string> = {
   "Nur wer die Vorlage angelegt hat oder Verwalter:innen dürfen sie ändern.": "Only the creator of the template or administrators may change it.",
 };
 
-/** Texts with numbers or names inside: [pattern, English with $1, $2 …]. */
-export const SERVER_EN_PATTERNS: [RegExp, string][] = [
+/** Texts with numbers or names inside; third value true = catch-all, only for error/message fields. */
+export const SERVER_EN_PATTERNS: [RegExp, string, boolean?][] = [
   [/^Mehr als (\S+) Dateien – nur die ersten wurden geprüft\.$/, "More than $1 files – only the first were checked."],
   [/^Mehr als (\S+) Dateien – nur die ersten wurden abgeglichen\.$/, "More than $1 files – only the first were synchronized."],
   [/^Mehr als (\S+) Dateien – bitte die Auswahl eingrenzen\.$/, "More than $1 files – please narrow the selection."],
@@ -197,6 +208,6 @@ export const SERVER_EN_PATTERNS: [RegExp, string][] = [
   [/^Linux-Gruppe \(GID (\d+)\)$/, "Linux group (GID $1)"],
   [/^Windows-Konto\/-Gruppe (.+)$/, "Windows account/group $1"],
   [/^Organisation (\d+)$/, "Organization $1"],
-  [/^(.+) fehlt\.$/, "$1 is missing."],
-  [/^(.+) ist zu lang\.$/, "$1 is too long."],
+  [/^(.+) fehlt\.$/, "$1 is missing.", true],
+  [/^(.+) ist zu lang\.$/, "$1 is too long.", true],
 ];

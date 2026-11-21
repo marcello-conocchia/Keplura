@@ -55,20 +55,32 @@ export function dateLocale(): string {
   return locale.value === "en" ? "en-GB" : "de-DE";
 }
 
-/** One text from the server (German) in the current UI language. Unknown texts stay as they are. */
-export function serverText(text: string): string {
+/**
+ * One text from the server (German) in the current UI language. Unknown texts stay as they are.
+ * {@code generic=false} skips the catch-all patterns ("… fehlt.", "… ist zu lang."), which only
+ * fit validation errors.
+ */
+export function serverText(text: string, generic = true): string {
   if (locale.value !== "en" || !text) return text;
-  const exact = SERVER_EN[text] ?? EN[text];
+  const exact = SERVER_EN[text];
   if (exact !== undefined) return exact;
-  for (const [pattern, english] of SERVER_EN_PATTERNS) {
+  for (const [pattern, english, isGeneric] of SERVER_EN_PATTERNS) {
+    if (isGeneric && !generic) continue;
     if (pattern.test(text)) return text.replace(pattern, english);
   }
   return text;
 }
 
+/** Exact match only, e.g. for a fixed chat answer the server sends. */
+export function serverExact(text: string): string {
+  return locale.value === "en" ? SERVER_EN[text] ?? text : text;
+}
+
 /** Response fields that carry server text; everything else (names, paths, locations) is user data. */
 const MESSAGE_KEYS = new Set(["message", "error", "reason", "contentReason", "lastRunMessage", "lastError",
-  "detail", "title", "problems"]);
+  "problems"]);
+/** Server texts that sit next to user data under the same key (e.g. a template "title"): no catch-all patterns. */
+const TEXT_KEYS = new Set(["detail", "title"]);
 /** Fields with fixed server labels: exact matches only, no patterns. */
 const LABEL_KEYS = new Set(["label", "categories", "broadGroups"]);
 
@@ -83,16 +95,18 @@ export function translateServer<T>(value: T): T {
   return walk(value, 0, null) as T;
 }
 
-type Mode = "message" | "label" | null;
+type Mode = "message" | "text" | "label" | null;
 
 function walk(v: unknown, depth: number, mode: Mode): unknown {
   if (typeof v === "string") {
     if (mode === "message") return serverText(v);
-    if (mode === "label") return SERVER_EN[v] ?? EN[v] ?? v;
+    if (mode === "text") return serverText(v, false);
+    if (mode === "label") return SERVER_EN[v] ?? v;
     return v;
   }
   if (depth > 8 || v === null || typeof v !== "object") return v;
   if (Array.isArray(v)) return v.map((x) => walk(x, depth + 1, mode));
   return Object.fromEntries(Object.entries(v as Record<string, unknown>).map(([k, x]) =>
-    [k, walk(x, depth + 1, MESSAGE_KEYS.has(k) ? "message" : LABEL_KEYS.has(k) ? "label" : null)]));
+    [k, walk(x, depth + 1,
+      MESSAGE_KEYS.has(k) ? "message" : TEXT_KEYS.has(k) ? "text" : LABEL_KEYS.has(k) ? "label" : null)]));
 }
