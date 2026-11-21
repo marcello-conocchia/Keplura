@@ -1,6 +1,6 @@
 # TU-02 — Aufrufkarten und konkrete Bestätigungen
 
-Status: **implementiert im Draft-PR, nicht gemergt** (Branch `feat/tool-use-confirmations`); unabhängige Code-/Security-Prüfung offen. Nächste einzelne Implementierungsaufgabe nach TU-01 (PR #15, Merge `1296cdb`). PO-Auftrag und Reihenfolge: [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Werkzeugausführung, Freigaben und Nutzerablauf.
+Status: **auf main übernommen**, PR #17, Squash-Merge `8f6852a40029c6c0e3ae8fa06b6edc437f24cb6b`, am 21.11.2026 nach Fetch und vollständigem Baumvergleich gegen den freigegebenen Head `01bf6f3` verifiziert. Unabhängige Code-/Security-Freigabe ausdrücklich auf `01bf6f3`; lokale Linux-CI Exit 0 auf Produktcommit `5b31a1a`, Evidence `ci/evidence/20261121-175832/`; danach nur Nachweise/Dokumentation. Gezielte Browser-QA laut PO-Bericht bestanden, mit den unten dokumentierten Grenzen. Kleinere Restgrenzen zu Zeitbudget/Stop bleiben dokumentierte Folgepunkte; alle Review-Threads geschlossen. Kein Release/Deployment. Nächste einzelne Aufgabe: [TU-03a](TU-03a-read-loop.md). PO-Auftrag und Reihenfolge: [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Werkzeugausführung, Freigaben und Nutzerablauf.
 
 ## Ziel
 
