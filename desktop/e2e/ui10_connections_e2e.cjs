@@ -4,7 +4,7 @@ const env=process.env;for(const k of ['E2E_EMAIL','E2E_PASSWORD','E2E_OUT'])if(!
 fs.mkdirSync(env.E2E_OUT,{recursive:true});const results=[];
 (async()=>{
   const browser=await chromium.launch({headless:true,args:['--no-sandbox'],...(env.E2E_CHROME?{executablePath:env.E2E_CHROME}:{})});
-  const page=await browser.newPage({viewport:{width:1440,height:1000},locale:'de-DE'});
+  const page=await browser.newPage({ locale: 'de-DE',viewport:{width:1440,height:1000},locale:'de-DE'});
   const dlg=()=>page.locator('dialog[open]'),shot=n=>page.screenshot({path:path.join(env.E2E_OUT,`${n}.png`)});
   async function point(name,fn,mode='synthetische Konfiguration und simulierte HTTP-Antworten'){
     try{await fn();results.push({name,mode,status:'bestanden'});}catch(e){results.push({name,mode,status:'rot',reason:e.message.slice(0,600)});await shot(`FAIL-${results.length}`).catch(()=>{});}

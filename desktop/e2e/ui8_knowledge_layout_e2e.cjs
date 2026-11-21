@@ -5,7 +5,7 @@ for(const k of ['E2E_EMAIL','E2E_PASSWORD','E2E_OUT','E2E_ORG_ID','E2E_SPACE_ID'
 const results=[];fs.mkdirSync(env.E2E_OUT,{recursive:true});
 (async()=>{
   const browser=await chromium.launch({headless:true,args:['--no-sandbox'],...(env.E2E_CHROME?{executablePath:env.E2E_CHROME}:{})});
-  const page=await browser.newPage({viewport:{width:1440,height:1000},locale:'de-DE'});
+  const page=await browser.newPage({ locale: 'de-DE',viewport:{width:1440,height:1000},locale:'de-DE'});
   const shot=n=>page.screenshot({path:path.join(env.E2E_OUT,`${n}.png`)});
   async function point(name,fn,mode='echt'){
     try{await fn();results.push({name,mode,status:'bestanden'});}catch(e){results.push({name,mode,status:'rot',reason:e.message.slice(0,500)});await shot(`FAIL-${results.length}`).catch(()=>{});}

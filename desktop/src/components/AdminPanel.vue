@@ -28,36 +28,36 @@ const forbidden = ref(false);
 
 <template>
   <PageContainer width="narrow">
-    <template #header><PageHeader title="Administration" description="Modelle, Verbindungen und Betrieb deiner Keplura-Installation" /></template>
+    <template #header><PageHeader :title="$t('Administration')" :description="$t('Modelle, Verbindungen und Betrieb deiner Keplura-Installation')" /></template>
   <section class="panel" data-testid="admin-panel">
 
     <p v-if="forbidden" class="note bad" data-testid="admin-forbidden">
-      Dieser Bereich ist nur für Administratorinnen und Administratoren zugänglich.
+      {{ $t("Dieser Bereich ist nur für Administratorinnen und Administratoren zugänglich.") }}
     </p>
 
-    <div class="admin-mobile-nav"><label for="admin-section-select">Administrationsbereich</label>
+    <div class="admin-mobile-nav"><label for="admin-section-select">{{ $t("Administrationsbereich") }}</label>
       <select id="admin-section-select" v-model="section" class="ic-native-control" data-testid="admin-section-select">
-        <optgroup label="KI und Wissen"><option value="provider">KI-Anbieter</option><option value="modell">Modelle</option><option value="rag">Suche und Wissen</option></optgroup>
-        <optgroup label="Verbindungen"><option value="datasources">Datenquellen</option><option value="websearch">Websuche</option><option value="mcp">MCP-Server</option><option value="directory">Verzeichnis</option><option value="access">Zugriff prüfen</option></optgroup>
-        <optgroup label="Betrieb"><option value="status">Systemstatus</option><option value="quality">Antwortqualität</option><option value="backup">Datensicherung</option></optgroup>
+        <optgroup :label="$t('KI und Wissen')"><option value="provider">{{ $t("KI-Anbieter") }}</option><option value="modell">{{ $t("Modelle") }}</option><option value="rag">{{ $t("Suche und Wissen") }}</option></optgroup>
+        <optgroup :label="$t('Verbindungen')"><option value="datasources">{{ $t("Datenquellen") }}</option><option value="websearch">{{ $t("Websuche") }}</option><option value="mcp">{{ $t("MCP-Server") }}</option><option value="directory">{{ $t("Verzeichnis") }}</option><option value="access">{{ $t("Zugriff prüfen") }}</option></optgroup>
+        <optgroup :label="$t('Betrieb')"><option value="status">{{ $t("Systemstatus") }}</option><option value="quality">{{ $t("Antwortqualität") }}</option><option value="backup">{{ $t("Datensicherung") }}</option></optgroup>
       </select>
     </div>
 
-    <nav class="tabs" aria-label="Admin-Bereiche">
-      <span class="admin-nav-label">KI &amp; Wissen</span>
-      <button type="button" :class="{ act: section === 'provider' }" data-testid="admin-tab-providers" @click="section = 'provider'">KI-Anbieter</button>
-      <button type="button" :class="{ act: section === 'modell' }" data-testid="admin-tab-models" @click="section = 'modell'">Modelle</button>
-      <button type="button" :class="{ act: section === 'rag' }" data-testid="admin-tab-rag" @click="section = 'rag'">Suche &amp; Wissen</button>
-      <span class="admin-nav-label">Verbindungen</span>
-      <button type="button" :class="{ act: section === 'datasources' }" data-testid="admin-tab-datasources" @click="section = 'datasources'">Datenquellen</button>
-      <button type="button" :class="{ act: section === 'websearch' }" data-testid="admin-tab-websearch" @click="section = 'websearch'">Websuche</button>
-      <button type="button" :class="{ act: section === 'mcp' }" data-testid="admin-tab-mcp" @click="section = 'mcp'">MCP-Server</button>
-      <button type="button" :class="{ act: section === 'directory' }" data-testid="admin-tab-directory" @click="section = 'directory'">Verzeichnis</button>
-      <button type="button" :class="{ act: section === 'access' }" data-testid="admin-tab-access" @click="section = 'access'">Zugriff prüfen</button>
-      <span class="admin-nav-label">Betrieb</span>
-      <button type="button" :class="{ act: section === 'status' }" data-testid="admin-tab-status" @click="section = 'status'">Systemstatus</button>
-      <button type="button" :class="{ act: section === 'quality' }" data-testid="admin-tab-quality" @click="section = 'quality'">Antwortqualität</button>
-      <button type="button" :class="{ act: section === 'backup' }" data-testid="admin-tab-backup" @click="section = 'backup'">Datensicherung</button>
+    <nav class="tabs" :aria-label="$t('Admin-Bereiche')">
+      <span class="admin-nav-label">{{ $t("KI & Wissen") }}</span>
+      <button type="button" :class="{ act: section === 'provider' }" data-testid="admin-tab-providers" @click="section = 'provider'">{{ $t("KI-Anbieter") }}</button>
+      <button type="button" :class="{ act: section === 'modell' }" data-testid="admin-tab-models" @click="section = 'modell'">{{ $t("Modelle") }}</button>
+      <button type="button" :class="{ act: section === 'rag' }" data-testid="admin-tab-rag" @click="section = 'rag'">{{ $t("Suche & Wissen") }}</button>
+      <span class="admin-nav-label">{{ $t("Verbindungen") }}</span>
+      <button type="button" :class="{ act: section === 'datasources' }" data-testid="admin-tab-datasources" @click="section = 'datasources'">{{ $t("Datenquellen") }}</button>
+      <button type="button" :class="{ act: section === 'websearch' }" data-testid="admin-tab-websearch" @click="section = 'websearch'">{{ $t("Websuche") }}</button>
+      <button type="button" :class="{ act: section === 'mcp' }" data-testid="admin-tab-mcp" @click="section = 'mcp'">{{ $t("MCP-Server") }}</button>
+      <button type="button" :class="{ act: section === 'directory' }" data-testid="admin-tab-directory" @click="section = 'directory'">{{ $t("Verzeichnis") }}</button>
+      <button type="button" :class="{ act: section === 'access' }" data-testid="admin-tab-access" @click="section = 'access'">{{ $t("Zugriff prüfen") }}</button>
+      <span class="admin-nav-label">{{ $t("Betrieb") }}</span>
+      <button type="button" :class="{ act: section === 'status' }" data-testid="admin-tab-status" @click="section = 'status'">{{ $t("Systemstatus") }}</button>
+      <button type="button" :class="{ act: section === 'quality' }" data-testid="admin-tab-quality" @click="section = 'quality'">{{ $t("Antwortqualität") }}</button>
+      <button type="button" :class="{ act: section === 'backup' }" data-testid="admin-tab-backup" @click="section = 'backup'">{{ $t("Datensicherung") }}</button>
     </nav>
     <div class="admin-content">
     <ProvidersPanel v-if="section === 'provider'" @forbidden="forbidden = true" />

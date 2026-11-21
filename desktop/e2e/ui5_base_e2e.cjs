@@ -15,7 +15,7 @@ const rgb = hex => `rgb(${[1,3,5].map(i => parseInt(hex.slice(i,i+2),16)).join('
 
 (async () => {
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'], ...(env.E2E_CHROME ? { executablePath: env.E2E_CHROME } : {}) });
-  const ctx = await browser.newContext({ viewport: { width: 1440, height: 1000 }, locale: 'de-DE' });
+  const ctx = await browser.newContext({ locale: 'de-DE', viewport: { width: 1440, height: 1000 }, locale: 'de-DE' });
   const page = await ctx.newPage();
   const dialog = () => page.locator('dialog[open]');
   const shot = name => page.screenshot({ path: path.join(env.E2E_OUT, `${name}.png`) });

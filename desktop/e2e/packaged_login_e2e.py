@@ -235,7 +235,7 @@ def start_app(binary):
     return subprocess.Popen(
         [binary],
         stdout=open("/tmp/e2e-app.log", "ab"), stderr=subprocess.STDOUT,
-        env=dict(os.environ, WEBKIT_DISABLE_COMPOSITING_MODE="1"),
+        env=dict(os.environ, WEBKIT_DISABLE_COMPOSITING_MODE="1", LANG="de_DE.UTF-8", LANGUAGE="de"),
     )
 
 

@@ -8,6 +8,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useAuthStore } from "../auth-store";
 import { globalSearch, type GlobalSearchResult } from "../productivity-api";
 import AppIcon from "./ui/AppIcon.vue";
+import { tr } from "../i18n";
 
 type View = "chat" | "wissen";
 const emit = defineEmits<{ navigate: [View] }>();
@@ -26,13 +27,13 @@ const items = computed<Item[]>(() => {
   const r = result.value;
   if (!r) return [];
   const out: Item[] = [];
-  for (const s of r.spaces) out.push({ key: `s${s.id}`, group: "Arbeitsbereiche", label: s.name, hint: "", icon: "folder",
+  for (const s of r.spaces) out.push({ key: `s${s.id}`, group: tr("Arbeitsbereiche"), label: s.name, hint: "", icon: "folder",
     run: async () => { await auth.selectSpace(s.id); emit("navigate", "chat"); } });
-  for (const k of r.knowledgeBases) out.push({ key: `k${k.id}`, group: "Wissensbasen", label: k.name, hint: k.spaceName, icon: "book",
+  for (const k of r.knowledgeBases) out.push({ key: `k${k.id}`, group: tr("Wissensbasen"), label: k.name, hint: k.spaceName, icon: "book",
     run: () => openKb(k.spaceId, k.id) });
-  for (const d of r.documents) out.push({ key: `d${d.id}`, group: "Dokumente", label: d.filename, hint: d.kbName, icon: "doc",
+  for (const d of r.documents) out.push({ key: `d${d.id}`, group: tr("Dokumente"), label: d.filename, hint: d.kbName, icon: "doc",
     run: () => openKb(d.spaceId, d.kbId) });
-  for (const c of r.conversations) out.push({ key: `c${c.id}`, group: "Chats", label: c.title || "Unbenannter Chat", hint: "", icon: "chat",
+  for (const c of r.conversations) out.push({ key: `c${c.id}`, group: tr("Chats"), label: c.title || tr("Unbenannter Chat"), hint: "", icon: "chat",
     run: async () => { await auth.selectSpace(c.spaceId); emit("navigate", "chat"); await nextTick(); auth.requestConversation("open", c.id); } });
   return out;
 });
@@ -99,17 +100,17 @@ onBeforeUnmount(() => { window.removeEventListener("keydown", globalKey); window
 
 <template>
   <div v-if="open" class="cp-scrim" data-testid="command-palette" @mousedown.self="close">
-    <div class="cp" role="dialog" aria-modal="true" aria-label="Globale Suche">
+    <div class="cp" role="dialog" aria-modal="true" :aria-label="$t('Globale Suche')">
       <div class="cp-head">
         <AppIcon name="search" :size="15" />
-        <input ref="input" v-model="q" class="cp-input" placeholder="Arbeitsbereiche, Wissensbasen, Dokumente, Chats suchen…"
-          aria-label="Suchbegriff" data-testid="command-palette-input" @keydown="onKey" />
-        <kbd>Esc</kbd>
+        <input ref="input" v-model="q" class="cp-input" :placeholder="$t('Arbeitsbereiche, Wissensbasen, Dokumente, Chats suchen…')"
+          :aria-label="$t('Suchbegriff')" data-testid="command-palette-input" @keydown="onKey" />
+        <kbd>{{ $t("Esc") }}</kbd>
       </div>
       <div class="cp-body" role="listbox">
-        <p v-if="!q.trim()" class="cp-empty">Tippe, um in deiner Organisation zu suchen.</p>
-        <p v-else-if="loading && !items.length" class="cp-empty">Suche läuft…</p>
-        <p v-else-if="!items.length" class="cp-empty">Keine Treffer für „{{ q.trim() }}“.</p>
+        <p v-if="!q.trim()" class="cp-empty">{{ $t("Tippe, um in deiner Organisation zu suchen.") }}</p>
+        <p v-else-if="loading && !items.length" class="cp-empty">{{ $t("Suche läuft…") }}</p>
+        <p v-else-if="!items.length" class="cp-empty">{{ $t("Keine Treffer für „{0}“.", q.trim()) }}</p>
         <template v-for="(it, i) in items" :key="it.key">
           <div v-if="i === 0 || items[i - 1].group !== it.group" class="cp-group">{{ it.group }}</div>
           <button type="button" class="cp-item" :class="{ 'is-active': i === active }" role="option" :aria-selected="i === active"

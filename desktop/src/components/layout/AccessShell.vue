@@ -14,7 +14,7 @@ defineProps<{ title?: string; intro?: string; wide?: boolean }>();
     <div class="access-panel" :class="{ wide }">
       <div class="access-brand">
         <span aria-hidden="true" class="access-mark"><AppIcon name="book" :size="15" /></span>
-        <span class="access-name">Keplura</span>
+        <span class="access-name">{{ $t("Keplura") }}</span>
       </div>
       <h1 v-if="title" class="access-title">{{ title }}</h1>
       <p v-if="intro" class="access-intro">{{ intro }}</p>

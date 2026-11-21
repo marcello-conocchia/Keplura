@@ -218,7 +218,7 @@ async function geometry(page, geom, tag) {
   await new Promise((r) => mock.listen(MOCK_PORT, "127.0.0.1", r));
   await bootJar();
   const browser = await chromium.launch({ executablePath: EXE });
-  const page = await browser.newPage({ viewport: { width: 1200, height: 1400 }, colorScheme: "light" });
+  const page = await browser.newPage({ locale: 'de-DE', viewport: { width: 1200, height: 1400 }, colorScheme: "light" });
   // Content determinism across the two legs: (a) freeze the PAGE Date so
   // optimistic local createdAt stamps render identically; (b) stub the
   // Intl formatter so EVERY timestamp label ("10. Sept. 2026, 12:00") is

@@ -18,6 +18,7 @@ import { initFullscreenState, toggleFullscreen, useFullscreen } from "./fullscre
 import { inTauri } from "./transport";
 import { serverUrl } from "./api";
 import { readOidcErrorFragment, readOidcFragment, stripOidcFragment } from "./oidc";
+import { tr } from "./i18n";
 
 /** M4b: the signed-in content area has two views; ADMIN-KI adds the admin
  * panel (third) — reachable for ADMINs via the sidebar entry only. */
@@ -47,7 +48,7 @@ const menuOpen = ref(false);
 const menuPanel = ref<HTMLElement | null>(null);
 const menuButton = ref<HTMLButtonElement | null>(null);
 const menuMedia = window.matchMedia("(max-width: 760px)");
-const viewTitle = computed(() => ({chat:"Chat",wissen:"Wissen",team:"Team",admin:"Administration"})[activeView.value]);
+const viewTitle = computed(() => ({chat:tr("Chat"),wissen:tr("Wissen"),team:tr("Team"),admin:tr("Administration")})[activeView.value]);
 function resizeMenu() { mobile.value = menuMedia.matches; if (!mobile.value) menuOpen.value = false; }
 async function closeMenu() { menuOpen.value = false; await nextTick(); menuButton.value?.focus(); }
 async function openMenu() { menuOpen.value = true; await nextTick(); menuPanel.value?.querySelector<HTMLElement>("button")?.focus(); }
@@ -202,12 +203,12 @@ const mustChangePassword = computed(() => auth.user?.mustChangePassword === true
 <template>
   <div class="shell">
     <header v-if="auth.loggedIn && mobile && !auth.restoring && !mustChangePassword" class="mobile-topbar">
-      <button ref="menuButton" type="button" aria-label="Menü öffnen" :aria-expanded="menuOpen" aria-controls="primary-navigation" data-testid="mobile-menu-open" @click="openMenu"><AppIcon name="overview" :size="15" /><span>Menü</span></button>
-      <span>{{ viewTitle }}</span><strong>Keplura</strong>
+      <button ref="menuButton" type="button" :aria-label="$t('Menü öffnen')" :aria-expanded="menuOpen" aria-controls="primary-navigation" data-testid="mobile-menu-open" @click="openMenu"><AppIcon name="overview" :size="15" /><span>{{ $t("Menü") }}</span></button>
+      <span>{{ viewTitle }}</span><strong>{{ $t("Keplura") }}</strong>
     </header>
     <div v-if="auth.loggedIn && mobile && menuOpen" class="mobile-menu-scrim" @click="closeMenu"></div>
-    <div v-if="auth.loggedIn && !auth.restoring && !mustChangePassword && (!mobile || menuOpen)" id="primary-navigation" ref="menuPanel" class="navigation-slot" :class="{'mobile-drawer': mobile}" :role="mobile ? 'dialog' : undefined" :aria-modal="mobile || undefined" aria-label="Navigation">
-      <div v-if="mobile" class="mobile-menu-head"><strong>Keplura</strong><button type="button" aria-label="Menü schließen" data-testid="mobile-menu-close" @click="closeMenu"><AppIcon name="close" :size="15" /></button></div>
+    <div v-if="auth.loggedIn && !auth.restoring && !mustChangePassword && (!mobile || menuOpen)" id="primary-navigation" ref="menuPanel" class="navigation-slot" :class="{'mobile-drawer': mobile}" :role="mobile ? 'dialog' : undefined" :aria-modal="mobile || undefined" :aria-label="$t('Navigation')">
+      <div v-if="mobile" class="mobile-menu-head"><strong>{{ $t("Keplura") }}</strong><button type="button" :aria-label="$t('Menü schließen')" data-testid="mobile-menu-close" @click="closeMenu"><AppIcon name="close" :size="15" /></button></div>
     <AppSidebar
       :status="status"
       :model-state="systemInfo?.model ?? ''"
@@ -223,7 +224,7 @@ const mustChangePassword = computed(() => auth.user?.mustChangePassword === true
     </div>
     <template v-if="auth.restoring">
       <AccessShell data-testid="auth-restoring">
-        <p class="boot-line" role="status"><span class="boot-spinner" aria-hidden="true"></span>Sitzung wird geprüft …</p>
+        <p class="boot-line" role="status"><span class="boot-spinner" aria-hidden="true"></span>{{ $t("Sitzung wird geprüft …") }}</p>
       </AccessShell>
     </template>
     <ChangePasswordView v-else-if="auth.loggedIn && mustChangePassword" />

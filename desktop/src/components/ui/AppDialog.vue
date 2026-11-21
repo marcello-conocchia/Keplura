@@ -2,10 +2,11 @@
 import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import AppIcon from "./AppIcon.vue";
 import Button from "./Button.vue";
+import { tr } from "../../i18n";
 const props=withDefaults(defineProps<{
   open:boolean; title:string; closeLabel?:string; error?:string;
   size?:"sm"|"md"|"lg"|"wizard"; busy?:boolean; dirty?:boolean; initialFocus?:"field"|"title"|"cancel";
-}>(),{closeLabel:"Schließen",error:"",size:"sm",busy:false,dirty:false,initialFocus:"field"});
+}>(),{closeLabel:()=>tr("Schließen"),error:"",size:"sm",busy:false,dirty:false,initialFocus:"field"});
 const emit=defineEmits<{close:[]}>();
 const dlg=ref<HTMLDialogElement|null>(null), titleEl=ref<HTMLElement|null>(null);
 const discard=ref(false), busyNotice=ref(false);
@@ -67,21 +68,21 @@ onMounted(()=>void syncOpen(props.open));
 onUnmounted(()=>{closing=true;if(dlg.value?.open)dlg.value.close();if(opener?.isConnected)opener.focus();});
 </script>
 <template>
-  <dialog ref="dlg" class="ic-dialog" :class="['dialog-'+size,{'dialog-discarding':discard}]" aria-modal="true" :aria-label="discard?'Änderungen verwerfen?':title"
+  <dialog ref="dlg" class="ic-dialog" :class="['dialog-'+size,{'dialog-discarding':discard}]" aria-modal="true" :aria-label="discard?$t('Änderungen verwerfen?'):title"
     @cancel.prevent="requestClose" @close="onNativeClose" @click="backdrop" @keydown="onKeydown">
     <div class="box">
-      <header class="head"><h2 ref="titleEl" tabindex="-1" class="ttl">{{discard?'Änderungen verwerfen?':title}}</h2>
+      <header class="head"><h2 ref="titleEl" tabindex="-1" class="ttl">{{discard?$t("Änderungen verwerfen?"):title}}</h2>
         <button type="button" class="x" data-testid="dialog-close" :aria-label="closeLabel" :title="closeLabel" :aria-disabled="busy||undefined" @click="requestClose"><AppIcon name="close" :size="20"/></button>
       </header>
       <div v-if="discard" class="discard-view">
-        <p>Deine noch nicht gespeicherten Änderungen gehen verloren. Bereits gespeicherte Änderungen bleiben erhalten.</p>
-        <div class="discard-actions"><Button data-testid="dialog-keep-editing" @click="keepEditing">Weiter bearbeiten</Button><Button variant="danger" data-testid="dialog-discard" @click="emit('close')">Änderungen verwerfen</Button></div>
+        <p>{{ $t("Deine noch nicht gespeicherten Änderungen gehen verloren. Bereits gespeicherte Änderungen bleiben erhalten.") }}</p>
+        <div class="discard-actions"><Button data-testid="dialog-keep-editing" @click="keepEditing">{{ $t("Weiter bearbeiten") }}</Button><Button variant="danger" data-testid="dialog-discard" @click="emit('close')">{{ $t("Änderungen verwerfen") }}</Button></div>
       </div>
       <div v-show="!discard" class="dialog-content"><div class="inner"><slot/></div>
         <p v-if="error" class="dlg-error" tabindex="-1" role="alert" data-testid="dialog-error">{{error}}</p>
         <footer v-if="$slots.footer" class="dialog-footer"><slot name="footer"/></footer>
       </div>
-      <p v-if="busyNotice" role="status" class="busy-notice">Der Vorgang läuft. Bitte warte, bis er abgeschlossen ist.</p>
+      <p v-if="busyNotice" role="status" class="busy-notice">{{ $t("Der Vorgang läuft. Bitte warte, bis er abgeschlossen ist.") }}</p>
     </div>
   </dialog>
 </template>

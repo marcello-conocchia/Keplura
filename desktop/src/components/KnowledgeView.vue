@@ -17,10 +17,10 @@ onMounted(() => {
 <template>
   <PageContainer>
     <template #header>
-      <PageHeader title="Wissen">
+      <PageHeader :title="$t('Wissen')">
         <template #description>
           <span data-testid="session-user-line">{{ auth.selectedSpace?.name ?? "" }}</span>
-          <span class="sr-only" data-testid="session-user">{{ auth.user?.displayName || "Keplura-Nutzer" }}</span>
+          <span class="sr-only" data-testid="session-user">{{ auth.user?.displayName || $t('Keplura-Nutzer') }}</span>
         </template>
       </PageHeader>
     </template>

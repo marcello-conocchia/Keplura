@@ -261,7 +261,7 @@ async function bootSession(page, orgName) {
   await bootJar("db");
 
   const browser = await chromium.launch({ executablePath: EXE });
-  const page = await browser.newPage({ viewport: { width: 1200, height: 1400 } });
+  const page = await browser.newPage({ locale: 'de-DE', viewport: { width: 1200, height: 1400 } });
   const shot = (name) => page.screenshot({ path: path.join(OUT_DIR, name), fullPage: true });
 
   const orgState = await bootSession(page, ORG_NAME);

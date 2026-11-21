@@ -12,7 +12,7 @@ fs.mkdirSync(env.E2E_OUT, { recursive: true });
 (async () => {
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'],
     ...(env.E2E_CHROME ? { executablePath: env.E2E_CHROME } : {}) });
-  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  const page = await browser.newPage({ locale: 'de-DE', viewport: { width: 1440, height: 1000 } });
   const step = async (name, fn) => { await fn(); console.log(JSON.stringify({ step: name, ok: true })); };
   const stats = async () => page.evaluate(async url => {
     const response = await fetch(url, { credentials: 'include' });

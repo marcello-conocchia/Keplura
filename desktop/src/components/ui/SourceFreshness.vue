@@ -6,8 +6,8 @@ const stamp = computed(() => sourceFreshness(props.value));
 </script>
 <template>
   <span class="source-freshness" data-testid="source-freshness">
-    <span>Stand: <time v-if="stamp.date" :datetime="stamp.date">{{ stamp.label }}</time><template v-else>{{ stamp.label }}</template></span>
-    <span v-if="stamp.older" class="source-aged" :title="`Stand vom ${stamp.label}, bitte prüfen, ob es aktuell ist`" data-testid="source-aged"><span aria-hidden="true">·</span> älteres Dokument</span>
+    <span>{{ $t("Stand:") }} <time v-if="stamp.date" :datetime="stamp.date">{{ stamp.label }}</time><template v-else>{{ stamp.label }}</template></span>
+    <span v-if="stamp.older" class="source-aged" :title="$t('Stand vom {0}, bitte prüfen, ob es aktuell ist', stamp.label)" data-testid="source-aged"><span aria-hidden="true">·</span> {{ $t("älteres Dokument") }}</span>
   </span>
 </template>
 <style scoped>

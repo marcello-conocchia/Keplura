@@ -112,7 +112,7 @@ async function assertLight(page, where) {
 
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE });
-  const page = await browser.newPage({
+  const page = await browser.newPage({ locale: 'de-DE',
     viewport: { width: 1100, height: 800 },
     colorScheme: "light",
   });

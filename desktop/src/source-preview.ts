@@ -1,5 +1,6 @@
 import { serverUrl } from "./api";
 import { desktopFetch } from "./transport";
+import { tr } from "./i18n";
 
 export interface SourceSelection {
   orgId: number; spaceId: number; kbId: number; documentId: number; chunkIdx: number;
@@ -35,5 +36,5 @@ export async function fetchSourcePreview(source: SourceSelection, center: number
 
 /** Display the physical source unit while retaining the shared pageNumber wire field. */
 export function sourcePageLabel(filename: string): string {
-  return filename.toLowerCase().endsWith(".pptx") ? "Folie" : "Seite";
+  return filename.toLowerCase().endsWith(".pptx") ? tr("Folie") : tr("Seite");
 }
