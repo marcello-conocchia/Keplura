@@ -103,4 +103,47 @@ class InternalTargetProvenanceTest {
         assertThat(M.readTree(stored)).hasSize(1);
         assertThat(M.readTree(stored).get(0).asString()).contains("Treffer 1 von 9");
     }
+
+    /**
+     * Re-review PR #26 (Codex, major): Unicode separators between otherwise public words encoded a private
+     * number (codepoint − U+2000 = digit) and the call ran automatically. Through the real central service:
+     * a card instead of an external call, and the exact text stays on the card.
+     */
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings={
+            "public\\u2009ticket\\u2001lookup\\u2000result\\u2000page",   // the reproduced 9100 encoding
+            "public\\u00A0ticket lookup result page", "public\\u202Fticket lookup result page",
+            "public\\u3000ticket lookup result page", "public\\u1680ticket lookup result page",
+            "public\\u205Fticket lookup result page", "public\\u2028ticket lookup result page",
+            "public\\u0085ticket lookup result page", "public\\tticket lookup result page",
+            "public  ticket lookup result page", "public ticket lookup result page ", "\\u2000public ticket lookup result page",
+            "cafe\\u0301 public ticket lookup result page"})
+    void nonCanonicalSpellingOfPublicTextBecomesACardNotAnExternalCall(String value) {
+        external.result = "public ticket lookup result page café public ticket lookup result page";
+        var turn = question();
+        assertThat(turn.call("external__lookup", "{\"q\":\"Ticket\"}").invoked()).isTrue();
+        internal.result = "Gehalt 9100";
+        turn.call("internal__lookup", "{\"q\":\"Kunde\"}");
+        String args = "{\"q\":\"" + value + "\"}";
+
+        var outcome = turn.call("external__lookup", args);
+
+        assertThat(outcome.invoked()).isFalse();
+        assertThat(external.invocations).hasValue(1);
+        var card = service.cards(1L, 1L, 1L).stream().filter(c -> c.status().equals("PENDING")).toList();
+        assertThat(card).singleElement().satisfies(c -> {
+            assertThat(c.mayContainInternal()).isTrue();
+            assertThat(M.readTree(c.argumentsText()).path("q").asString()).isEqualTo(M.readTree(args).path("q").asString());
+        });
+    }
+
+    @Test void canonicalPublicTextStillRunsAutomatically() {
+        external.result = "public ticket lookup result page";
+        var turn = question();
+        turn.call("external__lookup", "{\"q\":\"Ticket\"}");
+        internal.result = "Gehalt 9100";
+        turn.call("internal__lookup", "{\"q\":\"Kunde\"}");
+        assertThat(turn.call("external__lookup", "{\"q\":\"public ticket lookup result page\"}").invoked()).isTrue();
+        assertThat(external.arguments.getLast()).isEqualTo("{\"q\":\"public ticket lookup result page\"}");
+    }
 }

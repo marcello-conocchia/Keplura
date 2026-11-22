@@ -14,16 +14,35 @@ import java.util.regex.Pattern;
  * <p>Every string or number value must appear as ONE contiguous token sequence in the person's question or in
  * one external result. A bag of individually public tokens is not enough, otherwise "9 1 0 0" could spell a
  * private 9100 from public digits. Very short values may only come from the question itself, so data cannot
- * leave one character per element or per call. The number of free values per call is capped, and unusual
- * whitespace is refused because it could encode data while the tokens stay equal.
+ * leave one character per element or per call. The number of free values per call is capped, and any
+ * non-canonical spelling (Unicode whitespace other than single U+0020, leading/trailing space, non-NFC text)
+ * is refused because it could encode data while the tokens stay equal.
  */
 public final class ToolArgumentProvenance {
     /** More free values than this in one call need a confirmation card. */
     public static final int MAX_AUTOMATIC_VALUES = 8;
     /** Values with fewer characters (whitespace ignored) are only accepted from the question itself. */
     public static final int MIN_SOURCE_VALUE_CHARS = 3;
-    private static final Pattern TOKENS = Pattern.compile("[\\p{L}\\p{M}\\p{N}]+|[^\\p{L}\\p{M}\\p{N}\\s]", Pattern.UNICODE_CHARACTER_CLASS);
+    /**
+     * ONE whitespace definition for the tokenizer AND the canonical-text check: {@code \s} under
+     * UNICODE_CHARACTER_CLASS = Unicode White_Space (U+00A0, U+2000–U+200A, U+202F, U+3000, …). If the two
+     * disagreed, characters the tokenizer drops could still reach the external tool and carry data.
+     */
+    private static final String SPACE = "\\s";
+    private static final Pattern TOKENS = Pattern.compile("[\\p{L}\\p{M}\\p{N}]+|[^\\p{L}\\p{M}\\p{N}" + SPACE + "]",
+            Pattern.UNICODE_CHARACTER_CLASS);
+    private static final Pattern WHITESPACE_RUN = Pattern.compile(SPACE + "+", Pattern.UNICODE_CHARACTER_CLASS);
     private ToolArgumentProvenance() { }
+
+    /**
+     * Only one exact spelling of a value is automatic: already NFC (NFC/NFD would be a free bit per character)
+     * and whitespace only as single U+0020 between tokens, nothing leading or trailing.
+     */
+    static boolean canonicalText(String value) {
+        if (!Normalizer.isNormalized(value, Normalizer.Form.NFC)) return false;
+        if (!WHITESPACE_RUN.matcher(value).replaceAll(" ").equals(value)) return false;
+        return !(value.startsWith(" ") || value.endsWith(" "));
+    }
 
     /** Token sequences of the question and of every public source (the question included). */
     public record Sources(List<String> question, List<List<String>> all) {
@@ -80,7 +99,7 @@ public final class ToolArgumentProvenance {
 
     private static boolean literal(String value, Sources sources, int[] values) {
         if (++values[0] > MAX_AUTOMATIC_VALUES) return false;
-        if (!value.equals(value.strip().replaceAll("\\s+", " "))) return false;
+        if (!canonicalText(value)) return false;
         List<String> needle = tokens(value);
         if (needle.isEmpty()) return value.isEmpty();
         int chars = 0;
@@ -91,7 +110,9 @@ public final class ToolArgumentProvenance {
     }
 
     private static boolean same(JsonNode a, JsonNode b) {
-        if (a.isString() && b.isString()) return normalized(a.asString()).equals(normalized(b.asString()));
+        // Schema values too: the raw spelling must be canonical, otherwise whitespace/NFD would carry data.
+        if (a.isString() && b.isString()) return canonicalText(a.asString())
+                && normalized(a.asString()).equals(normalized(b.asString()));
         return a.equals(b);
     }
 }
