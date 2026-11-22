@@ -1,6 +1,6 @@
 # TU-03b — Begrenzte Fortsetzung nach konkreter Bestätigung
 
-Status: **implementiert, Linux-CI grün; Code-/Security-Freigabe auf 31c1849 liegt vor. Minor korrigiert und gezielt geprüft.** Branch `feat/tool-use-confirmed-continuation` ab main `53bad15`. Codex implementiert, Claude prüft danach unabhängig Code und Sicherheit (bestehenden PO-Rollentausch fortgeführt). Nicht gemergt. Nächste einzelne Aufgabe nach TU-03a (PR #19, Merge `5c25bfa`). Zweiter Umsetzungsschritt von TU-03 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Modell-/Werkzeugschleife, Bestätigungen, externe Aufrufe und Rechte.
+Status: **abgeschlossen, auf main** — PR #21, Squash-Merge `b1b9e72` (22.11.2026), Baum identisch mit Head `fe7a4d6`. Linux-CI Exit 0 auf Produktcommit `88c8669`, Evidence `ci/evidence/20261121-205038/`; unabhängige Code-/Security-Freigabe durch Claude auf `31c1849`; minor danach in `fe7a4d6` mit gezielten Tests korrigiert (Review-rounds-Regel). Zweiter Umsetzungsschritt von TU-03 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md); nächster Schritt [TU-03c](TU-03c-dependent-action.md). Klasse A: Modell-/Werkzeugschleife, Bestätigungen, externe Aufrufe und Rechte.
 
 ## Ziel
 
