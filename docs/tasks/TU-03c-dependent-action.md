@@ -1,6 +1,6 @@
 # TU-03c — Abhängige Folgeaktion mit konkreter Bestätigung
 
-Status: **implementiert; Linux-CI grün, unabhängige Prüfung offen.** Branch `feat/tool-use-dependent-action` ab main `564a85b`. Codex implementiert, Claude prüft unabhängig Code und Sicherheit; bestehende Rollenteilung fortgeführt. Nicht gemergt. Nächste einzelne Aufgabe nach TU-03b (PR #21, Merge `b1b9e72`). Dritter und letzter Umsetzungsschritt von TU-03 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Schreibaktionen, Bestätigungen, externe Aufrufe und Rechte.
+Status: **abgeschlossen, auf main** — PR #23, Squash-Merge `37362d7` (22.11.2026), Baum identisch mit freigegebenem Head `74ec292`. Linux-CI Exit 0 auf Produktcommit `7e05e92`, Evidence `ci/evidence/20261122-105648/`; unabhängige Code-/Security-Freigabe durch Claude auf `74ec292`. Dritter und letzter Umsetzungsschritt von TU-03 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md); TU-03 damit abgeschlossen, nächster Schritt [TU-04a](TU-04a-knowledge-search-tool.md). Klasse A: Schreibaktionen, Bestätigungen, externe Aufrufe und Rechte.
 
 ## Ziel
 
