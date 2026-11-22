@@ -53,6 +53,11 @@ public final class ToolQuestionStore {
         if(jdbc.update("update tool_question set internal_seen=true where prompt_message_id=?",promptId)!=1)
             throw new IllegalStateException("question provenance unavailable");
     }
+    /** Same marking for results of internal MCP targets; questions without tracked state have no continuation. */
+    public void markInternalIfTracked(long promptId) {
+        jdbc.update("update tool_question set internal_seen=true where prompt_message_id=?",promptId);
+    }
+    /** Column name kept from V29; it stores the external result texts used as provenance sources. */
     public void savePublicTokens(long promptId,String tokens) {
         jdbc.update("update tool_question set public_tokens=? where prompt_message_id=?",tokens,promptId);
     }

@@ -175,22 +175,27 @@ public class ToolExecutionService {
         catch (NoSuchAlgorithmException e) { throw new IllegalStateException(e); }
     }
 
-    private void addPublicTokens(long promptId,String source) {
+    /** Max. external results kept as provenance sources per question (each already capped at MAX_RESULT_CHARS). */
+    static final int MAX_PUBLIC_SOURCES = 16;
+
+    /** Keeps each external result as ONE source text: provenance needs contiguous sequences, not a token bag. */
+    private void addPublicSource(long promptId,String source) {
         var state=questions.find(promptId).orElse(null);
         if(state==null) return;
-        var tokens=new java.util.LinkedHashSet<String>();
-        for(JsonNode token:mapper.readTree(state.publicTokens())) tokens.add(token.asString());
-        tokens.addAll(ToolArgumentProvenance.tokens(source));
-        questions.savePublicTokens(promptId,mapper.writeValueAsString(tokens));
+        var sources=new java.util.ArrayList<String>();
+        for(JsonNode text:mapper.readTree(state.publicTokens())) sources.add(text.asString());
+        if(sources.size()>=MAX_PUBLIC_SOURCES) return;
+        sources.add(source);
+        questions.savePublicTokens(promptId,mapper.writeValueAsString(sources));
     }
 
     private boolean requiresDisclosure(Long promptId,ToolDefinition tool,JsonNode args) {
         if(promptId==null) return false;
         var state=questions.find(promptId).orElse(null);
         if(state==null || !state.internalSeen()) return false;
-        var tokens=ToolArgumentProvenance.tokens(state.prompt());
-        for(JsonNode token:mapper.readTree(state.publicTokens())) tokens.add(token.asString());
-        return !ToolArgumentProvenance.allowed(args,tool.inputSchema(),tokens);
+        var sources=new java.util.ArrayList<String>();
+        for(JsonNode text:mapper.readTree(state.publicTokens())) sources.add(text.asString());
+        return !ToolArgumentProvenance.allowed(args,tool.inputSchema(),ToolArgumentProvenance.Sources.of(state.prompt(),sources));
     }
 
     public record ResolvedDialogue(ArrayNode messages,String authorizationStamp) { }
@@ -510,7 +515,10 @@ public class ToolExecutionService {
             if(row.promptMessageId()!=null) {
                 if(adapter.referencesOnly() && mapper.readTree(text).isArray() && !mapper.readTree(text).isEmpty()) {
                     questions.markInternal(row.promptMessageId());
-                } else if(!t.internal() && !adapter.referencesOnly()) addPublicTokens(row.promptMessageId(),text);
+                } else if(t.internal() && !adapter.referencesOnly()) {
+                    // Data from an admin-marked internal server is internal too: never public, and it marks the question.
+                    if(!text.isBlank()) questions.markInternalIfTracked(row.promptMessageId());
+                } else if(!adapter.referencesOnly()) addPublicSource(row.promptMessageId(),text);
             }
             ok = true;
         } catch (ToolAdapter.ToolInvocationException e) {
