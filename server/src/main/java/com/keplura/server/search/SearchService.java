@@ -69,18 +69,36 @@ public class SearchService {
         this.documents=documents; this.chunks=chunks;
     }
 
-    /** Rehydrate a saved location through CURRENT space, KB and document ACLs; no embedding request. */
+    private record DocumentKey(Long user,Long org,Long space,Long kb,Long document) { }
+    private record WindowKey(DocumentKey document,int from,int to) { }
+
+    /** Rehydrate saved locations through current KB/document ACLs; no embedding request. */
     @Transactional(readOnly = true)
     public SearchHit resolveHit(Long userId,Long orgId,Long spaceId,Long kbId,Long documentId,int chunkIdx,double score) {
-        requireKb(userId,orgId,spaceId,kbId);
-        if(documents==null || chunks==null || chunkIdx<0) return null;
-        var document=documents.findByIdInKbForMember(documentId,kbId,spaceId,orgId,userId).orElse(null);
-        if(document==null) return null;
-        var window=chunks.findPreviewWindow(documentId,kbId,spaceId,orgId,userId,chunkIdx,chunkIdx);
-        if(window.isEmpty()) return null;
-        var chunk=window.getFirst();
-        return new SearchHit(documentId,document.getFilename(),chunkIdx,chunk.getText(),score,chunk.getPageNumber(),
-                chunk.getSectionTitle(),chunk.getStartOffset(),chunk.getEndOffset(),document.getSourceUpdatedAt());
+        var hits=resolveWindow(userId,orgId,spaceId,kbId,documentId,chunkIdx,chunkIdx,score);
+        return hits.isEmpty()?null:hits.getFirst();
+    }
+
+    /** At most seven consecutive chunks, with the same full rights chain as an ordinary search. */
+    @Transactional(readOnly = true)
+    public List<SearchHit> resolveWindow(Long userId,Long orgId,Long spaceId,Long kbId,Long documentId,
+                                         int from,int to,double score) {
+        if(from<0 || to<from || (long)to-from>6) return List.of();
+        return ReferenceReadScope.run(() -> {
+            var key=new DocumentKey(userId,orgId,spaceId,kbId,documentId);
+            var document=ReferenceReadScope.memo(key,() -> {
+                requireKb(userId,orgId,spaceId,kbId);
+                return documents==null?null:documents.findByIdInKbForMember(documentId,kbId,spaceId,orgId,userId).orElse(null);
+            });
+            if(document==null || chunks==null) return List.of();
+            List<SearchHit> found=ReferenceReadScope.memo(new WindowKey(key,from,to),() -> {
+                var window=chunks.findPreviewWindow(documentId,kbId,spaceId,orgId,userId,from,to);
+                return window.stream().map(c -> new SearchHit(documentId,document.getFilename(),c.getChunkIdx(),c.getText(),0,
+                        c.getPageNumber(),c.getSectionTitle(),c.getStartOffset(),c.getEndOffset(),document.getSourceUpdatedAt())).toList();
+            });
+            for(var hit:found) ReferenceReadScope.seed(new WindowKey(key,hit.chunkIdx(),hit.chunkIdx()),List.of(hit));
+            return found.stream().map(h -> h.withScore(score)).toList();
+        });
     }
 
     @org.springframework.beans.factory.annotation.Autowired

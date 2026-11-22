@@ -32,7 +32,7 @@ watch(()=>[auth.selectedOrgId,isOwner.value],loadOrgTools,{immediate:true});
 </script>
 <template>
   <section v-if="isOwner" class="connection-note" data-testid="org-tool-settings">
-    <label v-if="orgTools" class="connection-check"><input type="checkbox" :checked="orgTools.knowledgeEnabled" :disabled="orgToolsBusy" @change="setOrgTools({knowledgeEnabled:!orgTools.knowledgeEnabled})" />{{ $t("Wissenssuche als Werkzeug für diese Organisation freigeben") }}</label>
+    <label v-if="orgTools" class="connection-check"><input type="checkbox" :checked="orgTools.knowledgeEnabled" :disabled="orgToolsBusy" @change="setOrgTools({knowledgeEnabled:!orgTools.knowledgeEnabled})" />{{ $t("Wissenssuche und Dokumentstellen als Werkzeuge für diese Organisation freigeben") }}</label>
     <label v-for="server in orgTools?.servers??[]" :key="server.serverId" class="connection-check">
       <input type="checkbox" :checked="server.internal" :disabled="orgToolsBusy" @change="setOrgTools({serverId:server.serverId,internal:!server.internal})" />
       {{ server.name }}: {{ $t("Internes Ziel für diese Organisation – Daten bleiben im Haus") }}

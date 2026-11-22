@@ -1,5 +1,6 @@
 package com.keplura.server.tool;
 
+import com.keplura.server.search.ReferenceReadScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +67,7 @@ public class ToolExecutionService {
     public record ToolCallView(String id, Long promptMessageId, String tool, String source, String risk,
                                String argumentsText, List<ArgumentField> argumentFields, String status,
                                boolean needsConfirmation, String result, String error, Instant createdAt,
-                               Instant expiresAt, String parentCallId, String parentTool,boolean mayContainInternal,boolean sourceUnavailable) {
+                               Instant expiresAt, String parentCallId, String parentTool,boolean mayContainInternal,boolean sourceUnavailable,boolean sourceTemporarilyUnavailable) {
     }
 
     /** Ein Eingabefeld, Wert verlustfrei als Text (Zeichenketten roh, sonst JSON). */
@@ -126,19 +127,24 @@ public class ToolExecutionService {
      * Benutzer ist Mitglied, der Arbeitsbereich gehört zur selben Organisation. Sonst {@code null}.
      */
     public ToolContext resolveContext(Long userId, Long orgId, Long conversationId) {
-        if (userId == null || orgId == null || conversationId == null) return null;
-        try {
-            return jdbc.query("""
-                    select c.space_id from chat_conversation c
-                    join space s on s.id = c.space_id and s.org_id = c.org_id
-                    where c.id = ? and c.org_id = ? and c.created_by = ?
-                      and exists (select 1 from membership m where m.org_id = c.org_id and m.user_id = c.created_by)""",
-                    (rs, n) -> new ToolContext(userId, orgId, rs.getLong(1), conversationId),
-                    conversationId, orgId, userId).stream().findFirst().orElse(null);
-        } catch (RuntimeException e) {
-            log.warn("tool context not resolvable ({})", e.getClass().getSimpleName());
+        try { return readContext(userId,orgId,conversationId); }
+        catch(RuntimeException unavailable) {
+            log.warn("tool context not resolvable ({})",unavailable.getClass().getSimpleName());
             return null;
         }
+    }
+
+    private record ContextKey(Long user,Long org,Long conversation) { }
+    /** An empty result proves denial; a database exception is not evidence of lost rights. */
+    private ToolContext readContext(Long userId,Long orgId,Long conversationId) {
+        if(userId==null || orgId==null || conversationId==null) return null;
+        return ReferenceReadScope.memo(new ContextKey(userId,orgId,conversationId),() -> jdbc.query("""
+                select c.space_id from chat_conversation c
+                join space s on s.id=c.space_id and s.org_id=c.org_id
+                where c.id=? and c.org_id=? and c.created_by=?
+                and exists(select 1 from membership m where m.org_id=c.org_id and m.user_id=c.created_by)""",
+                (rs,n) -> new ToolContext(userId,orgId,rs.getLong(1),conversationId),
+                conversationId,orgId,userId).stream().findFirst().orElse(null));
     }
 
     /** Gibt es im Chat mindestens ein ausführbares Werkzeug? */
@@ -202,6 +208,10 @@ public class ToolExecutionService {
 
     /** Rehydrate only server-authored references to owned successful cards; strip all private metadata. */
     public ResolvedDialogue resolveDialogue(ToolTurn turn,ArrayNode source) {
+        return ReferenceReadScope.run(() -> readDialogue(turn,source));
+    }
+
+    private ResolvedDialogue readDialogue(ToolTurn turn,ArrayNode source) {
         ArrayNode messages=source.deepCopy();
         StringBuilder stamps=new StringBuilder();
         for(JsonNode value:messages) {
@@ -219,7 +229,7 @@ public class ToolExecutionService {
                 if(current!=null && adapter!=null && adapter.referencesOnly() && blockReason(current)==null
                         && definitionHash(current).equals(row.definitionHash())) {
                     if(mapper.readTree(row.resultText()).isArray() && !mapper.readTree(row.resultText()).isEmpty()) questions.markInternal(turn.promptMessageId);
-                    var resolved=adapter.resolve(turn.ctx,current,row.resultText());
+                    var resolved=resolveReference(turn.ctx,current,row.resultText());
                     content=resolved.text(); citations=resolved.citationsJson();
                 }
             }
@@ -239,6 +249,10 @@ public class ToolExecutionService {
 
     /** Fresh metadata only. Called at answer persistence/trailer time so revoked documents cannot be cited. */
     public String questionCitations(Long conversationId,Long promptId) {
+        return ReferenceReadScope.run(() -> readQuestionCitations(conversationId,promptId));
+    }
+
+    private String readQuestionCitations(Long conversationId,Long promptId) {
         ArrayNode citations=mapper.createArrayNode();
         if(promptId==null) return citations.toString();
         var state=questions.find(promptId).orElse(null);
@@ -246,14 +260,14 @@ public class ToolExecutionService {
         ToolContext ctx=resolveContext(state.userId(),state.orgId(),conversationId);
         if(ctx==null) return citations.toString();
         var seen=new java.util.HashSet<String>();
-        for(var row:cards.forQuestion(ctx,promptId)) {
+        for(var row:questionRows(ctx,promptId)) {
             var adapter=adapters.get(row.adapter());
             if(adapter==null || !adapter.referencesOnly() || row.status()!=ToolCallStore.Status.SUCCEEDED || row.resultText()==null) continue;
             ToolDefinition current=currentById(ctx,row.adapter(),row.toolId());
             if(current==null || blockReason(current)!=null || !definitionHash(current).equals(row.definitionHash())) continue;
-            for(JsonNode cite:mapper.readTree(adapter.resolve(ctx,current,row.resultText()).citationsJson())) {
+            for(JsonNode cite:mapper.readTree(resolveReference(ctx,current,row.resultText()).citationsJson())) {
                 String key=cite.path("documentId").toString()+":"+cite.path("chunkIdx").toString();
-                if(citations.size()<8 && seen.add(key)) citations.add(cite);
+                if(citations.size()<64 && seen.add(key)) citations.add(cite);
             }
         }
         return citations.toString();
@@ -271,16 +285,38 @@ public class ToolExecutionService {
         return marker<0 ? "" : value.substring(marker);
     }
 
+    private record RowsKey(ToolContext context,Long prompt) { }
+    private record ReferenceKey(ToolContext context,String definition,String stored) { }
+    private record AccessKey(ToolContext context,Long prompt) { }
+    private enum ReferenceAccess { READABLE, DENIED, UNAVAILABLE }
+
+    private List<ToolCallStore.Row> questionRows(ToolContext ctx,Long prompt) {
+        return ReferenceReadScope.memo(new RowsKey(ctx,prompt),() -> cards.forQuestion(ctx,prompt));
+    }
+
+    private ToolAdapter.Resolved resolveReference(ToolContext ctx,ToolDefinition definition,String stored) {
+        return ReferenceReadScope.memo(new ReferenceKey(ctx,definitionHash(definition),stored),
+                () -> adapters.get(definition.adapter()).resolve(ctx,definition,stored));
+    }
+
+    private ReferenceAccess referenceAccess(ToolContext ctx,Long promptId) {
+        return ReferenceReadScope.memo(new AccessKey(ctx,promptId),() -> {
+            if(promptId==null) return ReferenceAccess.READABLE;
+            try {
+                for(var row:questionRows(ctx,promptId)) {
+                    var adapter=adapters.get(row.adapter());
+                    if(adapter==null || !adapter.referencesOnly() || row.status()!=ToolCallStore.Status.SUCCEEDED || row.resultText()==null) continue;
+                    var definition=currentById(ctx,row.adapter(),row.toolId());
+                    if(definition==null || blockReason(definition)!=null || !definitionHash(definition).equals(row.definitionHash())
+                            || !resolveReference(ctx,definition,row.resultText()).complete()) return ReferenceAccess.DENIED;
+                }
+                return ReferenceAccess.READABLE;
+            } catch(RuntimeException unavailable) { return ReferenceAccess.UNAVAILABLE; }
+        });
+    }
+
     private boolean referencesReadable(ToolContext ctx,Long promptId) {
-        if(promptId==null) return true;
-        for(var row:cards.forQuestion(ctx,promptId)) {
-            var adapter=adapters.get(row.adapter());
-            if(adapter==null || !adapter.referencesOnly() || row.status()!=ToolCallStore.Status.SUCCEEDED || row.resultText()==null) continue;
-            var definition=currentById(ctx,row.adapter(),row.toolId());
-            if(definition==null || blockReason(definition)!=null || !definitionHash(definition).equals(row.definitionHash())
-                    || !adapter.resolve(ctx,definition,row.resultText()).complete()) return false;
-        }
-        return true;
+        return referenceAccess(ctx,promptId)==ReferenceAccess.READABLE;
     }
 
     /** Fails closed before any model request. Capability is consumed once, never recovered after failure. */
@@ -445,10 +481,12 @@ public class ToolExecutionService {
         return out;
     }
 
+    private record DefinitionsKey(ToolContext context,String adapter) { }
+
     private ToolDefinition currentById(ToolContext ctx, String adapterKind, String toolId) {
         ToolAdapter adapter = adapters.get(adapterKind);
         if (adapter == null || toolId == null) return null;
-        for (ToolDefinition d : adapter.definitionsFor(ctx)) {
+        for (ToolDefinition d : ReferenceReadScope.memo(new DefinitionsKey(ctx,adapterKind),() -> adapter.definitionsFor(ctx))) {
             if (d != null && toolId.equals(d.id())) return d;
         }
         return null;
@@ -509,9 +547,9 @@ public class ToolExecutionService {
         String error = null;
         String text = null;
         try {
-            text = Objects.requireNonNullElse(adapter.invoke(ctx,t, args), "");
-            if (text.length() > MAX_RESULT_CHARS) text = text.substring(0, MAX_RESULT_CHARS) + "\n[gekürzt]";
             var row=cards.find(cardId).orElseThrow();
+            text = Objects.requireNonNullElse(adapter.invoke(ctx,t,args,row.promptMessageId()), "");
+            if (text.length() > MAX_RESULT_CHARS) text = text.substring(0, MAX_RESULT_CHARS) + "\n[gekürzt]";
             if(row.promptMessageId()!=null) {
                 if(adapter.referencesOnly() && mapper.readTree(text).isArray() && !mapper.readTree(text).isEmpty()) {
                     questions.markInternal(row.promptMessageId());
@@ -545,7 +583,7 @@ public class ToolExecutionService {
     /** Karten des Chats für genau diese Person; abgelaufene/hängende Zustände werden ehrlich angezeigt. */
     public List<ToolCallView> cards(Long userId, Long orgId, Long conversationId) {
         Instant now = wallClock.get();
-        return cards.listOwned(userId, orgId, conversationId).stream().map(r -> view(r, now)).toList();
+        return ReferenceReadScope.run(() -> cards.listOwned(userId,orgId,conversationId).stream().map(r -> view(r,now)).toList());
     }
 
     /** Display/persistence signal only; execution checks fail closed in ToolTurn.active(). */
@@ -560,7 +598,11 @@ public class ToolExecutionService {
     }
 
     /** Previous confirmations inform a NEW explicit question's answer, never a tool-enabled request. */
-    public String completedEvidence(Long userId, Long orgId, Long conversationId, Long promptMessageId) {
+    public String completedEvidence(Long userId,Long orgId,Long conversationId,Long promptMessageId) {
+        return ReferenceReadScope.run(() -> readCompletedEvidence(userId,orgId,conversationId,promptMessageId));
+    }
+
+    private String readCompletedEvidence(Long userId,Long orgId,Long conversationId,Long promptMessageId) {
         if (promptMessageId == null) return "";
         StringBuilder out = new StringBuilder();
         try {
@@ -570,7 +612,7 @@ public class ToolExecutionService {
                 ToolDefinition current = currentById(ctx, row.adapter(), row.toolId());
                 if (row.spaceId() != ctx.spaceId().longValue() || current == null || blockReason(current) != null
                         || !definitionHash(current).equals(row.definitionHash()) || row.resultText() == null) continue;
-                String part = "Werkzeug „" + row.toolName() + "“ (früher bestätigt):\n" + adapters.get(current.adapter()).resolve(ctx,current,row.resultText()).text() + "\n\n";
+                String part = "Werkzeug „" + row.toolName() + "“ (früher bestätigt):\n" + resolveReference(ctx,current,row.resultText()).text() + "\n\n";
                 int left = 16_000 - out.length();
                 if (left <= 0) break;
                 out.append(part, 0, Math.min(part.length(), left));
@@ -699,6 +741,10 @@ public class ToolExecutionService {
     }
 
     private ToolCallView view(ToolCallStore.Row r, Instant now) {
+        return ReferenceReadScope.run(() -> readView(r,now));
+    }
+
+    private ToolCallView readView(ToolCallStore.Row r,Instant now) {
         List<ArgumentField> fields = new java.util.ArrayList<>();
         if (r.argumentsJson() != null) {
             try {
@@ -712,25 +758,27 @@ public class ToolExecutionService {
             }
         }
         ToolCallStore.Status status = ToolCallStore.effectiveStatus(r, now);
-        boolean sourceUnavailable=false;
+        ToolContext context=null;
+        ReferenceAccess access;
         try {
-            ToolContext ctx=resolveContext(r.userId(),r.orgId(),r.conversationId());
-            sourceUnavailable=ctx!=null && !referencesReadable(ctx,r.promptMessageId());
-            if(ctx==null && (r.disclosureConfirmation() || (adapters.containsKey(r.adapter()) && adapters.get(r.adapter()).referencesOnly()))) sourceUnavailable=true;
-        } catch(RuntimeException unavailable) { sourceUnavailable=true; }
-        if(sourceUnavailable && status==ToolCallStore.Status.PENDING) {
+            context=readContext(r.userId(),r.orgId(),r.conversationId());
+            access=context==null?ReferenceAccess.DENIED:referenceAccess(context,r.promptMessageId());
+        } catch(RuntimeException unavailable) { access=ReferenceAccess.UNAVAILABLE; }
+        if(access==ReferenceAccess.DENIED && status==ToolCallStore.Status.PENDING) {
             cards.cancel(r.id(),now); status=ToolCallStore.Status.CANCELLED;
         }
         String result=status==ToolCallStore.Status.SUCCEEDED?r.resultText():null;
         if(result!=null && adapters.containsKey(r.adapter()) && adapters.get(r.adapter()).referencesOnly()) {
             result=null;
-            try {
-                ToolContext ctx=resolveContext(r.userId(),r.orgId(),r.conversationId());
-                ToolDefinition current=ctx==null?null:currentById(ctx,r.adapter(),r.toolId());
-                if(current!=null && blockReason(current)==null && definitionHash(current).equals(r.definitionHash()))
-                    result=adapters.get(r.adapter()).resolve(ctx,current,r.resultText()).text();
-            } catch(RuntimeException unavailable) { /* no private snapshot fallback */ }
+            if(access==ReferenceAccess.READABLE) {
+                try {
+                    ToolDefinition current=currentById(context,r.adapter(),r.toolId());
+                    if(current!=null && blockReason(current)==null && definitionHash(current).equals(r.definitionHash()))
+                        result=resolveReference(context,current,r.resultText()).text();
+                } catch(RuntimeException unavailable) { access=ReferenceAccess.UNAVAILABLE; }
+            }
         }
+        boolean sourceUnavailable=access!=ReferenceAccess.READABLE;
         var parent = r.parentCallId()==null ? null : cards.find(r.parentCallId()).orElse(null);
         if (parent!=null && (parent.userId()!=r.userId() || parent.orgId()!=r.orgId()
                 || parent.conversationId()!=r.conversationId() || parent.spaceId()!=r.spaceId()
@@ -739,7 +787,7 @@ public class ToolExecutionService {
                 r.risk() == null ? null : r.risk().name(), sourceUnavailable?null:r.argumentsJson(), sourceUnavailable?List.of():List.copyOf(fields), status.name(),
                 r.needsConfirmation(), sourceUnavailable?null:result, r.error(),
                 r.createdAt(), status == ToolCallStore.Status.PENDING ? r.expiresAt() : null,
-                parent==null ? null : parent.publicId(), parent==null ? null : parent.toolName(),r.disclosureConfirmation(),sourceUnavailable);
+                parent==null ? null : parent.publicId(), parent==null ? null : parent.toolName(),r.disclosureConfirmation(),sourceUnavailable,access==ReferenceAccess.UNAVAILABLE);
     }
 
     /** Ein Antwort-Turn: angebotene Werkzeuge plus Zähler und Zeitbudget. Nicht threadsicher. */
@@ -801,6 +849,10 @@ public class ToolExecutionService {
 
         /** Before EACH model round and tool call, including READ/WRITE. */
         public boolean active() {
+            return ReferenceReadScope.run(this::readActive);
+        }
+
+        private boolean readActive() {
             if (ctx == null) return false;
             try {
                 return ctx.equals(resolveContext(ctx.userId(), ctx.orgId(), ctx.conversationId()))

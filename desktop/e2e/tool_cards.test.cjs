@@ -77,4 +77,5 @@ test("privacy READ card needs a decision only while its sources remain readable"
   const read = card({risk:"READ",mayContainInternal:true});
   assert.equal(c.canDecide(read,at("2026-11-21T10:05:00Z")),true);
   assert.equal(c.canDecide({...read,sourceUnavailable:true},at("2026-11-21T10:05:00Z")),false);
+  assert.equal(c.canDecide({...read,sourceTemporarilyUnavailable:true},at("2026-11-21T10:05:00Z")),false);
 });

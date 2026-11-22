@@ -142,6 +142,11 @@ class ChatApiIntegrationTest {
     @Autowired private ChatService chatService;
     @Autowired private com.keplura.server.tool.ToolExecutionService realToolExecution;
     @Autowired private com.keplura.server.tool.KnowledgeSearchAdapter knowledgeAdapter;
+    @org.springframework.test.context.bean.override.mockito.MockitoSpyBean
+    private com.keplura.server.search.SearchService referenceSearch;
+    @org.springframework.test.context.bean.override.mockito.MockitoSpyBean
+    private com.keplura.server.search.ChunkRepository referenceChunks;
+    @Autowired private com.keplura.server.search.EmbeddingService embeddings;
 
     @BeforeAll
     static void startMockUpstream() throws IOException {
@@ -155,6 +160,31 @@ class ChatApiIntegrationTest {
                 toolBodies.add(lastBody.get());
                 int turn = toolRequests.incrementAndGet();
                 toolRequestHook.run();
+                if(stubToolMode.startsWith("document")) {
+                    var json=tools.jackson.databind.json.JsonMapper.builder().build();
+                    String name="knowledge_search", args="{\"query\":\"alpha\",\"topK\":1}";
+                    if(turn==2) {
+                        var found=java.util.regex.Pattern.compile("\\[Dokument (\\d+), Abschnitt (\\d+)\\]").matcher(lastBody.get());
+                        boolean present=found.find();
+                        name="document_read";
+                        args=json.createObjectNode().put("documentId",present?Long.parseLong(found.group(1)):999999)
+                                .put("chunkIdx",present?Integer.parseInt(found.group(2)):0).put("before",1).put("after",1).toString();
+                    } else if(turn==3) {
+                        name="s1__echo";
+                        args=json.createObjectNode().put("message",stubToolMode.equals("document-public")?"alpha":"PRIVATE_NEIGHBOR_7821").toString();
+                    }
+                    var response=json.createObjectNode();
+                    var message=response.putArray("choices").addObject().putObject("message");
+                    if(turn<=2 || (turn==3 && !stubToolMode.equals("document-answer")))
+                        message.putArray("tool_calls").addObject().put("id","call").put("type","function")
+                                .putObject("function").put("name",name).put("arguments",args);
+                    else message.put("content","Document answer"+(stubToolMode.equals("document-answer")?" PRIVATE_NEIGHBOR_7821":""));
+                    byte[] bytes=response.toString().getBytes(StandardCharsets.UTF_8);
+                    exchange.getResponseHeaders().set("Content-Type","application/json");
+                    exchange.sendResponseHeaders(200,bytes.length);
+                    try(var out=exchange.getResponseBody()) { out.write(bytes); }
+                    return;
+                }
                 if(stubToolMode.startsWith("knowledge")) {
                     boolean fromExternal=stubToolMode.equals("knowledge-external-tokens");
                     boolean knowledge=fromExternal?turn==2:turn==1;
@@ -247,6 +277,7 @@ class ChatApiIntegrationTest {
 
     @BeforeEach
     void resetScript() {
+        Mockito.reset(referenceSearch,referenceChunks);
         jdbc.update("delete from mcp_org_boundary where server_id in(select id from mcp_server where name='Boundary')");
         jdbc.update("delete from mcp_server where name='Boundary'");
         stubToolMode = "";
@@ -358,6 +389,111 @@ class ChatApiIntegrationTest {
         assertThat(jdbc.queryForObject("select internal_seen from tool_question where conversation_id=?",Boolean.class,Long.valueOf(f.chat()))).isTrue();
         for(String body:toolBodies) assertThat(body).doesNotContain("_keplura_reference","_keplura_arguments");
         if(mode.equals("public")) assertThat(f.external().lastArguments.get()).isEqualTo("{\"message\":\"alpha\"}");
+    }
+
+    private KnowledgeFixture documentFixture(String mode) {
+        var f=knowledgeFixture(mode,false);
+        long kb=Long.parseLong(f.scope()[3]);
+        long document=jdbc.queryForObject("select id from kb_document where knowledge_base_id=?",Long.class,kb);
+        jdbc.update("delete from kb_chunk where document_id=?",document);
+        String embedding=tools.jackson.databind.json.JsonMapper.builder().build().writeValueAsString(embeddings.embed("alpha"));
+        String zero=com.keplura.server.search.EmbeddingCodec.encode(new float[com.keplura.server.search.EmbeddingCodec.decode(embedding).length]);
+        for(int idx=0;idx<3;idx++) jdbc.update("insert into kb_chunk(document_id,knowledge_base_id,chunk_idx,chunk_text,embedding,created_at,page_number) values(?,?,?,?,?,current_timestamp,?)",
+                document,kb,idx,idx==1?"alpha search anchor":"PRIVATE_NEIGHBOR_7821 section "+idx,idx==1?embedding:zero,idx+1);
+        return f;
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings={"answer","private","public"})
+    void documentReadUsesSearchHitReadsNeighborsAndPreservesProvenance(String mode) {
+        var f=documentFixture("document-"+mode);
+        var response=runKnowledge(f);
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
+        assertThat(response.getBody()).contains("Document answer","richtlinie.txt");
+        var json=tools.jackson.databind.json.JsonMapper.builder().build();
+        var transcript=json.readTree(exchange("GET",transcriptPath(f.scope()[1],f.chat()),f.scope()[0],null).getBody());
+        var read=transcript.path("toolCalls").get(1);
+        assertThat(read.path("tool").asString()).isEqualTo("document_read");
+        assertThat(read.path("result").asString()).contains("Abschnitt 0","Abschnitt 1","Abschnitt 2","PRIVATE_NEIGHBOR_7821");
+        var arguments=json.readTree(read.path("argumentsText").asString());
+        assertThat(arguments.path("chunkIdx").asInt()).isEqualTo(1);
+        assertThat(f.external().invocations).hasValue(mode.equals("public")?1:0);
+        if(mode.equals("private")) assertThat(transcript.path("toolCalls").get(2).path("status").asString()).isEqualTo("PENDING");
+        assertThat(jdbc.queryForList("select result_text from tool_call where conversation_id=? and adapter='knowledge'",String.class,Long.valueOf(f.chat())))
+                .allSatisfy(stored -> assertThat(stored).doesNotContain("PRIVATE_NEIGHBOR_7821","search anchor"));
+        assertThat(jdbc.queryForObject("select dialogue_json from tool_question where conversation_id=?",String.class,Long.valueOf(f.chat())))
+                .doesNotContain("PRIVATE_NEIGHBOR_7821","search anchor");
+        var finalBody=json.readTree(toolBodies.getLast());
+        assertThat(finalBody.path("tool_choice").asString()).isEqualTo("none");
+        assertThat(toolBodies.get(2)).contains("PRIVATE_NEIGHBOR_7821");
+        var citations=transcript.path("messages").get(1).path("citations");
+        assertThat(citations).hasSize(3);
+    }
+
+    @Test void documentReadRevocationDropsTextAndCancelsPendingDisclosure() {
+        var f=documentFixture("document-private"); runKnowledge(f);
+        revokeKnowledge(f);
+        var after=exchange("GET",transcriptPath(f.scope()[1],f.chat()),f.scope()[0],null).getBody();
+        assertThat(after).doesNotContain("PRIVATE_NEIGHBOR_7821","richtlinie.txt");
+        var cards=tools.jackson.databind.json.JsonMapper.builder().build().readTree(after).path("toolCalls");
+        assertThat(cards.get(2).path("status").asString()).isEqualTo("CANCELLED");
+        assertThat(f.external().invocations).hasValue(0);
+    }
+
+    @Test void documentReadTransientFailureHidesDataButPreservesPendingCardAndRecovers() {
+        var f=documentFixture("document-private"); runKnowledge(f);
+        Mockito.doThrow(new org.springframework.dao.TransientDataAccessResourceException("temporary read failure"))
+                .when(referenceSearch).resolveHit(Mockito.anyLong(),Mockito.anyLong(),Mockito.anyLong(),Mockito.anyLong(),Mockito.anyLong(),Mockito.anyInt(),Mockito.anyDouble());
+        var json=tools.jackson.databind.json.JsonMapper.builder().build();
+        var unavailable=json.readTree(exchange("GET",transcriptPath(f.scope()[1],f.chat()),f.scope()[0],null).getBody());
+        var card=unavailable.path("toolCalls").get(2);
+        assertThat(card.path("status").asString()).isEqualTo("PENDING");
+        assertThat(card.path("sourceTemporarilyUnavailable").asBoolean()).isTrue();
+        assertThat(card.path("argumentsText").isNull()).isTrue();
+        assertThat(unavailable.path("toolCalls").toString()).doesNotContain("PRIVATE_NEIGHBOR_7821","temporary read failure");
+        Mockito.reset(referenceSearch);
+        var recovered=json.readTree(exchange("GET",transcriptPath(f.scope()[1],f.chat()),f.scope()[0],null).getBody()).path("toolCalls").get(2);
+        assertThat(recovered.path("status").asString()).isEqualTo("PENDING");
+        assertThat(recovered.path("sourceUnavailable").asBoolean()).isFalse();
+        assertThat(recovered.path("argumentsText").asString()).contains("PRIVATE_NEIGHBOR_7821");
+        assertThat(f.external().invocations).hasValue(0);
+    }
+
+    @Test void transcriptRehydratesEachDocumentWindowOnceAndRechecksOnTheNextRequest() {
+        var f=documentFixture("document-private"); runKnowledge(f);
+        Mockito.clearInvocations(referenceChunks);
+        var first=exchange("GET",transcriptPath(f.scope()[1],f.chat()),f.scope()[0],null);
+        assertThat(first.getBody()).contains("PRIVATE_NEIGHBOR_7821");
+        Mockito.verify(referenceChunks,Mockito.atMost(2)).findPreviewWindow(Mockito.anyLong(),Mockito.anyLong(),Mockito.anyLong(),Mockito.anyLong(),Mockito.anyLong(),Mockito.anyInt(),Mockito.anyInt());
+        revokeKnowledge(f);
+        assertThat(exchange("GET",transcriptPath(f.scope()[1],f.chat()),f.scope()[0],null).getBody()).doesNotContain("PRIVATE_NEIGHBOR_7821","richtlinie.txt");
+    }
+
+    @Test void documentReadRevokedBeforeContinuationCannotReuseTheWindowInALaterQuestion() {
+        var f=documentFixture("document-private"); runKnowledge(f);
+        var json=tools.jackson.databind.json.JsonMapper.builder().build();
+        var card=json.readTree(exchange("GET",transcriptPath(f.scope()[1],f.chat()),f.scope()[0],null).getBody()).path("toolCalls").get(2);
+        String base=transcriptPath(f.scope()[1],f.chat())+"/tool-calls/"+card.path("id").asString();
+        var decision=exchange("POST",base+"/decision",f.scope()[0],Map.of("decision","confirm"));
+        assertThat(f.external().invocations).hasValue(1);
+        String token=json.readTree(decision.getBody()).path("continuationToken").asString();
+        assertThat(token).hasSize(36);
+        revokeKnowledge(f);
+        int requests=toolBodies.size();
+        exchange("POST",base+"/continue",f.scope()[0],Map.of("token",token));
+        assertThat(toolBodies).hasSize(requests);
+        stubToolMode="one-call"; toolRequests.set(0); toolBodies.clear();
+        assertThat(runKnowledge(f).getStatusCode().value()).isEqualTo(200);
+        assertThat(toolBodies).allSatisfy(body -> assertThat(body).doesNotContain("PRIVATE_NEIGHBOR_7821"));
+    }
+
+    @Test void documentReadRightsRevokedDuringTheNextModelRequestPreventDisclosure() {
+        var f=documentFixture("document-private");
+        toolRequestHook=()->{ if(toolRequests.get()==3) revokeKnowledge(f); };
+        runKnowledge(f);
+        assertThat(f.external().invocations).hasValue(0);
+        assertThat(toolBodies).hasSize(3);
+        assertThat(exchange("GET",transcriptPath(f.scope()[1],f.chat()),f.scope()[0],null).getBody()).doesNotContain("PRIVATE_NEIGHBOR_7821","richtlinie.txt");
     }
 
     @Test void externalResultsRemainValidProvenanceAfterKnowledgeSearch() {

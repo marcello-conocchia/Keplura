@@ -32,6 +32,11 @@ public interface ToolAdapter {
 
     default String invoke(ToolContext context, ToolDefinition tool, JsonNode arguments) { return invoke(tool, arguments); }
 
+    /** The owning prompt comes only from the server-created card, never from model arguments. */
+    default String invoke(ToolContext context, ToolDefinition tool, JsonNode arguments, Long promptMessageId) {
+        return invoke(context, tool, arguments);
+    }
+
     /** Reference-only adapters never persist private excerpts in cards or loop checkpoints. */
     default boolean referencesOnly() { return false; }
 

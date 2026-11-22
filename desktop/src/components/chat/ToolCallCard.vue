@@ -59,7 +59,8 @@ const deadline = computed(() =>
     </dl>
     <p v-else-if="card.argumentsText !== null" class="tool-card-note">{{ $t("Ohne Eingaben.") }}</p>
     <p v-if="card.argumentsText === null && !card.sourceUnavailable" class="tool-card-note">{{ $t("Die Eingaben wurden nicht gespeichert (zu groß oder ungültig).") }}</p>
-    <p v-if="card.sourceUnavailable" class="tool-card-note">{{ $t("Die internen Fundstellen sind nicht mehr lesbar.") }}</p>
+    <p v-if="card.sourceTemporarilyUnavailable" class="tool-card-note">{{ $t("Die internen Fundstellen sind vorübergehend nicht verfügbar. Bitte erneut laden.") }}</p>
+    <p v-else-if="card.sourceUnavailable" class="tool-card-note">{{ $t("Die internen Fundstellen sind nicht mehr lesbar.") }}</p>
     <p v-if="hidden > 0" class="tool-card-note">{{ $t("{0} weitere Eingaben nicht in der Übersicht.", hidden) }}</p>
     <p v-if="partial" class="tool-card-note">{{ $t("Die Übersicht ist gekürzt. Maßgeblich sind die vollständigen Eingaben.") }}</p>
 
