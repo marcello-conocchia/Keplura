@@ -1,0 +1,7 @@
+Runner: runner.sh (in this directory), image intracore-ci:local, fresh clone of commit 97ede97 from a git bundle.
+User: runuser -u ci (uid 1500), non-root; acl package installed by the runner (apt-get install acl).
+Note: the container's own `id`/`setfacl --version` output was not preserved (container removed before capture).
+Indirect check: rights tests that fail by design as root passed (see server-chunk logs:
+LocalSourceConnectorTest, ExposureScanServiceTest).
+97ede9700732bd10eae81c3a2e3d44a3b9b31e79
+ci_exit=0
