@@ -1,6 +1,6 @@
 # TU-04a — Interne Wissenssuche als Werkzeug
 
-Status: **Draft-PR #26. Code-/Security-Freigaben liegen vor: Claude für die ursprüngliche Implementierung (nach Korrektur), Codex für Claudes Korrekturen auf `483d1de`. Minor aus Codex' letzter Re-Review in `599043d` mit gezielter Regression behoben (ohne neue volle CI/Review-Runde gemäß Review rounds). Finale Linux-CI auf `b4fe684` grün. Nicht gemergt.** Erste Aufgabe von TU-04 nach Abschluss von TU-03, gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). PO-Entscheidung vom 22.11.2026: automatisch mit Herkunftsprüfung. Klasse A: Datenquellen und Dokumentrechte, Modell-/Werkzeugschleife.
+Status: **abgeschlossen, auf main** — PR #26, Squash-Merge `841ae00` (22.11.2026), Baum identisch mit Head `e191bf3`. Linux-CI Exit 0 auf Produktcommit `b4fe684`, Evidence `ci/evidence/20261122-184320/`; danach nur die minor-Korrektur `599043d` mit gezielten Tests (Review rounds). Reviews: Claude für die Implementierung, Codex für Claudes Korrekturen. Erste Aufgabe von TU-04 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md); nächster Schritt [TU-04b](TU-04b-document-read-tool.md). Klasse A: Datenquellen und Dokumentrechte, Modell-/Werkzeugschleife.
 
 ## Ziel
 
