@@ -72,3 +72,9 @@ test("cards render after the answer of their question, or after the question if 
   assert.deepEqual(c.replaceCard([card({ id: "a" }), card({ id: "b" })], card({ id: "b", status: "REJECTED" })).map((x) => x.status),
     ["PENDING", "REJECTED"]);
 });
+
+test("privacy READ card needs a decision only while its sources remain readable", () => {
+  const read = card({risk:"READ",mayContainInternal:true});
+  assert.equal(c.canDecide(read,at("2026-11-21T10:05:00Z")),true);
+  assert.equal(c.canDecide({...read,sourceUnavailable:true},at("2026-11-21T10:05:00Z")),false);
+});

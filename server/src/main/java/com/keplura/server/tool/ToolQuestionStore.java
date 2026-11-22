@@ -9,7 +9,7 @@ import java.util.Optional;
 public final class ToolQuestionStore {
     public record State(long promptId, long conversationId, long userId, long orgId, long spaceId,
                         String prompt, String dialogue, String catalog, String webContext, int models, int attempts,
-                        boolean continued, boolean followupUsed, Long decisionCallId) { }
+                        boolean continued, boolean followupUsed, Long decisionCallId,boolean internalSeen,String publicTokens) { }
     private final JdbcTemplate jdbc;
     public ToolQuestionStore(JdbcTemplate jdbc) { this.jdbc = jdbc; }
 
@@ -24,7 +24,8 @@ public final class ToolQuestionStore {
                 rs.getLong("prompt_message_id"),rs.getLong("conversation_id"),rs.getLong("user_id"),
                 rs.getLong("org_id"),rs.getLong("space_id"),rs.getString("prompt_text"),rs.getString("dialogue_json"),
                 rs.getString("catalog_json"),rs.getString("web_context"),rs.getInt("model_requests"),rs.getInt("attempts"),
-                rs.getBoolean("continued"),rs.getBoolean("followup_used"),rs.getObject("decision_call_id",Long.class)), promptId).stream().findFirst();
+                rs.getBoolean("continued"),rs.getBoolean("followup_used"),rs.getObject("decision_call_id",Long.class),
+                rs.getBoolean("internal_seen"),rs.getString("public_tokens")), promptId).stream().findFirst();
     }
     public boolean model(long promptId) {
         return jdbc.update("update tool_question set model_requests=model_requests+1 where prompt_message_id=? and model_requests<5", promptId)==1;
@@ -47,6 +48,19 @@ public final class ToolQuestionStore {
                 and ready=true and continued=false""", promptId,cardId,hash,Timestamp.from(now))==1;
     }
     public void delete(long conversationId) { jdbc.update("delete from tool_question where conversation_id=?",conversationId); }
+
+    public void markInternal(long promptId) {
+        if(jdbc.update("update tool_question set internal_seen=true where prompt_message_id=?",promptId)!=1)
+            throw new IllegalStateException("question provenance unavailable");
+    }
+    /** Same marking for results of internal MCP targets; questions without tracked state have no continuation. */
+    public void markInternalIfTracked(long promptId) {
+        jdbc.update("update tool_question set internal_seen=true where prompt_message_id=?",promptId);
+    }
+    /** Column name kept from V29; it stores the external result texts used as provenance sources. */
+    public void savePublicTokens(long promptId,String tokens) {
+        jdbc.update("update tool_question set public_tokens=? where prompt_message_id=?",tokens,promptId);
+    }
 
     /** One proposal, only in the consumed continuation of this specific parent decision. */
     public boolean claimFollowup(long promptId, long parentCallId) {

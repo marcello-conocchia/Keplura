@@ -49,7 +49,7 @@ public class ToolCallStore {
                       long spaceId, String adapter, String toolId, String functionName, String toolName, Long sourceId,
                       String sourceName, ToolRisk risk, String definitionHash, String argumentsJson, Status status,
                       boolean needsConfirmation, String resultText, String error, Instant createdAt,
-                      Instant expiresAt, Instant startedAt, boolean superseded, Long parentCallId) {
+                      Instant expiresAt, Instant startedAt, boolean superseded, Long parentCallId,boolean disclosureConfirmation) {
     }
 
     /** Maximal speicherbare Länge der kanonischen Argumente (= Turn-Limit). */
@@ -90,6 +90,12 @@ public class ToolCallStore {
     public Optional<Row> create(ToolContext ctx, Long promptMessageId, ToolDefinition tool, String definitionHash,
                                 String argumentsJson, Status status, boolean needsConfirmation, String error, Instant now,
                                 Long parentCallId) {
+        return create(ctx,promptMessageId,tool,definitionHash,argumentsJson,status,needsConfirmation,error,now,parentCallId,false);
+    }
+
+    public Optional<Row> create(ToolContext ctx, Long promptMessageId, ToolDefinition tool, String definitionHash,
+                                String argumentsJson, Status status, boolean needsConfirmation, String error, Instant now,
+                                Long parentCallId,boolean disclosureConfirmation) {
         if (argumentsJson != null && argumentsJson.length() > MAX_ARGUMENTS_JSON) {
             throw new IllegalArgumentException("arguments too large to store exactly");
         }
@@ -109,8 +115,8 @@ public class ToolCallStore {
             var st = c.prepareStatement("""
                     insert into tool_call (public_id, conversation_id, prompt_message_id, user_id, org_id, space_id,
                       adapter, tool_id, function_name, tool_name, source_id, source_name, risk, definition_hash,
-                      fingerprint, arguments_json, status, needs_confirmation, error, created_at, expires_at, started_at, parent_call_id)
-                    values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", new String[]{"id"});
+                      fingerprint, arguments_json, status, needs_confirmation, error, created_at, expires_at, started_at, parent_call_id,disclosure_confirmation)
+                    values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", new String[]{"id"});
             int i = 1;
             st.setString(i++, publicId);
             st.setLong(i++, ctx.conversationId());
@@ -134,7 +140,8 @@ public class ToolCallStore {
             st.setTimestamp(i++, Timestamp.from(now));
             st.setTimestamp(i++, expires == null ? null : Timestamp.from(expires));
             st.setTimestamp(i++, started == null ? null : Timestamp.from(started));
-            if (parentCallId == null) st.setNull(i, Types.BIGINT); else st.setLong(i, parentCallId);
+            if (parentCallId == null) st.setNull(i++, Types.BIGINT); else st.setLong(i++, parentCallId);
+            st.setBoolean(i,disclosureConfirmation);
             return st;
         }, keys);
         long id = Objects.requireNonNull(keys.getKey(), "tool_call id missing").longValue();
@@ -291,7 +298,7 @@ public class ToolCallStore {
               needs_confirmation, result_text, error, created_at, expires_at, started_at,
               case when prompt_message_id is null then false when (""" + " "
             + CURRENT_GENERATION.formatted("tool_call.conversation_id", "tool_call.prompt_message_id")
-            + ") then false else true end as superseded, parent_call_id from tool_call";
+            + ") then false else true end as superseded, parent_call_id,disclosure_confirmation from tool_call";
 
     private static final RowMapper<Row> ROWS = (rs, n) -> {
         long prompt = rs.getLong(4);
@@ -308,7 +315,7 @@ public class ToolCallStore {
                 rs.getLong(7), rs.getString(8), rs.getString(9), rs.getString(10), rs.getString(11), sourceId,
                 rs.getString(13), ToolRisk.parse(rs.getString(14)), rs.getString(15), rs.getString(16), status,
                 rs.getBoolean(18), rs.getString(19), rs.getString(20), instant(rs.getTimestamp(21)),
-                instant(rs.getTimestamp(22)), instant(rs.getTimestamp(23)), rs.getBoolean(24), rs.getObject(25, Long.class));
+                instant(rs.getTimestamp(22)), instant(rs.getTimestamp(23)), rs.getBoolean(24), rs.getObject(25, Long.class),rs.getBoolean(26));
     };
 
     private static Instant instant(Timestamp t) {

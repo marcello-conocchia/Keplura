@@ -19,5 +19,10 @@ import tools.jackson.databind.JsonNode;
  */
 public record ToolDefinition(String id, String adapter, String functionName, String toolName, Long sourceId,
                              String sourceName, String description, JsonNode inputSchema, ToolRisk risk,
-                             boolean approved, String fingerprint) {
+                             boolean approved, String fingerprint, boolean internal) {
+    public ToolDefinition(String id, String adapter, String functionName, String toolName, Long sourceId,
+                          String sourceName, String description, JsonNode inputSchema, ToolRisk risk,
+                          boolean approved, String fingerprint) {
+        this(id, adapter, functionName, toolName, sourceId, sourceName, description, inputSchema, risk, approved, fingerprint, false);
+    }
 }
