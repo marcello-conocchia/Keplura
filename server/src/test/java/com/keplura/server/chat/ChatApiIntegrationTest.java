@@ -11,6 +11,7 @@ import ch.qos.logback.core.read.ListAppender;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.Mockito;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ import java.net.Socket;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -115,6 +117,7 @@ class ChatApiIntegrationTest {
     private static volatile boolean stubNoDone = false;
     private static volatile boolean stubAbortBeforeHeaders = false;
     private static volatile String stubToolMode = "";
+    private static Runnable toolRequestHook=()->{};
     private static final AtomicInteger toolRequests = new AtomicInteger();
     private static final java.util.List<String> toolBodies = new java.util.concurrent.CopyOnWriteArrayList<>();
     private static final AtomicInteger upstreamHits = new AtomicInteger();
@@ -138,6 +141,7 @@ class ChatApiIntegrationTest {
 
     @Autowired private ChatService chatService;
     @Autowired private com.keplura.server.tool.ToolExecutionService realToolExecution;
+    @Autowired private com.keplura.server.tool.KnowledgeSearchAdapter knowledgeAdapter;
 
     @BeforeAll
     static void startMockUpstream() throws IOException {
@@ -150,6 +154,26 @@ class ChatApiIntegrationTest {
             if (!stubToolMode.isEmpty() && (lastBody.get().contains("\"tools\"") || lastBody.get().contains("\"tool_choice\":\"none\""))) {
                 toolBodies.add(lastBody.get());
                 int turn = toolRequests.incrementAndGet();
+                toolRequestHook.run();
+                if(stubToolMode.startsWith("knowledge")) {
+                    boolean fromExternal=stubToolMode.equals("knowledge-external-tokens");
+                    boolean knowledge=fromExternal?turn==2:turn==1;
+                    String name=knowledge?"knowledge_search":"s1__echo";
+                    String arguments=knowledge?"{\"query\":\"alpha\",\"topK\":8}"
+                            :fromExternal && turn==3?"{\"message\":\"EXTERNAL_NONCE_7314\"}":stubToolMode.equals("knowledge-public") || fromExternal?"{\"message\":\"alpha\"}":"{\"message\":\"PRIVATE_KNOWLEDGE_9100\"}";
+                    var json=tools.jackson.databind.json.JsonMapper.builder().build();
+                    var response=json.createObjectNode();
+                    var message=response.putArray("choices").addObject().putObject("message");
+                    if(turn==1 || turn==2 || (fromExternal && turn==3) || (turn==4 && stubToolMode.equals("knowledge-repeat"))) {
+                        message.putArray("tool_calls").addObject().put("id","call").put("type","function")
+                                .putObject("function").put("name",name).put("arguments",arguments);
+                    } else message.put("content","Knowledge answer");
+                    byte[] bytes=response.toString().getBytes(StandardCharsets.UTF_8);
+                    exchange.getResponseHeaders().set("Content-Type","application/json");
+                    exchange.sendResponseHeaders(200,bytes.length);
+                    try(var out=exchange.getResponseBody()) { out.write(bytes); }
+                    return;
+                }
                 boolean callFirst = ((stubToolMode.equals("after-call") || stubToolMode.equals("one-call") || stubToolMode.equals("dependent")) && turn == 1)
                         || stubToolMode.equals("injection");
                 boolean followup = stubToolMode.equals("dependent") && turn==3;
@@ -223,7 +247,10 @@ class ChatApiIntegrationTest {
 
     @BeforeEach
     void resetScript() {
+        jdbc.update("delete from mcp_org_boundary where server_id in(select id from mcp_server where name='Boundary')");
+        jdbc.update("delete from mcp_server where name='Boundary'");
         stubToolMode = "";
+        toolRequestHook=()->{};
         toolRequests.set(0);
         toolBodies.clear();
         chatService.setToolExecutionService(realToolExecution);
@@ -258,14 +285,16 @@ class ChatApiIntegrationTest {
         volatile com.keplura.server.tool.ToolRisk risk = com.keplura.server.tool.ToolRisk.READ;
         volatile boolean approved = true;
         boolean includeWrite;
+        boolean internal;
 
         @Override public String kind() { return "fixture"; }
 
         @Override public java.util.List<com.keplura.server.tool.ToolDefinition> definitions(Long spaceId) {
             var schema = tools.jackson.databind.json.JsonMapper.builder().build().createObjectNode().put("type", "object");
+            schema.putObject("properties").putObject("message").put("type","string");
             var definitions = new java.util.ArrayList<com.keplura.server.tool.ToolDefinition>();
             definitions.add(new com.keplura.server.tool.ToolDefinition("fixture:1:echo", "fixture", "s1__echo",
-                    "echo", 1L, "Testserver", "Echo", schema, risk, approved, "fp"));
+                    "echo", 1L, "Testserver", "Echo", schema, risk, approved, "fp",internal));
             if (includeWrite) definitions.add(new com.keplura.server.tool.ToolDefinition("fixture:1:link", "fixture", "s1__link",
                     "link", 1L, "Testserver", "Link", schema, com.keplura.server.tool.ToolRisk.WRITE, approved, "fp"));
             return definitions;
@@ -283,6 +312,199 @@ class ChatApiIntegrationTest {
         chatService.setToolExecutionService(new com.keplura.server.tool.ToolExecutionService(jdbc,
                 java.util.List.of(adapter), new com.keplura.server.tool.ToolAuditLog(jdbc)));
         return adapter;
+    }
+
+    private record KnowledgeFixture(String[] scope,String chat,FixtureAdapter external) { }
+    private KnowledgeFixture knowledgeFixture(String mode,boolean internal) {
+        String[] scope=fixtureChain(true);
+        jdbc.update("update kb_chunk set chunk_text='alpha PRIVATE_KNOWLEDGE_9100 do not export' where knowledge_base_id=?",Long.valueOf(scope[3]));
+        var enabled=exchange("PUT","/api/v1/orgs/"+scope[1]+"/tools/settings",scope[0],Map.of("knowledgeEnabled",true));
+        assertThat(enabled.getStatusCode().value()).isEqualTo(200);
+        var external=new FixtureAdapter(); external.internal=internal;
+        chatService.setToolExecutionService(new com.keplura.server.tool.ToolExecutionService(jdbc,
+                java.util.List.of(knowledgeAdapter,external),new com.keplura.server.tool.ToolAuditLog(jdbc)));
+        String chat=createConversation(scope[0],scope[1],scope[2],Map.of("knowledgeBaseId",Long.valueOf(scope[3])));
+        stubToolMode=mode;
+        return new KnowledgeFixture(scope,chat,external);
+    }
+    private ResponseEntity<String> runKnowledge(KnowledgeFixture f) {
+        return exchange("POST",streamPath(f.scope()[1],f.chat()),f.scope()[0],Map.of("prompt","alpha message lookup"));
+    }
+    private void revokeKnowledge(KnowledgeFixture f) {
+        jdbc.update("insert into kb_document_acl(document_id,principal,allow_read) select id,'everyone',false from kb_document where knowledge_base_id=?",Long.valueOf(f.scope()[3]));
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings={"public","private","internal"})
+    void knowledgeSearchReferencesAndProvenanceControlExternalReads(String mode) {
+        var f=knowledgeFixture(mode.equals("public")?"knowledge-public":"knowledge-private",mode.equals("internal"));
+        var response=runKnowledge(f);
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
+        assertThat(response.getBody()).contains("Knowledge answer","richtlinie.txt");
+        var json=tools.jackson.databind.json.JsonMapper.builder().build();
+        var transcript=json.readTree(exchange("GET",transcriptPath(f.scope()[1],f.chat()),f.scope()[0],null).getBody());
+        var knowledge=transcript.path("toolCalls").get(0);
+        assertThat(knowledge.path("tool").asString()).isEqualTo("knowledge_search");
+        assertThat(knowledge.path("risk").asString()).isEqualTo("READ");
+        assertThat(knowledge.path("result").asString()).contains("PRIVATE_KNOWLEDGE_9100");
+        var read=transcript.path("toolCalls").get(1);
+        assertThat(f.external().invocations.get()).isEqualTo(mode.equals("private")?0:1);
+        assertThat(read.path("status").asString()).isEqualTo(mode.equals("private")?"PENDING":"SUCCEEDED");
+        assertThat(read.path("mayContainInternal").asBoolean()).isEqualTo(mode.equals("private"));
+        assertThat(jdbc.queryForObject("select result_text from tool_call where conversation_id=? and adapter='knowledge'",String.class,Long.valueOf(f.chat())))
+                .contains("documentId","chunkIdx").doesNotContain("PRIVATE_KNOWLEDGE_9100");
+        assertThat(jdbc.queryForObject("select dialogue_json from tool_question where conversation_id=?",String.class,Long.valueOf(f.chat())))
+                .doesNotContain("PRIVATE_KNOWLEDGE_9100");
+        assertThat(jdbc.queryForObject("select internal_seen from tool_question where conversation_id=?",Boolean.class,Long.valueOf(f.chat()))).isTrue();
+        for(String body:toolBodies) assertThat(body).doesNotContain("_keplura_reference","_keplura_arguments");
+        if(mode.equals("public")) assertThat(f.external().lastArguments.get()).isEqualTo("{\"message\":\"alpha\"}");
+    }
+
+    @Test void externalResultsRemainValidProvenanceAfterKnowledgeSearch() {
+        var f=knowledgeFixture("knowledge-external-tokens",false);
+        f.external().result="EXTERNAL_NONCE_7314";
+        runKnowledge(f);
+        assertThat(f.external().invocations).hasValue(2);
+        assertThat(f.external().lastArguments.get()).contains("EXTERNAL_NONCE_7314");
+        var transcript=exchange("GET",transcriptPath(f.scope()[1],f.chat()),f.scope()[0],null).getBody();
+        assertThat(transcript).doesNotContain("PENDING");
+        assertThat(toolBodies).hasSize(5);
+    }
+
+    @Test void privacyReadConfirmationResumesOnceAndAnotherPrivacyCardNeedsItsOwnDecision() {
+        var f=knowledgeFixture("knowledge-repeat",false);
+        runKnowledge(f);
+        var json=tools.jackson.databind.json.JsonMapper.builder().build();
+        var first=json.readTree(exchange("GET",transcriptPath(f.scope()[1],f.chat()),f.scope()[0],null).getBody()).path("toolCalls").get(1);
+        String firstBase=transcriptPath(f.scope()[1],f.chat())+"/tool-calls/"+first.path("id").asString();
+        var decision=exchange("POST",firstBase+"/decision",f.scope()[0],Map.of("decision","confirm"));
+        assertThat(decision.getStatusCode().value()).isEqualTo(200);
+        String token=json.readTree(decision.getBody()).path("continuationToken").asString();
+        assertThat(token).hasSize(36);
+        assertThat(f.external().lastArguments.get()).isEqualTo(first.path("argumentsText").asString());
+        assertThat(exchange("POST",firstBase+"/continue",f.scope()[0],Map.of("token",token)).getStatusCode().value()).isEqualTo(200);
+        var second=json.readTree(exchange("GET",transcriptPath(f.scope()[1],f.chat()),f.scope()[0],null).getBody()).path("toolCalls").get(2);
+        assertThat(second.path("status").asString()).isEqualTo("PENDING");
+        assertThat(second.path("mayContainInternal").asBoolean()).isTrue();
+        assertThat(f.external().invocations.get()).isEqualTo(1);
+        String secondBase=transcriptPath(f.scope()[1],f.chat())+"/tool-calls/"+second.path("id").asString();
+        var finished=exchange("POST",secondBase+"/decision",f.scope()[0],Map.of("decision","confirm"));
+        assertThat(json.readTree(finished.getBody()).has("continuationToken")).isFalse();
+        assertThat(exchange("POST",firstBase+"/continue",f.scope()[0],Map.of("token",token)).getStatusCode().value()).isEqualTo(409);
+        assertThat(toolBodies).hasSize(5);
+        assertThat(f.external().invocations.get()).isEqualTo(2);
+    }
+
+    @Test void revokedKnowledgeDisappearsFromCardsCitationsAndPendingDisclosure() {
+        var f=knowledgeFixture("knowledge-private",false);
+        runKnowledge(f);
+        var json=tools.jackson.databind.json.JsonMapper.builder().build();
+        var before=json.readTree(exchange("GET",transcriptPath(f.scope()[1],f.chat()),f.scope()[0],null).getBody());
+        String id=before.path("toolCalls").get(1).path("id").asString();
+        revokeKnowledge(f);
+        String after=exchange("GET",transcriptPath(f.scope()[1],f.chat()),f.scope()[0],null).getBody();
+        assertThat(after).doesNotContain("PRIVATE_KNOWLEDGE_9100","richtlinie.txt");
+        assertThat(json.readTree(after).path("toolCalls").get(1).path("status").asString()).isEqualTo("CANCELLED");
+        assertThat(exchange("POST",transcriptPath(f.scope()[1],f.chat())+"/tool-calls/"+id+"/decision",f.scope()[0],Map.of("decision","confirm")).getStatusCode().value()).isEqualTo(409);
+        assertThat(f.external().invocations.get()).isZero();
+    }
+
+    @Test void revokedKnowledgeCannotBeRehydratedIntoAContinuation() {
+        var f=knowledgeFixture("knowledge-private",false);
+        runKnowledge(f);
+        var json=tools.jackson.databind.json.JsonMapper.builder().build();
+        String id=json.readTree(exchange("GET",transcriptPath(f.scope()[1],f.chat()),f.scope()[0],null).getBody()).path("toolCalls").get(1).path("id").asString();
+        String base=transcriptPath(f.scope()[1],f.chat())+"/tool-calls/"+id;
+        var decision=exchange("POST",base+"/decision",f.scope()[0],Map.of("decision","confirm"));
+        String token=json.readTree(decision.getBody()).path("continuationToken").asString();
+        revokeKnowledge(f);
+        int requests=toolBodies.size();
+        var resumed=exchange("POST",base+"/continue",f.scope()[0],Map.of("token",token));
+        assertThat(resumed.getBody()).doesNotContain("PRIVATE_KNOWLEDGE_9100");
+        assertThat(toolBodies).hasSize(requests);
+        assertThat(f.external().invocations.get()).isEqualTo(1);
+    }
+
+    @Test void rightsRevokedWhileModelIsThinkingPreventTheLateExternalCall() {
+        var f=knowledgeFixture("knowledge-private",false);
+        toolRequestHook=()->{ if(toolRequests.get()==2) revokeKnowledge(f); };
+        var response=runKnowledge(f);
+        assertThat(response.getBody()).doesNotContain("PRIVATE_KNOWLEDGE_9100");
+        assertThat(f.external().invocations.get()).isZero();
+        assertThat(toolBodies).hasSize(2);
+    }
+
+    @Test void organizationToolSettingsRequireOwnerAndCsrf() {
+        var a=fixtureChain(false); var b=fixtureChain(false);
+        String path="/api/v1/orgs/"+a[1]+"/tools/settings";
+        assertThat(exchange("GET",path,a[0],null).getBody()).contains("\"knowledgeEnabled\":false");
+        assertThat(rest.exchange(RequestEntity.put(URI.create(path)).header(HttpHeaders.COOKIE,a[0]).contentType(MediaType.APPLICATION_JSON)
+                .body(Map.of("knowledgeEnabled",true)),String.class).getStatusCode().value()).isEqualTo(403);
+        long member=jdbc.queryForObject("select user_id from membership where org_id=? and role='OWNER'",Long.class,Long.valueOf(b[1]));
+        jdbc.update("insert into membership(org_id,user_id,role,created_at) values(?,?,'MEMBER',current_timestamp)",Long.valueOf(a[1]),member);
+        assertThat(exchange("PUT",path,b[0],Map.of("knowledgeEnabled",true)).getStatusCode().value()).isEqualTo(403);
+        assertThat(exchange("PUT","/api/v1/orgs/"+b[1]+"/tools/settings",a[0],Map.of("knowledgeEnabled",true)).getStatusCode().value()).isEqualTo(403);
+        assertThat(exchange("PUT",path,a[0],Map.of("knowledgeEnabled",true)).getStatusCode().value()).isEqualTo(200);
+        assertThat(jdbc.queryForObject("select count(*) from tool_admin_event where org_id=?",Integer.class,Long.valueOf(a[1]))).isEqualTo(1);
+    }
+
+    @Test void knowledgeToolIsOffWithoutAssignmentAndRejectsInjectedScope() {
+        var a=fixtureChain(true); var b=fixtureChain(true);
+        long org=Long.parseLong(a[1]);
+        String chat=createConversation(a[0],a[1],a[2],Map.of("knowledgeBaseId",Long.valueOf(a[3])));
+        long user=jdbc.queryForObject("select created_by from chat_conversation where id=?",Long.class,Long.valueOf(chat));
+        var service=new com.keplura.server.tool.ToolExecutionService(jdbc,List.of(knowledgeAdapter),new com.keplura.server.tool.ToolAuditLog(jdbc));
+        var ctx=service.resolveContext(user,org,Long.valueOf(chat));
+        assertThat(service.openTurn(ctx).offered()).isEmpty();
+        exchange("PUT","/api/v1/orgs/"+org+"/tools/settings",a[0],Map.of("knowledgeEnabled",true));
+        String empty=createConversation(a[0],a[1],a[2],Map.of());
+        assertThat(service.openTurn(service.resolveContext(user,org,Long.valueOf(empty))).offered()).isEmpty();
+        var turn=service.openTurn(ctx);
+        assertThat(turn.offered()).containsKey("knowledge_search");
+        assertThat(turn.call("knowledge_search","{\"query\":\"alpha\",\"knowledgeBaseId\":"+b[3]+"}").invoked()).isFalse();
+        assertThat(turn.call("knowledge_search","{\"query\":\"alpha\",\"topK\":9}").invoked()).isFalse();
+        assertThat(turn.call("knowledge_search","{\"query\":\"   \"}").invoked()).isFalse();
+        var refs=tools.jackson.databind.json.JsonMapper.builder().build().readTree(knowledgeAdapter.invoke(ctx,
+                turn.offered().get("knowledge_search"),tools.jackson.databind.json.JsonMapper.builder().build().readTree("{\"query\":\"Richtlinie\"}")));
+        assertThat(refs).hasSize(1);
+        assertThat(refs.get(0).path("kbId").asLong()).isEqualTo(Long.parseLong(a[3]));
+        assertThat(refs.toString()).doesNotContain("Richtlinie");
+        jdbc.update("insert into kb_document_acl(document_id,principal,allow_read) select id,'everyone',false from kb_document where knowledge_base_id=?",Long.valueOf(a[3]));
+        assertThat(knowledgeAdapter.resolve(ctx,turn.offered().get("knowledge_search"),refs.toString()).complete()).isFalse();
+        assertThat(knowledgeAdapter.invoke(ctx,turn.offered().get("knowledge_search"),tools.jackson.databind.json.JsonMapper.builder().build().readTree("{\"query\":\"Richtlinie\"}"))).isEqualTo("[]");
+    }
+
+    @Test void orgBoundaryChangeCancelsPlansAndInvalidatesCatalogAndContinuationEvenAfterFlipBack() {
+        var a=fixtureChain(false); var b=fixtureChain(false);
+        jdbc.update("insert into mcp_server(name,url,enabled,tools_json,enabled_tools,tool_risks,all_spaces,created_at) values('Boundary','http://localhost/mcp',true,?, 'echo',?,true,current_timestamp)",
+                "[{\"name\":\"echo\",\"inputSchema\":{\"type\":\"object\"}}]","{\"echo\":\"CRITICAL\"}");
+        long server=jdbc.queryForObject("select max(id) from mcp_server",Long.class);
+        var client=Mockito.mock(com.keplura.server.mcp.McpClient.class);
+        var mcp=new com.keplura.server.mcp.McpToolAdapter(jdbc,null,client);
+        var service=new com.keplura.server.tool.ToolExecutionService(jdbc,List.of(mcp),new com.keplura.server.tool.ToolAuditLog(jdbc));
+        long org=Long.parseLong(a[1]);
+        String chat=createConversation(a[0],a[1],a[2],Map.of());
+        long user=jdbc.queryForObject("select created_by from chat_conversation where id=?",Long.class,Long.valueOf(chat));
+        jdbc.update("insert into chat_message(conversation_id,role,content,model,citations_json,status,created_at) values(?,'user','echo','','[]','complete',current_timestamp)",Long.valueOf(chat));
+        long prompt=jdbc.queryForObject("select max(id) from chat_message where conversation_id=?",Long.class,Long.valueOf(chat));
+        var ctx=service.resolveContext(user,org,Long.valueOf(chat));
+        var turn=service.openTurn(ctx,prompt); turn.startQuestion("echo",""); assertThat(turn.beginRound()).isTrue();
+        turn.call("s"+server+"__echo","{\"id\":1}"); turn.call("s"+server+"__echo","{\"id\":2}");
+        turn.checkpoint(tools.jackson.databind.json.JsonMapper.builder().build().createArrayNode(),true);
+        var cards=service.cards(user,org,Long.valueOf(chat)); assertThat(cards).hasSize(2);
+        var decided=(com.keplura.server.tool.ToolExecutionService.Decision.Done)service.decide(user,org,Long.valueOf(chat),cards.get(0).id(),false);
+        assertThat(decided.continuationToken()).hasSize(36);
+        String path="/api/v1/orgs/"+org+"/tools/settings";
+        assertThat(exchange("PUT",path,a[0],Map.of("serverId",server,"internal",true)).getStatusCode().value()).isEqualTo(200);
+        assertThat(turn.active()).isFalse();
+        assertThat(service.cards(user,org,Long.valueOf(chat)).get(1).status()).isEqualTo("CANCELLED");
+        assertThat(mcp.definitions(Long.valueOf(a[2])).getFirst().internal()).isTrue();
+        assertThat(mcp.definitions(Long.valueOf(b[2])).getFirst().internal()).isFalse();
+        exchange("PUT",path,a[0],Map.of("serverId",server,"internal",false));
+        assertThat(turn.active()).isFalse();
+        assertThat(service.takeContinuation(user,org,Long.valueOf(chat),cards.get(0).id(),decided.continuationToken())).isNull();
+        assertThat(jdbc.queryForObject("select count(*) from tool_admin_event where org_id=? and action='mcp_boundary'",Integer.class,org)).isEqualTo(2);
+        Mockito.verifyNoInteractions(client);
     }
 
     @Test void unsupportedToolsFallBackBeforeAnyCallWithoutLeakingUpstreamError() {
@@ -639,8 +861,8 @@ class ChatApiIntegrationTest {
     }
 
     private ResponseEntity<String> exchange(String method, String path, String cookie, Object body) {
-        if ("POST".equals(method)) {
-            RequestEntity.BodyBuilder builder = RequestEntity.post(URI.create(path))
+        if ("POST".equals(method) || "PUT".equals(method)) {
+            RequestEntity.BodyBuilder builder = RequestEntity.method(org.springframework.http.HttpMethod.valueOf(method), URI.create(path))
                     .header(HttpHeaders.COOKIE, cookie)
                     .header(com.keplura.server.auth.CsrfService.HEADER_NAME,
                             com.keplura.server.auth.CsrfTestSupport.csrfValue(cookie))

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 /** Administration → MCP-Server: eintragen, verbinden, je Werkzeug Risikoklasse setzen und einzeln freigeben (TU-01). */
 import { onBeforeUnmount, onMounted, ref } from "vue";
+import OrgToolsPanel from "../OrgToolsPanel.vue";
 import {
   createMcpServer, deleteMcpServer, listMcpCalls, listMcpServers, listMcpSpaces, refreshMcpServer, updateMcpServer,
   type McpServer, type McpTool, type ToolRisk,
@@ -137,6 +138,7 @@ async function confirmRemove() {
 
 <template>
   <section class="connection-page" data-testid="admin-mcp-section">
+    <OrgToolsPanel />
     <header class="connection-header"><div class="connection-heading"><h2>{{ $t("MCP-Server") }}</h2><p class="connection-description">{{ $t("Verbinde Werkzeuge für den Chat und lege fest, wer sie verwenden darf.") }}</p></div><div class="connection-actions"><Button variant="icon" size="compact" :disabled="loading" :aria-label="$t('MCP-Verbindungen aktualisieren')" :title="$t('Aktualisieren')" @click="load"><AppIcon name="refresh" :size="16" /></Button><Button variant="primary" data-testid="admin-mcp-open" @click="openConnect"><AppIcon name="plus" :size="16" />{{ $t("Server verbinden") }}</Button></div></header>
     <p v-if="loading&&!loaded" class="connection-loading" role="status">{{ $t("Verbindungen werden geladen …") }}</p>
     <div v-if="loadError" class="connection-note error connection-error" role="alert"><p>{{loadError}}</p><Button size="compact" @click="load">{{ $t("Erneut versuchen") }}</Button></div>

@@ -127,7 +127,8 @@ public class ChatService {
                                                   ChatProperties chat,
                                                   com.keplura.server.gateway.GatewayProperties effective) {
         return toolExecution == null ? null
-                : new ChatToolLoop(toolExecution, gatewayClient).run(userId, orgId, ctx, prompt, chat, effective);
+                : new ChatToolLoop(toolExecution, gatewayClient).run(userId, orgId, ctx, prompt, chat, effective,
+                    () -> refreshToolEvidence(userId,orgId,ctx,chat));
     }
 
     private ChatContextService contextService;
@@ -228,7 +229,13 @@ public class ChatService {
 
     /** What the end-of-stream persistence needs; created committed by beginTurn. */
     public record TurnContext(Long conversationId, String citationsJson,
-                              byte[] canonicalRequestBody, boolean noEvidence, Long promptMessageId, AtomicBoolean interrupted) {
+                              byte[] canonicalRequestBody, boolean noEvidence, Long promptMessageId, AtomicBoolean interrupted,
+                              java.util.concurrent.atomic.AtomicReference<String> currentRagCitations) {
+        public TurnContext(Long conversationId,String citationsJson,byte[] canonicalRequestBody,boolean noEvidence,
+                           Long promptMessageId,AtomicBoolean interrupted) {
+            this(conversationId,citationsJson,canonicalRequestBody,noEvidence,promptMessageId,interrupted,
+                    new java.util.concurrent.atomic.AtomicReference<>(citationsJson));
+        }
         public TurnContext(Long conversationId, String citationsJson, byte[] canonicalRequestBody,
                            boolean noEvidence, Long promptMessageId) {
             this(conversationId, citationsJson, canonicalRequestBody, noEvidence, promptMessageId, new AtomicBoolean());
@@ -280,7 +287,7 @@ public class ChatService {
         List<MessageDto> messages = messageRepository.findTranscript(conversation.getId()).stream()
                 .sorted(java.util.Comparator.<ChatMessage, Long>comparing(m ->
                         m.getPromptMessageId() == null ? m.getId() : m.getPromptMessageId()).thenComparing(ChatMessage::getId))
-                .map(this::toDto)
+                .map(m -> toDto(m,userId,orgId,conversation))
                 .toList();
         List<com.keplura.server.tool.ToolExecutionService.ToolCallView> toolCalls = List.of();
         if (toolExecution != null) {
@@ -325,7 +332,7 @@ public class ChatService {
         for (ChatMessage m : transcript) {
             if (m.getId().equals(messageId)) {
                 if (!ChatMessage.ROLE_ASSISTANT.equals(m.getRole())) break;
-                MessageDto dto = toDto(m);
+                MessageDto dto = toDto(m, userId, orgId, conversation);
                 return new AnswerExportService.ExportInput(question, dto.content(), dto.citations(), dto.createdAt(),
                         dto.model());
             }
@@ -391,7 +398,8 @@ public class ChatService {
                     false, continuation.state().promptId());
         });
         try {
-            return new StreamedTurn(new ChatToolLoop(toolExecution, gatewayClient).resume(ctx, continuation, chat, effective),
+            return new StreamedTurn(new ChatToolLoop(toolExecution, gatewayClient).resume(ctx, continuation, chat, effective,
+                    () -> refreshToolEvidence(userId,orgId,ctx,chat)),
                     new SseTurnObserver(), ctx);
         } catch (GatewayException e) {
             persistAnswer(ctx, "", "", ctx.interrupted().get() ? ChatMessage.STATUS_ABORTED : ChatMessage.STATUS_FAILED);
@@ -514,11 +522,12 @@ public class ChatService {
         } else {
             endStatus = ChatMessage.STATUS_INCOMPLETE;
         }
-        persistAnswer(ctx, observer.answerText(), observer.modelTag(), endStatus);
+        String citations=citationSnapshot(ctx);
+        persistAnswer(ctx, observer.answerText(), observer.modelTag(), endStatus,citations);
         // Chat-only trailer events AFTER the upstream frames: citations + the
         // persisted status. A client that already stopped reading simply never
         // sees them — the DB row is the source of truth either way.
-        writeTrailerEvent(out, "citations", ctx.citationsJson());
+        writeTrailerEvent(out, "citations", citations);
         writeTrailerEvent(out, "turn", "{\"status\":\"" + endStatus + "\"}");
         return endStatus;
     }
@@ -699,6 +708,10 @@ public class ChatService {
 
     /** Transaction at stream end: exactly one assistant row, honest status. */
     private void persistAnswer(TurnContext ctx, String text, String modelTag, String endStatus) {
+        persistAnswer(ctx,text,modelTag,endStatus,citationSnapshot(ctx));
+    }
+
+    private void persistAnswer(TurnContext ctx,String text,String modelTag,String endStatus,String citations) {
         String persisted = text;
         if (ChatMessage.STATUS_FAILED.equals(endStatus) && persisted.isEmpty()) {
             persisted = FAILURE_NOTE;
@@ -707,7 +720,7 @@ public class ChatService {
         try {
             txTemplate.executeWithoutResult(s -> {
                 messageRepository.saveAndFlush(ChatMessage.assistantAnswer(
-                          ctx.conversationId(), finalText, modelTag, ctx.citationsJson(), endStatus, ctx.promptMessageId()));
+                          ctx.conversationId(), finalText, modelTag, citations, endStatus, ctx.promptMessageId()));
                 conversationRepository.touch(ctx.conversationId(), Instant.now());
             });
         } catch (RuntimeException e) {
@@ -717,6 +730,52 @@ public class ChatService {
             log.error("chat answer persistence failed (conversation={}, cause={})",
                     ctx.conversationId(), e.getClass().getSimpleName());
         }
+    }
+
+    /** Rebuild private RAG/attachments for the tools-disabled request; never reuse stale excerpts. */
+    private byte[] refreshToolEvidence(Long userId,Long orgId,TurnContext ctx,ChatProperties chat) {
+        if(toolExecution==null || !toolExecution.knowledgeActive(ctx.conversationId(),ctx.promptMessageId())) return ctx.canonicalRequestBody();
+        requireOrgMembership(userId,orgId);
+        var conversation=requireConversation(ctx.conversationId(),orgId,userId);
+        var bases=groundingKbIds(conversation);
+        List<SearchHit> hits=new ArrayList<>();
+        for(JsonNode ref:mapper.readTree(ctx.citationsJson())) {
+            for(Long kb:bases) {
+                try {
+                    var hit=searchService.resolveHit(userId,orgId,conversation.getSpaceId(),kb,ref.path("documentId").asLong(),
+                            ref.path("chunkIdx").asInt(),ref.path("score").asDouble());
+                    if(hit!=null) { hits.add(hit); break; }
+                } catch(SearchService.SearchTargetNotFoundException denied) { /* omit revoked KB */ }
+            }
+        }
+        ctx.currentRagCitations().set(citationsJson(hits));
+        ObjectNode body=(ObjectNode)mapper.readTree(buildCanonicalBody(conversation,!bases.isEmpty(),hits,List.of(),chat,ctx.promptMessageId()));
+        for(JsonNode message:mapper.readTree(ctx.canonicalRequestBody()).path("messages")) {
+            if(message.path("role").asString("").equals("system") && message.path("content").asString("").startsWith(WEB_SYSTEM_PROMPT))
+                ((ArrayNode)body.path("messages")).add(message);
+        }
+        return mapper.writeValueAsBytes(body);
+    }
+
+    private String citationSnapshot(TurnContext ctx) {
+        try {
+            var conversation=conversationRepository.findById(ctx.conversationId()).orElse(null);
+            if(conversation!=null && !ctx.citationsJson().equals("[]")) refreshToolEvidence(conversation.getCreatedBy(),conversation.getOrgId(),ctx,chatProps);
+        } catch(RuntimeException unavailable) { ctx.currentRagCitations().set("[]"); }
+        ArrayNode merged=mapper.createArrayNode();
+        var keys=new java.util.HashSet<String>();
+        for(JsonNode cite:mapper.readTree(ctx.currentRagCitations().get())) {
+            if(keys.add(cite.path("documentId")+":"+cite.path("chunkIdx"))) merged.add(cite);
+        }
+        try {
+            if(toolExecution!=null) for(JsonNode cite:mapper.readTree(toolExecution.questionCitations(ctx.conversationId(),ctx.promptMessageId()))) {
+                if(keys.add(cite.path("documentId")+":"+cite.path("chunkIdx"))) {
+                    merged.add(cite);
+                    if(merged.toString().length()>ChatMessage.MAX_CITATIONS_LENGTH) { merged.remove(merged.size()-1); break; }
+                }
+            }
+        } catch(RuntimeException unavailable) { /* do not reuse private metadata snapshots */ }
+        return merged.toString();
     }
 
     private String citationsJson(List<SearchHit> hits) {
@@ -742,10 +801,22 @@ public class ChatService {
         catch (java.time.format.DateTimeParseException ignored) { return null; }
     }
 
-    private MessageDto toDto(ChatMessage m) {
+    private MessageDto toDto(ChatMessage m,Long userId,Long orgId,Conversation conversation) {
         List<Citation> citations = new ArrayList<>();
         try {
-            JsonNode arr = mapper.readTree(m.getCitationsJson());
+            String stored=m.getCitationsJson();
+            if(toolExecution!=null && toolExecution.knowledgeActive(conversation.getId(),m.getPromptMessageId())) {
+                List<SearchHit> current=new ArrayList<>();
+                for(JsonNode ref:mapper.readTree(stored)) for(Long kb:groundingKbIds(conversation)) {
+                    try {
+                        var hit=searchService.resolveHit(userId,orgId,conversation.getSpaceId(),kb,
+                                ref.path("documentId").asLong(),ref.path("chunkIdx").asInt(),ref.path("score").asDouble());
+                        if(hit!=null) { current.add(hit); break; }
+                    } catch(SearchService.SearchTargetNotFoundException denied) { /* omit */ }
+                }
+                stored=citationsJson(current);
+            }
+            JsonNode arr = mapper.readTree(stored);
             if (arr.isArray()) {
                 for (JsonNode node : arr) {
                     citations.add(new Citation(

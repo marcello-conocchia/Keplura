@@ -1,0 +1,75 @@
+package com.keplura.server.tool;
+
+import com.keplura.server.auth.AuthPrincipal;
+import com.keplura.server.auth.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.List;
+
+/** Org-scoped tools administration; platform-wide MCP configuration grants no cross-org trust. */
+@RestController
+@RequestMapping("/api/v1/orgs/{orgId}/tools/settings")
+public class ToolSettingsController {
+    public record Boundary(long serverId,String name,boolean internal) { }
+    public record Settings(boolean knowledgeEnabled,List<Boundary> servers) { }
+    public record Input(Boolean knowledgeEnabled,Long serverId,Boolean internal) { }
+    private final JdbcTemplate jdbc;
+    public ToolSettingsController(JdbcTemplate jdbc) { this.jdbc=jdbc; }
+
+    private long owner(long orgId,HttpServletRequest request) {
+        var session=request.getSession(false);
+        var principal=session==null?null:session.getAttribute(AuthService.SESSION_PRINCIPAL_ATTR);
+        if(!(principal instanceof AuthPrincipal p)) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        Integer count=jdbc.queryForObject("select count(*) from membership where org_id=? and user_id=? and role='OWNER'",Integer.class,orgId,p.userId());
+        if(count==null || count!=1) throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        return p.userId();
+    }
+    private List<Boundary> boundaries(long orgId) {
+        return jdbc.query("""
+            select s.id,s.name,coalesce(b.internal,false) from mcp_server s
+            left join mcp_org_boundary b on b.server_id=s.id and b.org_id=?
+            where s.all_spaces=true or exists(select 1 from mcp_server_space x join space p on p.id=x.space_id where x.server_id=s.id and p.org_id=?)
+            order by s.id""",(rs,n)->new Boundary(rs.getLong(1),rs.getString(2),rs.getBoolean(3)),orgId,orgId);
+    }
+    @GetMapping
+    public Settings get(@PathVariable long orgId,HttpServletRequest request) {
+        owner(orgId,request);
+        var flags=jdbc.queryForList("select knowledge_enabled from org_tool_setting where org_id=?",Boolean.class,orgId);
+        return new Settings(!flags.isEmpty() && flags.getFirst(),boundaries(orgId));
+    }
+    @PutMapping
+    @Transactional
+    public Settings put(@PathVariable long orgId,@RequestBody Input input,HttpServletRequest request) {
+        long userId=owner(orgId,request);
+        // Same org row serializes settings changes without races in insert/update or revision.
+        jdbc.queryForObject("select id from organization where id=? for update",Long.class,orgId);
+        if(input.knowledgeEnabled()!=null) {
+            int changed=jdbc.update("update org_tool_setting set knowledge_enabled=?,revision=revision+1 where org_id=? and knowledge_enabled<>?",input.knowledgeEnabled(),orgId,input.knowledgeEnabled());
+            if(jdbc.queryForObject("select count(*) from org_tool_setting where org_id=?",Integer.class,orgId)==0) {
+                jdbc.update("insert into org_tool_setting(org_id,knowledge_enabled,revision) values(?,?,1)",orgId,input.knowledgeEnabled()); changed=1;
+            }
+            if(changed>0) audit(orgId,userId,null,"knowledge_search",input.knowledgeEnabled());
+        }
+        if(input.serverId()!=null && input.internal()!=null) {
+            if(boundaries(orgId).stream().noneMatch(b -> b.serverId()==input.serverId())) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            int changed=jdbc.update("update mcp_org_boundary set internal=?,revision=revision+1 where org_id=? and server_id=? and internal<>?",input.internal(),orgId,input.serverId(),input.internal());
+            if(jdbc.queryForObject("select count(*) from mcp_org_boundary where org_id=? and server_id=?",Integer.class,orgId,input.serverId())==0) {
+                jdbc.update("insert into mcp_org_boundary(org_id,server_id,internal,revision) values(?,?,?,1)",orgId,input.serverId(),input.internal()); changed=1;
+            }
+            if(changed>0) {
+                audit(orgId,userId,input.serverId(),"mcp_boundary",input.internal());
+                jdbc.update("update tool_call set status='CANCELLED',decided_at=? where org_id=? and adapter='mcp' and source_id=? and status='PENDING'",Timestamp.from(Instant.now()),orgId,input.serverId());
+            }
+        }
+        return get(orgId,request);
+    }
+    private void audit(long org,long user,Long server,String action,boolean enabled) {
+        jdbc.update("insert into tool_admin_event(org_id,user_id,server_id,action,enabled,created_at) values(?,?,?,?,?,?)",org,user,server,action,enabled,Timestamp.from(Instant.now()));
+    }
+}

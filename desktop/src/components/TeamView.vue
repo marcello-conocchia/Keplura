@@ -11,6 +11,7 @@ import { ORG_NAME_MAX_LENGTH } from "../api";
 import PageContainer from "./layout/PageContainer.vue";
 import PageHeader from "./layout/PageHeader.vue";
 import MembersPanel from "./MembersPanel.vue";
+import OrgToolsPanel from "./OrgToolsPanel.vue";
 import AppDialog from "./ui/AppDialog.vue";
 import AppIcon from "./ui/AppIcon.vue";
 import Input from "./ui/Input.vue";
@@ -211,6 +212,7 @@ function rowAction(org: Organization, action: string) {
       </section>
 
       <MembersPanel />
+      <OrgToolsPanel />
     </section>
 
     <AppDialog ref="createDialog" :open="orgFormOpen" :title="$t('Organisation anlegen')" :error="orgError" :busy="creating" :dirty="orgName.trim() !== ''" @close="orgFormOpen = false">

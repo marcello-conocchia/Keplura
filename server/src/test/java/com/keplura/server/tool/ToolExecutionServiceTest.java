@@ -82,6 +82,18 @@ class ToolExecutionServiceTest {
 
     private long nextUser = 4711;
 
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings={"{\"n\":1e400}","{\"n\":-1e400}","{\"n\":NaN}","{\"n\":Infinity}",
+            "{\"n\":-Infinity}","{\"n\":[{\"nested\":1e400}]}"})
+    void rawNonFiniteNumbersCannotBecomeExecutableStrings(String args) {
+        adapter.schema=M.readTree("{\"type\":\"object\"}");
+        var turn=service.openTurn(service.resolveContext(user,orgId,chat));
+        var result=turn.call("f__echo",args);
+        assertThat(result.invoked()).isFalse();
+        assertThat(adapter.invocations.get()).isZero();
+        assertThat(service.cards(user,orgId,chat)).noneMatch(c -> c.status().equals("PENDING") || c.status().equals("SUCCEEDED"));
+    }
+
     /** membership/chat_conversation carry plain user ids (no FK, V1 baseline), so no app_user row is needed. */
     private long insertUser(String email) {
         return nextUser++;

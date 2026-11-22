@@ -20,6 +20,8 @@ public interface ToolAdapter {
      */
     List<ToolDefinition> definitions(Long spaceId);
 
+    default List<ToolDefinition> definitionsFor(ToolContext context) { return definitions(context.spaceId()); }
+
     /**
      * Führt den bereits zentral geprüften Aufruf genau einmal aus. Keine automatische Wiederholung.
      * Muss selbst zeit- und größenbegrenzt sein und darf keine Zugangsdaten im Ergebnis liefern.
@@ -27,6 +29,17 @@ public interface ToolAdapter {
      * @throws ToolInvocationException mit generischer, für Nutzer geeigneter Meldung
      */
     String invoke(ToolDefinition tool, JsonNode arguments);
+
+    default String invoke(ToolContext context, ToolDefinition tool, JsonNode arguments) { return invoke(tool, arguments); }
+
+    /** Reference-only adapters never persist private excerpts in cards or loop checkpoints. */
+    default boolean referencesOnly() { return false; }
+
+    record Resolved(String text, String citationsJson, boolean complete) { }
+
+    default Resolved resolve(ToolContext context, ToolDefinition tool, String stored) {
+        return new Resolved(stored, "[]", true);
+    }
 
     /** Fehler beim externen Aufruf; die Meldung darf an Modell und Audit gehen (keine Geheimnisse). */
     class ToolInvocationException extends RuntimeException {

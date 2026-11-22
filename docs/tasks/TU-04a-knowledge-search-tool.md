@@ -1,6 +1,6 @@
 # TU-04a — Interne Wissenssuche als Werkzeug
 
-Status: **geplant, nicht gestartet.** Erste Aufgabe von TU-04 nach Abschluss von TU-03 (PRs #19/#21/#23, letzter Merge `37362d7`), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). PO-Entscheidung vom 22.11.2026: **automatisch mit Herkunftsprüfung** (ersetzt die zuvor gewählte Variante A, siehe unten). Klasse A: Datenquellen und Dokumentrechte, Modell-/Werkzeugschleife.
+Status: **in Umsetzung durch Codex; CI und unabhängiges Code-/Security-Review durch Claude ausstehend.** Erste Aufgabe von TU-04 nach Abschluss von TU-03 (PRs #19/#21/#23, letzter Merge `37362d7`), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). PO-Entscheidung vom 22.11.2026: **automatisch mit Herkunftsprüfung** (ersetzt die zuvor gewählte Variante A, siehe unten). Klasse A: Datenquellen und Dokumentrechte, Modell-/Werkzeugschleife.
 
 ## Ziel
 
@@ -52,3 +52,17 @@ Geskriptetes Gateway vor dem echten zentralen Dienst mit H2, echter `SearchServi
 ## Workspace
 
 Eigener Worktree auf Branch `feat/tool-use-knowledge-search` ab aktuellem main. Implementierung und unabhängige Prüfung nach PO-Zuweisung (bei TU-03: Codex implementiert, Claude prüft). Genau eine Implementierungsaufgabe. Draft-PR, kein Merge durch den Entwickler; Provider-/Budgetregeln aus AGENTS.md gelten.
+
+## Implementierungsstand (22.11.2026, noch nicht freigegeben)
+
+- Funktionsreferenz: [Open WebUI Knowledge](https://docs.openwebui.com/features/workspace/knowledge/) und [Tools](https://docs.openwebui.com/features/extensibility/plugin/tools/), abgerufen am 22.11.2026. Übernommen wird die gezielte Wissenssuche über Werkzeuge; Keplura ergänzt die oben genehmigten Rechte-, Herkunfts- und Bestätigungsgrenzen. Weitere Open-WebUI-Funktionen bleiben in den folgenden TU-Aufgaben.
+- V29 ist additiv: Org-Freigabe, MCP-Vertrauen je Organisation inklusive Revision, Metadaten-Audit und Herkunftsstatus je Frage. Ein global angebundener MCP-Server wird durch die interne Markierung einer Organisation niemals für andere Organisationen intern. Nur OWNER der betreffenden Organisation darf die Einstellungen setzen, mit CSRF. Der vorhandene MCP-Bereich und die Organisationsverwaltung verwenden dieselben Schalter; kein Zugriff auf globale MCP-Konfiguration für normale OWNER.
+- Fundstellen in Wissenssuch-Karten speichern nur KB-/Dokument-ID, Chunk-Index und Score. Der Schleifendialog speichert Referenzen auf diese Karten; auch Argumente werden dort über die Karte referenziert, damit der Dialog keine weitere Kopie modellseitig abgeleiteter privater Eingaben anlegt. Die exakten ausführbaren Eingaben bleiben wie in TU-02 auf der jeweiligen Karte gespeichert. Bereits verfasste Chatantworten werden durch einen späteren Rechteentzug nicht gelöscht.
+- Vor Modellanfragen, nach der Modellantwort, vor Werkzeugaufrufen, bei Bestätigung sowie Karten-/Zitatanzeige werden Fundstellen neu über die bestehende Rechtekette aufgelöst. Bei nicht mehr lesbaren Referenzen endet die betroffene Runde; offene Karten werden ohne Aufruf abgebrochen und ihre Eingaben/Ergebnisse nicht angezeigt. Keine Wiederaufnahme mit alten Textkopien. Änderungen der aufgelösten Belege während einer Modellanfrage verwerfen deren verspätetes Ergebnis.
+- Die Herkunftsprüfung normalisiert Unicode-NFC und Groß-/Kleinschreibung. Zusätzlich zu Wörtern/Zahlen werden Satz- und Sonderzeichen wörtlich geprüft; dynamische JSON-Schlüssel müssen ebenfalls öffentlich belegt sein. Feste Schema-Feldnamen sowie `enum`/`const`/`default`, boolesche Werte und null gelten wie spezifiziert. Das ist bewusst konservativ: Im Zweifel erscheint eine Karte statt einer Modell- oder Heuristikentscheidung.
+- Herkunftsquellen sind ausschließlich die aktuelle Frage und tatsächliche erfolgreiche externe Ergebnisse derselben Frage. Interne Zielergebnisse und Wissenssuchtreffer erweitern diese Menge nie. Interne Treffer markieren die Frage dauerhaft vor der ersten Textauflösung; fehlende Speicherung beendet den Aufruf ohne private Ergebnisse freizugeben.
+- Die erste Weitergabe-Karte kann die bestehende einmalige Fortsetzung auslösen; eine weitere Karte darin hat keinen Fortsetzungsnachweis. Eine bestätigte READ-Karte eröffnet keine abhängigen Schreibrechte. Die vorhandenen Budgets und Einmaligkeitsregeln gelten weiter.
+- Nicht endliche Zahlen werden für alle Adapter vor der Kanonisierung geprüft. Kein stilles Umwandeln von `1e400` in ausführbaren Text.
+- Migration V1–V28 und Upgrade V29 auf PostgreSQL 16.10 ausgeführt, einschließlich bestehender Zeilen, sicherer Standardwerte und unabhängiger Org-Markierungen. H2 über Flyway-/HTTP-Tests. Desktop-Build, Übersetzungsprüfung und Kartentests ausgeführt. Finale CI und unabhängige Freigabe stehen noch aus. Kein echter Modell-/Browsernachweis; Gateway in Tests geskriptet.
+
+Die vereinbarte Grenze bleibt: Auswahl/Reihenfolge öffentlich erlaubter Tokens und Aufrufzeitpunkte können einen begrenzten Restkanal bilden. Vertrauenswürdige interne Ziele und ausdrücklich bestätigte Weitergaben sind bewusste Freigaben, keine automatische DLP-Garantie. Aufbewahrung von Fragen/Karten, weitere eingebaute Werkzeuge und Dependabot gehören in spätere reguläre Aufgaben.

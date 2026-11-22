@@ -61,6 +61,27 @@ public class SearchService {
     private final SearchStore store;
     private final int maxQueryChars;
     private LocalReranker reranker;
+    private com.keplura.server.knowledge.DocumentRepository documents;
+    private ChunkRepository chunks;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    void setReferenceRepositories(com.keplura.server.knowledge.DocumentRepository documents,ChunkRepository chunks) {
+        this.documents=documents; this.chunks=chunks;
+    }
+
+    /** Rehydrate a saved location through CURRENT space, KB and document ACLs; no embedding request. */
+    @Transactional(readOnly = true)
+    public SearchHit resolveHit(Long userId,Long orgId,Long spaceId,Long kbId,Long documentId,int chunkIdx,double score) {
+        requireKb(userId,orgId,spaceId,kbId);
+        if(documents==null || chunks==null || chunkIdx<0) return null;
+        var document=documents.findByIdInKbForMember(documentId,kbId,spaceId,orgId,userId).orElse(null);
+        if(document==null) return null;
+        var window=chunks.findPreviewWindow(documentId,kbId,spaceId,orgId,userId,chunkIdx,chunkIdx);
+        if(window.isEmpty()) return null;
+        var chunk=window.getFirst();
+        return new SearchHit(documentId,document.getFilename(),chunkIdx,chunk.getText(),score,chunk.getPageNumber(),
+                chunk.getSectionTitle(),chunk.getStartOffset(),chunk.getEndOffset(),document.getSourceUpdatedAt());
+    }
 
     @org.springframework.beans.factory.annotation.Autowired
     void setReranker(LocalReranker reranker) { this.reranker = reranker; }

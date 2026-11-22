@@ -100,6 +100,10 @@ export interface McpServer {
 }
 const MCP = "/api/v1/admin/mcp-servers";
 export const listMcpServers = () => call<McpServer[]>("GET", MCP);
+export interface OrgToolSettings { knowledgeEnabled: boolean; servers: {serverId: number; name: string; internal: boolean}[] }
+export const getOrgToolSettings = (orgId: number) => call<OrgToolSettings>("GET", `/api/v1/orgs/${orgId}/tools/settings`);
+export const updateOrgToolSettings = (orgId: number,input: {knowledgeEnabled?: boolean; serverId?: number; internal?: boolean}) =>
+  call<OrgToolSettings>("PUT", `/api/v1/orgs/${orgId}/tools/settings`, input);
 export const createMcpServer = (input: { name: string; url: string; token: string | null }) => call<McpServer>("POST", MCP, input, 60000);
 export const updateMcpServer = (id: number, input: { name?: string; url?: string; token?: string | null; enabled?: boolean; enabledTools?: string[]; allSpaces?: boolean; spaceIds?: number[]; toolRisks?: Record<string, ToolRisk | ""> }) =>
   call<McpServer>("PATCH", `${MCP}/${id}`, input);

@@ -55,7 +55,9 @@ public class McpToolAdapter implements ToolAdapter {
         List<ToolDefinition> out = new ArrayList<>();
         if (spaceId == null) return out;
         jdbc.query("""
-                select s.id, s.name, s.url, s.token_enc, s.tools_json, s.enabled_tools, s.tool_risks from mcp_server s
+                select s.id, s.name, s.url, s.token_enc, s.tools_json, s.enabled_tools, s.tool_risks,
+                       coalesce(b.internal,false),coalesce(b.revision,0) from mcp_server s
+                left join mcp_org_boundary b on b.server_id=s.id and b.org_id=(select org_id from space where id=?)
                 where s.enabled = true and (s.all_spaces = true
                    or exists (select 1 from mcp_server_space x where x.server_id = s.id and x.space_id = ?))
                 order by s.id""", rs -> {
@@ -64,28 +66,35 @@ public class McpToolAdapter implements ToolAdapter {
             long serverId = rs.getLong(1);
             Set<String> approved = approvals(rs.getString(6));
             Map<String, ToolRisk> risks = risks(rs.getString(7));
-            String fingerprint = fingerprint(serverId, rs.getString(3), rs.getString(4));
+            String fingerprint = fingerprint(serverId, rs.getString(3), rs.getString(4))+":boundary:"+rs.getLong(9);
             for (JsonNode t : mapper.readTree(json)) {
                 String name = t.path("name").asString("");
                 if (name.isEmpty()) continue;
                 JsonNode schema = schemaOf(t);
                 out.add(new ToolDefinition(KIND + ":" + serverId + ":" + name, KIND, functionName(serverId, name), name,
                         serverId, rs.getString(2), t.path("description").asString(""), schema, risks.get(name),
-                        approved.contains(name), fingerprint));
+                        approved.contains(name), fingerprint,rs.getBoolean(8)));
             }
-        }, spaceId);
+        }, spaceId, spaceId);
         return out;
     }
 
     @Override
     public String invoke(ToolDefinition tool, JsonNode arguments) {
+        throw new ToolNotStartedException("Der Ausführungskontext fehlt. Das Werkzeug wurde nicht aufgerufen.");
+    }
+
+    @Override
+    public String invoke(com.keplura.server.tool.ToolContext context, ToolDefinition tool, JsonNode arguments) {
         var rows = jdbc.queryForList("select url, token_enc from mcp_server where id = ? and enabled = true", tool.sourceId());
         if (rows.isEmpty()) throw new ToolNotStartedException("Der MCP-Server ist nicht mehr aktiv.");
         Object url = rows.getFirst().get("url");
         Object enc = rows.getFirst().get("token_enc");
         String urlText = url == null ? null : url.toString();
         String encText = enc == null ? null : enc.toString();
-        if (!fingerprint(tool.sourceId(), urlText, encText).equals(tool.fingerprint())) {
+        var revisions=jdbc.queryForList("select revision from mcp_org_boundary where server_id=? and org_id=?",Long.class,tool.sourceId(),context.orgId());
+        long revision=revisions.isEmpty()?0:revisions.getFirst();
+        if (!(fingerprint(tool.sourceId(), urlText, encText)+":boundary:"+revision).equals(tool.fingerprint())) {
             throw new ToolNotStartedException("Das Verbindungsziel hat sich geändert. Das Werkzeug wurde nicht aufgerufen.");
         }
         String token;

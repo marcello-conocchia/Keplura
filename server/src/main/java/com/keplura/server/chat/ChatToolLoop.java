@@ -31,6 +31,11 @@ final class ChatToolLoop {
 
     GatewayClient.UpstreamStream run(Long userId, Long orgId, ChatService.TurnContext ctx, String prompt,
                                      ChatProperties chat, GatewayProperties effective) {
+        return run(userId,orgId,ctx,prompt,chat,effective,ctx::canonicalRequestBody);
+    }
+
+    GatewayClient.UpstreamStream run(Long userId,Long orgId,ChatService.TurnContext ctx,String prompt,
+            ChatProperties chat,GatewayProperties effective,java.util.function.Supplier<byte[]> freshEvidence) {
         var context = execution.resolveContext(userId, orgId, ctx.conversationId());
         if (context == null) return null; // no tool plan; ordinary chat can still answer
         // Never recreate this object between rounds: its sealed policy and counters belong to the question.
@@ -43,21 +48,26 @@ final class ChatToolLoop {
             }
         }
         turn.startQuestion(prompt, webContext);
-        return runLoop(ctx, prompt, chat, effective, turn, null, null);
+        return runLoop(ctx, prompt, chat, effective, turn, null, null,freshEvidence);
     }
 
     GatewayClient.UpstreamStream resume(ChatService.TurnContext ctx, ToolExecutionService.Continuation continuation,
                                          ChatProperties chat, GatewayProperties effective) {
+        return resume(ctx,continuation,chat,effective,ctx::canonicalRequestBody);
+    }
+
+    GatewayClient.UpstreamStream resume(ChatService.TurnContext ctx,ToolExecutionService.Continuation continuation,
+            ChatProperties chat,GatewayProperties effective,java.util.function.Supplier<byte[]> freshEvidence) {
         return runLoop(ctx, continuation.state().prompt(), chat, effective, continuation.turn(),
-                continuation.state().dialogue(), continuation.decision());
+                continuation.state().dialogue(), continuation.decision(),freshEvidence);
     }
 
     private GatewayClient.UpstreamStream runLoop(ChatService.TurnContext ctx, String prompt, ChatProperties chat,
-            GatewayProperties effective, ToolExecutionService.ToolTurn turn, String savedDialogue, String decision) {
+            GatewayProperties effective, ToolExecutionService.ToolTurn turn, String savedDialogue, String decision,
+            java.util.function.Supplier<byte[]> freshEvidence) {
         boolean continuation = savedDialogue != null;
         ObjectNode body = (ObjectNode) mapper.readTree(ctx.canonicalRequestBody());
         body.put("stream", false);
-        ArrayNode evidence = (ArrayNode) body.get("messages");
         ArrayNode dialogue = mapper.createArrayNode();
         dialogue.addObject().put("role", "system").put("content",
                 "Wähle nur Werkzeuge für den aktuellen Nutzerauftrag. Plane Schreibaktionen vollständig jetzt. "
@@ -83,6 +93,7 @@ final class ChatToolLoop {
             if (!turn.beginRound()) return buffered(model, used, "Das Modellbudget dieser Frage ist aufgebraucht. Es wurden keine weiteren Werkzeuge aufgerufen.");
             ArrayNode offered = turn.toolsJson();
             boolean finalAnswer = finishRequested || turn.remainingModels() == 0 || turn.mustFinish() || offered.isEmpty();
+            byte[] currentEvidence=finalAnswer?freshEvidence.get():null;
             if (finalAnswer) {
                 body.remove("tools");
                 body.put("tool_choice", "none");
@@ -95,13 +106,16 @@ final class ChatToolLoop {
                 // Only the current question and this loop's own results can become tool arguments.
                 body.set("messages", dialogue);
             } else {
-                ArrayNode messages = evidence.deepCopy();
+                ArrayNode messages = ((ArrayNode)mapper.readTree(currentEvidence).get("messages")).deepCopy();
                 for (int i = 2; i < dialogue.size(); i++) messages.add(dialogue.get(i));
                 messages.addObject().put("role", "system").put("content",
                         "Erstelle jetzt die Abschlussantwort aus den verfügbaren Belegen. Keine weiteren Werkzeugaktionen. "
                         + "Beachte den protokollierten Status: Behaupte keine Ausführung für abgelehnte, offene oder gesperrte Aufrufe.");
                 body.set("messages", messages);
             }
+            ArrayNode referenceMessages=(ArrayNode)body.get("messages");
+            var resolved=execution.resolveDialogue(turn,referenceMessages);
+            body.set("messages",resolved.messages());
             GatewayClient.BufferedUpstreamResponse response;
             try {
                 response = gateway.completeJson(mapper.writeValueAsBytes(body), chat.model(), effective);
@@ -113,6 +127,10 @@ final class ChatToolLoop {
                 throw failure;
             }
             if (!turn.active()) return interrupted(ctx, model, used);
+            if(!execution.resolveDialogue(turn,referenceMessages).authorizationStamp().equals(resolved.authorizationStamp())) {
+                return interrupted(ctx,model,used);
+            }
+            if(finalAnswer && !java.util.Arrays.equals(currentEvidence,freshEvidence.get())) return interrupted(ctx,model,used);
             JsonNode root;
             try {
                 root = mapper.readTree(response.body());
@@ -146,18 +164,19 @@ final class ChatToolLoop {
             for (int i = 0; i < count; i++) {
                 if (!turn.active()) return interrupted(ctx, model, used);
                 JsonNode call = calls.get(i);
-                String id = call.path("id").asString("");
-                if (id.length() > 128) id = id.substring(0, 128);
+                String id = "call-"+(ToolExecutionService.MAX_CALLS_PER_TURN-turn.remainingCalls()+1);
                 String name = call.path("function").path("name").asString("");
                 JsonNode raw = call.path("function").path("arguments");
                 String args = raw.isString() ? raw.asString()
                         : raw.isMissingNode() || raw.isNull() ? "{}" : mapper.writeValueAsString(raw);
                 ObjectNode planned = accepted.addObject().put("id", id).put("type", "function");
-                planned.putObject("function").put("name", name.length() > 64 ? name.substring(0, 64) : name)
-                        .put("arguments", args.length() <= ToolExecutionService.MAX_ARGUMENT_CHARS ? args : "{}");
+                planned.putObject("function").put("name",turn.offered().containsKey(name)?name:"unknown")
+                        .put("arguments","{}");
                 var outcome = turn.call(name, args);
+                if(outcome.argumentCardId()!=null) planned.put("_keplura_arguments",outcome.argumentCardId());
                 if (outcome.invoked() && !used.contains(outcome.toolName())) used.add(outcome.toolName());
-                dialogue.addObject().put("role", "tool").put("tool_call_id", id).put("content", outcome.text());
+                var resultMessage=dialogue.addObject().put("role", "tool").put("tool_call_id", id).put("content", outcome.text());
+                if(outcome.referenceCardId()!=null) resultMessage.put("_keplura_reference",outcome.referenceCardId());
             }
             turn.checkpoint(dialogue, false);
         }

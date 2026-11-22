@@ -124,15 +124,15 @@ class McpToolAdapterTest {
     @Test void invokeRefusesChangedTargetBeforeAnyNetworkCall() {
         ToolDefinition d = echo();
         jdbc.update("update mcp_server set url = 'http://localhost/elsewhere'");
-        assertThatThrownBy(() -> adapter.invoke(d, null)).isInstanceOf(ToolAdapter.ToolNotStartedException.class);
+        assertThatThrownBy(() -> adapter.invoke(new com.keplura.server.tool.ToolContext(1L,1L,1L,1L),d, null)).isInstanceOf(ToolAdapter.ToolNotStartedException.class);
         jdbc.update("update mcp_server set url = 'http://localhost/mcp', enabled = false");
-        assertThatThrownBy(() -> adapter.invoke(d, null)).isInstanceOf(ToolAdapter.ToolNotStartedException.class);
+        assertThatThrownBy(() -> adapter.invoke(new com.keplura.server.tool.ToolContext(1L,1L,1L,1L),d, null)).isInstanceOf(ToolAdapter.ToolNotStartedException.class);
         verifyNoInteractions(client);
     }
 
     @Test void invokeMapsClientErrorsToSafeMessages() {
         when(client.callTool(anyString(), anyString(), anyString(), any())).thenThrow(new McpClient.McpException("Zugriff abgelehnt."));
-        assertThatThrownBy(() -> adapter.invoke(echo(), null)).isInstanceOf(ToolAdapter.ToolInvocationException.class)
+        assertThatThrownBy(() -> adapter.invoke(new com.keplura.server.tool.ToolContext(1L,1L,1L,1L),echo(), null)).isInstanceOf(ToolAdapter.ToolInvocationException.class)
                 .isNotInstanceOf(ToolAdapter.ToolNotStartedException.class).hasMessage("Zugriff abgelehnt.");
     }
 
