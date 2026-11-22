@@ -8,7 +8,7 @@ Diese Reihenfolge ersetzt ältere allgemeine Angaben zur nächsten UI-/Roadmap-A
 
 ## Verbindliche Reihenfolge
 
-**TU-01, TU-02 und TU-03 sind abgeschlossen und auf main (PRs #15/#17 und #19/#21/#23 für TU-03a/b/c, Merges `1296cdb`/`8f6852a`/`5c25bfa`/`b1b9e72`/`37362d7`, 21./22.11.2026). Nächste einzelne Aufgabe ist TU-04a: interne Wissenssuche als eingebautes READ-Werkzeug als erster Teil von TU-04. TU-04–TU-07 sind noch nicht abgeschlossen.** Genau eine aktive Implementierungsaufgabe. Größere Schritte werden bei Bedarf in kleine PRs zerlegt; nur die unmittelbar nächste Implementierungsaufgabe wird konkret angelegt.
+**TU-01, TU-02, TU-03 und TU-04a sind abgeschlossen und auf main (PRs #15/#17, #19/#21/#23 für TU-03a/b/c und #26 für TU-04a, Merges `1296cdb`/`8f6852a`/`5c25bfa`/`b1b9e72`/`37362d7`/`841ae00`, 21./22.11.2026). Nächste einzelne Aufgabe ist TU-04b: Dokumentstellen lesen als eingebautes READ-Werkzeug als zweiter Teil von TU-04. TU-04–TU-07 sind noch nicht abgeschlossen.** Genau eine aktive Implementierungsaufgabe. Größere Schritte werden bei Bedarf in kleine PRs zerlegt; nur die unmittelbar nächste Implementierungsaufgabe wird konkret angelegt.
 
 | Schritt | Umfang | Abnahmeziel |
 | --- | --- | --- |
@@ -39,7 +39,7 @@ Nach jedem Merge PROJECT_STATE.md mit tatsächlichem Stand, Belegen und nächste
 
 ## Unmittelbar nächste Aufgabe
 
-**TU-04a — interne Wissenssuche als Werkzeug**, siehe [Spec](tasks/TU-04a-knowledge-search-tool.md). Implementiert in Draft-PR #26; Linux-CI auf 578370a grün, Nachweise ci/evidence/20261122-121520/; unabhängige Prüfung durch Claude ausstehend, nicht gemergt. PO-Entscheidung 22.11.2026 (ersetzt Variante A): externe READ-Aufrufe nach einer internen Suche automatisch bei nachweisbarer Herkunft aus Frage/externen Ergebnissen oder bei als intern markiertem Ziel, sonst Karte mit exakten Eingaben. Das Modell kann in den Wissensbasen des Chats gezielt nachsuchen, mit Rechteprüfung bei jedem Aufruf und Zitaten; eingebautes READ-Werkzeug, standardmäßig aus, Adminfreigabe je Organisation. Dazu der vorbestehende Befund zur Zahlenprüfung (nicht endliche Zahlen vor der Kanonisierung sperren). Erledigt: TU-03 vollständig — [TU-03a](tasks/TU-03a-read-loop.md) mehrstufige READ-Folgeaufrufe (PR #19), [TU-03b](tasks/TU-03b-confirmed-continuation.md) einmalige Fortsetzung nach Bestätigung (PR #21), [TU-03c](tasks/TU-03c-dependent-action.md) eine bestätigungspflichtige Folgeaktion (PR #23). Weitere TU-04-Teile (Dokumentstellen lesen, Anhänge, Websuche, Webseitenabruf) folgen einzeln.
+**TU-04b — Dokumentstellen lesen**, siehe [Spec](tasks/TU-04b-document-read-tool.md). Geplant, nicht gestartet. Das Modell kann zu einem Treffer der Wissenssuche derselben Frage den umgebenden Abschnitt lesen (begrenztes Fenster benachbarter Chunks), mit Rechteprüfung bei jedem Zugriff, nur Fundstellen gespeichert und dieselbe Herkunftsprüfung wie TU-04a. Erledigt: TU-03 vollständig (PRs #19/#21/#23) und [TU-04a](tasks/TU-04a-knowledge-search-tool.md) interne Wissenssuche mit Herkunftsprüfung (PR #26). Weitere TU-04-Teile (Anhänge, Websuche, Webseitenabruf) folgen einzeln.
 
 ## Vergleichsquellen (abgerufen am 21.11.2026)
 
