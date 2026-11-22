@@ -1,6 +1,6 @@
 # TU-04a — Interne Wissenssuche als Werkzeug
 
-Status: **geplant, nicht gestartet.** Erste Aufgabe von TU-04 nach Abschluss von TU-03 (PRs #19/#21/#23, letzter Merge `37362d7`), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). PO-Entscheidung vom 22.11.2026: **Variante A** (siehe unten). Klasse A: Datenquellen und Dokumentrechte, Modell-/Werkzeugschleife.
+Status: **geplant, nicht gestartet.** Erste Aufgabe von TU-04 nach Abschluss von TU-03 (PRs #19/#21/#23, letzter Merge `37362d7`), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). PO-Entscheidung vom 22.11.2026: **automatisch mit Herkunftsprüfung** (ersetzt die zuvor gewählte Variante A, siehe unten). Klasse A: Datenquellen und Dokumentrechte, Modell-/Werkzeugschleife.
 
 ## Ziel
 
@@ -14,17 +14,20 @@ Heute bekommt das Modell nur die Treffer einer einzigen Suche mit der Originalfr
 - Zitate: Die Fundstellen der Werkzeugtreffer fließen in die bestehenden Zitate der Antwort ein (gleiche Anzeige wie RAG-Treffer). Keine Zitate auf Treffer, die die Person nicht mehr sehen darf.
 - **Keine dauerhafte Kopie privater Auszüge:** Karten, `tool_question`-Dialog und spätere „früher bestätigte Ergebnisse“ speichern für dieses Werkzeug nur Fundstellen (Dokument, Abschnitt, Seite, Score), keinen Chunk-Text. Wird der Text später gebraucht (Karte anzeigen, Fortsetzung aus TU-03b, Abschlussanfrage), wird er mit **aktuellen** Rechten neu aufgelöst oder weggelassen.
 - **Vorbestehender Befund aus TU-02 (minor, Security low, Review zu PR #23):** Nicht endliche Zahlen (`1e400`, `-1e400`, NaN-Varianten) werden heute vor der Prüfung kanonisiert und dabei zum Text `"Infinity"`, sodass `finiteAndBounded` sie nicht sieht. Den Validator auf die **ungewandelten** Argumente anwenden, bevor kanonisiert wird, oder die Kanonisierung bei nicht endlichen Zahlen scheitern lassen. Gilt für alle Werkzeuge, nicht nur für dieses.
-- Desktop: bestehende Karte und Zitatanzeige. Ein Schalter in der bestehenden Admin-Werkzeugverwaltung (Deutsch/Englisch). Keine neue UI-Richtung.
+- Desktop: bestehende Karte und Zitatanzeige. Ein Schalter in der bestehenden Admin-Werkzeugverwaltung für die Wissenssuche und je MCP-Server die Markierung intern/extern; Kartenhinweis bei möglichen internen Inhalten (Deutsch/Englisch). Falls für die Markierung eine Migration nötig ist: additiv, Standard extern. Keine neue UI-Richtung.
 
-## PO-Entscheidung (22.11.2026, Chat: „Ja, A und mergen“)
+## PO-Entscheidung (22.11.2026, Chat)
 
-Bisher sehen werkzeugfähige Modellanfragen keine privaten Inhalte außer eigenen Werkzeugergebnissen. Mit diesem Werkzeug werden private Dokumentauszüge selbst zu Werkzeugergebnissen. Stehen in derselben Frage externe Werkzeuge (MCP) zur Verfügung, könnte ein eingeschleuster Text im Dokument das Modell dazu bringen, Inhalte als Argument eines externen READ-Aufrufs nach außen zu senden (siehe major-Befund zu PR #19).
+Mit diesem Werkzeug werden private Dokumentauszüge zu Werkzeugergebnissen und stehen damit in werkzeugfähigen Runden. Eine eingeschleuste Anweisung in einem Dokument könnte das Modell dazu bringen, Inhalte als Argument eines externen Werkzeugs nach außen zu senden (vgl. major-Befund zu PR #19). Der PO hat zuerst Variante A gewählt (danach keine externen READ-Werkzeuge mehr) und sie dann ersetzt: Intern suchen und danach extern nachschlagen **soll funktionieren, aber ohne Abfluss interner Inhalte** („doch es soll funktionieren“ → „ja C aber ohne abflussrisiko“ → „ja“ zu folgendem Vorschlag). Verbindlich ist:
 
-- **A (empfohlen, vom PO gewählt, verbindlich):** Sobald eine Wissenssuche in einer Frage Treffer geliefert hat, bietet der Server in dieser Frage keine externen READ-Werkzeuge mehr an und führt sie nicht mehr aus. Vorher sind externe Werkzeuge möglich. Bestätigungspflichtige Karten (CRITICAL, Folgeaktionen) bleiben möglich, weil die Person die exakten Eingaben sieht. Nachteil: kein „intern suchen → extern nachschlagen“ in einer Frage, dafür reicht eine neue Frage.
-- **B:** Ist die Wissenssuche in einer Frage angeboten, werden externe Werkzeuge in dieser Frage gar nicht angeboten. Am einfachsten und strengsten, aber schlechter nutzbar.
-- **C:** Keine Einschränkung; das Restrisiko wird nur dokumentiert. Am schnellsten, aber genau der Abflussweg, den TU-03a geschlossen hat.
+- **Markierung der Frage:** Sobald `knowledge_search` in einer Frage mindestens einen Treffer geliefert hat, gilt die Frage serverseitig als „mit internen Inhalten“. Die Markierung bleibt bis zum Ende der Frage, einschließlich TU-03b-Fortsetzung.
+- **1. Automatisch, wenn nichts Internes mitgeht:** Ein externer READ-Aufruf läuft danach weiter ohne Rückfrage, wenn **jeder** Wert in seinen Argumenten aus der aktuellen Frage der Person oder aus Ergebnissen externer Werkzeuge dieser Frage stammt. Der Server prüft das wörtlich, nicht per Modell: Zeichenketten werden in Wörter zerlegt (Unicode-NFC, Groß-/Kleinschreibung und Leerraum normalisiert), und jedes Wort sowie jede Zahl muss in einer dieser Quellen vorkommen. Zulässig sind außerdem Werte aus `enum`/`const`/`default` des Schemas, Wahrheitswerte und `null`. Ergebnisse von `knowledge_search` zählen nie als Quelle.
+- **2. Automatisch bei vertrauenswürdigen Zielen:** Ein Org-Admin kann einen MCP-Server ausdrücklich als **intern** markieren (Daten bleiben im Haus, z. B. eigenes Ticketsystem). Standard ist **extern**. Für interne Server entfällt die Herkunftsprüfung. Die Markierung gehört zum Definitions-Hash: Eine Änderung hebt gebundene Kataloge, Fortsetzungen und offene Karten wie jede Definitionsänderung auf. Die Änderung wird protokolliert, und nur Admins können sie setzen.
+- **3. Sonst eine Karte:** Ein externer READ-Aufruf, der die Prüfung nicht besteht, wird nicht gesperrt, sondern als PENDING-Karte mit den exakten Eingaben und dem Hinweis „enthält möglicherweise interne Inhalte“ vorgelegt (TU-02-Bestätigungsweg, einmalig, mit erneuter Rechte-/Definitionsprüfung). Nach der Entscheidung läuft die Frage wie in TU-03b genau einmal weiter. Eine weitere solche Karte in der Fortsetzung bleibt offen und löst keine weitere Fortsetzung aus.
+- Unverändert gilt: WRITE/CRITICAL und Folgeaktionen nur über Karten (TU-02/TU-03c), RAG-Treffer, Anhänge, Verlauf und frühere Ergebnisse weiterhin nur in der werkzeuglosen Abschlussanfrage (TU-03a).
+- **Ehrliche Grenze:** Inhalte verlassen das Haus nur über Karten, die die Person sieht, oder an als intern markierte Ziele. Theoretisch bleibt ein sehr schmaler Restkanal über Auswahl und Reihenfolge erlaubter Wörter sowie Anzahl und Zeitpunkt von Aufrufen (begrenzt durch 8 Versuche je Frage). Kein Abfluss von Dokumenttext, Zahlen oder Namen, die nicht schon in Frage oder externen Ergebnissen stehen. Kein heuristischer DLP-Filter und keine Modellbewertung als Sicherheitsgrenze.
 
-Der PO hat **A** gewählt. B und C sind verworfen; eine Änderung wäre eine neue PO-Entscheidung. Die Acceptance Criteria unten setzen A um.
+Variante A und die ursprünglichen Varianten B/C sind damit ersetzt. Eine Änderung wäre eine neue PO-Entscheidung.
 
 ## Non-Goals
 
@@ -36,7 +39,7 @@ Kein Lesen ganzer Dokumentstellen (TU-04b), keine Anhang-Werkzeuge (TU-04c), kei
 2. Ausgeschaltet, nicht Admin oder fremde Org: Das Werkzeug wird nicht angeboten, und ein vom Modell trotzdem gelieferter Aufruf wird gesperrt. Ein Nicht-Admin kann den Schalter nicht setzen (403).
 3. Treffer aus Dokumenten ohne Leserecht, aus fremden Bereichen/Orgs oder aus nicht zugeordneten Wissensbasen erscheinen nie, auch nicht mit vom Modell vorgegebenen IDs oder Parametern.
 4. Nach Entzug eines Dokumentrechts erscheint dessen Text weder in der Karte noch in einer TU-03b-Fortsetzung noch als früherer Beleg einer neuen Frage.
-5. Variante A (PO-Entscheidung): Nach einer Wissenssuche mit Treffern wird kein externes READ-Werkzeug mehr angeboten oder ausgeführt (Adapterzähler); vorher bleibt es möglich. Kein privater Marker gelangt in Argumente eines externen Werkzeugs.
+5. Herkunftsprüfung (PO-Entscheidung): Nach einer Wissenssuche mit Treffern läuft ein externer READ-Aufruf mit Argumenten nur aus Frage und externen Ergebnissen automatisch. Ein Aufruf mit einem privaten Marker aus einem Treffer (auch in Groß-/Kleinschreibung, mit anderem Leerraum oder als Teil eines längeren Werts) wird nie automatisch ausgeführt, sondern als Karte vorgelegt (Adapterzähler 0 bis zur Bestätigung); an einen als intern markierten Server läuft er automatisch. Die Markierung kann nur ein Admin setzen (403 sonst); ihre Änderung hebt offene Karten und Fortsetzungen auf. Kein privater Marker gelangt ohne Karte zu einem externen Server, auch nicht über die Fortsetzung.
 6. `1e400`, `-1e400` und NaN-Varianten in Werkzeugargumenten werden mit verständlichem Hinweis gesperrt, für alle Werkzeuge; der Adapterzähler bleibt bei 0.
 7. Bestehende Limits (5 Modellanfragen, 8 Versuche, 120 s, 16 000/8 000 Zeichen), Stop/neue Frage/Rechteentzug sowie TU-02/TU-03-Abläufe und normale RAG-Chats funktionieren unverändert.
 8. Gezielte Tests während der Arbeit, einmal lokale Linux-CI am Ende als Nicht-root mit acl; unabhängige Code-/Security-Freigabe gemäß AGENTS.md. Bei einer Migration: additiv, unter H2 und PostgreSQL geprüft. Keine Browser-/Feldtests ohne PO-Auftrag.
@@ -44,7 +47,7 @@ Kein Lesen ganzer Dokumentstellen (TU-04b), keine Anhang-Werkzeuge (TU-04c), kei
 
 ## Tests
 
-Geskriptetes Gateway vor dem echten zentralen Dienst mit H2, echter `SearchService` mit Test-Embeddings bzw. Fake-Store über ACL-Fixtures (Muster `ChatToolLoopTest` sowie die bestehenden Such- und ACL-Tests): Treffer und Zitate, ausgeschaltet/fremde Org, ACL-Entzug vor Anzeige, Fortsetzung und neuer Frage, nicht zugeordnete Wissensbasis, Variante A mit gezähltem externem Fake-Adapter, nicht endliche Zahlen. HTTP-Regression für den Admin-Schalter inkl. CSRF und Nicht-Admin. Volle CI einmal am Ende.
+Geskriptetes Gateway vor dem echten zentralen Dienst mit H2, echter `SearchService` mit Test-Embeddings bzw. Fake-Store über ACL-Fixtures (Muster `ChatToolLoopTest` sowie die bestehenden Such- und ACL-Tests): Treffer und Zitate, ausgeschaltet/fremde Org, ACL-Entzug vor Anzeige, Fortsetzung und neuer Frage, nicht zugeordnete Wissensbasis, Herkunftsprüfung mit gezähltem externem Fake-Adapter (sauber, Marker, Normalisierungsvarianten, Schema-Enums, interner Server, Markierungswechsel), nicht endliche Zahlen. HTTP-Regression für den Admin-Schalter inkl. CSRF und Nicht-Admin. Volle CI einmal am Ende.
 
 ## Workspace
 
