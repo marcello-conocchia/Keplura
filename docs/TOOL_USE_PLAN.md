@@ -39,7 +39,7 @@ Nach jedem Merge PROJECT_STATE.md mit tatsächlichem Stand, Belegen und nächste
 
 ## Unmittelbar nächste Aufgabe
 
-**TU-04b — Dokumentstellen lesen**, siehe [Spec](tasks/TU-04b-document-read-tool.md). In Umsetzung durch Codex; unabhängiges Review durch Claude ausstehend. Das Modell kann zu einem Treffer der Wissenssuche derselben Frage den umgebenden Abschnitt lesen (begrenztes Fenster benachbarter Chunks), mit Rechteprüfung bei jedem Zugriff, nur Fundstellen gespeichert und dieselbe Herkunftsprüfung wie TU-04a. Erledigt: TU-03 vollständig (PRs #19/#21/#23) und [TU-04a](tasks/TU-04a-knowledge-search-tool.md) interne Wissenssuche mit Herkunftsprüfung (PR #26). Weitere TU-04-Teile (Anhänge, Websuche, Webseitenabruf) folgen einzeln.
+**TU-04b — Dokumentstellen lesen**, siehe [Spec](tasks/TU-04b-document-read-tool.md). Implementiert in Draft-PR #28; Linux-CI auf `8665d0d` grün, Nachweis `ci/evidence/20261122-195911/`; unabhängiges Review durch Claude ausstehend, nicht gemergt. Das Modell kann zu einem Treffer der Wissenssuche derselben Frage den umgebenden Abschnitt lesen (begrenztes Fenster benachbarter Chunks), mit Rechteprüfung bei jedem Zugriff, nur Fundstellen gespeichert und dieselbe Herkunftsprüfung wie TU-04a. Erledigt: TU-03 vollständig (PRs #19/#21/#23) und [TU-04a](tasks/TU-04a-knowledge-search-tool.md) interne Wissenssuche mit Herkunftsprüfung (PR #26). Weitere TU-04-Teile (Anhänge, Websuche, Webseitenabruf) folgen einzeln.
 
 ## Vergleichsquellen (abgerufen am 21.11.2026)
 

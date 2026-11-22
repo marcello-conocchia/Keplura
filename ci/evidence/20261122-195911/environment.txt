@@ -1,0 +1,4 @@
+uid=1500(ci) gid=1500(ci) groups=1500(ci)
+setfacl 2.3.2
+8665d0d655740ecaca3840a912024c93ad35110f
+ci_exit=0

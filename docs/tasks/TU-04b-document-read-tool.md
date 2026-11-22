@@ -1,6 +1,6 @@
 # TU-04b — Dokumentstellen lesen
 
-Status: **in Umsetzung durch Codex; finale Linux-CI und unabhängiges Code-/Security-Review durch Claude ausstehend. Nicht gemergt.** Zweite Aufgabe von TU-04 nach TU-04a (PR #26, Merge `841ae00`), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Dokumentrechte, Datenquellen, Modell-/Werkzeugschleife.
+Status: **implementiert in Draft-PR #28; Linux-CI grün, unabhängiges Code-/Security-Review durch Claude ausstehend. Nicht gemergt.** Zweite Aufgabe von TU-04 nach TU-04a (PR #26, Merge `841ae00`), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Dokumentrechte, Datenquellen, Modell-/Werkzeugschleife.
 
 ## Ziel
 
@@ -52,3 +52,9 @@ Eigener Worktree auf Branch `feat/tool-use-document-read` ab aktuellem main. Imp
 - Gezielte Tests: geskriptetes Gateway über echten Chat-/Such-/ACL-Pfad, Nachbarabschnitte und Zitate, private/öffentliche externe Folgeeingaben, Rechteentzug und Wiederholung in anderer Frage, vorübergehende Auflösungs- und Kontextfehler, begrenzte Store-Zugriffe pro Transkript; zusätzlich zentraler Dienst für Ankerbindung, Fenstergrenzen, unbekannte/fremde IDs, Argumentgrenzen und nicht endliche Zahlen. Keine Browser-QA beauftragt, kein Nachweis mit echtem Modell.
 
 Der Aufbewahrungs-Folgepunkt und die bekannten Abhängigkeitswarnungen bleiben eigene Aufgaben. Bereits verfasste Chatantworten werden durch späteren Rechteentzug nicht gelöscht; Fundstellen, Karten, Neuauflösung und folgende Belegverwendung verwenden aktuelle Rechte.
+
+## Validierung und Übergabe
+
+Verbindliche Linux-CI Exit 0 auf Produktcommit `8665d0d655740ecaca3840a912024c93ad35110f` (`uid=1500(ci)`, `setfacl 2.3.2` gesichert): 88 Klassen, 832 Tests, 0 Fehler, 1 übersprungen; Rechte-Helfer, Desktop-Build und cargo check PASS. Nachweise `ci/evidence/20261122-195911/` (`MATRIX.md`, `ci-local.log`, `environment.txt`, `runner.sh`). Danach nur Dokumentation/Nachweise. Unabhängiges Review durch Claude ausstehend; kein Merge, keine Browser-QA, kein Release/Deployment.
+
+Gezielte Entwicklungstests: 197 Tests im Chat-/Tool-/Suchbereich grün, danach 6 gezielte HTTP-Fälle für den letzten Stand einschließlich Fortsetzung/Rechteentzug grün. Desktop-Build und Übersetzungsprüfung grün; 6 Kartentests und 4 Servertext-Übersetzungstests grün. Ein vorher begonnener CI-Lauf auf `b1b14e9` wurde vor Abschluss angehalten, um den neuen englischen Fehlertext aufzunehmen; maßgeblich ist ausschließlich der vollständige grüne Lauf auf `8665d0d`. Kein Testnachweis mit echtem Modell oder Browser.
