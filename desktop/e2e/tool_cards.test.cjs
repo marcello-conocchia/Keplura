@@ -33,6 +33,12 @@ test("only a pending, confirmable card before its deadline can be decided", () =
   assert.equal(c.canDecide(card({ expiresAt: "garbage" }), at("2026-11-21T10:05:00Z")), false);
 });
 
+test("a dependent WRITE card needs the same concrete decision as CRITICAL", () => {
+  const followup = card({ risk: "WRITE", parentCallId: "parent", parentTool: "create_ticket" });
+  assert.equal(c.canDecide(followup, at("2026-11-21T10:05:00Z")), true);
+  assert.equal(c.canDecide({ ...followup, needsConfirmation: false }, at("2026-11-21T10:05:00Z")), false);
+});
+
 test("summary uses lossless server text, marks every shortening; exact text stays the basis", () => {
   const fields = [
     { name: "id", value: "9007199254740993" }, // beyond 2^53: must not become ...992

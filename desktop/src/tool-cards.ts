@@ -27,6 +27,9 @@ export interface ToolCallCard {
   error: string | null;
   createdAt: string;
   expiresAt: string | null;
+  /** Server-bound first confirmed action; absent for initial and READ calls. */
+  parentCallId?: string | null;
+  parentTool?: string | null;
 }
 
 export type Tone = "ok" | "wait" | "neutral" | "error" | "info";

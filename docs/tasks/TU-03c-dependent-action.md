@@ -1,6 +1,6 @@
 # TU-03c — Abhängige Folgeaktion mit konkreter Bestätigung
 
-Status: **geplant, nicht gestartet.** Nächste einzelne Aufgabe nach TU-03b (PR #21, Merge `b1b9e72`). Dritter und letzter Umsetzungsschritt von TU-03 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Schreibaktionen, Bestätigungen, externe Aufrufe und Rechte.
+Status: **implementiert; Linux-CI grün, unabhängige Prüfung offen.** Branch `feat/tool-use-dependent-action` ab main `564a85b`. Codex implementiert, Claude prüft unabhängig Code und Sicherheit; bestehende Rollenteilung fortgeführt. Nicht gemergt. Nächste einzelne Aufgabe nach TU-03b (PR #21, Merge `b1b9e72`). Dritter und letzter Umsetzungsschritt von TU-03 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Schreibaktionen, Bestätigungen, externe Aufrufe und Rechte.
 
 ## Ziel
 
@@ -41,3 +41,23 @@ Geskriptetes Gateway und Fake-Adapter mit Aufrufzähler über den echten zentral
 ## Workspace
 
 Eigener Worktree auf Branch `feat/tool-use-dependent-action` ab aktuellem main. Implementierung und unabhängige Prüfung nach PO-Zuweisung (bei TU-03a/b: Codex implementiert, Claude prüft). Genau eine Implementierungsaufgabe. Draft-PR, kein Merge durch den Entwickler; Provider-/Budgetregeln aus AGENTS.md gelten.
+
+## Umsetzung und Nachweise (22.11.2026)
+
+- V28 ergänzt nullable `tool_call.parent_call_id` und `tool_question.followup_used` (Default false); keine bestehenden Geschäftsdaten geändert. Alte Karten haben keine Herkunft und behalten ihr Verhalten.
+- Nur die bereits einmalig beanspruchte Fortsetzung einer erfolgreich bestätigten Erstaktion erhält im Dienst die Möglichkeit, eine Folgeaktion vorzuschlagen. Originalkatalog und Kontext bleiben gebunden. Der persistente Vorschlagszähler wird atomar auf Frage und konkrete Erstentscheidung geprüft; weitere WRITE-/CRITICAL-Vorschläge werden gezählt und gesperrt.
+- WRITE wie CRITICAL wird als Folgeaktion ausschließlich PENDING mit `needsConfirmation=true` gespeichert, mit exaktem Argumenttext und Herkunft. Im bestehenden Entscheidungsweg werden zusätzlich Herkunft, ursprünglicher Katalog, aktueller Kontext, Generation und Definitionen geprüft. Kein neuer Fortsetzungsnachweis nach einer Folgeentscheidung; keine dritte Kettenstufe.
+- Duplikatsprüfung gegen Karten derselben Frage: gleiches Werkzeug und gleiche Argumente einschließlich verschachtelter Objekte, unabhängig von Feldreihenfolge und gleichwertiger JSON-Zahlenschreibweise. Auch laufende, ausstehende, abgelehnte und möglicherweise schon ausgeführte fehlgeschlagene Aufrufe bleiben geschützt.
+- Karte zeigt „Folgeaktion zu …“ mit Link zur konkret bestätigten Erstkarte; ursprüngliche Risikoklasse bleibt sichtbar, vollständige Argumente bleiben Grundlage der Bestätigung. Deutsch-/englischsprachiger Hinweis und Sperrtexte.
+- Gemeinsame Budgets, serialisierte Ausführung und Kontexttrennung unverändert. Auch Anfragen mit einem WRITE-/CRITICAL-Angebot erhalten keine privaten Belege; diese kommen erst in die werkzeuglose Abschlussanfrage. Kein neuer Adapter oder neue Abhängigkeit.
+- Gezielte Tests grün: ChatToolLoopTest 61, ChatApiIntegrationTest 34, ToolConfirmationTest 28, ToolExecutionServiceTest 17, FlywayBaselineMigrationTest 4 (144 insgesamt); 14 Node-Karten-/Übersetzungstests und Desktop-Build mit Übersetzungsprüfung.
+- PostgreSQL 16: portable Migrationen V1–V28 per psql mit ON_ERROR_STOP angewendet; zusätzlicher transaktionaler Upgrade-Probe prüft bestehende Daten, nullable Herkunft, Default false, falschen Elternaufruf, ersten/zweiten Vorschlags-Claim und exakte Argumente. H2 wird über die Flyway-Tests geprüft. Kein pgvector-/Release-Nachweis daraus abgeleitet.
+- Verbindliche lokale Linux-CI auf 7e05e92 Exit 0: Nicht-root ci (UID 1500) mit acl, Linux-Dateisystem; 85 Klassen genau einmal, 729 Tests, 0 Fehler, 1 übersprungen. Rechte-Helfer, Desktop-Build und cargo check PASS. Evidence ci/evidence/20261122-105648/ einschließlich PostgreSQL-Probe/Log. Danach nur Nachweise/Dokumentationsstatus ergänzt. Unabhängiges Code-/Security-Review durch Claude noch offen. Keine Browser-/Feldtests oder echtes Modell verwendet. Autoritatives Hermes-Kanban von diesem Windows-Host nicht erreichbar; kein Ersatzboard angelegt.
+
+## Grenzen
+
+- Ein ungültiger oder doppelter erster WRITE-/CRITICAL-Vorschlag verbraucht den einmaligen Vorschlag ebenfalls. Kein automatisches Neuplanen einer Ersatzaktion; eine neue explizite Frage bleibt möglich.
+- READ-Aufrufe im selben bereits gelieferten Batch bleiben möglich; nach einer PENDING-Folgekarte erfolgt nur die werkzeuglose Abschlussantwort. Nach der Folgeentscheidung ist das Ergebnis nur auf der Karte und bei einer nächsten expliziten Frage verfügbar.
+- Manipulierte eigene Werkzeugergebnisse können weiterhin READ-Argumente beeinflussen und einen falschen Folgeaktionsvorschlag anregen. Kein privater zusätzlicher Belegkontext in werkzeugfähigen Anfragen; keine Schreibausführung ohne die erneute konkrete Bestätigung.
+- Bestehende TU-03b-Grenzen (maximal eine Fortsetzung, konservative Wartezeit, weiche Grenze bereits laufender externer Aufrufe, kein Übernehmen verwaister Guards) bleiben bestehen. Aufbewahrung von tool_question und Dependabot-Warnungen bleiben separate Folgeaufgaben; keine neue Löschrichtlinie oder Sicherheits-Sammeländerung in diesem PR.
+- TU-03 erst nach erfolgreichem Gate-Abschluss und Merge als abgeschlossen markieren; danach TU-04. Kein Selbst-Merge, Release oder Deployment.
