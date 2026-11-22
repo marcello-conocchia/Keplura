@@ -694,6 +694,7 @@ export const EN: Record<string, string> = {
   "Der Ausgang ist unklar. Der Aufruf wird nicht automatisch wiederholt; bitte im angebundenen System prüfen.": "The outcome is unclear. The call is not repeated automatically; please check in the connected system.",
   "Ergebnis (Fremdinhalt)": "Result (external content)",
   "Wartet auf Bestätigung": "Waiting for confirmation",
+  "Folgeaktion zu {0}": "Follow-up action to {0}",
   "Läuft": "Running",
   "Abgelehnt": "Rejected",
   "Nicht ausgeführt": "Not run",

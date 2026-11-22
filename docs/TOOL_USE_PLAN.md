@@ -39,7 +39,7 @@ Nach jedem Merge PROJECT_STATE.md mit tatsächlichem Stand, Belegen und nächste
 
 ## Unmittelbar nächste Aufgabe
 
-**TU-03c — abhängige Folgeaktion mit konkreter Bestätigung**, siehe [Spec](tasks/TU-03c-dependent-action.md). Geplant, nicht gestartet. In der einmaligen Fortsetzung nach einem bestätigten Ergebnis darf das Modell höchstens eine weitere WRITE/CRITICAL-Aktion vorschlagen; sie wird nie automatisch ausgeführt, sondern immer als Karte mit konkreter Bestätigung vorgelegt, auch bei WRITE. Doppelte Aktionen derselben Frage sind gesperrt. Erledigt: [TU-03a](tasks/TU-03a-read-loop.md) — mehrstufige READ-Folgeaufrufe (PR #19); [TU-03b](tasks/TU-03b-confirmed-continuation.md) — einmalige Fortsetzung nach Bestätigung (PR #21). Mit TU-03c ist TU-03 inhaltlich vollständig; die Phase gilt erst nach dessen Merge als abgeschlossen.
+**TU-03c — abhängige Folgeaktion mit konkreter Bestätigung**, siehe [Spec](tasks/TU-03c-dependent-action.md). Implementiert auf feat/tool-use-dependent-action; lokale Linux-CI und unabhängige Prüfung durch Claude offen, nicht gemergt. In der einmaligen Fortsetzung nach einem bestätigten Ergebnis darf das Modell höchstens eine weitere WRITE/CRITICAL-Aktion vorschlagen; sie wird nie automatisch ausgeführt, sondern immer als Karte mit konkreter Bestätigung vorgelegt, auch bei WRITE. Doppelte Aktionen derselben Frage sind gesperrt. Erledigt: [TU-03a](tasks/TU-03a-read-loop.md) — mehrstufige READ-Folgeaufrufe (PR #19); [TU-03b](tasks/TU-03b-confirmed-continuation.md) — einmalige Fortsetzung nach Bestätigung (PR #21). Mit TU-03c ist TU-03 inhaltlich vollständig; die Phase gilt erst nach dessen Merge als abgeschlossen.
 
 ## Vergleichsquellen (abgerufen am 21.11.2026)
 

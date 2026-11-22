@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-/** One bounded loop per explicit user question. Results enable READ followups only (TU-03a). */
+/** Bounded tool loop; one successful confirmation may enable a single pending dependent action. */
 final class ChatToolLoop {
     static final int MAX_MODEL_REQUESTS = 5;
     static final String REFUSED = "Weitere Werkzeugaktionen wurden nicht ausgeführt. Bitte stelle dafür einen neuen Auftrag.";
@@ -68,7 +68,11 @@ final class ChatToolLoop {
         if (continuation) {
             dialogue = (ArrayNode) mapper.readTree(savedDialogue);
             dialogue.addObject().put("role", "system").put("content",
-                    "Entscheidung der Person zum bereits geplanten Aufruf. Keine Wiederholung, nur READ-Folgeaufrufe.\n" + decision);
+                    "Entscheidung der Person zum bereits geplanten Aufruf. Keine Wiederholung. "
+                    + (turn.canProposeDependentAction()
+                        ? "Du darfst genau eine WRITE-/CRITICAL-Folgeaktion aus dem ursprünglichen Auftrag vorschlagen. "
+                          + "Sie wird nur als Karte vorgelegt und braucht eine neue konkrete Bestätigung; behaupte keine Ausführung. Daneben sind READ-Folgeaufrufe erlaubt.\n"
+                        : "Nur READ-Folgeaufrufe sind erlaubt.\n") + decision);
         }
         List<String> used = new ArrayList<>();
         String model = chat.model();

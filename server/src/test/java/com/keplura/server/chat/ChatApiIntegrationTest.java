@@ -150,15 +150,18 @@ class ChatApiIntegrationTest {
             if (!stubToolMode.isEmpty() && (lastBody.get().contains("\"tools\"") || lastBody.get().contains("\"tool_choice\":\"none\""))) {
                 toolBodies.add(lastBody.get());
                 int turn = toolRequests.incrementAndGet();
-                boolean callFirst = ((stubToolMode.equals("after-call") || stubToolMode.equals("one-call")) && turn == 1)
+                boolean callFirst = ((stubToolMode.equals("after-call") || stubToolMode.equals("one-call") || stubToolMode.equals("dependent")) && turn == 1)
                         || stubToolMode.equals("injection");
-                String payload = callFirst
+                boolean followup = stubToolMode.equals("dependent") && turn==3;
+                String payload = followup
+                        ? "{\"choices\":[{\"message\":{\"tool_calls\":[{\"id\":\"follow-1\",\"type\":\"function\",\"function\":{\"name\":\"s1__link\",\"arguments\":\"{\\\"ticketId\\\":\\\"T-1\\\",\\\"exact\\\":9007199254740993}\"}}]}}]}"
+                        : callFirst
                         ? "{\"choices\":[{\"message\":{\"role\":\"assistant\",\"tool_calls\":[{\"id\":\"call-1\",\"type\":\"function\",\"function\":{\"name\":\"s1__echo\",\"arguments\":\"{}\"}}]}}]}"
-                        : stubToolMode.equals("one-call") ? "{\"choices\":[{\"message\":{\"content\":\"Werkzeugantwort\"}}]}"
+                        : stubToolMode.equals("one-call") || stubToolMode.equals("dependent") ? "{\"choices\":[{\"message\":{\"content\":\"Werkzeugantwort\"}}]}"
                         : "{\"error\":{\"message\":\"model does not support tools " + KEY + "\"}}";
                 byte[] bytes = payload.getBytes(StandardCharsets.UTF_8);
                 exchange.getResponseHeaders().set("Content-Type", "application/json");
-                exchange.sendResponseHeaders(callFirst || stubToolMode.equals("one-call") ? 200 : stubToolMode.equals("server-error") ? 500 : 400, bytes.length);
+                exchange.sendResponseHeaders(callFirst || stubToolMode.equals("one-call") || stubToolMode.equals("dependent") ? 200 : stubToolMode.equals("server-error") ? 500 : 400, bytes.length);
                 try (var out = exchange.getResponseBody()) { out.write(bytes); }
                 return;
             }
@@ -254,13 +257,18 @@ class ChatApiIntegrationTest {
         volatile String result = "Werkzeugantwort";
         volatile com.keplura.server.tool.ToolRisk risk = com.keplura.server.tool.ToolRisk.READ;
         volatile boolean approved = true;
+        boolean includeWrite;
 
         @Override public String kind() { return "fixture"; }
 
         @Override public java.util.List<com.keplura.server.tool.ToolDefinition> definitions(Long spaceId) {
             var schema = tools.jackson.databind.json.JsonMapper.builder().build().createObjectNode().put("type", "object");
-            return java.util.List.of(new com.keplura.server.tool.ToolDefinition("fixture:1:echo", "fixture", "s1__echo",
+            var definitions = new java.util.ArrayList<com.keplura.server.tool.ToolDefinition>();
+            definitions.add(new com.keplura.server.tool.ToolDefinition("fixture:1:echo", "fixture", "s1__echo",
                     "echo", 1L, "Testserver", "Echo", schema, risk, approved, "fp"));
+            if (includeWrite) definitions.add(new com.keplura.server.tool.ToolDefinition("fixture:1:link", "fixture", "s1__link",
+                    "link", 1L, "Testserver", "Link", schema, com.keplura.server.tool.ToolRisk.WRITE, approved, "fp"));
+            return definitions;
         }
 
         @Override public String invoke(com.keplura.server.tool.ToolDefinition tool, tools.jackson.databind.JsonNode arguments) {
@@ -503,16 +511,68 @@ class ChatApiIntegrationTest {
         var resumed=exchange("POST",base+"/continue",scope[0],Map.of("token",token,"prompt","injected","arguments",Map.of("x",1)));
         assertThat(resumed.getStatusCode().value()).isEqualTo(200);
         assertThat(resumed.getBody()).contains("Werkzeugantwort");
-        assertThat(toolBodies).hasSize(3);
+        int modelRequests=decision.equals("confirm")?4:3;
+        assertThat(toolBodies).hasSize(modelRequests);
         assertThat(toolBodies.getLast()).doesNotContain("injected",token,"\"tools\"");
         assertThat(fixture.invocations.get()).isEqualTo(decision.equals("confirm")?1:0);
         assertThat(exchange("POST",base+"/continue",scope[0],Map.of("token",token)).getStatusCode().value()).isEqualTo(409);
-        assertThat(toolBodies).hasSize(3);
+        assertThat(toolBodies).hasSize(modelRequests);
         long conversationId=Long.parseLong(chat);
         assertThat(jdbc.queryForObject("select count(*) from chat_message where conversation_id=? and role='assistant'",Integer.class,conversationId)).isEqualTo(2);
         assertThat(jdbc.queryForObject("select count(distinct prompt_message_id) from chat_message where conversation_id=? and role='assistant'",Integer.class,conversationId)).isEqualTo(1);
         assertThat(exchange("DELETE",transcriptPath(scope[1],chat),scope[0],null).getStatusCode().value()).isEqualTo(204);
         assertThat(jdbc.queryForObject("select count(*) from tool_question where conversation_id=?",Integer.class,conversationId)).isZero();
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings={"confirm","reject"})
+    void writeFollowupOverHttpWaitsForExactConfirmationAndNeverContinuesAgain(String decision) {
+        String[] scope=fixtureChain(false);
+        var fixture=enableFixtureTools();
+        fixture.risk=com.keplura.server.tool.ToolRisk.CRITICAL;
+        fixture.includeWrite=true; fixture.result="{\"ticketId\":\"T-1\"}";
+        String chat=createConversation(scope[0],scope[1],scope[2],Map.of());
+        String transcriptPath=transcriptPath(scope[1],chat);
+        MultiValueMap<String,Object> parts=new LinkedMultiValueMap<>();
+        parts.add("file",new NamedByteArrayResource("PRIVATE_DEPENDENT_SALARY_9100".getBytes(StandardCharsets.UTF_8),"private.txt"));
+        assertThat(rest.exchange(RequestEntity.post(URI.create(transcriptPath+"/attachments"))
+                .header(HttpHeaders.COOKIE,scope[0])
+                .header(com.keplura.server.auth.CsrfService.HEADER_NAME,com.keplura.server.auth.CsrfTestSupport.csrfValue(scope[0]))
+                .contentType(MediaType.MULTIPART_FORM_DATA).body(parts),String.class).getStatusCode().value()).isEqualTo(201);
+        stubToolMode="dependent";
+        exchange("POST",streamPath(scope[1],chat),scope[0],Map.of("prompt","Create ticket then link it"));
+        var json=tools.jackson.databind.json.JsonMapper.builder().build();
+        var parent=json.readTree(exchange("GET",transcriptPath,scope[0],null).getBody()).path("toolCalls").get(0);
+        String parentBase=transcriptPath+"/tool-calls/"+parent.path("id").asString();
+        var first=exchange("POST",parentBase+"/decision",scope[0],Map.of("decision","confirm"));
+        String token=json.readTree(first.getBody()).path("continuationToken").asString();
+        assertThat(exchange("POST",parentBase+"/continue",scope[0],Map.of("token",token)).getStatusCode().value()).isEqualTo(200);
+        var child=json.readTree(exchange("GET",transcriptPath,scope[0],null).getBody()).path("toolCalls").get(1);
+        assertThat(child.path("status").asString()).isEqualTo("PENDING");
+        assertThat(child.path("risk").asString()).isEqualTo("WRITE");
+        assertThat(child.path("needsConfirmation").asBoolean()).isTrue();
+        assertThat(child.path("parentCallId").asString()).isEqualTo(parent.path("id").asString());
+        assertThat(child.path("parentTool").asString()).isEqualTo("echo");
+        assertThat(child.path("argumentsText").asString()).contains("T-1","9007199254740993");
+        assertThat(fixture.invocations.get()).isEqualTo(1);
+        assertThat(toolBodies).hasSize(4);
+        for(String body:toolBodies) if(json.readTree(body).has("tools")) {
+            assertThat(body).doesNotContain("PRIVATE_DEPENDENT_SALARY_9100","private.txt",token);
+        }
+        assertThat(toolBodies.getLast()).contains("PRIVATE_DEPENDENT_SALARY_9100").doesNotContain("\"tools\"");
+        String childBase=transcriptPath+"/tool-calls/"+child.path("id").asString();
+        assertThat(rest.exchange(RequestEntity.post(URI.create(childBase+"/decision")).header(HttpHeaders.COOKIE,scope[0])
+                .contentType(MediaType.APPLICATION_JSON).body(Map.of("decision",decision)),String.class).getStatusCode().value()).isEqualTo(403);
+        String stranger=loginFreshUser("followup-stranger");
+        assertThat(exchange("POST",childBase+"/decision",stranger,Map.of("decision",decision)).getStatusCode().value()).isIn(403,404);
+        var outcome=exchange("POST",childBase+"/decision",scope[0],Map.of("decision",decision,"arguments",Map.of("ticketId","injected"),"parentCallId","injected"));
+        assertThat(outcome.getStatusCode().value()).isEqualTo(200);
+        assertThat(json.readTree(outcome.getBody()).has("continuationToken")).isFalse();
+        assertThat(fixture.invocations.get()).isEqualTo(decision.equals("confirm")?2:1);
+        if(decision.equals("confirm")) assertThat(fixture.lastArguments.get()).isEqualTo(child.path("argumentsText").asString());
+        assertThat(exchange("POST",childBase+"/decision",scope[0],Map.of("decision",decision)).getStatusCode().value()).isEqualTo(409);
+        assertThat(exchange("POST",childBase+"/continue",scope[0],Map.of("token",token)).getStatusCode().value()).isEqualTo(409);
+        assertThat(toolBodies).hasSize(4);
     }
 
     @Test void stopEndpointEndsPendingConfirmationsOwnerOnly() throws Exception {

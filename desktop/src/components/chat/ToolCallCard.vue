@@ -2,7 +2,7 @@
 /**
  * TU-02 — one tool call card under a chat answer: tool/source, risk class, readable arguments,
  * honest status and the result (foreign content, plain text) or a generic error. A pending
- * CRITICAL call shows Confirm / Reject; the server binds and executes exactly the shown call.
+ * action shows Confirm / Reject; the server binds and executes exactly the shown call.
  */
 import { computed } from "vue";
 import Button from "../ui/Button.vue";
@@ -44,6 +44,10 @@ const deadline = computed(() =>
         <StatusPill :tone="meta.tone" data-testid="chat-tool-call-status">{{ $t(meta.label) }}</StatusPill>
       </span>
     </header>
+
+    <p v-if="card.parentCallId" class="tool-card-note" data-testid="chat-tool-call-parent">
+      <a :href="`#tool-call-${card.parentCallId}`">{{ $t("Folgeaktion zu {0}", card.parentTool ?? card.parentCallId) }}</a>
+    </p>
 
     <dl v-if="args.length" class="tool-card-args">
       <template v-for="a in args" :key="a.key">

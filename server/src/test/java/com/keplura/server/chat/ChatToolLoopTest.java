@@ -40,12 +40,15 @@ class ChatToolLoopTest {
         boolean approved = true;
         String fingerprint = "fp";
         JsonNode schema = M.readTree("{\"type\":\"object\"}");
+        List<ToolDefinition> extra = new ArrayList<>();
         boolean fail;
         Runnable duringInvoke = () -> { };
         @Override public String kind() { return "fixture"; }
         @Override public List<ToolDefinition> definitions(Long space) {
-            return List.of(def("search", ToolRisk.READ), def("detail", ToolRisk.READ),
-                    def("write", ToolRisk.WRITE), def("critical", ToolRisk.CRITICAL));
+            var definitions = new ArrayList<>(List.of(def("search", ToolRisk.READ), def("detail", ToolRisk.READ),
+                    def("write", ToolRisk.WRITE), def("critical", ToolRisk.CRITICAL)));
+            definitions.addAll(extra);
+            return definitions;
         }
         ToolDefinition def(String name, ToolRisk risk) {
             return new ToolDefinition("fixture:1:" + name, kind(), name, name, 1L, "Fixture", "desc",
@@ -152,13 +155,171 @@ class ChatToolLoopTest {
         assertThat(take(done)).isNull();
     }
 
-    @Test void resumedModelCannotRepeatCriticalOrIntroduceWriteActions() throws Exception {
+    @Test void resumedModelCannotRepeatCriticalOrRunWritesWithoutConfirmation() throws Exception {
         var done = decide(true);
         script = (i,b) -> i==2 ? plan(call("critical","{}"),call("write","{}"),call("detail","{}")) : answer("Safe");
         resume(done);
         assertThat(adapter.calls).containsExactly("critical","detail");
         assertThat(execution.cards(1L,1L,1L)).filteredOn(c -> c.status().equals("BLOCKED")).hasSize(2);
-        assertThat(requests.get(2).path("tools").toString()).doesNotContain("\"name\":\"write\"","\"name\":\"critical\"");
+        assertThat(requests.get(2).path("tools").toString()).contains("\"name\":\"write\"","\"name\":\"critical\"");
+    }
+
+    private ToolExecutionService.ToolCallView propose(ToolExecutionService.Decision.Done parent, String name, String args) throws Exception {
+        script=(i,b) -> i==2 ? plan(call(name,args)) : answer("Waiting for follow-up confirmation");
+        resume(parent);
+        return execution.cards(1L,1L,1L).stream().filter(c -> c.status().equals("PENDING") && parent.card().id().equals(c.parentCallId())).findFirst().orElseThrow();
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings={"write","critical"})
+    void dependentActionAlwaysNeedsANewConcreteConfirmation(String name) throws Exception {
+        var parent=decide(true);
+        var child=propose(parent,name,"{\"ticketId\":\"T-1\",\"large\":9007199254740993}");
+        assertThat(child.parentCallId()).isEqualTo(parent.card().id());
+        assertThat(child.parentTool()).isEqualTo("critical");
+        assertThat(child.risk()).isEqualTo(name.equals("write")?"WRITE":"CRITICAL");
+        assertThat(child.needsConfirmation()).isTrue();
+        assertThat(child.argumentsText()).contains("9007199254740993");
+        assertThat(adapter.calls).containsExactly("critical");
+        assertThat(requests).hasSize(4);
+        assertThat(requests.stream().filter(b -> b.has("tools"))).allSatisfy(b ->
+                assertThat(b.path("messages").toString()).doesNotContain("UNTRUSTED_HISTORY"));
+        assertThat(requests.getLast().path("messages").toString()).contains("UNTRUSTED_HISTORY");
+        var confirmed=(ToolExecutionService.Decision.Done)execution.decide(1L,1L,1L,child.id(),true);
+        assertThat(confirmed.card().status()).isEqualTo("SUCCEEDED");
+        assertThat(confirmed.continuationToken()).isNull();
+        assertThat(adapter.calls).containsExactly("critical",name);
+        assertThat(adapter.arguments.getLast().toString()).isEqualTo(child.argumentsText());
+        assertThat(execution.decide(1L,1L,1L,child.id(),true)).isInstanceOf(ToolExecutionService.Decision.Conflict.class);
+        assertThat(execution.takeContinuation(1L,1L,1L,child.id(),parent.continuationToken())).isNull();
+        assertThat(requests).hasSize(4);
+    }
+
+    @Test void rejectingTheParentNeverOffersOrPlansDependentActions() throws Exception {
+        var parent=decide(false);
+        script=(i,b) -> {
+            if(b.has("tools")) assertThat(b.path("tools").toString()).doesNotContain("\"name\":\"write\"","\"name\":\"critical\"");
+            return i==2 ? plan(call("write","{\"id\":\"T-1\"}")) : answer("Rejected");
+        };
+        resume(parent);
+        assertThat(adapter.calls).isEmpty();
+        assertThat(execution.cards(1L,1L,1L)).noneMatch(c -> c.status().equals("PENDING") || c.parentCallId()!=null);
+    }
+
+    @Test void oneDependentProposalPerQuestionEvenWithinASingleBatch() throws Exception {
+        var parent=decide(true);
+        script=(i,b) -> i==2 ? plan(call("write","{\"id\":\"first\"}"),call("critical","{\"id\":\"second\"}"),call("write","{\"id\":\"third\"}")) : answer("Waiting");
+        resume(parent);
+        assertThat(execution.cards(1L,1L,1L)).filteredOn(c -> c.status().equals("PENDING")).hasSize(1);
+        assertThat(execution.cards(1L,1L,1L)).filteredOn(c -> c.status().equals("BLOCKED")).hasSize(2);
+        assertThat(adapter.calls).containsExactly("critical");
+        assertThat(jdbc.queryForObject("select attempts from tool_question",Integer.class)).isEqualTo(4);
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings={"SUCCEEDED","RUNNING","REJECTED","PENDING","FAILED"})
+    void duplicateOriginalActionCannotBeProposedAgain(String previousStatus) throws Exception {
+        script=(i,b) -> i==0 ? plan(call("critical","{}"),call("write","{\"a\":1,\"nested\":{\"b\":2,\"c\":3}}")) : answer("Waiting");
+        text();
+        var parent=(ToolExecutionService.Decision.Done)execution.decide(1L,1L,1L,execution.cards(1L,1L,1L).getFirst().id(),true);
+        jdbc.update("update tool_call set status=? where tool_name='write'",previousStatus);
+        script=(i,b) -> i==2 ? plan(call("write","{\"nested\":{\"c\":3.0,\"b\":2},\"a\":1e0}")) : answer("Duplicate blocked");
+        resume(parent);
+        assertThat(adapter.calls).containsExactly("write","critical");
+        assertThat(execution.cards(1L,1L,1L)).filteredOn(c -> c.parentCallId()!=null && c.status().equals("BLOCKED"))
+                .singleElement().satisfies(c -> assertThat(c.error()).contains("bereits ausgeführt, geplant oder entschieden"));
+        assertThat(execution.cards(1L,1L,1L)).noneMatch(c -> c.parentCallId()!=null && c.status().equals("PENDING"));
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings={"stop","new-question","membership","approval","target","schema"})
+    void changedContextBlocksDependentConfirmation(String change) throws Exception {
+        var child=propose(decide(true),"write","{\"id\":\"T-1\"}");
+        switch(change) {
+            case "stop" -> execution.stop(1L,1L,1L);
+            case "new-question" -> question(2);
+            case "membership" -> jdbc.update("delete from membership where user_id=1");
+            case "approval" -> adapter.approved=false;
+            case "target" -> adapter.fingerprint="changed";
+            case "schema" -> adapter.schema=M.readTree("{\"type\":\"object\",\"additionalProperties\":false}");
+        }
+        execution.decide(1L,1L,1L,child.id(),true);
+        assertThat(adapter.calls).containsExactly("critical");
+    }
+
+    @Test void parallelDependentConfirmationExecutesOnlyOnceAndNeverResumes() throws Exception {
+        var child=propose(decide(true),"write","{\"id\":\"T-1\"}");
+        try(var pool=java.util.concurrent.Executors.newFixedThreadPool(8)) {
+            var futures=new ArrayList<java.util.concurrent.Future<ToolExecutionService.Decision>>();
+            for(int i=0;i<12;i++) futures.add(pool.submit(() -> execution.decide(1L,1L,1L,child.id(),true)));
+            int winners=0;
+            for(var future:futures) if(future.get() instanceof ToolExecutionService.Decision.Done d) {
+                winners++; assertThat(d.continuationToken()).isNull();
+            }
+            assertThat(winners).isEqualTo(1);
+        }
+        assertThat(adapter.calls).containsExactly("critical","write");
+        assertThat(requests).hasSize(4);
+    }
+
+    @Test void declinedDependentActionEndsWithoutExecutionOrFurtherContinuation() throws Exception {
+        var child=propose(decide(true),"write","{\"id\":\"T-1\"}");
+        var declined=(ToolExecutionService.Decision.Done)execution.decide(1L,1L,1L,child.id(),false);
+        assertThat(declined.card().status()).isEqualTo("REJECTED");
+        assertThat(declined.continuationToken()).isNull();
+        assertThat(adapter.calls).containsExactly("critical");
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings={"failed","blocked","unknown"})
+    void unsuccessfulParentCannotStartAContinuationOrDependentAction(String mode) throws Exception {
+        script=(i,b) -> i==0 ? plan(call("critical","{}")) : answer("Waiting");
+        text();
+        var card=execution.cards(1L,1L,1L).getFirst();
+        switch(mode) {
+            case "failed" -> adapter.fail=true;
+            case "blocked" -> adapter.approved=false;
+            case "unknown" -> jdbc.update("update tool_call set status='RUNNING',started_at=?",Timestamp.from(Instant.now().minusSeconds(360)));
+        }
+        var decision=execution.decide(1L,1L,1L,card.id(),true);
+        if(decision instanceof ToolExecutionService.Decision.Done done) assertThat(done.continuationToken()).isNull();
+        assertThat(execution.takeContinuation(1L,1L,1L,card.id(),java.util.UUID.randomUUID().toString())).isNull();
+        assertThat(adapter.calls).hasSize(mode.equals("failed")?1:0);
+        assertThat(requests).hasSize(2);
+        assertThat(execution.cards(1L,1L,1L)).noneMatch(c -> c.parentCallId()!=null);
+    }
+
+    @Test void modelCannotExpandCatalogOrLowerTheRiskOfADependentWrite() throws Exception {
+        var parent=decide(true);
+        adapter.extra.add(adapter.def("new-tool",ToolRisk.WRITE)); // approved after the original catalog was bound
+        JsonNode disguised=call("write","{\"id\":\"T-1\"}");
+        ((tools.jackson.databind.node.ObjectNode) disguised.path("function")).put("risk","READ").put("approved",true);
+        script=(i,b) -> {
+            if(i==2) {
+                assertThat(b.path("tools").toString()).doesNotContain("new-tool");
+                return plan(call("new-tool","{}"),disguised);
+            }
+            return answer("Waiting");
+        };
+        resume(parent);
+        assertThat(adapter.calls).containsExactly("critical");
+        assertThat(execution.cards(1L,1L,1L)).filteredOn(c -> c.parentCallId()!=null && c.status().equals("PENDING"))
+                .singleElement().satisfies(c -> {
+                    assertThat(c.risk()).isEqualTo("WRITE"); assertThat(c.needsConfirmation()).isTrue();
+                });
+        assertThat(jdbc.queryForObject("select attempts from tool_question",Integer.class)).isEqualTo(3);
+    }
+
+    @Test void dependentConfirmationUsesTheOriginalQuestionsRemainingToolTime() throws Exception {
+        var parent=decide(true);
+        var child=propose(parent,"write","{\"id\":\"T-1\"}");
+        jdbc.update("update tool_call set finished_at=? where public_id=?",Timestamp.from(Instant.now().plusSeconds(121)),parent.card().id());
+        var decision=(ToolExecutionService.Decision.Done)execution.decide(1L,1L,1L,child.id(),true);
+        assertThat(decision.card().status()).isEqualTo("BLOCKED");
+        assertThat(decision.continuationToken()).isNull();
+        assertThat(adapter.calls).containsExactly("critical");
+        assertThat(jdbc.queryForObject("select model_requests from tool_question",Integer.class)).isEqualTo(4);
+        assertThat(jdbc.queryForObject("select attempts from tool_question",Integer.class)).isEqualTo(2);
     }
 
     @Test void roundApiAutomaticallySealsPolicyInsideTheService() {
