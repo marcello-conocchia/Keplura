@@ -1,6 +1,6 @@
 # TU-04a — Interne Wissenssuche als Werkzeug
 
-Status: **Draft-PR #26. Claude-Review Runde 1 ohne Freigabe; Korrektur `97ede97` (Claude). Codex-Re-Review auf `294f88d` ohne Freigabe (Unicode-Leerraum, major); Korrektur `b4fe684` (Claude), finale Linux-CI darauf grün. Gezielte Re-Review durch Codex offen. Nicht gemergt.** Erste Aufgabe von TU-04 nach Abschluss von TU-03, gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). PO-Entscheidung vom 22.11.2026: automatisch mit Herkunftsprüfung. Klasse A: Datenquellen und Dokumentrechte, Modell-/Werkzeugschleife.
+Status: **Draft-PR #26. Code-/Security-Freigaben liegen vor: Claude für die ursprüngliche Implementierung (nach Korrektur), Codex für Claudes Korrekturen auf `483d1de`. Minor aus Codex' letzter Re-Review in `599043d` mit gezielter Regression behoben (ohne neue volle CI/Review-Runde gemäß Review rounds). Finale Linux-CI auf `b4fe684` grün. Nicht gemergt.** Erste Aufgabe von TU-04 nach Abschluss von TU-03, gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). PO-Entscheidung vom 22.11.2026: automatisch mit Herkunftsprüfung. Klasse A: Datenquellen und Dokumentrechte, Modell-/Werkzeugschleife.
 
 ## Ziel
 
@@ -81,3 +81,10 @@ Die vereinbarte Grenze bleibt: Auswahl/Reihenfolge öffentlich erlaubter Tokens 
 - Regression über den echten `ToolExecutionService` (`InternalTargetProvenanceTest`): Codex' Fall und weitere Schreibweisen (U+00A0, U+202F, U+3000, U+1680, U+205F, U+2028, U+0085, Tab, doppelt/angehängt/führend, NFD) ergeben eine Karte mit exaktem Wert statt eines externen Aufrufs; kanonische öffentliche Schreibweise bleibt automatisch. Ohne die Korrektur schlagen 9 dieser Fälle fehl.
 - Finale Linux-CI auf `b4fe684`: Exit 0, `uid=1500(ci)`, `setfacl 2.3.2` (gesichert in environment.txt), frischer Klon; 87 Klassen genau einmal, 796 Tests, 0 Fehler, 1 übersprungen; Rechte-Helfer, Desktop-Build und cargo check PASS. Evidence `ci/evidence/20261122-184320/` mit Runner-Skript. Danach nur Doku/Nachweise.
 - **Gezielte unabhängige Re-Review dieser Korrektur durch Codex offen.**
+
+## Minor aus Codex' Re-Review (22.11.2026)
+
+- Codex-Re-Review auf `483d1de`: Freigabe der Unicode-Korrektur; ein **minor / Security low** — bei strukturierten `enum`-/`const`-/`default`-Werten (Objekt/Liste) prüfte der Gleichheitszweig enthaltene Strings nicht auf Kanonik.
+- Behoben (Claude): Schemawerte werden rekursiv geprüft, einschließlich Objektschlüsseln; erst danach greift die Gleichheit. Gezielte Regression in `ToolArgumentProvenanceTest` (7 strukturierte Fälle mit U+2009, doppeltem Leerraum, NFD und Schlüssel; ohne die Korrektur schlagen alle 7 fehl) sowie ein kanonischer strukturierter Wert bleibt automatisch.
+- Gezielt grün: ToolArgumentProvenanceTest 40, InternalTargetProvenanceTest 18, ToolExecutionServiceTest 23, ChatApiIntegrationTest 45. Gemäß AGENTS.md / Review rounds für diesen minor keine neue volle CI und keine Review-Runde; maßgeblicher CI-Nachweis bleibt `ci/evidence/20261122-184320/` auf `b4fe684`.
+- Folgepunkt unverändert (info): `view()` bricht offene Karten auch bei vorübergehenden Lesefehlern ab, Fundstellen werden je Karte/Nachricht neu aufgelöst. Aufbewahrung von `tool_question` sowie die 5 Dependabot-Warnungen bleiben separate Folgeaufgaben.
