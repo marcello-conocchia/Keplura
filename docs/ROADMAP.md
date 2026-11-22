@@ -16,7 +16,7 @@ be started, decomposed or tasked without explicit PO approval.**
 
 ## Aktuelle Priorität — Tool Use (PO-beschlossen 21.11.2026)
 
-**Arbeitsziel für die nächsten Tage: Kepluras Tool Use mindestens auf den dokumentierten Funktionsumfang von Open WebUI bringen.** Verbindliche Reihenfolge und Abnahmeziele: [TOOL_USE_PLAN.md](TOOL_USE_PLAN.md). TU-01, TU-02, TU-03 und TU-04a sind abgeschlossen (PRs #15/#17/#19/#21/#23/#26, Merges 1296cdb/8f6852a/5c25bfa/b1b9e72/37362d7/841ae00). Nächste einzelne Implementierungsaufgabe: [TU-04b](tasks/TU-04b-document-read-tool.md), Dokumentstellen lesen als eingebautes Werkzeug als zweiter Teil von TU-04, geplant und noch nicht gestartet.
+**Arbeitsziel für die nächsten Tage: Kepluras Tool Use mindestens auf den dokumentierten Funktionsumfang von Open WebUI bringen.** Verbindliche Reihenfolge und Abnahmeziele: [TOOL_USE_PLAN.md](TOOL_USE_PLAN.md). TU-01, TU-02, TU-03, TU-04a und TU-04b sind abgeschlossen (PRs #15/#17/#19/#21/#23/#26/#28, Merges 1296cdb/8f6852a/5c25bfa/b1b9e72/37362d7/841ae00/8e88e8d). Nächste einzelne Implementierungsaufgabe: [TU-04c](tasks/TU-04c-attachment-tools.md), Anhänge auflisten, durchsuchen und lesen als dritter Teil von TU-04, geplant und noch nicht gestartet.
 
 Reihenfolge: gemeinsame Grundlage → Bestätigungen/Aufrufanzeige → mehrstufige Ausführung → Wissen/Anhänge/Web → Auswahl/Tool-Suche/Rückfragen → Adapter/OAuth/Medien → zusätzliche Fähigkeiten einzeln. Eine aktive Implementierung; bestehende Sicherheitsbefunde und Gates bleiben verbindlich. Kein Fertigstellungstermin für den Gesamtumfang zugesagt.
 

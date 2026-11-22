@@ -8,7 +8,7 @@ Diese Reihenfolge ersetzt ältere allgemeine Angaben zur nächsten UI-/Roadmap-A
 
 ## Verbindliche Reihenfolge
 
-**TU-01, TU-02, TU-03 und TU-04a sind abgeschlossen und auf main (PRs #15/#17, #19/#21/#23 für TU-03a/b/c und #26 für TU-04a, Merges `1296cdb`/`8f6852a`/`5c25bfa`/`b1b9e72`/`37362d7`/`841ae00`, 21./22.11.2026). Nächste einzelne Aufgabe ist TU-04b: Dokumentstellen lesen als eingebautes READ-Werkzeug als zweiter Teil von TU-04. TU-04–TU-07 sind noch nicht abgeschlossen.** Genau eine aktive Implementierungsaufgabe. Größere Schritte werden bei Bedarf in kleine PRs zerlegt; nur die unmittelbar nächste Implementierungsaufgabe wird konkret angelegt.
+**TU-01, TU-02, TU-03, TU-04a und TU-04b sind abgeschlossen und auf main (PRs #15/#17, #19/#21/#23 für TU-03a/b/c, #26 für TU-04a und #28 für TU-04b, Merges `1296cdb`/`8f6852a`/`5c25bfa`/`b1b9e72`/`37362d7`/`841ae00`/`8e88e8d`, 21./22.11.2026). Nächste einzelne Aufgabe ist TU-04c: Anhänge auflisten, durchsuchen und lesen als dritter Teil von TU-04. TU-04–TU-07 sind noch nicht abgeschlossen.** Genau eine aktive Implementierungsaufgabe. Größere Schritte werden bei Bedarf in kleine PRs zerlegt; nur die unmittelbar nächste Implementierungsaufgabe wird konkret angelegt.
 
 | Schritt | Umfang | Abnahmeziel |
 | --- | --- | --- |
@@ -39,7 +39,7 @@ Nach jedem Merge PROJECT_STATE.md mit tatsächlichem Stand, Belegen und nächste
 
 ## Unmittelbar nächste Aufgabe
 
-**TU-04b — Dokumentstellen lesen**, siehe [Spec](tasks/TU-04b-document-read-tool.md). Implementiert in Draft-PR #28; Linux-CI auf `8665d0d` grün, Nachweis `ci/evidence/20261122-195911/`; unabhängiges Review durch Claude ausstehend, nicht gemergt. Das Modell kann zu einem Treffer der Wissenssuche derselben Frage den umgebenden Abschnitt lesen (begrenztes Fenster benachbarter Chunks), mit Rechteprüfung bei jedem Zugriff, nur Fundstellen gespeichert und dieselbe Herkunftsprüfung wie TU-04a. Erledigt: TU-03 vollständig (PRs #19/#21/#23) und [TU-04a](tasks/TU-04a-knowledge-search-tool.md) interne Wissenssuche mit Herkunftsprüfung (PR #26). Weitere TU-04-Teile (Anhänge, Websuche, Webseitenabruf) folgen einzeln.
+**TU-04c — Anhänge als Werkzeuge**, siehe [Spec](tasks/TU-04c-attachment-tools.md). Geplant, nicht gestartet. Das Modell kann die Anhänge des eigenen Chats auflisten, darin wörtlich suchen und begrenzte Stellen lesen; nur Fundstellen gespeichert, Herkunftsprüfung wie TU-04a. Erledigt: TU-03 vollständig (PRs #19/#21/#23), [TU-04a](tasks/TU-04a-knowledge-search-tool.md) interne Wissenssuche mit Herkunftsprüfung (PR #26), [TU-04b](tasks/TU-04b-document-read-tool.md) Dokumentstellen lesen (PR #28). Danach in TU-04 offen: Websuche und Webseitenabruf als Werkzeuge.
 
 ## Vergleichsquellen (abgerufen am 21.11.2026)
 

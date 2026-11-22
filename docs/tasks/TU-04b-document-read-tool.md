@@ -1,6 +1,6 @@
 # TU-04b — Dokumentstellen lesen
 
-Status: **implementiert in Draft-PR #28; Linux-CI grün, unabhängiges Code-/Security-Review durch Claude ausstehend. Nicht gemergt.** Zweite Aufgabe von TU-04 nach TU-04a (PR #26, Merge `841ae00`), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Dokumentrechte, Datenquellen, Modell-/Werkzeugschleife.
+Status: **abgeschlossen, auf main** — PR #28, Squash-Merge `8e88e8d` (22.11.2026), Baum identisch mit freigegebenem Head `909ede8`. Linux-CI Exit 0 auf Produktcommit `8665d0d`, Evidence `ci/evidence/20261122-195911/`; unabhängige Code-/Security-Freigabe durch Claude auf `909ede8` (zwei info-Folgepunkte, siehe PROJECT_STATE). Zweite Aufgabe von TU-04 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md); nächster Schritt [TU-04c](TU-04c-attachment-tools.md). Klasse A: Dokumentrechte, Datenquellen, Modell-/Werkzeugschleife.
 
 ## Ziel
 
