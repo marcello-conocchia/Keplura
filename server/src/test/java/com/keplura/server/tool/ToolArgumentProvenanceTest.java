@@ -73,4 +73,26 @@ class ToolArgumentProvenanceTest {
         assertThat(allowed("{\"ids\":[\"alpha\",\"beta\",\"gamma\",\"delta\",\"epsilon\",\"zeta\",\"theta\",\"iota\"]}",s)).isTrue();
         assertThat(allowed("{\"ids\":[\"alpha\",\"beta\",\"gamma\",\"delta\",\"epsilon\",\"zeta\",\"theta\",\"iota\",\"kappa\"]}",s)).isFalse();
     }
+
+    /** Re-review PR #26 (Codex, minor): structured schema values must not bypass the canonical-text check. */
+    @ParameterizedTest
+    @ValueSource(strings={
+            "{\"type\":\"object\",\"default\":{\"q\":\"public\\u2009ticket\"}}",
+            "{\"type\":\"object\",\"const\":{\"q\":\"public\\u2009ticket\"}}",
+            "{\"type\":\"object\",\"enum\":[{\"q\":\"public\\u2009ticket\"}]}",
+            "{\"type\":\"array\",\"default\":[\"public\\u2009ticket\"]}",
+            "{\"type\":\"object\",\"default\":{\"q\":[\"public  ticket\"]}}",
+            "{\"type\":\"object\",\"default\":{\"q\":\"cafe\\u0301\"}}",
+            "{\"type\":\"object\",\"default\":{\"k\\u2009ey\":\"public ticket\"}}"})
+    void structuredSchemaValuesNeedCanonicalTextToo(String rawSchema) {
+        var structured=mapper.readTree(rawSchema);
+        var args=structured.has("default")?structured.get("default"):structured.has("const")?structured.get("const"):structured.get("enum").get(0);
+        // the value equals the schema block exactly, but its strings are not canonical → card
+        assertThat(ToolArgumentProvenance.allowed(args,structured,sources("unrelated"))).isFalse();
+    }
+
+    @Test void canonicalStructuredSchemaValuesStayAutomatic() {
+        var structured=mapper.readTree("{\"type\":\"object\",\"default\":{\"q\":\"public ticket\",\"tags\":[\"a b\",\"café\"]}}");
+        assertThat(ToolArgumentProvenance.allowed(structured.get("default"),structured,sources("unrelated"))).isTrue();
+    }
 }

@@ -111,8 +111,21 @@ public final class ToolArgumentProvenance {
 
     private static boolean same(JsonNode a, JsonNode b) {
         // Schema values too: the raw spelling must be canonical, otherwise whitespace/NFD would carry data.
-        if (a.isString() && b.isString()) return canonicalText(a.asString())
-                && normalized(a.asString()).equals(normalized(b.asString()));
+        // Structured enum/const/default values (objects, lists) are checked recursively, keys included.
+        if (!allCanonical(a)) return false;
+        if (a.isString() && b.isString()) return normalized(a.asString()).equals(normalized(b.asString()));
         return a.equals(b);
+    }
+
+    private static boolean allCanonical(JsonNode value) {
+        if (value.isString()) return canonicalText(value.asString());
+        if (value.isObject()) {
+            for (var e : value.properties()) if (!canonicalText(e.getKey()) || !allCanonical(e.getValue())) return false;
+            return true;
+        }
+        if (value.isArray()) {
+            for (JsonNode item : value) if (!allCanonical(item)) return false;
+        }
+        return true;
     }
 }
