@@ -1,0 +1,38 @@
+ci-local gate — run 20261122-121520  (repo: /review/repo)
+head: 578370a | suites: none
+[native reader] 12:15:20: cargo build + cargo test --locked
+[1/4] server  12:15:20: mvn package (skipTests) + chunked surefire, forkCount=1, chunk=12
+  manifest: 86 test classes -> chunks of 12
+  chunk 1 (12 classes) 12:15:37
+  chunk 2 (12 classes) 12:16:36
+  chunk 3 (12 classes) 12:17:11
+  chunk 4 (12 classes) 12:17:57
+  chunk 5 (12 classes) 12:18:26
+  chunk 6 (12 classes) 12:19:08
+  chunk 7 (12 classes) 12:19:42
+  chunk 8 (2 classes) 12:20:20
+[2/4] desktop 12:20:27: npm ci + npm run build (vue-tsc typecheck)
+[3/4] tauri   12:20:46: cargo check --all-targets (src-tauri, Linux)
+all selected stages green — evidence: /review/repo/ci/evidence/20261122-121520
+
+================= RESULT MATRIX =================
+STAGE                        RESULT NOTE
+server:local-reader          PASS   locked Rust build and FD snapshot regressions
+server:package               PASS   compile + fat jar
+server:chunk-1               PASS   12 classes — [INFO] Tests run: 158, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-2               PASS   12 classes — [INFO] Tests run: 95, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-3               PASS   12 classes — [INFO] Tests run: 128, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-4               PASS   12 classes — [INFO] Tests run: 68, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-5               PASS   12 classes — [INFO] Tests run: 98, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-6               PASS   12 classes — [INFO] Tests run: 74, Failures: 0, Errors: 0, Skipped: 1
+server:chunk-7               PASS   12 classes — [INFO] Tests run: 138, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-8               PASS   2 classes — [INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+server:manifest-audit        PASS   86 classes, each exactly once in 8 chunks
+desktop:build                PASS   npm ci + vue-tsc + vite build
+desktop:cargo-check          PASS   cargo check --all-targets
+e2e                          SKIP   no suite selected (--suite/--with-e2e)
+-------------------------------------------------
+failed stages : 0
+exit code     : 0  (0 green / 1 test-fail / 2 gate-integrity / 3 resource-infra)
+evidence      : /review/repo/ci/evidence/20261122-121520
+=================================================
