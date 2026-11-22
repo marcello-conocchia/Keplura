@@ -8,7 +8,7 @@ Diese Reihenfolge ersetzt ältere allgemeine Angaben zur nächsten UI-/Roadmap-A
 
 ## Verbindliche Reihenfolge
 
-**TU-01, TU-02, TU-03a und TU-03b sind auf main (PRs #15/#17/#19/#21, Merges `1296cdb`/`8f6852a`/`5c25bfa`/`b1b9e72`, 21./22.11.2026). Nächste einzelne Aufgabe ist TU-03c: eine bestätigungspflichtige Folgeaktion aus einem bestätigten Ergebnis als letzter Teil von TU-03. TU-03–TU-07 sind noch nicht abgeschlossen.** Genau eine aktive Implementierungsaufgabe. Größere Schritte werden bei Bedarf in kleine PRs zerlegt; nur die unmittelbar nächste Implementierungsaufgabe wird konkret angelegt.
+**TU-01, TU-02 und TU-03 sind abgeschlossen und auf main (PRs #15/#17 und #19/#21/#23 für TU-03a/b/c, Merges `1296cdb`/`8f6852a`/`5c25bfa`/`b1b9e72`/`37362d7`, 21./22.11.2026). Nächste einzelne Aufgabe ist TU-04a: interne Wissenssuche als eingebautes READ-Werkzeug als erster Teil von TU-04. TU-04–TU-07 sind noch nicht abgeschlossen.** Genau eine aktive Implementierungsaufgabe. Größere Schritte werden bei Bedarf in kleine PRs zerlegt; nur die unmittelbar nächste Implementierungsaufgabe wird konkret angelegt.
 
 | Schritt | Umfang | Abnahmeziel |
 | --- | --- | --- |
@@ -39,7 +39,7 @@ Nach jedem Merge PROJECT_STATE.md mit tatsächlichem Stand, Belegen und nächste
 
 ## Unmittelbar nächste Aufgabe
 
-**TU-03c — abhängige Folgeaktion mit konkreter Bestätigung**, siehe [Spec](tasks/TU-03c-dependent-action.md). Implementiert auf feat/tool-use-dependent-action; lokale Linux-CI auf 7e05e92 grün (729 Tests, 1 übersprungen; Evidence ci/evidence/20261122-105648/), unabhängige Prüfung durch Claude offen, nicht gemergt. In der einmaligen Fortsetzung nach einem bestätigten Ergebnis darf das Modell höchstens eine weitere WRITE/CRITICAL-Aktion vorschlagen; sie wird nie automatisch ausgeführt, sondern immer als Karte mit konkreter Bestätigung vorgelegt, auch bei WRITE. Doppelte Aktionen derselben Frage sind gesperrt. Erledigt: [TU-03a](tasks/TU-03a-read-loop.md) — mehrstufige READ-Folgeaufrufe (PR #19); [TU-03b](tasks/TU-03b-confirmed-continuation.md) — einmalige Fortsetzung nach Bestätigung (PR #21). Mit TU-03c ist TU-03 inhaltlich vollständig; die Phase gilt erst nach dessen Merge als abgeschlossen.
+**TU-04a — interne Wissenssuche als Werkzeug**, siehe [Spec](tasks/TU-04a-knowledge-search-tool.md). Geplant, nicht gestartet. PO-Entscheidung 22.11.2026: Variante A — nach einer internen Wissenssuche mit Treffern keine externen READ-Werkzeuge mehr in derselben Frage. Das Modell kann in den Wissensbasen des Chats gezielt nachsuchen, mit Rechteprüfung bei jedem Aufruf und Zitaten; eingebautes READ-Werkzeug, standardmäßig aus, Adminfreigabe je Organisation. Dazu der vorbestehende Befund zur Zahlenprüfung (nicht endliche Zahlen vor der Kanonisierung sperren). Erledigt: TU-03 vollständig — [TU-03a](tasks/TU-03a-read-loop.md) mehrstufige READ-Folgeaufrufe (PR #19), [TU-03b](tasks/TU-03b-confirmed-continuation.md) einmalige Fortsetzung nach Bestätigung (PR #21), [TU-03c](tasks/TU-03c-dependent-action.md) eine bestätigungspflichtige Folgeaktion (PR #23). Weitere TU-04-Teile (Dokumentstellen lesen, Anhänge, Websuche, Webseitenabruf) folgen einzeln.
 
 ## Vergleichsquellen (abgerufen am 21.11.2026)
 
