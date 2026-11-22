@@ -39,6 +39,7 @@ class ChatToolLoopTest {
         List<JsonNode> arguments = new ArrayList<>();
         boolean approved = true;
         String fingerprint = "fp";
+        JsonNode schema = M.readTree("{\"type\":\"object\"}");
         boolean fail;
         Runnable duringInvoke = () -> { };
         @Override public String kind() { return "fixture"; }
@@ -48,7 +49,7 @@ class ChatToolLoopTest {
         }
         ToolDefinition def(String name, ToolRisk risk) {
             return new ToolDefinition("fixture:1:" + name, kind(), name, name, 1L, "Fixture", "desc",
-                    M.readTree("{\"type\":\"object\"}"), risk, approved, fingerprint);
+                    schema, risk, approved, fingerprint);
         }
         @Override public String invoke(ToolDefinition t, JsonNode args) {
             calls.add(t.toolName()); arguments.add(args);
@@ -100,6 +101,180 @@ class ChatToolLoopTest {
     }
     private GatewayClient.UpstreamStream run() { return loop.run(1L, 1L, ctx, "Find ticket", ChatProperties.of("test", 5, 2, 200, 100), config); }
     private String text() throws Exception { try (var stream = run()) { return new String(stream.body().readAllBytes(), StandardCharsets.UTF_8); } }
+
+    private ToolExecutionService.Decision.Done decide(boolean confirm) throws Exception {
+        script = (i,b) -> i==0 ? plan(call("critical", "{}")) : answer("Waiting");
+        text();
+        var card = execution.cards(1L,1L,1L).getFirst();
+        var done = (ToolExecutionService.Decision.Done) execution.decide(1L,1L,1L,card.id(),confirm);
+        assertThat(done.continuationToken()).isNotNull();
+        return done;
+    }
+    private ToolExecutionService.Continuation take(ToolExecutionService.Decision.Done done) {
+        return execution.takeContinuation(1L,1L,1L,done.card().id(),done.continuationToken());
+    }
+    private String resume(ToolExecutionService.Decision.Done done) throws Exception {
+        var continuation = take(done);
+        assertThat(continuation).isNotNull();
+        try (var stream = loop.resume(ctx,continuation,ChatProperties.of("test",5,2,200,100),config)) {
+            return new String(stream.body().readAllBytes(),StandardCharsets.UTF_8);
+        }
+    }
+
+    @Test void confirmedResultResumesOnceWithReadThenGroundedAnswer() throws Exception {
+        var done = decide(true);
+        script = (i,b) -> {
+            if (i==2) {
+                assertThat(b.path("messages").toString()).contains("bereits genau einmal", "resolved").doesNotContain("UNTRUSTED_HISTORY");
+                return plan(call("detail","{\"ticketId\":\"T-1\"}"));
+            }
+            return answer("Confirmed and resolved");
+        };
+        assertThat(resume(done)).contains("Confirmed and resolved");
+        assertThat(adapter.calls).containsExactly("critical","detail");
+        assertThat(requests).hasSize(5);
+        assertThat(requests.getLast().has("tools")).isFalse();
+        assertThat(requests.getLast().path("messages").toString()).contains("UNTRUSTED_HISTORY");
+        assertThat(take(done)).isNull();
+        assertThat(execution.decide(1L,1L,1L,done.card().id(),true)).isInstanceOf(ToolExecutionService.Decision.Conflict.class);
+        assertThat(jdbc.queryForObject("select model_requests from tool_question",Integer.class)).isEqualTo(5);
+        assertThat(execution.cards(1L,1L,1L)).allMatch(c -> c.promptMessageId()==1L);
+    }
+
+    @Test void rejectedResultResumesWithoutExecutingTheCriticalAction() throws Exception {
+        var done = decide(false);
+        script = (i,b) -> {
+            assertThat(b.path("messages").toString()).contains("abgelehnt", "NICHT ausgeführt");
+            return answer("Nothing executed");
+        };
+        assertThat(resume(done)).contains("Nothing executed");
+        assertThat(adapter.calls).isEmpty();
+        assertThat(take(done)).isNull();
+    }
+
+    @Test void resumedModelCannotRepeatCriticalOrIntroduceWriteActions() throws Exception {
+        var done = decide(true);
+        script = (i,b) -> i==2 ? plan(call("critical","{}"),call("write","{}"),call("detail","{}")) : answer("Safe");
+        resume(done);
+        assertThat(adapter.calls).containsExactly("critical","detail");
+        assertThat(execution.cards(1L,1L,1L)).filteredOn(c -> c.status().equals("BLOCKED")).hasSize(2);
+        assertThat(requests.get(2).path("tools").toString()).doesNotContain("\"name\":\"write\"","\"name\":\"critical\"");
+    }
+
+    @Test void roundApiAutomaticallySealsPolicyInsideTheService() {
+        var turn = execution.openTurn(execution.resolveContext(1L,1L,1L),1L);
+        assertThat(turn.beginRound()).isTrue();
+        turn.call("search","{}");
+        assertThat(turn.beginRound()).isTrue();
+        turn.call("write","{}"); turn.call("critical","{}");
+        assertThat(adapter.calls).containsExactly("search");
+        assertThat(execution.cards(1L,1L,1L)).noneMatch(c -> c.status().equals("PENDING"));
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings={"new-question","stop","membership","approval","target","space","schema","expired"})
+    void invalidatedDecisionCannotStartAModelRequest(String change) throws Exception {
+        var done = decide(true);
+        switch(change) {
+            case "new-question" -> question(2);
+            case "stop" -> execution.stop(1L,1L,1L);
+            case "membership" -> jdbc.update("delete from membership where user_id=1");
+            case "approval" -> adapter.approved=false;
+            case "target" -> adapter.fingerprint="changed";
+            case "schema" -> adapter.schema=M.readTree("{\"type\":\"object\",\"additionalProperties\":false}");
+            case "expired" -> jdbc.update("update tool_question set continuation_expires_at=?",Timestamp.from(Instant.now().minusSeconds(1)));
+            case "space" -> {
+                jdbc.update("insert into space(id,org_id,name,created_at) values(2,1,'Other',current_timestamp)");
+                jdbc.update("update chat_conversation set space_id=2 where id=1");
+            }
+        }
+        assertThat(take(done)).isNull();
+        assertThat(requests).hasSize(2); assertThat(adapter.calls).containsExactly("critical");
+    }
+
+    @Test void concurrentContinuationsHaveExactlyOneWinner() throws Exception {
+        var done = decide(true);
+        try (var pool = java.util.concurrent.Executors.newFixedThreadPool(8)) {
+            var futures = new ArrayList<java.util.concurrent.Future<ToolExecutionService.Continuation>>();
+            for(int i=0;i<12;i++) futures.add(pool.submit(() -> take(done)));
+            int winners=0;
+            for(var future:futures) if(future.get()!=null) winners++;
+            assertThat(winners).isEqualTo(1);
+        }
+        assertThat(requests).hasSize(2); assertThat(adapter.calls).containsExactly("critical");
+    }
+
+    @Test void exhaustedModelBudgetCannotBeResetByContinuation() throws Exception {
+        var done = decide(true);
+        jdbc.update("update tool_question set model_requests=5");
+        assertThat(resume(done)).contains("Modellbudget");
+        assertThat(requests).hasSize(2); assertThat(adapter.calls).containsExactly("critical");
+    }
+
+    @Test void exhaustedAttemptBudgetAllowsOnlyToolsDisabledCompletion() throws Exception {
+        var done = decide(true);
+        jdbc.update("update tool_question set attempts=8");
+        script = (i,b) -> {
+            assertThat(b.has("tools")).isFalse();
+            return plan(call("detail","{}"));
+        };
+        resume(done);
+        assertThat(requests).hasSize(3); assertThat(adapter.calls).containsExactly("critical");
+        assertThat(jdbc.queryForObject("select attempts from tool_question",Integer.class)).isEqualTo(8);
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings={"target","stop","new-question"})
+    void stopOrChangedTargetDuringContinuationDiscardsLateRead(String change) throws Exception {
+        var done = decide(true);
+        script = (i,b) -> {
+            switch(change) {
+                case "target" -> adapter.fingerprint="changed";
+                case "stop" -> execution.stop(1L,1L,1L);
+                case "new-question" -> question(2);
+            }
+            return plan(call("detail","{}"));
+        };
+        assertThat(resume(done)).contains("gestoppt");
+        assertThat(adapter.calls).containsExactly("critical");
+        assertThat(ctx.interrupted().get()).isTrue();
+    }
+
+    @Test void initialCallsAndContinuationShareExactlyEightAttempts() throws Exception {
+        JsonNode[] calls={call("critical","{}"),call("search","{}"),call("search","{}"),call("search","{}"),
+                call("search","{}"),call("search","{}"),call("search","{}")};
+        script=(i,b) -> i==0 ? plan(calls) : answer("Waiting");
+        text();
+        var card=execution.cards(1L,1L,1L).getFirst();
+        var done=(ToolExecutionService.Decision.Done)execution.decide(1L,1L,1L,card.id(),true);
+        script=(i,b) -> i==2 ? plan(call("detail","{}"),call("detail","{}"),call("detail","{}")) : answer("Done");
+        resume(done);
+        assertThat(adapter.calls).hasSize(8);
+        assertThat(adapter.calls.stream().filter("critical"::equals)).hasSize(1);
+        assertThat(adapter.calls.stream().filter("detail"::equals)).hasSize(1);
+        assertThat(requests).hasSize(4);
+        assertThat(requests.getLast().has("tools")).isFalse();
+        assertThat(jdbc.queryForObject("select attempts from tool_question",Integer.class)).isEqualTo(8);
+    }
+
+    @Test void failedResumedModelRequestNeverFallsBackOrReplays() throws Exception {
+        var done=decide(true);
+        script=(i,b) -> { throw new GatewayException.ToolsUnsupported(); };
+        assertThatThrownBy(() -> resume(done)).isInstanceOf(GatewayException.ToolsUnsupported.class);
+        assertThat(take(done)).isNull();
+        assertThat(requests).hasSize(3); assertThat(adapter.calls).containsExactly("critical");
+    }
+
+    @Test void confirmationExpiryDoesNotInvalidateFreshDecisionCapability() throws Exception {
+        var done=decide(true);
+        jdbc.update("update tool_call set expires_at=?",Timestamp.from(Instant.now().minusSeconds(1)));
+        script=(i,b) -> answer("Already executed");
+        assertThat(resume(done)).contains("Already executed");
+        assertThat(requests.getLast().path("messages").toString())
+                .contains("bereits genau einmal", "abgelehnte, offene oder gesperrte")
+                .doesNotContain("Ein vorgelegter oder gesperrter Aufruf wurde nicht ausgeführt");
+        assertThat(adapter.calls).containsExactly("critical");
+    }
 
     @Test void resultDrivesReadFollowupAndCardsKeepOneQuestion() throws Exception {
         script = (i, b) -> i == 0 ? plan(call("search", "{}"))
@@ -249,6 +424,8 @@ class ChatToolLoopTest {
         script = (i,b) -> { throw new GatewayException.ToolsUnsupported(); };
         assertThat(run()).isNull(); assertThat(adapter.calls).isEmpty();
         requests.clear();
+        question(2);
+        ctx = new ChatService.TurnContext(1L,"[]",ctx.canonicalRequestBody(),false,2L);
         script = (i,b) -> { if (i == 0) return plan(call("search", "{}")); throw new GatewayException.ToolsUnsupported(); };
         assertThatThrownBy(this::run).isInstanceOf(GatewayException.ToolsUnsupported.class);
         assertThat(adapter.calls).containsExactly("search"); assertThat(requests).hasSize(2);

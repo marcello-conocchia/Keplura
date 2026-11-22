@@ -6,6 +6,7 @@ import {
   CHAT_PROMPT_MAX_LENGTH,
   createConversation,
   decideToolCall,
+  continueToolCall,
   deleteConversation,
   stopToolCalls,
   fetchTranscript,
@@ -86,7 +87,7 @@ function cardsAt(index: number): ToolCallCardDto[] {
 }
 /** One decision at a time; the server consumes the pending call exactly once anyway. */
 async function decideCard(card: ToolCallCardDto, decision: "confirm" | "reject") {
-  if (decidingCard.value !== null) return;
+  if (decidingCard.value !== null || streaming.value) return;
   const s = scoped();
   const conversationId = activeId.value;
   if (!s || conversationId === null) return;
@@ -99,6 +100,31 @@ async function decideCard(card: ToolCallCardDto, decision: "confirm" | "reject")
       toolCalls.value = replaceCard(toolCalls.value, outcome.card);
       if (outcome.kind === "conflict") {
         cardError.value = { id: card.id, message: tr("Dieser Aufruf wurde bereits entschieden oder ist nicht mehr offen.") };
+      }
+      if (outcome.kind === "ok" && outcome.continuationToken) {
+        streaming.value = true;
+        streamedText.value = "";
+        streamCitations.value = [];
+        const continuationController = new AbortController();
+        stopController = continuationController;
+        try {
+          const continued = await continueToolCall(s.orgId, conversationId, card.id, outcome.continuationToken,
+            (event) => {
+              if (activeId.value !== conversationId) return;
+              if (event.kind === "delta") streamedText.value += event.text;
+              if (event.kind === "citations") streamCitations.value = event.citations;
+            }, continuationController.signal);
+          if (continued.kind === "unauthorized") auth.dropExpiredSession();
+          if (continued.kind === "error" && activeId.value === conversationId) {
+            cardError.value = { id: card.id, message: tr("Die Fortsetzung ist nicht mehr verfügbar. Bitte stelle eine neue Frage.") };
+          }
+        } finally {
+          if (stopController === continuationController) {
+            stopController = null;
+            streaming.value = false;
+          }
+          if (activeId.value === conversationId) await readBackTranscript(s.orgId, conversationId, false);
+        }
       }
     } else if (outcome.kind === "expired") {
       auth.dropExpiredSession();

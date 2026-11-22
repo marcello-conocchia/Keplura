@@ -475,6 +475,46 @@ class ChatApiIntegrationTest {
                 Long.valueOf(chat))).isZero();
     }
 
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings={"confirm","reject"})
+    void decisionWinnerCanContinueOnceWithCsrfAndOwnership(String decision) {
+        String[] scope=fixtureChain(false);
+        var fixture=enableFixtureTools(); fixture.risk=com.keplura.server.tool.ToolRisk.CRITICAL;
+        String chat=createConversation(scope[0],scope[1],scope[2],Map.of());
+        stubToolMode="one-call";
+        assertThat(exchange("POST",streamPath(scope[1],chat),scope[0],Map.of("prompt","Use echo once")).getStatusCode().value()).isEqualTo(200);
+        var json=tools.jackson.databind.json.JsonMapper.builder().build();
+        var before=json.readTree(exchange("GET",transcriptPath(scope[1],chat),scope[0],null).getBody());
+        String cardId=before.path("toolCalls").get(0).path("id").asString();
+        String base=transcriptPath(scope[1],chat)+"/tool-calls/"+cardId;
+        var decided=exchange("POST",base+"/decision",scope[0],Map.of("decision",decision));
+        String token=json.readTree(decided.getBody()).path("continuationToken").asString();
+        assertThat(token).hasSize(36);
+        assertThat(exchange("GET",transcriptPath(scope[1],chat),scope[0],null).getBody()).doesNotContain(token,"continuationToken");
+        var noCsrf=rest.exchange(RequestEntity.post(URI.create(base+"/continue")).header(HttpHeaders.COOKIE,scope[0])
+                .contentType(MediaType.APPLICATION_JSON).body(Map.of("token",token)),String.class);
+        assertThat(noCsrf.getStatusCode().value()).isEqualTo(403);
+        String stranger=loginFreshUser("continue-stranger");
+        assertThat(exchange("POST",base+"/continue",stranger,Map.of("token",token)).getStatusCode().value()).isIn(403,404,409);
+        String otherOrg=fixtureChain(false)[1];
+        assertThat(exchange("POST",base.replace("/orgs/"+scope[1]+"/","/orgs/"+otherOrg+"/")+"/continue",scope[0],Map.of("token",token)).getStatusCode().value()).isIn(403,404,409);
+        assertThat(exchange("POST",base+"/continue",scope[0],Map.of("token","wrong")).getStatusCode().value()).isEqualTo(409);
+        assertThat(toolBodies).hasSize(2);
+        var resumed=exchange("POST",base+"/continue",scope[0],Map.of("token",token,"prompt","injected","arguments",Map.of("x",1)));
+        assertThat(resumed.getStatusCode().value()).isEqualTo(200);
+        assertThat(resumed.getBody()).contains("Werkzeugantwort");
+        assertThat(toolBodies).hasSize(3);
+        assertThat(toolBodies.getLast()).doesNotContain("injected",token,"\"tools\"");
+        assertThat(fixture.invocations.get()).isEqualTo(decision.equals("confirm")?1:0);
+        assertThat(exchange("POST",base+"/continue",scope[0],Map.of("token",token)).getStatusCode().value()).isEqualTo(409);
+        assertThat(toolBodies).hasSize(3);
+        long conversationId=Long.parseLong(chat);
+        assertThat(jdbc.queryForObject("select count(*) from chat_message where conversation_id=? and role='assistant'",Integer.class,conversationId)).isEqualTo(2);
+        assertThat(jdbc.queryForObject("select count(distinct prompt_message_id) from chat_message where conversation_id=? and role='assistant'",Integer.class,conversationId)).isEqualTo(1);
+        assertThat(exchange("DELETE",transcriptPath(scope[1],chat),scope[0],null).getStatusCode().value()).isEqualTo(204);
+        assertThat(jdbc.queryForObject("select count(*) from tool_question where conversation_id=?",Integer.class,conversationId)).isZero();
+    }
+
     @Test void stopEndpointEndsPendingConfirmationsOwnerOnly() throws Exception {
         String[] scope = fixtureChain(false);
         var fixture = enableFixtureTools();

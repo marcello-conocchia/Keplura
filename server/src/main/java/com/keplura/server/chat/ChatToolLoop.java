@@ -36,6 +36,25 @@ final class ChatToolLoop {
         // Never recreate this object between rounds: its sealed policy and counters belong to the question.
         var turn = execution.openTurn(context, ctx.promptMessageId());
         if (turn.offered().isEmpty()) return null;
+        String webContext = "";
+        for (JsonNode message : mapper.readTree(ctx.canonicalRequestBody()).path("messages")) {
+            if (message.path("role").asString().equals("system") && message.path("content").asString("").startsWith(ChatService.WEB_SYSTEM_PROMPT)) {
+                webContext = message.path("content").asString();
+            }
+        }
+        turn.startQuestion(prompt, webContext);
+        return runLoop(ctx, prompt, chat, effective, turn, null, null);
+    }
+
+    GatewayClient.UpstreamStream resume(ChatService.TurnContext ctx, ToolExecutionService.Continuation continuation,
+                                         ChatProperties chat, GatewayProperties effective) {
+        return runLoop(ctx, continuation.state().prompt(), chat, effective, continuation.turn(),
+                continuation.state().dialogue(), continuation.decision());
+    }
+
+    private GatewayClient.UpstreamStream runLoop(ChatService.TurnContext ctx, String prompt, ChatProperties chat,
+            GatewayProperties effective, ToolExecutionService.ToolTurn turn, String savedDialogue, String decision) {
+        boolean continuation = savedDialogue != null;
         ObjectNode body = (ObjectNode) mapper.readTree(ctx.canonicalRequestBody());
         body.put("stream", false);
         ArrayNode evidence = (ArrayNode) body.get("messages");
@@ -46,15 +65,20 @@ final class ChatToolLoop {
                 + "Nach Ergebnissen sind ausschließlich freigegebene Lese-Folgeaufrufe möglich. "
                 + "Kritische Aufrufe warten auf eine konkrete Bestätigung und werden nicht automatisch fortgesetzt.");
         dialogue.addObject().put("role", "user").put("content", prompt);
+        if (continuation) {
+            dialogue = (ArrayNode) mapper.readTree(savedDialogue);
+            dialogue.addObject().put("role", "system").put("content",
+                    "Entscheidung der Person zum bereits geplanten Aufruf. Keine Wiederholung, nur READ-Folgeaufrufe.\n" + decision);
+        }
         List<String> used = new ArrayList<>();
         String model = chat.model();
         boolean finishRequested = false;
 
         for (int request = 0; request < MAX_MODEL_REQUESTS; request++) {
             if (!turn.active()) return interrupted(ctx, model, used);
-            if (request > 0) turn.readOnlyFollowups();
+            if (!turn.beginRound()) return buffered(model, used, "Das Modellbudget dieser Frage ist aufgebraucht. Es wurden keine weiteren Werkzeuge aufgerufen.");
             ArrayNode offered = turn.toolsJson();
-            boolean finalAnswer = finishRequested || request == MAX_MODEL_REQUESTS - 1 || turn.mustFinish() || offered.isEmpty();
+            boolean finalAnswer = finishRequested || turn.remainingModels() == 0 || turn.mustFinish() || offered.isEmpty();
             if (finalAnswer) {
                 body.remove("tools");
                 body.put("tool_choice", "none");
@@ -71,14 +95,14 @@ final class ChatToolLoop {
                 for (int i = 2; i < dialogue.size(); i++) messages.add(dialogue.get(i));
                 messages.addObject().put("role", "system").put("content",
                         "Erstelle jetzt die Abschlussantwort aus den verfügbaren Belegen. Keine weiteren Werkzeugaktionen. "
-                        + "Ein vorgelegter oder gesperrter Aufruf wurde nicht ausgeführt.");
+                        + "Beachte den protokollierten Status: Behaupte keine Ausführung für abgelehnte, offene oder gesperrte Aufrufe.");
                 body.set("messages", messages);
             }
             GatewayClient.BufferedUpstreamResponse response;
             try {
                 response = gateway.completeJson(mapper.writeValueAsBytes(body), chat.model(), effective);
             } catch (GatewayException.ToolsUnsupported unsupported) {
-                if (request == 0) return turn.active() ? null : interrupted(ctx, model, used);
+                if (request == 0 && !continuation) return turn.active() ? null : interrupted(ctx, model, used);
                 throw unsupported; // no retries, even if every earlier attempt was blocked
             } catch (GatewayException failure) {
                 if (!turn.active()) return interrupted(ctx, model, used);
@@ -97,9 +121,10 @@ final class ChatToolLoop {
             if (!message.isObject() || (!calls.isMissingNode() && !calls.isNull() && !calls.isArray())) {
                 throw new GatewayException(HttpStatus.BAD_GATEWAY, "model gateway upstream response invalid");
             }
+            if (finalAnswer) turn.checkpoint(dialogue, true);
             if (!calls.isArray() || calls.isEmpty()) {
                 // Before any execution, ordinary grounded streaming remains the fallback.
-                if (request == 0) return null;
+                if (request == 0 && !continuation) return null;
                 if (!finalAnswer) {
                     // Ground the answer with private evidence only after closing tool execution.
                     finishRequested = true;
@@ -130,6 +155,7 @@ final class ChatToolLoop {
                 if (outcome.invoked() && !used.contains(outcome.toolName())) used.add(outcome.toolName());
                 dialogue.addObject().put("role", "tool").put("tool_call_id", id).put("content", outcome.text());
             }
+            turn.checkpoint(dialogue, false);
         }
         // Every path normally returns on the fifth (tools-disabled) request.
         return buffered(model, used, REFUSED);

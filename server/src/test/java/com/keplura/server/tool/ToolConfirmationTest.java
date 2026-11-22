@@ -88,6 +88,82 @@ class ToolConfirmationTest {
                 System::nanoTime, now::get);
     }
 
+    @Test void simultaneousDifferentConfirmationsSerializeAndShareTime() throws Exception {
+        var turn = turn();
+        turn.call("f__delete", "{\"id\":\"one\"}");
+        turn.call("f__delete", "{\"id\":\"two\"}");
+        var cards = service.cards(user,orgId,chat);
+        assertThat(cards).hasSize(2);
+        var active = new java.util.concurrent.atomic.AtomicInteger();
+        var maxActive = new java.util.concurrent.atomic.AtomicInteger();
+        fake.onInvoke = () -> {
+            int current=active.incrementAndGet(); maxActive.accumulateAndGet(current,Math::max);
+            try { Thread.sleep(50); } catch(InterruptedException e) { throw new RuntimeException(e); }
+            now.updateAndGet(t -> t.plusSeconds(121));
+            active.decrementAndGet();
+        };
+        try(var pool=java.util.concurrent.Executors.newFixedThreadPool(2)) {
+            var start = new java.util.concurrent.CountDownLatch(1);
+            var first=pool.submit(() -> { start.await(); return service.decide(user,orgId,chat,cards.get(0).id(),true); });
+            var second=pool.submit(() -> { start.await(); return service.decide(user,orgId,chat,cards.get(1).id(),true); });
+            start.countDown();
+            assertThat(first.get()).isInstanceOf(ToolExecutionService.Decision.Done.class);
+            assertThat(second.get()).isInstanceOf(ToolExecutionService.Decision.Done.class);
+        }
+        assertThat(maxActive.get()).isEqualTo(1);
+        assertThat(fake.invocations.get()).isEqualTo(1);
+        assertThat(service.cards(user,orgId,chat)).filteredOn(c -> c.status().equals("BLOCKED")).hasSize(1);
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(booleans = {true, false})
+    void guardTimeoutMarksUnstartedCardBlocked(boolean critical) {
+        var clock = new java.util.concurrent.atomic.AtomicLong();
+        service = new ToolExecutionService(jdbc, List.of(fake), new ToolAuditLog(jdbc), new ToolCallStore(jdbc),
+                () -> clock.getAndAdd(ToolExecutionService.MAX_TOOL_TIME_PER_TURN.toNanos()), now::get);
+        assertGuardFailureIsBlocked(critical, false);
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(booleans = {true, false})
+    void interruptedGuardWaitMarksUnstartedCardBlocked(boolean critical) {
+        try {
+            assertGuardFailureIsBlocked(critical, true);
+            assertThat(Thread.currentThread().isInterrupted()).isTrue();
+        } finally {
+            Thread.interrupted(); // do not pass the test thread's interrupt to another test
+        }
+    }
+
+    private void assertGuardFailureIsBlocked(boolean critical, boolean interrupt) {
+        var turn = turn();
+        String callId = null;
+        if (critical) {
+            turn.call("f__delete", "{\"id\":\"one\"}");
+            callId = service.cards(user, orgId, chat).getFirst().id();
+        }
+        jdbc.update("insert into tool_execution_guard(prompt_message_id,conversation_id,lease) values(?,?,'crashed-holder')", promptId, chat);
+        if (interrupt) Thread.currentThread().interrupt();
+        if (critical) {
+            var done = (ToolExecutionService.Decision.Done) service.decide(user, orgId, chat, callId, true);
+            assertThat(done.card().status()).isEqualTo("BLOCKED");
+            assertThat(done.continuationToken()).isNull();
+            assertThat(service.decide(user, orgId, chat, callId, true)).isInstanceOf(ToolExecutionService.Decision.Conflict.class);
+        } else {
+            var outcome = turn.call("f__read", "{\"id\":\"one\"}");
+            assertThat(outcome.invoked()).isFalse();
+            assertThat(outcome.text()).contains("nicht aufgerufen");
+        }
+        assertThat(fake.invocations.get()).isZero();
+        assertThat(jdbc.queryForObject("select count(*) from tool_call_log", Integer.class)).isZero();
+        assertThat(jdbc.queryForObject("select lease from tool_execution_guard where prompt_message_id=?", String.class, promptId)).isEqualTo("crashed-holder");
+        now.updateAndGet(t -> t.plusSeconds(360));
+        assertThat(service.cards(user, orgId, chat)).singleElement().satisfies(card -> {
+            assertThat(card.status()).isEqualTo("BLOCKED");
+            assertThat(card.error()).contains("nicht aufgerufen");
+        });
+    }
+
     private long id(String sql) {
         var keys = new org.springframework.jdbc.support.GeneratedKeyHolder();
         jdbc.update(c -> c.prepareStatement(sql, new String[]{"id"}), keys);

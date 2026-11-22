@@ -627,7 +627,7 @@ export async function stopToolCalls(orgId: number, conversationId: number): Prom
 }
 
 export type ToolCallDecisionOutcome =
-  | { kind: "ok"; card: ToolCallCard }
+  | { kind: "ok"; card: ToolCallCard; continuationToken?: string }
   /** already decided, expired or cancelled — the card shows the server's current state */
   | { kind: "conflict"; card: ToolCallCard }
   | { kind: "gone" }
@@ -663,8 +663,8 @@ export async function decideToolCall(
   if (response.status === 404) return { kind: "gone" };
   if (response.status === 200 || response.status === 409) {
     try {
-      const card = (await response.json()) as ToolCallCard;
-      return response.status === 200 ? { kind: "ok", card } : { kind: "conflict", card };
+      const { continuationToken, ...card } = (await response.json()) as ToolCallCard & { continuationToken?: string };
+      return response.status === 200 ? { kind: "ok", card, continuationToken } : { kind: "conflict", card };
     } catch {
       return { kind: "error" };
     }
@@ -866,14 +866,27 @@ export async function streamChatTurn(
   stopSignal: AbortSignal,
   webSearch = false,
 ): Promise<ChatStreamOutcome> {
+  return streamChatRequest(`${serverUrl}/api/v1/orgs/${orgId}/chat/conversations/${conversationId}/stream`,
+    webSearch ? { prompt, webSearch: true } : { prompt }, onEvent, stopSignal);
+}
+
+/** Only called immediately by the winning decision; never retried or restored from a transcript. */
+export async function continueToolCall(orgId: number, conversationId: number, callId: string, token: string,
+  onEvent: (event: ChatStreamEvent) => void, stopSignal: AbortSignal): Promise<ChatStreamOutcome> {
+  return streamChatRequest(`${serverUrl}/api/v1/orgs/${orgId}/chat/conversations/${conversationId}/tool-calls/${encodeURIComponent(callId)}/continue`,
+    { token }, onEvent, stopSignal);
+}
+
+async function streamChatRequest(url: string, body: object,
+  onEvent: (event: ChatStreamEvent) => void, stopSignal: AbortSignal): Promise<ChatStreamOutcome> {
   let response: Response;
   try {
     response = await desktopFetch(
-      `${serverUrl}/api/v1/orgs/${orgId}/chat/conversations/${conversationId}/stream`,
+      url,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(webSearch ? { prompt, webSearch: true } : { prompt }),
+        body: JSON.stringify(body),
         signal: stopSignal,
       },
     );
