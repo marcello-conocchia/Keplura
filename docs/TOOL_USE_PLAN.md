@@ -8,7 +8,7 @@ Diese Reihenfolge ersetzt ältere allgemeine Angaben zur nächsten UI-/Roadmap-A
 
 ## Verbindliche Reihenfolge
 
-**TU-01, TU-02 und TU-03a sind auf main (PRs #15/#17/#19, Merges `1296cdb`/`8f6852a`/`5c25bfa`, 21.11.2026). Nächste einzelne Aufgabe ist TU-03b: begrenzte Fortsetzung nach konkreter Bestätigung als zweiter Teil von TU-03. TU-03–TU-07 sind noch nicht abgeschlossen.** Genau eine aktive Implementierungsaufgabe. Größere Schritte werden bei Bedarf in kleine PRs zerlegt; nur die unmittelbar nächste Implementierungsaufgabe wird konkret angelegt.
+**TU-01, TU-02, TU-03a und TU-03b sind auf main (PRs #15/#17/#19/#21, Merges `1296cdb`/`8f6852a`/`5c25bfa`/`b1b9e72`, 21./22.11.2026). Nächste einzelne Aufgabe ist TU-03c: eine bestätigungspflichtige Folgeaktion aus einem bestätigten Ergebnis als letzter Teil von TU-03. TU-03–TU-07 sind noch nicht abgeschlossen.** Genau eine aktive Implementierungsaufgabe. Größere Schritte werden bei Bedarf in kleine PRs zerlegt; nur die unmittelbar nächste Implementierungsaufgabe wird konkret angelegt.
 
 | Schritt | Umfang | Abnahmeziel |
 | --- | --- | --- |
@@ -39,7 +39,7 @@ Nach jedem Merge PROJECT_STATE.md mit tatsächlichem Stand, Belegen und nächste
 
 ## Unmittelbar nächste Aufgabe
 
-**TU-03b — begrenzte Fortsetzung nach konkreter Bestätigung**, siehe [Spec](tasks/TU-03b-confirmed-continuation.md). Implementiert auf feat/tool-use-confirmed-continuation; lokale Linux-CI auf 88c8669 grün (701 Tests, 1 übersprungen; Evidence ci/evidence/20261121-205038/), Code-/Security-Freigabe durch Claude auf 31c1849 liegt vor; minor Guard-Timeout/Interrupt korrigiert und gezielt geprüft, ohne neue volle CI gemäß Review-rounds-Regel, nicht gemergt. Nach einer ausdrücklichen Entscheidung zu einer CRITICAL-Karte setzt der Server dieselbe Frage einmal fort, mit Restbudget, nur READ-Folgeaufrufen und werkzeugloser Abschlussantwort. Erledigt: [TU-03a](tasks/TU-03a-read-loop.md) — Suchen → Detail lesen → Nachsuchen → Antwort mit READ-Folgeaufrufen (PR #19). Danach offen in TU-03: davon abhängige Schreibketten (eine weitere WRITE/CRITICAL-Aktion aus einem bestätigten Ergebnis). TU-03a und TU-03b allein erfüllen nicht die gesamte Phase.
+**TU-03c — abhängige Folgeaktion mit konkreter Bestätigung**, siehe [Spec](tasks/TU-03c-dependent-action.md). Geplant, nicht gestartet. In der einmaligen Fortsetzung nach einem bestätigten Ergebnis darf das Modell höchstens eine weitere WRITE/CRITICAL-Aktion vorschlagen; sie wird nie automatisch ausgeführt, sondern immer als Karte mit konkreter Bestätigung vorgelegt, auch bei WRITE. Doppelte Aktionen derselben Frage sind gesperrt. Erledigt: [TU-03a](tasks/TU-03a-read-loop.md) — mehrstufige READ-Folgeaufrufe (PR #19); [TU-03b](tasks/TU-03b-confirmed-continuation.md) — einmalige Fortsetzung nach Bestätigung (PR #21). Mit TU-03c ist TU-03 inhaltlich vollständig; die Phase gilt erst nach dessen Merge als abgeschlossen.
 
 ## Vergleichsquellen (abgerufen am 21.11.2026)
 
