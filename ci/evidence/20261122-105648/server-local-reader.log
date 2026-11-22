@@ -1,0 +1,15 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.11s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.01s
+     Running unittests src/main.rs (server/target/native-reader/debug/build/keplura-local-reader/9ee33be5d2c10f60/out/keplura_local_reader-9ee33be5d2c10f60)
+
+running 7 tests
+test tests::only_local_filesystems_are_supported_and_reasons_survive_io_errors ... ok
+test tests::leaf_replacement_never_pairs_old_acl_with_new_bytes ... ok
+test tests::extended_acl_and_read_limit_are_refused ... ok
+test tests::modification_during_copy_invalidates_the_entire_output ... ok
+test tests::symlinks_and_parent_traversal_are_refused ... ok
+test tests::changes_to_the_open_inode_are_refused ... ok
+test tests::replaced_parent_cannot_redirect_the_open_snapshot ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

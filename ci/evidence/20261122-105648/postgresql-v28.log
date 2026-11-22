@@ -1,0 +1,50 @@
+Applying V1__baseline.sql
+Applying V2__spaces.sql
+Applying V3__knowledge.sql
+Applying V4__chunks.sql
+Applying V6__chat.sql
+Applying V7__document_index_status.sql
+Applying V8__org_invites.sql
+Applying V9__user_role.sql
+Applying V10__ai_provider_model.sql
+Applying V11__oidc_provider.sql
+Applying V12__document_index_status_async.sql
+Applying V13__chunk_source_location.sql
+Applying V14__chat_message_feedback.sql
+Applying V15__user_must_change_password.sql
+Applying V16__datasources_and_access.sql
+Applying V17__quality_questions.sql
+Applying V18__data_source_sharepoint.sql
+Applying V19__prompt_templates.sql
+Applying V20__chat_kbs_attachments.sql
+Applying V21__web_search_settings.sql
+Applying V22__mcp_servers.sql
+Applying V23__mcp_stage2.sql
+Applying V24__datasource_exclude_patterns_longer.sql
+Applying V25__tool_foundation.sql
+Applying V26__tool_call_cards.sql
+Applying V27__tool_question_continuation.sql
+Applying V28__tool_dependent_action.sql
+                                         version                                          
+------------------------------------------------------------------------------------------
+ PostgreSQL 16.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 14.2.0) 14.2.0, 64-bit
+(1 row)
+
+BEGIN
+CREATE SCHEMA
+SET
+CREATE TABLE
+CREATE TABLE
+INSERT 0 1
+INSERT 0 1
+ALTER TABLE
+ALTER TABLE
+DO
+INSERT 0 1
+DO
+                                          result                                           
+-------------------------------------------------------------------------------------------
+ PASS: V28 additive upgrade, preserved rows, parent binding, single claim, exact arguments
+(1 row)
+
+ROLLBACK
