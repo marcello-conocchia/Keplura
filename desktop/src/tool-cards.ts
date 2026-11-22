@@ -32,6 +32,7 @@ export interface ToolCallCard {
   parentTool?: string | null;
   mayContainInternal?: boolean;
   sourceUnavailable?: boolean;
+  sourceTemporarilyUnavailable?: boolean;
 }
 
 export type Tone = "ok" | "wait" | "neutral" | "error" | "info";
@@ -63,7 +64,7 @@ export function riskLabel(risk: string | null): string {
 
 /** Only a PENDING card that needs confirmation and is not past its deadline can be decided. */
 export function canDecide(card: ToolCallCard, now: number = Date.now()): boolean {
-  if (card.sourceUnavailable || card.status !== "PENDING" || !card.needsConfirmation) return false;
+  if (card.sourceTemporarilyUnavailable || card.sourceUnavailable || card.status !== "PENDING" || !card.needsConfirmation) return false;
   if (!card.expiresAt) return false;
   const deadline = Date.parse(card.expiresAt);
   return Number.isFinite(deadline) && deadline > now;

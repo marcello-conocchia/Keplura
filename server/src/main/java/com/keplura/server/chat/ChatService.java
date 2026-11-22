@@ -280,15 +280,14 @@ public class ChatService {
                 conversation.getCreatedAt(), conversation.getUpdatedAt());
     }
 
-    @Transactional(readOnly = true)
+    // Reference reads use their own read transactions: one transient failure must not roll back the entire transcript.
     public TranscriptDto transcript(Long userId, Long orgId, Long conversationId) {
+        return com.keplura.server.search.ReferenceReadScope.run(() -> readTranscript(userId,orgId,conversationId));
+    }
+
+    private TranscriptDto readTranscript(Long userId,Long orgId,Long conversationId) {
         requireOrgMembership(userId, orgId);
         Conversation conversation = requireConversation(conversationId, orgId, userId);
-        List<MessageDto> messages = messageRepository.findTranscript(conversation.getId()).stream()
-                .sorted(java.util.Comparator.<ChatMessage, Long>comparing(m ->
-                        m.getPromptMessageId() == null ? m.getId() : m.getPromptMessageId()).thenComparing(ChatMessage::getId))
-                .map(m -> toDto(m,userId,orgId,conversation))
-                .toList();
         List<com.keplura.server.tool.ToolExecutionService.ToolCallView> toolCalls = List.of();
         if (toolExecution != null) {
             try {
@@ -298,6 +297,11 @@ public class ChatService {
                 log.warn("tool call cards unreadable (conversation={})", conversation.getId());
             }
         }
+        List<MessageDto> messages = messageRepository.findTranscript(conversation.getId()).stream()
+                .sorted(java.util.Comparator.<ChatMessage, Long>comparing(m ->
+                        m.getPromptMessageId() == null ? m.getId() : m.getPromptMessageId()).thenComparing(ChatMessage::getId))
+                .map(m -> toDto(m,userId,orgId,conversation))
+                .toList();
         return new TranscriptDto(conversation.getId(), messages, toolCalls);
     }
 
@@ -734,6 +738,10 @@ public class ChatService {
 
     /** Rebuild private RAG/attachments for the tools-disabled request; never reuse stale excerpts. */
     private byte[] refreshToolEvidence(Long userId,Long orgId,TurnContext ctx,ChatProperties chat) {
+        return com.keplura.server.search.ReferenceReadScope.run(() -> readToolEvidence(userId,orgId,ctx,chat));
+    }
+
+    private byte[] readToolEvidence(Long userId,Long orgId,TurnContext ctx,ChatProperties chat) {
         if(toolExecution==null || !toolExecution.knowledgeActive(ctx.conversationId(),ctx.promptMessageId())) return ctx.canonicalRequestBody();
         requireOrgMembership(userId,orgId);
         var conversation=requireConversation(ctx.conversationId(),orgId,userId);
@@ -758,6 +766,10 @@ public class ChatService {
     }
 
     private String citationSnapshot(TurnContext ctx) {
+        return com.keplura.server.search.ReferenceReadScope.run(() -> readCitationSnapshot(ctx));
+    }
+
+    private String readCitationSnapshot(TurnContext ctx) {
         try {
             var conversation=conversationRepository.findById(ctx.conversationId()).orElse(null);
             if(conversation!=null && !ctx.citationsJson().equals("[]")) refreshToolEvidence(conversation.getCreatedBy(),conversation.getOrgId(),ctx,chatProps);

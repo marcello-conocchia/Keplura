@@ -170,6 +170,7 @@ export const SERVER_EN: Record<string, string> = {
   "Der Server bietet zu viele Werkzeuge an.": "The server offers too many tools.",
   "Die Verbindung ist fehlgeschlagen.": "The connection failed.",
   "Bitte einen Namen angeben (max. 120 Zeichen).": "Please enter a name (max. 120 characters).",
+  "Die Dokumentstelle ist nicht für diese Frage freigegeben.": "This document section is not approved for this question.",
   "Das Werkzeug ist nicht mehr freigegeben. Es wurde nicht aufgerufen.": "The tool is no longer approved. It was not called.",
   "Aufruf begonnen; Abschluss noch nicht bestätigt.": "Call started; completion not confirmed yet.",
   "Das Werkzeug konnte nicht sicher freigegeben und protokolliert werden. Es wurde nicht aufgerufen.": "The tool could not be approved and logged safely. It was not called.",
