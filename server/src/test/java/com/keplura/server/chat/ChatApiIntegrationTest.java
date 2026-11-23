@@ -142,6 +142,7 @@ class ChatApiIntegrationTest {
     @Autowired private ChatService chatService;
     @Autowired private com.keplura.server.tool.ToolExecutionService realToolExecution;
     @Autowired private com.keplura.server.tool.KnowledgeSearchAdapter knowledgeAdapter;
+    @Autowired private com.keplura.server.tool.AttachmentToolAdapter attachmentAdapter;
     @org.springframework.test.context.bean.override.mockito.MockitoSpyBean
     private com.keplura.server.search.SearchService referenceSearch;
     @org.springframework.test.context.bean.override.mockito.MockitoSpyBean
@@ -179,6 +180,31 @@ class ChatApiIntegrationTest {
                         message.putArray("tool_calls").addObject().put("id","call").put("type","function")
                                 .putObject("function").put("name",name).put("arguments",args);
                     else message.put("content","Document answer"+(stubToolMode.equals("document-answer")?" PRIVATE_NEIGHBOR_7821":""));
+                    byte[] bytes=response.toString().getBytes(StandardCharsets.UTF_8);
+                    exchange.getResponseHeaders().set("Content-Type","application/json");
+                    exchange.sendResponseHeaders(200,bytes.length);
+                    try(var out=exchange.getResponseBody()) { out.write(bytes); }
+                    return;
+                }
+                if(stubToolMode.startsWith("attachment")) {
+                    var json=tools.jackson.databind.json.JsonMapper.builder().build();
+                    String name="attachment_search", args="{\"query\":\"Stichwort\"}";
+                    if(turn==2) {
+                        var found=java.util.regex.Pattern.compile("\\[Anhang (\\d+)\\] [^,]+, Position (\\d+)").matcher(lastBody.get());
+                        boolean present=found.find();
+                        name="attachment_read";
+                        args=json.createObjectNode().put("attachmentId",present?Long.parseLong(found.group(1)):999999)
+                                .put("offset",present?Integer.parseInt(found.group(2)):0).put("length",60).toString();
+                    } else if(turn==3) {
+                        name="s1__echo";
+                        args=json.createObjectNode().put("message",ATTACHMENT_SECRET).toString();
+                    }
+                    var response=json.createObjectNode();
+                    var message=response.putArray("choices").addObject().putObject("message");
+                    if(turn<=2 || (turn==3 && stubToolMode.equals("attachment-private")))
+                        message.putArray("tool_calls").addObject().put("id","call").put("type","function")
+                                .putObject("function").put("name",name).put("arguments",args);
+                    else message.put("content","Attachment answer");
                     byte[] bytes=response.toString().getBytes(StandardCharsets.UTF_8);
                     exchange.getResponseHeaders().set("Content-Type","application/json");
                     exchange.sendResponseHeaders(200,bytes.length);
@@ -494,6 +520,110 @@ class ChatApiIntegrationTest {
         assertThat(f.external().invocations).hasValue(0);
         assertThat(toolBodies).hasSize(3);
         assertThat(exchange("GET",transcriptPath(f.scope()[1],f.chat()),f.scope()[0],null).getBody()).doesNotContain("PRIVATE_NEIGHBOR_7821","richtlinie.txt");
+    }
+
+    // ---- TU-04c: attachment tools ----
+
+    private static final String ATTACHMENT_SECRET = "PRIVATE_ATTACHMENT_4711";
+    private record AttachmentFixture(String cookie,String org,String chat,long hidden,FixtureAdapter external) { }
+
+    /** 30 000 + 30 000 characters: the secret at 15 000 of the second file lies behind the 40 000-character prompt block. */
+    private AttachmentFixture attachmentFixture(String mode) {
+        String[] scope=fixtureChain(false);
+        assertThat(exchange("PUT","/api/v1/orgs/"+scope[1]+"/tools/settings",scope[0],Map.of("knowledgeEnabled",true)).getStatusCode().value()).isEqualTo(200);
+        var external=new FixtureAdapter();
+        chatService.setToolExecutionService(new com.keplura.server.tool.ToolExecutionService(jdbc,
+                java.util.List.of(attachmentAdapter,external),new com.keplura.server.tool.ToolAuditLog(jdbc)));
+        String chat=createConversation(scope[0],scope[1],scope[2],Map.of());
+        long user=jdbc.queryForObject("select created_by from chat_conversation where id=?",Long.class,Long.valueOf(chat));
+        String insert="insert into chat_attachment(conversation_id,filename,text_content,char_count,truncated,created_by,created_at) values(?,?,?,30000,true,?,current_timestamp)";
+        jdbc.update(insert,Long.valueOf(chat),"eins.txt","a".repeat(30_000),user);
+        jdbc.update(insert,Long.valueOf(chat),"zwei.txt","b".repeat(15_000)+"Stichwort "+ATTACHMENT_SECRET+" "+"c".repeat(14_966),user);
+        long hidden=jdbc.queryForObject("select max(id) from chat_attachment where conversation_id=?",Long.class,Long.valueOf(chat));
+        stubToolMode=mode;
+        return new AttachmentFixture(scope[0],scope[1],chat,hidden,external);
+    }
+    private ResponseEntity<String> runAttachments(AttachmentFixture f) {
+        return exchange("POST",streamPath(f.org(),f.chat()),f.cookie(),Map.of("prompt","Stichwort suchen"));
+    }
+    private tools.jackson.databind.JsonNode attachmentCards(AttachmentFixture f) {
+        return tools.jackson.databind.json.JsonMapper.builder().build()
+                .readTree(exchange("GET",transcriptPath(f.org(),f.chat()),f.cookie(),null).getBody()).path("toolCalls");
+    }
+    private void deleteAttachment(AttachmentFixture f) {
+        assertThat(exchange("DELETE",transcriptPath(f.org(),f.chat())+"/attachments/"+f.hidden(),f.cookie(),null).getStatusCode().value()).isEqualTo(204);
+    }
+
+    @Test void attachmentSearchFindsTextBehindThePromptBudgetReadsItAndAnswersFromIt() {
+        var f=attachmentFixture("attachment-answer");
+        var response=runAttachments(f);
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
+        assertThat(response.getBody()).contains("Attachment answer");
+        assertThat(toolBodies).hasSize(4);
+        // tool-enabled requests never carry the private attachment block
+        assertThat(toolBodies.get(0)).doesNotContain("aaaaaaaaaa",ATTACHMENT_SECRET);
+        assertThat(toolBodies.get(1)).contains("Position 15000",ATTACHMENT_SECRET).doesNotContain("aaaaaaaaaa");
+        var json=tools.jackson.databind.json.JsonMapper.builder().build();
+        var last=json.readTree(toolBodies.getLast());
+        assertThat(last.path("tool_choice").asString()).isEqualTo("none");
+        boolean blockSeen=false, readSeen=false;
+        for(var message:last.path("messages")) {
+            String content=message.path("content").asString("");
+            if(content.startsWith("Der Benutzer hat die folgenden Dateien")) {
+                blockSeen=true;
+                assertThat(content).contains("=== Datei: eins.txt ===","=== Datei: zwei.txt ===").doesNotContain(ATTACHMENT_SECRET);
+            }
+            if(message.path("role").asString().equals("tool") && content.contains("Zeichen 15000–15060 von 30000")) readSeen=content.contains(ATTACHMENT_SECRET);
+        }
+        assertThat(blockSeen).isTrue();
+        assertThat(readSeen).isTrue();
+        var cards=attachmentCards(f);
+        assertThat(cards.get(0).path("tool").asString()).isEqualTo("attachment_search");
+        assertThat(cards.get(0).path("argumentsText").asString()).contains("Stichwort");
+        assertThat(cards.get(0).path("result").asString()).contains("[Anhang "+f.hidden()+"] zwei.txt, Position 15000");
+        assertThat(cards.get(1).path("tool").asString()).isEqualTo("attachment_read");
+        assertThat(cards.get(1).path("argumentsText").asString()).contains("\"attachmentId\":"+f.hidden(),"\"offset\":15000");
+        assertThat(cards.get(1).path("result").asString()).contains(ATTACHMENT_SECRET);
+        assertThat(jdbc.queryForList("select result_text from tool_call where conversation_id=? and adapter='attachments'",String.class,Long.valueOf(f.chat())))
+                .hasSize(2).allSatisfy(stored -> assertThat(stored).contains("attachmentId").doesNotContain(ATTACHMENT_SECRET,"zwei.txt"));
+        assertThat(jdbc.queryForObject("select dialogue_json from tool_question where conversation_id=?",String.class,Long.valueOf(f.chat())))
+                .doesNotContain(ATTACHMENT_SECRET,"zwei.txt","bbbbbbbbbb");
+        for(String body:toolBodies) assertThat(body).doesNotContain("_keplura_reference","_keplura_arguments");
+
+        deleteAttachment(f);
+        var after=attachmentCards(f);
+        assertThat(after.toString()).doesNotContain(ATTACHMENT_SECRET,"zwei.txt");
+        assertThat(after.get(1).path("sourceUnavailable").asBoolean()).isTrue();
+        // a later question neither sees the deleted text in its tool requests nor in its final request
+        stubToolMode="one-call"; toolRequests.set(0); toolBodies.clear();
+        assertThat(runAttachments(f).getStatusCode().value()).isEqualTo(200);
+        assertThat(toolBodies).isNotEmpty().allSatisfy(body -> assertThat(body).doesNotContain(ATTACHMENT_SECRET,"zwei.txt"));
+    }
+
+    @Test void attachmentTextNeverLeavesAutomaticallyAndDeletionCancelsThePendingCard() {
+        var f=attachmentFixture("attachment-private");
+        runAttachments(f);
+        var cards=attachmentCards(f);
+        assertThat(cards.get(2).path("status").asString()).isEqualTo("PENDING");
+        assertThat(cards.get(2).path("mayContainInternal").asBoolean()).isTrue();
+        assertThat(f.external().invocations).hasValue(0);
+        assertThat(jdbc.queryForObject("select internal_seen from tool_question where conversation_id=?",Boolean.class,Long.valueOf(f.chat()))).isTrue();
+        deleteAttachment(f);
+        var after=attachmentCards(f);
+        assertThat(after.get(2).path("status").asString()).isEqualTo("CANCELLED");
+        assertThat(after.toString()).doesNotContain(ATTACHMENT_SECRET);
+        assertThat(exchange("POST",transcriptPath(f.org(),f.chat())+"/tool-calls/"+after.get(2).path("id").asString()+"/decision",
+                f.cookie(),Map.of("decision","confirm")).getStatusCode().value()).isEqualTo(409);
+        assertThat(f.external().invocations).hasValue(0);
+    }
+
+    @Test void deletingTheReadAttachmentWhileTheModelThinksEndsTheRound() {
+        var f=attachmentFixture("attachment-answer");
+        toolRequestHook=()->{ if(toolRequests.get()==3) jdbc.update("delete from chat_attachment where id=?",f.hidden()); };
+        var response=runAttachments(f);
+        assertThat(toolBodies).hasSize(3);
+        assertThat(response.getBody()).doesNotContain("Attachment answer",ATTACHMENT_SECRET);
+        assertThat(attachmentCards(f).toString()).doesNotContain(ATTACHMENT_SECRET);
     }
 
     @Test void externalResultsRemainValidProvenanceAfterKnowledgeSearch() {

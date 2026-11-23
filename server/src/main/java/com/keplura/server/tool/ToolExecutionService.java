@@ -273,10 +273,13 @@ public class ToolExecutionService {
         return citations.toString();
     }
 
+    /** Private reference tools were offered: the final request and citations are rebuilt from current rights and attachments. */
     public boolean knowledgeActive(Long conversationId,Long promptId) {
         if(promptId==null) return false;
         var state=questions.find(promptId).orElse(null);
-        return state!=null && state.conversationId()==conversationId && mapper.readTree(state.catalog()).has("knowledge_search");
+        if(state==null || state.conversationId()!=conversationId) return false;
+        var catalog=mapper.readTree(state.catalog());
+        return catalog.has("knowledge_search") || catalog.has("attachment_search");
     }
 
     private static String boundaryRevision(ToolDefinition definition) {

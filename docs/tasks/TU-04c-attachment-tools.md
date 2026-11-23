@@ -1,6 +1,6 @@
 # TU-04c — Anhänge auflisten, durchsuchen und lesen
 
-Status: **geplant, nicht gestartet.** Dritte Aufgabe von TU-04 nach TU-04b (PR #28, Merge `8e88e8d`), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: private Chat-Inhalte, Modell-/Werkzeugschleife.
+Status: **in Umsetzung** auf `feat/tool-use-attachments` (PO-Zuweisung 23.11.2026: Claude implementiert, unabhängige Prüfung durch Codex). Dritte Aufgabe von TU-04 nach TU-04b (PR #28, Merge `8e88e8d`), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: private Chat-Inhalte, Modell-/Werkzeugschleife.
 
 ## Ziel
 
