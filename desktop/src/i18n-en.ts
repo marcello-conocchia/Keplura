@@ -697,7 +697,7 @@ export const EN: Record<string, string> = {
   "Enthält möglicherweise interne Inhalte.": "May contain internal content.",
   "Die internen Fundstellen sind nicht mehr lesbar.": "The internal sources are no longer readable.",
   "Die internen Fundstellen sind vorübergehend nicht verfügbar. Bitte erneut laden.": "Internal sources are temporarily unavailable. Please reload.",
-  "Wissenssuche und Dokumentstellen als Werkzeuge für diese Organisation freigeben": "Enable knowledge search and document reading as tools for this organization",
+  "Wissenssuche, Dokumentstellen und Chat-Anhänge als Werkzeuge für diese Organisation freigeben": "Enable knowledge search, document reading and chat attachments as tools for this organization",
   "Internes Ziel für diese Organisation – Daten bleiben im Haus": "Internal destination for this organization – data stays in-house",
   "Werkzeugeinstellungen benötigen die Organisationsverwaltung.": "Tool settings require organization administration.",
   "Folgeaktion zu {0}": "Follow-up action to {0}",
