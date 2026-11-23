@@ -8,7 +8,7 @@ Diese Reihenfolge ersetzt ältere allgemeine Angaben zur nächsten UI-/Roadmap-A
 
 ## Verbindliche Reihenfolge
 
-**TU-01, TU-02, TU-03, TU-04a und TU-04b sind abgeschlossen und auf main (PRs #15/#17, #19/#21/#23 für TU-03a/b/c, #26 für TU-04a und #28 für TU-04b, Merges `1296cdb`/`8f6852a`/`5c25bfa`/`b1b9e72`/`37362d7`/`841ae00`/`8e88e8d`, 21./22.11.2026). Nächste einzelne Aufgabe ist TU-04c: Anhänge auflisten, durchsuchen und lesen als dritter Teil von TU-04. TU-04–TU-07 sind noch nicht abgeschlossen.** Genau eine aktive Implementierungsaufgabe. Größere Schritte werden bei Bedarf in kleine PRs zerlegt; nur die unmittelbar nächste Implementierungsaufgabe wird konkret angelegt.
+**TU-01, TU-02, TU-03, TU-04a, TU-04b und TU-04c sind abgeschlossen und auf main (PRs #15/#17, #19/#21/#23 für TU-03a/b/c, #26 für TU-04a, #28 für TU-04b und #30 für TU-04c, Merges `1296cdb`/`8f6852a`/`5c25bfa`/`b1b9e72`/`37362d7`/`841ae00`/`8e88e8d`/`35fa2d2`, 21.–23.11.2026). Nächste einzelne Aufgabe ist TU-04d: Websuche als Werkzeug als vierter Teil von TU-04; danach als letzter Teil Webseitenabruf (TU-04e). TU-04–TU-07 sind noch nicht abgeschlossen.** Genau eine aktive Implementierungsaufgabe. Größere Schritte werden bei Bedarf in kleine PRs zerlegt; nur die unmittelbar nächste Implementierungsaufgabe wird konkret angelegt.
 
 | Schritt | Umfang | Abnahmeziel |
 | --- | --- | --- |
@@ -39,7 +39,7 @@ Nach jedem Merge PROJECT_STATE.md mit tatsächlichem Stand, Belegen und nächste
 
 ## Unmittelbar nächste Aufgabe
 
-**TU-04c — Anhänge als Werkzeuge**, siehe [Spec](tasks/TU-04c-attachment-tools.md). Geplant, nicht gestartet. Das Modell kann die Anhänge des eigenen Chats auflisten, darin wörtlich suchen und begrenzte Stellen lesen; nur Fundstellen gespeichert, Herkunftsprüfung wie TU-04a. Erledigt: TU-03 vollständig (PRs #19/#21/#23), [TU-04a](tasks/TU-04a-knowledge-search-tool.md) interne Wissenssuche mit Herkunftsprüfung (PR #26), [TU-04b](tasks/TU-04b-document-read-tool.md) Dokumentstellen lesen (PR #28). Danach in TU-04 offen: Websuche und Webseitenabruf als Werkzeuge.
+**TU-04d — Websuche als Werkzeug**, siehe [Spec](tasks/TU-04d-web-search-tool.md). Geplant, nicht gestartet. Das Modell kann innerhalb der Werkzeugschleife selbst über den bestehenden Suchanbieter nachsuchen (externes READ, eigener Org-Schalter, nur mit „Im Web suchen“ in der Frage); Herkunftsprüfung und private Argumente wie TU-04a/c. Erledigt: TU-03 vollständig (PRs #19/#21/#23), [TU-04a](tasks/TU-04a-knowledge-search-tool.md) interne Wissenssuche mit Herkunftsprüfung (PR #26), [TU-04b](tasks/TU-04b-document-read-tool.md) Dokumentstellen lesen (PR #28), [TU-04c](tasks/TU-04c-attachment-tools.md) Anhänge auflisten, durchsuchen und lesen (PR #30). Danach in TU-04 offen: Webseitenabruf mit SSRF-Schutz (TU-04e).
 
 ## Vergleichsquellen (abgerufen am 21.11.2026)
 
