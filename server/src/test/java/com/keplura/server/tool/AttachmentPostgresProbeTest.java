@@ -88,4 +88,24 @@ class AttachmentPostgresProbeTest {
         assertThat(after.toString()).doesNotContain("PG_PROBE_TEXT");
         assertThat(cards.find(pending).orElseThrow().status()).isEqualTo(ToolCallStore.Status.CANCELLED);
     }
+
+    @Autowired private com.keplura.server.chat.ChatContextService context;
+
+    /** The deletion itself cancels the card after commit and drops private arguments; the deletion always commits. */
+    @Test void attachmentDeletionCancelsAndForgetsPrivateArgumentsOnPostgres() {
+        var f = fixture();
+        var ctx = tools.resolveContext(f.user(), f.org(), f.chat());
+        var turn = tools.openTurn(ctx, f.prompt());
+        turn.startQuestion("stichwort", "");
+        assertThat(turn.call("attachment_search", "{\"query\":\"stichwort\"}").invoked()).isTrue();
+        var read = attachments.definitionsFor(ctx).stream().filter(d -> d.toolName().equals("attachment_read")).findFirst().orElseThrow();
+        long pending = cards.create(ctx, f.prompt(), read, ToolExecutionService.definitionHash(read),
+                "{\"attachmentId\":" + f.attachment() + ",\"offset\":0,\"note\":\"PG_PROBE_TEXT\"}", ToolCallStore.Status.PENDING,
+                true, null, Instant.now(), null, true, true).orElseThrow().id();
+        context.deleteAttachment(f.user(), f.org(), f.chat(), f.attachment());
+        assertThat(jdbc.queryForObject("select count(*) from chat_attachment where id=?", Integer.class, f.attachment())).isZero();
+        var row = cards.find(pending).orElseThrow();
+        assertThat(row.status()).isEqualTo(ToolCallStore.Status.CANCELLED);
+        assertThat(row.argumentsJson()).isNull();
+    }
 }

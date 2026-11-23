@@ -96,6 +96,17 @@ public class ToolCallStore {
     public Optional<Row> create(ToolContext ctx, Long promptMessageId, ToolDefinition tool, String definitionHash,
                                 String argumentsJson, Status status, boolean needsConfirmation, String error, Instant now,
                                 Long parentCallId,boolean disclosureConfirmation) {
+        return create(ctx,promptMessageId,tool,definitionHash,argumentsJson,status,needsConfirmation,error,now,parentCallId,disclosureConfirmation,false);
+    }
+
+    /**
+     * {@code privateArguments}: the arguments may carry values from internal results of this question. They are
+     * stored only while the card can still run ({@link #FORGET_PRIVATE}); a blocked plan never stores them.
+     */
+    public Optional<Row> create(ToolContext ctx, Long promptMessageId, ToolDefinition tool, String definitionHash,
+                                String argumentsJson, Status status, boolean needsConfirmation, String error, Instant now,
+                                Long parentCallId,boolean disclosureConfirmation,boolean privateArguments) {
+        if (privateArguments && status != Status.PENDING && status != Status.RUNNING) argumentsJson = null;
         if (argumentsJson != null && argumentsJson.length() > MAX_ARGUMENTS_JSON) {
             throw new IllegalArgumentException("arguments too large to store exactly");
         }
@@ -115,8 +126,8 @@ public class ToolCallStore {
             var st = c.prepareStatement("""
                     insert into tool_call (public_id, conversation_id, prompt_message_id, user_id, org_id, space_id,
                       adapter, tool_id, function_name, tool_name, source_id, source_name, risk, definition_hash,
-                      fingerprint, arguments_json, status, needs_confirmation, error, created_at, expires_at, started_at, parent_call_id,disclosure_confirmation)
-                    values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", new String[]{"id"});
+                      fingerprint, arguments_json, status, needs_confirmation, error, created_at, expires_at, started_at, parent_call_id,disclosure_confirmation,private_arguments)
+                    values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", new String[]{"id"});
             int i = 1;
             st.setString(i++, publicId);
             st.setLong(i++, ctx.conversationId());
@@ -141,7 +152,8 @@ public class ToolCallStore {
             st.setTimestamp(i++, expires == null ? null : Timestamp.from(expires));
             st.setTimestamp(i++, started == null ? null : Timestamp.from(started));
             if (parentCallId == null) st.setNull(i++, Types.BIGINT); else st.setLong(i++, parentCallId);
-            st.setBoolean(i,disclosureConfirmation);
+            st.setBoolean(i++,disclosureConfirmation);
+            st.setBoolean(i,privateArguments);
             return st;
         }, keys);
         long id = Objects.requireNonNull(keys.getKey(), "tool_call id missing").longValue();
@@ -151,9 +163,24 @@ public class ToolCallStore {
             int cancelled = jdbc.update("update tool_call set status = 'CANCELLED', decided_at = ? where id = ? and status = 'PENDING' and not ("
                     + CURRENT_GENERATION.formatted("tool_call.conversation_id", "tool_call.prompt_message_id") + ")",
                     Timestamp.from(now), id);
-            if (cancelled == 1) return Optional.empty();
+            if (cancelled == 1) { forgetPrivate("id = ?", id); return Optional.empty(); }
         }
         return Optional.of(find(id).orElseThrow());
+    }
+
+    /**
+     * Private arguments are dropped as soon as a card can no longer run: always for READ (the result is a
+     * reference or was already disclosed with confirmation), and for WRITE/CRITICAL whenever nothing was
+     * executed. An executed confirmed action keeps its exact arguments as the record of what was done
+     * (and for the duplicate guard of TU-03c).
+     */
+    static final String FORGET_PRIVATE = """
+            update tool_call set arguments_json = null where private_arguments = true and arguments_json is not null
+            and status not in ('PENDING','RUNNING')
+            and (risk is null or risk = 'READ' or status in ('REJECTED','CANCELLED','EXPIRED','BLOCKED')) and\s""";
+
+    private void forgetPrivate(String where, Object... args) {
+        jdbc.update(FORGET_PRIVATE + where, args);
     }
 
     public Optional<Row> find(long id) {
@@ -206,17 +233,21 @@ public class ToolCallStore {
         String generation = next == Status.RUNNING
                 ? " and prompt_message_id is not null and "
                   + CURRENT_GENERATION.formatted("tool_call.conversation_id", "tool_call.prompt_message_id") : "";
-        return jdbc.update("""
+        boolean claimed = jdbc.update("""
                 update tool_call set status = ?, decided_at = ?, started_at = ?
                 where id = ? and status = 'PENDING' and expires_at > ?""" + generation,
                 next.name(), Timestamp.from(now), next == Status.RUNNING ? Timestamp.from(now) : null,
                 id, Timestamp.from(now)) == 1;
+        if (claimed) forgetPrivate("id = ?", id);
+        return claimed;
     }
 
     /** Ausstehende Karte endgültig abbrechen (z. B. Generation überholt). */
     public boolean cancel(long id, Instant now) {
-        return jdbc.update("update tool_call set status = 'CANCELLED', decided_at = ? where id = ? and status = 'PENDING'",
+        boolean cancelled = jdbc.update("update tool_call set status = 'CANCELLED', decided_at = ? where id = ? and status = 'PENDING'",
                 Timestamp.from(now), id) == 1;
+        if (cancelled) forgetPrivate("id = ?", id);
+        return cancelled;
     }
 
     /**
@@ -240,6 +271,7 @@ public class ToolCallStore {
         }
         jdbc.update("update tool_call set status = 'CANCELLED', decided_at = ? where conversation_id = ? and status = 'PENDING' and prompt_message_id <= ?",
                 Timestamp.from(now), conversationId, stopped);
+        forgetPrivate("conversation_id = ?", conversationId);
     }
 
     /** Bereits verbrauchte Werkzeugzeit aller Aufrufe derselben Frage (laufende bis {@code now}). */
@@ -259,15 +291,19 @@ public class ToolCallStore {
 
     /** Abgelaufene ausstehende Karte endgültig als EXPIRED markieren. */
     public boolean expire(long id, Instant now) {
-        return jdbc.update("update tool_call set status = 'EXPIRED', decided_at = ? where id = ? and status = 'PENDING' and expires_at <= ?",
+        boolean expired = jdbc.update("update tool_call set status = 'EXPIRED', decided_at = ? where id = ? and status = 'PENDING' and expires_at <= ?",
                 Timestamp.from(now), id, Timestamp.from(now)) == 1;
+        if (expired) forgetPrivate("id = ?", id);
+        return expired;
     }
 
     /** Neue Nachricht im Chat: alle noch offenen Bestätigungen dieses Chats abbrechen. */
     public int cancelPending(long userId, long conversationId, Instant now) {
         // Older turns that plan later are refused by the generation guard in create/claim.
-        return jdbc.update("update tool_call set status = 'CANCELLED', decided_at = ? where user_id = ? and conversation_id = ? and status = 'PENDING'",
+        int cancelled = jdbc.update("update tool_call set status = 'CANCELLED', decided_at = ? where user_id = ? and conversation_id = ? and status = 'PENDING'",
                 Timestamp.from(now), userId, conversationId);
+        forgetPrivate("user_id = ? and conversation_id = ?", userId, conversationId);
+        return cancelled;
     }
 
     /** Abschluss eines RUNNING-Aufrufs (nur aus RUNNING heraus). */
@@ -276,6 +312,7 @@ public class ToolCallStore {
         if (result != null && result.length() > MAX_RESULT_CHARS) result = result.substring(0, MAX_RESULT_CHARS) + "\n[gekürzt]";
         jdbc.update("update tool_call set status = ?, result_text = ?, error = ?, finished_at = ? where id = ? and status = 'RUNNING'",
                 status.name(), result, error == null ? null : cap(error, 300), Timestamp.from(now), id);
+        forgetPrivate("id = ?", id);
     }
 
     public void deleteConversation(long conversationId) {

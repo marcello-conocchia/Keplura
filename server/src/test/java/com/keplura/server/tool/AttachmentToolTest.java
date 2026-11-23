@@ -110,7 +110,85 @@ class AttachmentToolTest {
         assertThat(turn.call("attachment_read", "{\"attachmentId\":11,\"offset\":15000,\"length\":40}").invoked()).isTrue();
         assertThat(M.readTree(stored("attachment_read")).get(0).path("length").asInt()).isEqualTo(40);
         assertThat(card("attachment_read").result()).contains("Zeichen 15000–15040 von 30000", "Stichwort " + SECRET);
-        assertThat(card("attachment_read").argumentsText()).contains("\"offset\":15000");
+        // the question's own query stays visible; the position taken from the internal hit is not stored
+        assertThat(card("attachment_search").argumentsText()).isEqualTo("{\"query\":\"STICHWORT\"}");
+        assertThat(card("attachment_read").argumentsText()).isNull();
+    }
+
+    private List<String> column(String name) {
+        return jdbc.queryForList("select " + name + " from tool_call order by id", String.class);
+    }
+    private void assertNoPrivateCopies() {
+        for (String c : List.of("arguments_json", "result_text", "error"))
+            assertThat(column(c)).allSatisfy(v -> assertThat(String.valueOf(v)).doesNotContain(SECRET, "zwei.txt"));
+        assertThat(jdbc.queryForList("select dialogue_json from tool_question", String.class))
+                .allSatisfy(v -> assertThat(String.valueOf(v)).doesNotContain(SECRET, "zwei.txt"));
+    }
+    private void assertNothingVisibleAfterDeletion() {
+        jdbc.update("delete from chat_attachment where id=11");
+        assertThat(service.cards(1L, 1L, 1L).toString()).doesNotContain(SECRET, "zwei.txt");
+        assertNoPrivateCopies();
+    }
+
+    @Test void privateFollowUpSearchIsExecutedButItsArgumentsAreNotKept() {
+        var turn = turn(1);
+        turn.call("attachment_search", "{\"query\":\"stichwort\"}");
+        // the model re-uses a private value and a file name it only learned from the result
+        assertThat(turn.call("attachment_search", "{\"query\":\"" + SECRET + "\"}").invoked()).isTrue();
+        assertThat(turn.call("attachment_search", "{\"query\":\"zwei.txt\"}").invoked()).isTrue();
+        assertThat(column("arguments_json")).containsExactly("{\"query\":\"stichwort\"}", null, null);
+        assertNoPrivateCopies();
+        assertNothingVisibleAfterDeletion();
+    }
+
+    @Test void pendingExternalProposalKeepsArgumentsOnlyWhileItCanRun() {
+        var turn = turn(1);
+        turn.call("attachment_search", "{\"query\":\"stichwort\"}");
+        turn.call("s1__echo", "{\"message\":\"zwei.txt " + SECRET + "\"}");
+        assertThat(card("echo").argumentsText()).contains(SECRET);
+        jdbc.update("delete from chat_attachment where id=11");
+        assertThat(card("echo").status()).isEqualTo("CANCELLED");
+        assertNothingVisibleAfterDeletion();
+        assertThat(external.invocations).hasValue(0);
+    }
+
+    @Test void rejectedAndExpiredPrivateProposalsDropTheirArguments() {
+        var turn = turn(1);
+        turn.call("attachment_search", "{\"query\":\"stichwort\"}");
+        turn.call("s1__echo", "{\"message\":\"" + SECRET + "\"}");
+        assertThat(service.decide(1L, 1L, 1L, card("echo").id(), false)).isInstanceOf(ToolExecutionService.Decision.Done.class);
+        assertThat(card("echo").status()).isEqualTo("REJECTED");
+        message(2, 1);
+        var next = turn(2);
+        next.call("attachment_search", "{\"query\":\"stichwort\"}");
+        next.call("s1__echo", "{\"message\":\"" + SECRET + "\"}");
+        jdbc.update("update tool_call set expires_at=? where status='PENDING'", java.sql.Timestamp.from(java.time.Instant.now().minusSeconds(1)));
+        assertThat(card("echo").status()).isEqualTo("EXPIRED");
+        assertThat(jdbc.queryForList("select status from tool_call where tool_name='echo' order by id", String.class)).containsExactly("REJECTED", "EXPIRED");
+        assertNothingVisibleAfterDeletion();
+        assertThat(external.invocations).hasValue(0);
+    }
+
+    @Test void confirmedPrivateDisclosureRunsOnceAndThenDropsItsArguments() {
+        var turn = turn(1);
+        turn.call("attachment_search", "{\"query\":\"stichwort\"}");
+        turn.call("s1__echo", "{\"message\":\"" + SECRET + "\"}");
+        service.decide(1L, 1L, 1L, card("echo").id(), true);
+        assertThat(external.invocations).hasValue(1);
+        assertThat(card("echo").status()).isEqualTo("SUCCEEDED");
+        assertThat(column("arguments_json")).allSatisfy(v -> assertThat(String.valueOf(v)).doesNotContain(SECRET));
+    }
+
+    @Test void unknownModelKeysNeverReachErrorsCardsOrDialogue() {
+        var turn = turn(1);
+        turn.call("attachment_search", "{\"query\":\"stichwort\"}");
+        var outcome = turn.call("attachment_read", "{\"attachmentId\":11,\"offset\":0,\"" + SECRET + "\":true}");
+        assertThat(outcome.invoked()).isFalse();
+        assertThat(outcome.text()).doesNotContain(SECRET).contains(ToolArgumentValidator.UNKNOWN_FIELD);
+        assertThat(card("attachment_read").error()).doesNotContain(SECRET);
+        assertNoPrivateCopies();
+        assertNothingVisibleAfterDeletion();
+        assertThat(card("attachment_read").error()).isNull();
     }
 
     @Test void onlyReferencesArePersistedInCardsAndDialogue() {

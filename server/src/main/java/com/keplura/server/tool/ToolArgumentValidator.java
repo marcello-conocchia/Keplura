@@ -37,6 +37,8 @@ public final class ToolArgumentValidator {
     static final int MAX_DEPTH = 16;
 
     private static final String UNCHECKABLE = "Das Eingabeschema kann nicht sicher geprüft werden.";
+    /** Fixed placeholder for keys the schema does not define; the model's key text is never echoed. */
+    static final String UNKNOWN_FIELD = "<nicht vorgesehenes Feld>";
     private static final Set<String> ANNOTATIONS = Set.of("title", "description", "default", "examples", "$schema",
             "$id", "$comment", "format", "readOnly", "writeOnly", "deprecated", "contentMediaType", "contentEncoding");
     private static final Set<String> TYPES = Set.of("object", "string", "number", "integer", "boolean", "array", "null");
@@ -224,9 +226,11 @@ public final class ToolArgumentValidator {
             JsonNode additional = schema.get("additionalProperties");
             for (Map.Entry<String, JsonNode> e : value.properties()) {
                 JsonNode sub = props.isObject() ? props.get(e.getKey()) : null;
+                // Only schema-defined names may appear in messages: model-chosen keys can carry private data.
+                String name = sub == null ? UNKNOWN_FIELD : e.getKey();
                 if (sub == null) sub = additional;
                 if (sub == null) continue; // JSON Schema default: additional properties allowed
-                String problem = errorAt(sub, e.getValue(), join(path, e.getKey()), depth + 1);
+                String problem = errorAt(sub, e.getValue(), join(path, name), depth + 1);
                 if (problem != null) return problem;
             }
         }

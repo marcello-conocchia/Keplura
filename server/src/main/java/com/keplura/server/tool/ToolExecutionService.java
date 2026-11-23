@@ -204,6 +204,21 @@ public class ToolExecutionService {
         return !ToolArgumentProvenance.allowed(args,tool.inputSchema(),ToolArgumentProvenance.Sources.of(state.prompt(),sources));
     }
 
+    /**
+     * After an internal result, any argument value without literal provenance (question or external result)
+     * may carry private data. Such arguments are never kept beyond the card's executable lifetime. Fails closed.
+     */
+    private boolean privateArguments(Long promptId,ToolDefinition tool,JsonNode args) {
+        if(promptId==null || args==null) return false;
+        try {
+            var state=questions.find(promptId).orElse(null);
+            if(state==null || !state.internalSeen()) return false;
+            var sources=new java.util.ArrayList<String>();
+            for(JsonNode text:mapper.readTree(state.publicTokens())) sources.add(text.asString());
+            return !ToolArgumentProvenance.allowed(args,tool.inputSchema(),ToolArgumentProvenance.Sources.of(state.prompt(),sources));
+        } catch(RuntimeException unavailable) { return true; }
+    }
+
     public record ResolvedDialogue(ArrayNode messages,String authorizationStamp) { }
 
     /** Rehydrate only server-authored references to owned successful cards; strip all private metadata. */
@@ -770,6 +785,8 @@ public class ToolExecutionService {
         if(access==ReferenceAccess.DENIED && status==ToolCallStore.Status.PENDING) {
             cards.cancel(r.id(),now); status=ToolCallStore.Status.CANCELLED;
         }
+        // Persist expiry so private arguments of an unanswered card do not outlive its confirmation window.
+        if(r.status()==ToolCallStore.Status.PENDING && status==ToolCallStore.Status.EXPIRED) cards.expire(r.id(),now);
         String result=status==ToolCallStore.Status.SUCCEEDED?r.resultText():null;
         if(result!=null && adapters.containsKey(r.adapter()) && adapters.get(r.adapter()).referencesOnly()) {
             result=null;
@@ -788,7 +805,7 @@ public class ToolExecutionService {
                 || !Objects.equals(parent.promptMessageId(),r.promptMessageId()))) parent=null;
         return new ToolCallView(r.publicId(), r.promptMessageId(), r.toolName(), r.sourceName(),
                 r.risk() == null ? null : r.risk().name(), sourceUnavailable?null:r.argumentsJson(), sourceUnavailable?List.of():List.copyOf(fields), status.name(),
-                r.needsConfirmation(), sourceUnavailable?null:result, r.error(),
+                r.needsConfirmation(), sourceUnavailable?null:result, sourceUnavailable?null:r.error(),
                 r.createdAt(), status == ToolCallStore.Status.PENDING ? r.expiresAt() : null,
                 parent==null ? null : parent.publicId(), parent==null ? null : parent.toolName(),r.disclosureConfirmation(),sourceUnavailable,access==ReferenceAccess.UNAVAILABLE);
     }
@@ -957,6 +974,7 @@ public class ToolExecutionService {
             String hash = definitionHash(t);
             boolean critical = t.risk() == ToolRisk.CRITICAL;
             boolean disclosure = t.risk()==ToolRisk.READ && !t.internal() && requiresDisclosure(promptMessageId,t,args);
+            boolean privateArgs = privateArguments(promptMessageId,t,args);
             // A CRITICAL plan only becomes a pending card here; it is never executed in the turn.
             Checked checked = recheck(ctx, t.adapter(), t.id(), hash, args, critical);
             if (checked.reason() != null) return blocked(checked.reason(), t, args);
@@ -968,7 +986,7 @@ public class ToolExecutionService {
                 Optional<ToolCallStore.Row> pending;
                 try {
                     pending = cards.create(ctx, promptMessageId, t, hash, canonical, ToolCallStore.Status.PENDING, true, null, now,
-                            dependent ? parentCallId : null,disclosure);
+                            dependent ? parentCallId : null,disclosure,privateArgs);
                 } catch (RuntimeException e) {
                     log.warn("pending tool call not stored ({})", e.getClass().getSimpleName());
                     return new Outcome("Der Aufruf konnte nicht zur Bestätigung vorgelegt werden. Er wurde nicht ausgeführt.",
@@ -985,8 +1003,8 @@ public class ToolExecutionService {
             }
             ToolCallStore.Row card;
             try {
-                card = cards.create(ctx, promptMessageId, t, hash, canonical, ToolCallStore.Status.RUNNING, false, null, now)
-                        .orElseThrow();
+                card = cards.create(ctx, promptMessageId, t, hash, canonical, ToolCallStore.Status.RUNNING, false, null, now,
+                        null,false,privateArgs).orElseThrow();
             } catch (RuntimeException e) {
                 log.warn("tool call card not stored ({})", e.getClass().getSimpleName());
                 return new Outcome("Das Werkzeug konnte nicht sicher protokolliert werden. Es wurde nicht aufgerufen.",
@@ -1020,7 +1038,7 @@ public class ToolExecutionService {
                 try {
                     var row=cards.create(ctx, promptMessageId, t, definitionHash(t), cards.canonical(args), ToolCallStore.Status.BLOCKED,
                             t.risk() == ToolRisk.CRITICAL || (parentCallId!=null && t.risk()!=ToolRisk.READ), reason, wallClock.get(),
-                            t.risk()!=ToolRisk.READ ? parentCallId : null);
+                            t.risk()!=ToolRisk.READ ? parentCallId : null,false,privateArguments(promptMessageId,t,args));
                     argumentCardId=row.map(ToolCallStore.Row::publicId).orElse(null);
                 } catch (RuntimeException e) {
                     log.warn("blocked tool call card not stored ({})", e.getClass().getSimpleName());

@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -133,7 +135,27 @@ public class ChatContextService {
         Conversation c = require(userId, orgId, conversationId);
         int n = jdbc.update("delete from chat_attachment where id = ? and conversation_id = ?", attachmentId, c.getId());
         if (n == 0) throw new ChatException(HttpStatus.NOT_FOUND, "attachment not found");
+        // TU-04c: open cards that referenced the deleted text end right away (dropping private arguments),
+        // not only on the next transcript read. After commit, so a failure can never undo the deletion.
+        if (tools == null) return;
+        Runnable recheck = () -> {
+            try { tools.cards(userId, orgId, c.getId()); }
+            catch (RuntimeException e) {
+                log.warn("tool cards not rechecked after attachment deletion ({})", e.getClass().getSimpleName());
+            }
+        };
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override public void afterCommit() { recheck.run(); }
+            });
+        } else recheck.run();
     }
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ChatContextService.class);
+    private com.keplura.server.tool.ToolExecutionService tools;
+
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    void setToolExecutionService(com.keplura.server.tool.ToolExecutionService tools) { this.tools = tools; }
 
     // ---- für ChatService (Unterhaltung bereits geprüft) ----
 

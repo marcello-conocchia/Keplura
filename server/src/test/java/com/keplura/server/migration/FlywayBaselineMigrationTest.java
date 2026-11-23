@@ -76,7 +76,8 @@ class FlywayBaselineMigrationTest {
         // V25 (TU-01: tool_risks column + tool_call_log) — portable.
         // V27 (TU-03b: persistent question budgets, execution guard and answer binding).
         // V28 binds a single dependent proposal to its first confirmed action.
-        assertThat(result.migrationsExecuted).isEqualTo(28);
+        // V29 knowledge tool/provenance, V30 (TU-04c) marks private arguments — both additive.
+        assertThat(result.migrationsExecuted).isEqualTo(29);
 
         JdbcTemplate jdbc = new JdbcTemplate(ds);
         assertThat(jdbc.queryForList("SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name <> 'flyway_schema_history'", String.class))
@@ -159,7 +160,7 @@ class FlywayBaselineMigrationTest {
         assertThat(jdbc.queryForList(
                 "SELECT version FROM flyway_schema_history WHERE version IS NOT NULL ORDER BY installed_rank",
                 String.class))
-                .containsExactly("1", "2", "3", "4", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29");
+                .containsExactly("1", "2", "3", "4", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30");
         // M4b: both chat tables have identity PKs, the citation blob and status
         // are NOT NULL (an assistant row without an honest end state must be
         // impossible at the schema level), and the list-read index exists.

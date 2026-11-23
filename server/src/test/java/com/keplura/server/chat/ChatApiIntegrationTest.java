@@ -441,8 +441,9 @@ class ChatApiIntegrationTest {
         var read=transcript.path("toolCalls").get(1);
         assertThat(read.path("tool").asString()).isEqualTo("document_read");
         assertThat(read.path("result").asString()).contains("Abschnitt 0","Abschnitt 1","Abschnitt 2","PRIVATE_NEIGHBOR_7821");
-        var arguments=json.readTree(read.path("argumentsText").asString());
-        assertThat(arguments.path("chunkIdx").asInt()).isEqualTo(1);
+        // documentId/chunkIdx came from the internal hit: shown via the resolved window, not kept as plaintext (TU-04c review)
+        assertThat(read.path("argumentsText").isNull()).isTrue();
+        assertThat(jdbc.queryForObject("select arguments_json from tool_call where conversation_id=? and tool_name='document_read'",String.class,Long.valueOf(f.chat()))).isNull();
         assertThat(f.external().invocations).hasValue(mode.equals("public")?1:0);
         if(mode.equals("private")) assertThat(transcript.path("toolCalls").get(2).path("status").asString()).isEqualTo("PENDING");
         assertThat(jdbc.queryForList("select result_text from tool_call where conversation_id=? and adapter='knowledge'",String.class,Long.valueOf(f.chat())))
@@ -582,8 +583,12 @@ class ChatApiIntegrationTest {
         assertThat(cards.get(0).path("argumentsText").asString()).contains("Stichwort");
         assertThat(cards.get(0).path("result").asString()).contains("[Anhang "+f.hidden()+"] zwei.txt, Position 15000");
         assertThat(cards.get(1).path("tool").asString()).isEqualTo("attachment_read");
-        assertThat(cards.get(1).path("argumentsText").asString()).contains("\"attachmentId\":"+f.hidden(),"\"offset\":15000");
-        assertThat(cards.get(1).path("result").asString()).contains(ATTACHMENT_SECRET);
+        // the read position came from the internal search hit, not from the question: shown via the
+        // resolved reference, never kept as a plaintext argument copy
+        assertThat(cards.get(1).path("argumentsText").isNull()).isTrue();
+        assertThat(cards.get(1).path("result").asString()).contains("[Anhang "+f.hidden()+"] zwei.txt, Zeichen 15000–15060",ATTACHMENT_SECRET);
+        assertThat(jdbc.queryForList("select arguments_json from tool_call where conversation_id=?",String.class,Long.valueOf(f.chat())))
+                .containsExactly("{\"query\":\"Stichwort\"}",null);
         assertThat(jdbc.queryForList("select result_text from tool_call where conversation_id=? and adapter='attachments'",String.class,Long.valueOf(f.chat())))
                 .hasSize(2).allSatisfy(stored -> assertThat(stored).contains("attachmentId").doesNotContain(ATTACHMENT_SECRET,"zwei.txt"));
         assertThat(jdbc.queryForObject("select dialogue_json from tool_question where conversation_id=?",String.class,Long.valueOf(f.chat())))
@@ -608,7 +613,17 @@ class ChatApiIntegrationTest {
         assertThat(cards.get(2).path("mayContainInternal").asBoolean()).isTrue();
         assertThat(f.external().invocations).hasValue(0);
         assertThat(jdbc.queryForObject("select internal_seen from tool_question where conversation_id=?",Boolean.class,Long.valueOf(f.chat()))).isTrue();
+        // the pending proposal needs its exact arguments only until it can no longer run
+        assertThat(cards.get(2).path("argumentsText").asString()).contains(ATTACHMENT_SECRET);
         deleteAttachment(f);
+        // cancelled by the deletion itself, before anyone reads the transcript again
+        assertThat(jdbc.queryForList("select status from tool_call where conversation_id=? order by id",String.class,Long.valueOf(f.chat())))
+                .containsExactly("SUCCEEDED","SUCCEEDED","CANCELLED");
+        for(String column:List.of("arguments_json","result_text","error"))
+            assertThat(jdbc.queryForList("select "+column+" from tool_call where conversation_id=?",String.class,Long.valueOf(f.chat())))
+                    .allSatisfy(value -> assertThat(String.valueOf(value)).doesNotContain(ATTACHMENT_SECRET,"zwei.txt"));
+        assertThat(jdbc.queryForObject("select dialogue_json from tool_question where conversation_id=?",String.class,Long.valueOf(f.chat())))
+                .doesNotContain(ATTACHMENT_SECRET,"zwei.txt");
         var after=attachmentCards(f);
         assertThat(after.get(2).path("status").asString()).isEqualTo("CANCELLED");
         assertThat(after.toString()).doesNotContain(ATTACHMENT_SECRET);
