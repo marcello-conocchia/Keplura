@@ -101,7 +101,7 @@ public class ToolCallStore {
 
     /**
      * {@code privateArguments}: the arguments may carry values from internal results of this question. They are
-     * stored only while the card can still run ({@link #FORGET_PRIVATE}); a blocked plan never stores them.
+     * stored only while the card can still run ({@link #DROP_PRIVATE}); a blocked plan never stores them.
      */
     public Optional<Row> create(ToolContext ctx, Long promptMessageId, ToolDefinition tool, String definitionHash,
                                 String argumentsJson, Status status, boolean needsConfirmation, String error, Instant now,
@@ -160,27 +160,43 @@ public class ToolCallStore {
         if (status == Status.PENDING) {
             // Superseded meanwhile (newer question or stop)? Then it never becomes decidable. The
             // decision itself re-checks the generation atomically, so this only keeps the card honest.
-            int cancelled = jdbc.update("update tool_call set status = 'CANCELLED', decided_at = ? where id = ? and status = 'PENDING' and not ("
+            int cancelled = jdbc.update("update tool_call set status = 'CANCELLED', decided_at = ?, " + DROP_PRIVATE + " where id = ? and status = 'PENDING' and not ("
                     + CURRENT_GENERATION.formatted("tool_call.conversation_id", "tool_call.prompt_message_id") + ")",
                     Timestamp.from(now), id);
-            if (cancelled == 1) { forgetPrivate("id = ?", id); return Optional.empty(); }
+            if (cancelled == 1) return Optional.empty();
         }
         return Optional.of(find(id).orElseThrow());
     }
 
-    /**
-     * Private arguments are dropped as soon as a card can no longer run: always for READ (the result is a
-     * reference or was already disclosed with confirmation), and for WRITE/CRITICAL whenever nothing was
-     * executed. An executed confirmed action keeps its exact arguments as the record of what was done
-     * (and for the duplicate guard of TU-03c).
+    /*
+     * Private arguments live only while a card can still run. They are dropped IN THE SAME UPDATE as the status
+     * change, never in a second statement: always for READ (the result is a reference or was disclosed with
+     * confirmation), and for WRITE/CRITICAL whenever nothing was executed. An executed confirmed action keeps its
+     * exact arguments as the record of what was done (and for the duplicate guard of TU-03c).
      */
-    static final String FORGET_PRIVATE = """
-            update tool_call set arguments_json = null where private_arguments = true and arguments_json is not null
-            and status not in ('PENDING','RUNNING')
-            and (risk is null or risk = 'READ' or status in ('REJECTED','CANCELLED','EXPIRED','BLOCKED')) and\s""";
+    /** SET fragment for transitions into a state in which nothing was executed (cancelled, expired, rejected, blocked). */
+    static final String DROP_PRIVATE = "arguments_json = case when private_arguments = true then null else arguments_json end";
+    /** SET fragment after an execution attempt: READ drops, an attempted WRITE/CRITICAL keeps its record. */
+    static final String DROP_PRIVATE_READ =
+            "arguments_json = case when private_arguments = true and (risk is null or risk = 'READ') then null else arguments_json end";
 
-    private void forgetPrivate(String where, Object... args) {
-        jdbc.update(FORGET_PRIVATE + where, args);
+    /**
+     * Durable cleanup for cards whose normal transition never happened (crash while RUNNING, unanswered proposal).
+     * Never re-executes anything and keeps an unclear RUNNING state as it is (shown as UNKNOWN).
+     * {@code conversationId == null}: all chats.
+     */
+    public int sweepPrivate(Long conversationId, Instant now) {
+        String scope = conversationId == null ? "" : " and conversation_id = " + conversationId.longValue();
+        Timestamp ts = Timestamp.from(now);
+        int n = jdbc.update("update tool_call set status = 'EXPIRED', decided_at = ?, " + DROP_PRIVATE
+                + " where status = 'PENDING' and expires_at <= ?" + scope, ts, ts);
+        n += jdbc.update("update tool_call set arguments_json = null where private_arguments = true and arguments_json is not null"
+                + " and status = 'RUNNING' and (risk is null or risk = 'READ') and started_at < ?" + scope,
+                Timestamp.from(now.minus(RUNNING_STALE_AFTER)));
+        n += jdbc.update("update tool_call set arguments_json = null where private_arguments = true and arguments_json is not null"
+                + " and status not in ('PENDING','RUNNING')"
+                + " and (risk is null or risk = 'READ' or status in ('REJECTED','CANCELLED','EXPIRED','BLOCKED'))" + scope);
+        return n;
     }
 
     public Optional<Row> find(long id) {
@@ -233,21 +249,17 @@ public class ToolCallStore {
         String generation = next == Status.RUNNING
                 ? " and prompt_message_id is not null and "
                   + CURRENT_GENERATION.formatted("tool_call.conversation_id", "tool_call.prompt_message_id") : "";
-        boolean claimed = jdbc.update("""
-                update tool_call set status = ?, decided_at = ?, started_at = ?
-                where id = ? and status = 'PENDING' and expires_at > ?""" + generation,
+        String drop = next == Status.RUNNING ? "" : ", " + DROP_PRIVATE;
+        return jdbc.update("update tool_call set status = ?, decided_at = ?, started_at = ?" + drop
+                + " where id = ? and status = 'PENDING' and expires_at > ?" + generation,
                 next.name(), Timestamp.from(now), next == Status.RUNNING ? Timestamp.from(now) : null,
                 id, Timestamp.from(now)) == 1;
-        if (claimed) forgetPrivate("id = ?", id);
-        return claimed;
     }
 
     /** Ausstehende Karte endgültig abbrechen (z. B. Generation überholt). */
     public boolean cancel(long id, Instant now) {
-        boolean cancelled = jdbc.update("update tool_call set status = 'CANCELLED', decided_at = ? where id = ? and status = 'PENDING'",
+        return jdbc.update("update tool_call set status = 'CANCELLED', decided_at = ?, " + DROP_PRIVATE + " where id = ? and status = 'PENDING'",
                 Timestamp.from(now), id) == 1;
-        if (cancelled) forgetPrivate("id = ?", id);
-        return cancelled;
     }
 
     /**
@@ -269,9 +281,8 @@ public class ToolCallStore {
                         stopped, Timestamp.from(now), conversationId, stopped);
             }
         }
-        jdbc.update("update tool_call set status = 'CANCELLED', decided_at = ? where conversation_id = ? and status = 'PENDING' and prompt_message_id <= ?",
+        jdbc.update("update tool_call set status = 'CANCELLED', decided_at = ?, " + DROP_PRIVATE + " where conversation_id = ? and status = 'PENDING' and prompt_message_id <= ?",
                 Timestamp.from(now), conversationId, stopped);
-        forgetPrivate("conversation_id = ?", conversationId);
     }
 
     /** Bereits verbrauchte Werkzeugzeit aller Aufrufe derselben Frage (laufende bis {@code now}). */
@@ -291,28 +302,25 @@ public class ToolCallStore {
 
     /** Abgelaufene ausstehende Karte endgültig als EXPIRED markieren. */
     public boolean expire(long id, Instant now) {
-        boolean expired = jdbc.update("update tool_call set status = 'EXPIRED', decided_at = ? where id = ? and status = 'PENDING' and expires_at <= ?",
+        return jdbc.update("update tool_call set status = 'EXPIRED', decided_at = ?, " + DROP_PRIVATE + " where id = ? and status = 'PENDING' and expires_at <= ?",
                 Timestamp.from(now), id, Timestamp.from(now)) == 1;
-        if (expired) forgetPrivate("id = ?", id);
-        return expired;
     }
 
     /** Neue Nachricht im Chat: alle noch offenen Bestätigungen dieses Chats abbrechen. */
     public int cancelPending(long userId, long conversationId, Instant now) {
         // Older turns that plan later are refused by the generation guard in create/claim.
-        int cancelled = jdbc.update("update tool_call set status = 'CANCELLED', decided_at = ? where user_id = ? and conversation_id = ? and status = 'PENDING'",
+        return jdbc.update("update tool_call set status = 'CANCELLED', decided_at = ?, " + DROP_PRIVATE + " where user_id = ? and conversation_id = ? and status = 'PENDING'",
                 Timestamp.from(now), userId, conversationId);
-        forgetPrivate("user_id = ? and conversation_id = ?", userId, conversationId);
-        return cancelled;
     }
 
     /** Abschluss eines RUNNING-Aufrufs (nur aus RUNNING heraus). */
     public void finish(long id, Status status, String resultText, String error, Instant now) {
         String result = resultText;
         if (result != null && result.length() > MAX_RESULT_CHARS) result = result.substring(0, MAX_RESULT_CHARS) + "\n[gekürzt]";
-        jdbc.update("update tool_call set status = ?, result_text = ?, error = ?, finished_at = ? where id = ? and status = 'RUNNING'",
+        // BLOCKED from RUNNING = never started: dropped like any other non-executed state.
+        String drop = status == Status.BLOCKED ? DROP_PRIVATE : DROP_PRIVATE_READ;
+        jdbc.update("update tool_call set status = ?, result_text = ?, error = ?, finished_at = ?, " + drop + " where id = ? and status = 'RUNNING'",
                 status.name(), result, error == null ? null : cap(error, 300), Timestamp.from(now), id);
-        forgetPrivate("id = ?", id);
     }
 
     public void deleteConversation(long conversationId) {

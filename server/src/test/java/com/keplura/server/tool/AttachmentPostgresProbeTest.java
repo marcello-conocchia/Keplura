@@ -108,4 +108,21 @@ class AttachmentPostgresProbeTest {
         assertThat(row.status()).isEqualTo(ToolCallStore.Status.CANCELLED);
         assertThat(row.argumentsJson()).isNull();
     }
+
+    /** Atomic drop on finish and the durable sweep for a crashed RUNNING card, on PostgreSQL. */
+    @Test void finishAndSweepDropPrivateArgumentsOnPostgres() {
+        var f = fixture();
+        var ctx = tools.resolveContext(f.user(), f.org(), f.chat());
+        var search = attachments.definitionsFor(ctx).stream().filter(d -> d.toolName().equals("attachment_search")).findFirst().orElseThrow();
+        Instant now = Instant.now();
+        long finished = cards.create(ctx, f.prompt(), search, "h", "{\"query\":\"PG_PROBE_TEXT\"}", ToolCallStore.Status.RUNNING,
+                false, null, now, null, false, true).orElseThrow().id();
+        cards.finish(finished, ToolCallStore.Status.SUCCEEDED, "[]", null, now);
+        assertThat(cards.find(finished).orElseThrow().argumentsJson()).isNull();
+        long crashed = cards.create(ctx, f.prompt(), search, "h", "{\"query\":\"PG_PROBE_TEXT\"}", ToolCallStore.Status.RUNNING,
+                false, null, now.minus(ToolCallStore.RUNNING_STALE_AFTER).minusSeconds(60), null, false, true).orElseThrow().id();
+        cards.sweepPrivate(f.chat(), now);
+        assertThat(cards.find(crashed).orElseThrow().argumentsJson()).isNull();
+        assertThat(cards.find(crashed).orElseThrow().status()).isEqualTo(ToolCallStore.Status.RUNNING);
+    }
 }

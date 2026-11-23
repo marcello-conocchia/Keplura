@@ -21,6 +21,7 @@ class AttachmentToolTest {
     private static final String SECRET = "PRIVATE_ATTACHMENT_4711";
     private final AtomicInteger textReads = new AtomicInteger();
     private final AtomicBoolean textUnavailable = new AtomicBoolean();
+    private final AtomicBoolean failFinish = new AtomicBoolean();
     private JdbcTemplate jdbc;
     private AttachmentToolAdapter adapter;
     private External external;
@@ -50,6 +51,12 @@ class AttachmentToolTest {
                     if (textUnavailable.get()) throw new org.springframework.dao.DataAccessResourceFailureException("temporary attachment failure");
                 }
                 return super.query(sql, mapper, args);
+            }
+            @Override public int update(String sql, Object... args) {
+                // one database failure exactly when a RUNNING card is completed
+                if (sql.contains("finished_at = ?") && failFinish.getAndSet(false))
+                    throw new org.springframework.dao.DataAccessResourceFailureException("finish failed once");
+                return super.update(sql, args);
             }
         };
         jdbc.update("insert into organization(id,name,created_at) values(1,'Org',current_timestamp),(2,'Other',current_timestamp)");
@@ -177,6 +184,59 @@ class AttachmentToolTest {
         assertThat(external.invocations).hasValue(1);
         assertThat(card("echo").status()).isEqualTo("SUCCEEDED");
         assertThat(column("arguments_json")).allSatisfy(v -> assertThat(String.valueOf(v)).doesNotContain(SECRET));
+    }
+
+    private void ageRunning() {
+        jdbc.update("update tool_call set started_at=? where status='RUNNING'",
+                java.sql.Timestamp.from(java.time.Instant.now().minus(ToolCallStore.RUNNING_STALE_AFTER).minusSeconds(60)));
+    }
+
+    @Test void statusAndArgumentDropAreOneStatementAndAFailedFinishIsSweptLater() {
+        var turn = turn(1);
+        turn.call("attachment_search", "{\"query\":\"stichwort\"}");
+        failFinish.set(true);
+        turn.call("attachment_search", "{\"query\":\"" + SECRET + "\"}");
+        // the completion failed as a whole: the card is still RUNNING, nothing was half-written
+        assertThat(jdbc.queryForObject("select status from tool_call where id=(select max(id) from tool_call)", String.class)).isEqualTo("RUNNING");
+        ageRunning();
+        assertThat(card("attachment_search").status()).isEqualTo("UNKNOWN");
+        assertThat(jdbc.queryForObject("select status from tool_call where id=(select max(id) from tool_call)", String.class)).isEqualTo("RUNNING");
+        assertNoPrivateCopies();
+        assertNothingVisibleAfterDeletion();
+    }
+
+    @Test void crashedRunningCardsLoseOnlyPrivateReadArgumentsAndStayUnclear() {
+        var ctx = service.resolveContext(1L, 1L, 1L);
+        var store = new ToolCallStore(jdbc);
+        var read = adapter.definitionsFor(ctx).stream().filter(d -> d.toolName().equals("attachment_search")).findFirst().orElseThrow();
+        var write = new ToolDefinition("external:1:send", "external", "s1__send", "send", 1L, "Extern", "Send",
+                M.createObjectNode().put("type", "object"), ToolRisk.WRITE, true, "fp", false);
+        var now = java.time.Instant.now();
+        long privateRead = store.create(ctx, 1L, read, "h", "{\"query\":\"" + SECRET + "\"}", ToolCallStore.Status.RUNNING, false, null, now, null, false, true).orElseThrow().id();
+        long publicRead = store.create(ctx, 1L, read, "h", "{\"query\":\"stichwort\"}", ToolCallStore.Status.RUNNING, false, null, now, null, false, false).orElseThrow().id();
+        long privateWrite = store.create(ctx, 1L, write, "h", "{\"message\":\"" + SECRET + "\"}", ToolCallStore.Status.RUNNING, false, null, now, null, false, true).orElseThrow().id();
+        assertThat(store.sweepPrivate(null, now)).isZero(); // still within the running window: untouched
+        assertThat(store.find(privateRead).orElseThrow().argumentsJson()).contains(SECRET);
+        ageRunning();
+        new ToolCallSweeper(store).sweep();
+        assertThat(store.find(privateRead).orElseThrow().argumentsJson()).isNull();
+        assertThat(store.find(privateRead).orElseThrow().status()).isEqualTo(ToolCallStore.Status.RUNNING);
+        assertThat(store.find(publicRead).orElseThrow().argumentsJson()).isEqualTo("{\"query\":\"stichwort\"}");
+        // an unclear, possibly executed WRITE keeps its record and is never retried
+        assertThat(store.find(privateWrite).orElseThrow().argumentsJson()).contains(SECRET);
+        assertThat(store.find(privateWrite).orElseThrow().status()).isEqualTo(ToolCallStore.Status.RUNNING);
+        assertThat(external.invocations).hasValue(0);
+    }
+
+    @Test void unansweredPrivateProposalIsExpiredByTheSweeperWithoutAnyView() {
+        var turn = turn(1);
+        turn.call("attachment_search", "{\"query\":\"stichwort\"}");
+        turn.call("s1__echo", "{\"message\":\"" + SECRET + "\"}");
+        jdbc.update("update tool_call set expires_at=? where status='PENDING'", java.sql.Timestamp.from(java.time.Instant.now().minusSeconds(1)));
+        new ToolCallSweeper(new ToolCallStore(jdbc)).sweep();
+        assertThat(jdbc.queryForList("select status from tool_call where tool_name='echo'", String.class)).containsExactly("EXPIRED");
+        assertNoPrivateCopies();
+        assertThat(external.invocations).hasValue(0);
     }
 
     @Test void unknownModelKeysNeverReachErrorsCardsOrDialogue() {

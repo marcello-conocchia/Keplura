@@ -601,6 +601,8 @@ public class ToolExecutionService {
     /** Karten des Chats für genau diese Person; abgelaufene/hängende Zustände werden ehrlich angezeigt. */
     public List<ToolCallView> cards(Long userId, Long orgId, Long conversationId) {
         Instant now = wallClock.get();
+        try { cards.sweepPrivate(conversationId, now); } // crash/expiry leftovers of this chat, never a re-execution
+        catch (RuntimeException e) { log.warn("private tool arguments not swept ({})", e.getClass().getSimpleName()); }
         return ReferenceReadScope.run(() -> cards.listOwned(userId,orgId,conversationId).stream().map(r -> view(r,now)).toList());
     }
 
