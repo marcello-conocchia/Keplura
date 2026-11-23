@@ -157,12 +157,12 @@ public class AttachmentToolAdapter implements ToolAdapter {
 
     private void read(ToolContext ctx, JsonNode args, ArrayNode refs) {
         long id = args.path("attachmentId").asLong(-1);
-        Attachment a = load(ctx, id);
-        if (a == null) throw new ToolNotStartedException(DENIED);
         long offset = args.path("offset").asLong(-1);
         int length = args.has("length") ? args.path("length").asInt(-1) : DEFAULT_READ;
         if (offset < 0 || offset > MAX_OFFSET || length < 1 || length > MAX_READ)
             throw new ToolNotStartedException("Position oder Länge sind ungültig.");
+        Attachment a = load(ctx, id);
+        if (a == null) throw new ToolNotStartedException(DENIED);
         int size = a.text().length();
         int from = (int) Math.min(offset, size);
         int to = (int) Math.min((long) from + length, size);
