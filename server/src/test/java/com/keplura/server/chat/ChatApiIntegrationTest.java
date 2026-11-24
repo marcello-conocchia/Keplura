@@ -186,6 +186,25 @@ class ChatApiIntegrationTest {
                     try(var out=exchange.getResponseBody()) { out.write(bytes); }
                     return;
                 }
+                if(stubToolMode.equals("web")) {
+                    var json=tools.jackson.databind.json.JsonMapper.builder().build();
+                    var response=json.createObjectNode();
+                    var message=response.putArray("choices").addObject().putObject("message");
+                    String query=null;
+                    if(turn==1 && lastBody.get().contains("\"web_search\"")) query="Satelliten Hersteller Europa";
+                    if(turn==2) {
+                        var found=java.util.regex.Pattern.compile("ORBITAL_TERM_[0-9]+").matcher(lastBody.get());
+                        query=(found.find()?found.group():"nichts gefunden")+" Hersteller";
+                    }
+                    if(query!=null) message.putArray("tool_calls").addObject().put("id","call").put("type","function")
+                            .putObject("function").put("name","web_search").put("arguments",json.createObjectNode().put("query",query).toString());
+                    else message.put("content","Web answer");
+                    byte[] bytes=response.toString().getBytes(StandardCharsets.UTF_8);
+                    exchange.getResponseHeaders().set("Content-Type","application/json");
+                    exchange.sendResponseHeaders(200,bytes.length);
+                    try(var out=exchange.getResponseBody()) { out.write(bytes); }
+                    return;
+                }
                 if(stubToolMode.startsWith("attachment")) {
                     var json=tools.jackson.databind.json.JsonMapper.builder().build();
                     String name="attachment_search", args="{\"query\":\"Stichwort\"}";
@@ -521,6 +540,69 @@ class ChatApiIntegrationTest {
         assertThat(f.external().invocations).hasValue(0);
         assertThat(toolBodies).hasSize(3);
         assertThat(exchange("GET",transcriptPath(f.scope()[1],f.chat()),f.scope()[0],null).getBody()).doesNotContain("PRIVATE_NEIGHBOR_7821","richtlinie.txt");
+    }
+
+    // ---- TU-04d: web search tool ----
+
+    private record WebFixture(String cookie,String org,String chat,java.util.List<String> queries) { }
+
+    /** Scripted search provider behind the real adapter; the platform provider of this context stays "none". */
+    private WebFixture webFixture(boolean orgSwitch) {
+        String[] scope=fixtureChain(false);
+        if(orgSwitch) {
+            var enabled=exchange("PUT","/api/v1/orgs/"+scope[1]+"/tools/settings",scope[0],Map.of("webSearchEnabled",true));
+            assertThat(enabled.getStatusCode().value()).isEqualTo(200);
+            assertThat(enabled.getBody()).contains("\"webSearchEnabled\":true","\"knowledgeEnabled\":false");
+        }
+        var queries=new java.util.concurrent.CopyOnWriteArrayList<String>();
+        var provider=new com.keplura.server.websearch.WebSearchService("searxng","https://search.example","",5,"",2) {
+            @Override public java.util.List<WebResult> search(Config c,String q) {
+                queries.add(q);
+                return java.util.List.of(new WebResult("Erster Treffer","https://example.org/eins","Quellbegriff ORBITAL_TERM_5521 steht hier."));
+            }
+        };
+        chatService.setToolExecutionService(new com.keplura.server.tool.ToolExecutionService(jdbc,
+                java.util.List.of(new com.keplura.server.tool.WebSearchToolAdapter(jdbc,provider)),new com.keplura.server.tool.ToolAuditLog(jdbc)));
+        String chat=createConversation(scope[0],scope[1],scope[2],Map.of());
+        stubToolMode="web";
+        return new WebFixture(scope[0],scope[1],chat,queries);
+    }
+
+    @Test void webSearchToolSearchesRephrasesSearchesAgainAndAnswers() {
+        var f=webFixture(true);
+        var response=exchange("POST",streamPath(f.org(),f.chat()),f.cookie(),Map.of("prompt","Wer baut Satelliten?","webSearch",true));
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
+        assertThat(response.getBody()).contains("Web answer");
+        assertThat(f.queries()).containsExactly("Satelliten Hersteller Europa","ORBITAL_TERM_5521 Hersteller");
+        // two search rounds, one model answer round, then the tools-disabled final answer request
+        assertThat(toolBodies).hasSize(4);
+        assertThat(toolBodies.get(0)).contains("\"web_search\"");
+        assertThat(toolBodies.getLast()).contains("\"tool_choice\":\"none\"");
+        assertThat(toolBodies.get(1)).contains("[W1] Erster Treffer","https://example.org/eins");
+        var cards=tools.jackson.databind.json.JsonMapper.builder().build()
+                .readTree(exchange("GET",transcriptPath(f.org(),f.chat()),f.cookie(),null).getBody()).path("toolCalls");
+        assertThat(cards).hasSize(2);
+        assertThat(cards.get(0).path("tool").asString()).isEqualTo("web_search");
+        assertThat(cards.get(0).path("argumentsText").asString()).contains("Satelliten Hersteller Europa");
+        assertThat(cards.get(1).path("argumentsText").asString()).contains("ORBITAL_TERM_5521 Hersteller");
+        assertThat(cards.get(1).path("status").asString()).isEqualTo("SUCCEEDED");
+        assertThat(jdbc.queryForObject("select count(*) from tool_admin_event where org_id=? and action='web_search' and enabled=true",
+                Integer.class,Long.valueOf(f.org()))).isEqualTo(1);
+    }
+
+    @Test void webSearchToolIsNotOfferedWithoutTheQuestionToggleOrTheOrgSwitch() {
+        var f=webFixture(true);
+        var plain=exchange("POST",streamPath(f.org(),f.chat()),f.cookie(),Map.of("prompt","Wer baut Satelliten?"));
+        assertThat(plain.getStatusCode().value()).isEqualTo(200);
+        assertThat(toolBodies).allSatisfy(body -> assertThat(body).doesNotContain("web_search"));
+        var off=webFixture(false);
+        toolBodies.clear();
+        exchange("POST",streamPath(off.org(),off.chat()),off.cookie(),Map.of("prompt","Wer baut Satelliten?","webSearch",true));
+        assertThat(toolBodies).allSatisfy(body -> assertThat(body).doesNotContain("web_search"));
+        assertThat(f.queries()).isEmpty();
+        assertThat(off.queries()).isEmpty();
+        var settings=exchange("GET","/api/v1/orgs/"+off.org()+"/tools/settings",off.cookie(),null);
+        assertThat(settings.getBody()).contains("\"webSearchEnabled\":false","\"webSearchAvailable\":false");
     }
 
     // ---- TU-04c: attachment tools ----

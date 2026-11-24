@@ -1,6 +1,6 @@
 # TU-04d — Websuche als Werkzeug
 
-Status: **geplant, nicht gestartet.** Vierte Aufgabe von TU-04 nach TU-04c (PR #30, Merge `35fa2d2`), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Anfragen an externe Hosts (Suchanbieter), Modell-/Werkzeugschleife. Der Webseitenabruf mit SSRF-Schutz folgt als eigener letzter Schritt (TU-04e), nicht hier.
+Status: **in Umsetzung** auf `feat/tool-use-web-search` (PO-Zuweisung 24.11.2026: Claude implementiert, unabhängige Prüfung durch Codex). Vierte Aufgabe von TU-04 nach TU-04c (PR #30, Merge `35fa2d2`), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Anfragen an externe Hosts (Suchanbieter), Modell-/Werkzeugschleife. Der Webseitenabruf mit SSRF-Schutz folgt als eigener letzter Schritt (TU-04e), nicht hier.
 
 ## Ziel
 

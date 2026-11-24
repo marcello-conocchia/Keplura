@@ -125,10 +125,11 @@ public class ChatService {
     /** TU-03a: bounded READ followups; the action planner sees only the current instruction. */
     private GatewayClient.UpstreamStream toolTurn(Long userId, Long orgId, TurnContext ctx, String prompt,
                                                   ChatProperties chat,
-                                                  com.keplura.server.gateway.GatewayProperties effective) {
+                                                  com.keplura.server.gateway.GatewayProperties effective,
+                                                  boolean webSearch) {
         return toolExecution == null ? null
                 : new ChatToolLoop(toolExecution, gatewayClient).run(userId, orgId, ctx, prompt, chat, effective,
-                    () -> refreshToolEvidence(userId,orgId,ctx,chat));
+                    () -> refreshToolEvidence(userId,orgId,ctx,chat), webSearch);
     }
 
     private ChatContextService contextService;
@@ -452,7 +453,7 @@ public class ChatService {
                     new java.io.ByteArrayInputStream(bytes), "text/event-stream"), observer, ctx);
         }
         try {
-            GatewayClient.UpstreamStream upstream = toolTurn(userId, orgId, ctx, prompt, chat, effective);
+            GatewayClient.UpstreamStream upstream = toolTurn(userId, orgId, ctx, prompt, chat, effective, webSearch);
             if (upstream == null) {
                 upstream = gatewayClient.openStream(ctx.canonicalRequestBody(), chat.model(), effective);
             }

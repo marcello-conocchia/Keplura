@@ -36,10 +36,16 @@ final class ChatToolLoop {
 
     GatewayClient.UpstreamStream run(Long userId,Long orgId,ChatService.TurnContext ctx,String prompt,
             ChatProperties chat,GatewayProperties effective,java.util.function.Supplier<byte[]> freshEvidence) {
+        return run(userId,orgId,ctx,prompt,chat,effective,freshEvidence,false);
+    }
+
+    /** {@code webSearch}: the person enabled "Im Web suchen" for THIS question (TU-04d). */
+    GatewayClient.UpstreamStream run(Long userId,Long orgId,ChatService.TurnContext ctx,String prompt,
+            ChatProperties chat,GatewayProperties effective,java.util.function.Supplier<byte[]> freshEvidence,boolean webSearch) {
         var context = execution.resolveContext(userId, orgId, ctx.conversationId());
         if (context == null) return null; // no tool plan; ordinary chat can still answer
         // Never recreate this object between rounds: its sealed policy and counters belong to the question.
-        var turn = execution.openTurn(context, ctx.promptMessageId());
+        var turn = execution.openTurn(context, ctx.promptMessageId(), webSearch);
         if (turn.offered().isEmpty()) return null;
         String webContext = "";
         for (JsonNode message : mapper.readTree(ctx.canonicalRequestBody()).path("messages")) {
