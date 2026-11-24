@@ -150,7 +150,7 @@ public class ToolExecutionService {
     /** Gibt es im Chat mindestens ein ausführbares Werkzeug? */
     public boolean hasTools(Long userId, Long orgId, Long conversationId) {
         ToolContext ctx = resolveContext(userId, orgId, conversationId);
-        return ctx != null && !catalog(ctx).isEmpty();
+        return ctx != null && !catalog(ctx, false).isEmpty();
     }
 
     /** Öffnet einen Antwort-Turn mit frisch ermitteltem Katalog und eigenen Limits. */
@@ -160,7 +160,15 @@ public class ToolExecutionService {
 
     /** Wie {@link #openTurn(ToolContext)}; Karten werden der Frage {@code promptMessageId} zugeordnet. */
     public ToolTurn openTurn(ToolContext ctx, Long promptMessageId) {
-        return new ToolTurn(ctx, ctx == null ? Map.of() : catalog(ctx), promptMessageId);
+        return openTurn(ctx, promptMessageId, false);
+    }
+
+    /**
+     * TU-04d: {@code webSearch} is the person's per-question choice ("Im Web suchen"). Without it no web tool is
+     * offered, so nothing leaves for the search provider. Continuations stay bound to this original catalog.
+     */
+    public ToolTurn openTurn(ToolContext ctx, Long promptMessageId, boolean webSearch) {
+        return new ToolTurn(ctx, ctx == null ? Map.of() : catalog(ctx, webSearch), promptMessageId);
     }
 
     public record Continuation(ToolTurn turn, ToolQuestionStore.State state, String decision) { }
@@ -370,7 +378,7 @@ public class ToolExecutionService {
     private Map<String, ToolDefinition> boundCatalog(ToolContext ctx, ToolQuestionStore.State state) {
         if (state.userId()!=ctx.userId() || state.orgId()!=ctx.orgId() || state.conversationId()!=ctx.conversationId()
                 || state.spaceId()!=ctx.spaceId()) return null;
-        Map<String, ToolDefinition> offered = catalog(ctx);
+        Map<String, ToolDefinition> offered = catalog(ctx, true); // narrowed to the stored original catalog below
         JsonNode expected = mapper.readTree(state.catalog());
         if (!expected.isObject()) return null;
         for (var e : expected.properties()) {
@@ -478,9 +486,10 @@ public class ToolExecutionService {
         }
     }
 
-    private Map<String, ToolDefinition> catalog(ToolContext ctx) {
+    private Map<String, ToolDefinition> catalog(ToolContext ctx, boolean webSearch) {
         Map<String, ToolDefinition> out = new LinkedHashMap<>();
         for (ToolAdapter adapter : adapters.values()) {
+            if (!webSearch && WebSearchToolAdapter.KIND.equals(adapter.kind())) continue;
             List<ToolDefinition> defs;
             try {
                 defs = adapter.definitionsFor(ctx);

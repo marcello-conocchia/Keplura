@@ -17,10 +17,14 @@ import java.util.List;
 @RequestMapping("/api/v1/orgs/{orgId}/tools/settings")
 public class ToolSettingsController {
     public record Boundary(long serverId,String name,boolean internal) { }
-    public record Settings(boolean knowledgeEnabled,List<Boundary> servers) { }
-    public record Input(Boolean knowledgeEnabled,Long serverId,Boolean internal) { }
+    /** {@code webSearchAvailable}: a search provider is configured by the platform admin (TU-04d). */
+    public record Settings(boolean knowledgeEnabled,boolean webSearchEnabled,boolean webSearchAvailable,List<Boundary> servers) { }
+    public record Input(Boolean knowledgeEnabled,Boolean webSearchEnabled,Long serverId,Boolean internal) { }
     private final JdbcTemplate jdbc;
+    private com.keplura.server.websearch.WebSearchService webSearch;
     public ToolSettingsController(JdbcTemplate jdbc) { this.jdbc=jdbc; }
+    @org.springframework.beans.factory.annotation.Autowired(required=false)
+    void setWebSearch(com.keplura.server.websearch.WebSearchService webSearch) { this.webSearch=webSearch; }
 
     private long owner(long orgId,HttpServletRequest request) {
         var session=request.getSession(false);
@@ -40,8 +44,12 @@ public class ToolSettingsController {
     @GetMapping
     public Settings get(@PathVariable long orgId,HttpServletRequest request) {
         owner(orgId,request);
-        var flags=jdbc.queryForList("select knowledge_enabled from org_tool_setting where org_id=?",Boolean.class,orgId);
-        return new Settings(!flags.isEmpty() && flags.getFirst(),boundaries(orgId));
+        var flags=jdbc.query("select knowledge_enabled,web_search_enabled from org_tool_setting where org_id=?",
+                (rs,n)->new boolean[]{rs.getBoolean(1),rs.getBoolean(2)},orgId);
+        boolean available=false;
+        try { available=webSearch!=null && webSearch.enabled(); }
+        catch(RuntimeException unreadable) { /* shown as unavailable; the tool itself fails closed */ }
+        return new Settings(!flags.isEmpty() && flags.getFirst()[0],!flags.isEmpty() && flags.getFirst()[1],available,boundaries(orgId));
     }
     @PutMapping
     @Transactional
@@ -55,6 +63,14 @@ public class ToolSettingsController {
                 jdbc.update("insert into org_tool_setting(org_id,knowledge_enabled,revision) values(?,?,1)",orgId,input.knowledgeEnabled()); changed=1;
             }
             if(changed>0) audit(orgId,userId,null,"knowledge_search",input.knowledgeEnabled());
+        }
+        if(input.webSearchEnabled()!=null) {
+            // Own revision: switching web search never changes (or cancels) the knowledge tools.
+            int changed=jdbc.update("update org_tool_setting set web_search_enabled=?,web_revision=web_revision+1 where org_id=? and web_search_enabled<>?",input.webSearchEnabled(),orgId,input.webSearchEnabled());
+            if(jdbc.queryForObject("select count(*) from org_tool_setting where org_id=?",Integer.class,orgId)==0) {
+                jdbc.update("insert into org_tool_setting(org_id,web_search_enabled,web_revision) values(?,?,1)",orgId,input.webSearchEnabled()); changed=1;
+            }
+            if(changed>0) audit(orgId,userId,null,"web_search",input.webSearchEnabled());
         }
         if(input.serverId()!=null && input.internal()!=null) {
             if(boundaries(orgId).stream().noneMatch(b -> b.serverId()==input.serverId())) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
