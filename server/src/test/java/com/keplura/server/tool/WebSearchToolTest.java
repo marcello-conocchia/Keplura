@@ -199,6 +199,55 @@ class WebSearchToolTest {
         assertThat(card("web_search").status()).isEqualTo("FAILED");
     }
 
+    /** Codex review TU-04d (major): a provider change after the central check never redirects the bound card. */
+    @Test void providerChangedAfterTheCheckSendsNothingToTheNewTarget() throws Exception {
+        var other = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        var otherQueries = new CopyOnWriteArrayList<String>();
+        other.createContext("/search", exchange -> {
+            otherQueries.add(exchange.getRequestURI().getRawQuery());
+            byte[] body = "{\"results\":[]}".getBytes(StandardCharsets.UTF_8);
+            exchange.sendResponseHeaders(200, body.length);
+            try (var out = exchange.getResponseBody()) { out.write(body); }
+        });
+        other.start();
+        try {
+            var a = new WebSearchService.Config("searxng", providerUrl, "", 5, List.of("blocked.test"), "admin");
+            var b = new WebSearchService.Config("searxng", "http://127.0.0.1:" + other.getAddress().getPort(), "", 5, List.of(), "admin");
+            var current = new java.util.concurrent.atomic.AtomicReference<>(a);
+            var switching = com.keplura.server.websearch.WebSearchTestSupport.withGuard(new WebSearchService("none", "", "", 5, "", 2) {
+                @Override public Config effective() { return current.get(); }
+            }, new SsrfGuard("127.0.0.1/32"));
+            var adapter = new WebSearchToolAdapter(jdbc, switching);
+            var ctx = service.resolveContext(1L, 1L, 1L);
+            var checked = adapter.definitionsFor(ctx).getFirst(); // what the central re-check bound the card to
+            current.set(b);                                         // admin switches the provider in this window
+            var args = M.readTree("{\"query\":\"" + SECRET + "\"}");
+            org.assertj.core.api.Assertions.assertThatThrownBy(() -> adapter.invoke(ctx, checked, args))
+                    .isInstanceOf(ToolAdapter.ToolNotStartedException.class);
+            assertThat(otherQueries).isEmpty();
+            assertThat(queries).isEmpty();
+            // with the unchanged target the same definition runs against exactly that target
+            current.set(a);
+            assertThat(adapter.invoke(ctx, checked, M.readTree("{\"query\":\"Satelliten\"}"))).contains("[W1]");
+            assertThat(queries).containsExactly("Satelliten");
+            assertThat(otherQueries).isEmpty();
+        } finally { other.stop(0); }
+    }
+
+    /** Codex review TU-04d (minor): a query the service would cut at 400 UTF-16 units is rejected, never sent altered. */
+    @Test void queryLongerThan400Utf16UnitsIsRejectedNotShortened() {
+        var turn = turn(true);
+        String rocket = new String(Character.toChars(0x1F680));
+        String fits = rocket.repeat(200); // 400 UTF-16 units: sent unchanged
+        assertThat(turn.call("web_search", M.createObjectNode().put("query", fits).toString()).invoked()).isTrue();
+        assertThat(queries).containsExactly(fits);
+        String tooLong = rocket.repeat(201); // 201 code points, 402 UTF-16 units: the schema accepts it
+        var rejected = turn.call("web_search", M.createObjectNode().put("query", tooLong).toString());
+        assertThat(rejected.invoked()).isFalse();
+        assertThat(rejected.text()).contains("Es wurde nichts gesendet");
+        assertThat(queries).containsExactly(fits);
+    }
+
     @Test void continuationStaysBoundToTheOriginalCatalogWithoutTheToggle() {
         // The stored catalog of a question without "Im Web suchen" never contains the web tool.
         var turn = turn(false);
