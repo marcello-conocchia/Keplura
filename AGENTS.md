@@ -9,7 +9,8 @@ Asking the owner is the exception, not the rule.
 Tool Use ist das Arbeitsziel für die nächsten Tage: mindestens der dokumentierte
 Funktionsumfang von Open WebUI. Vor jeder nächsten Aufgabenwahl
 `docs/PROJECT_STATE.md` und `docs/TOOL_USE_PLAN.md` lesen. TU-01 bis TU-05a sind auf
-main (bis PR #36); nächste Aufgabe: nächsten kleinsten TU-05-Schritt (Modellvorgaben) spezifizieren.
+main (bis PR #36); aktuelle Aufgabe: `docs/tasks/TU-05b-d-model-defaults-tool-search-questions.md`
+(PO 25.11.2026: TU-05b–d in einem PR mit getrennten Commits; Claude implementiert, Codex prüft).
 Genau eine Implementierung gleichzeitig.
 Die Reihenfolge ersetzt ältere allgemeine Folgeaufgaben, nicht offene
 Sicherheitsverpflichtungen. Bestehende Gate-, Provider-/Budget-, Release- und
@@ -75,6 +76,11 @@ Deployregeln bleiben verbindlich. Der Plan ist kein Nachweis fertiger Funktionen
     why in one line. A Class-B PR that turns out to touch a Class-A area is
     re-classified, never merged as B.
   - Prefer small PRs merged soon over long-lived stacked branches.
+    Exception (PO decision 2026-11-25, chat: „ja opption 1“): on explicit PO
+    instruction, related sub-steps of the same roadmap step may ship as ONE
+    PR with one commit per sub-step, one shared spec, one CI run at the end
+    and one review round (Class A still independently reviewed). Without
+    such an instruction, small PRs remain the rule. First used for TU-05b–d.
 - Lean verification (PO decision 2026-11-16, Chat: „wir testen einfach zu
   viel“ → „Ja mache das und veranker das im Projekt das Codex auch weis“).
   Binding for every agent (Claude, Codex, Hermes profiles):
