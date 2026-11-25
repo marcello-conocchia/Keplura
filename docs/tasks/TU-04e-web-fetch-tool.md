@@ -1,6 +1,6 @@
 # TU-04e — Webseitenabruf als Werkzeug
 
-Status: **Freigegeben zur Übernahme in PR #34: Claude: APPROVED (Code + Security) auf 8387fc3, lokale Linux-CI grün; noch nicht gemergt (25.11.2026).** Fünfte und letzte Aufgabe von TU-04 nach TU-04d (PR #32, Merge `ddc05a9`), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Laden beliebiger Adressen aus dem Internet (SSRF-Fläche), Verarbeitung fremder Inhalte, Modell-/Werkzeugschleife.
+Status: **abgeschlossen auf main, PR #34, Squash-Merge 36014ca (25.11.2026).** Fünfte und letzte Aufgabe von TU-04; damit TU-04 vollständig abgeschlossen. Claude: APPROVED (Code + Security) auf 8387fc3; lokale Linux-CI Exit 0. Nach Fetch Dateibaum identisch mit freigegebenem PR-Head 12c2151. Kein Release/Deployment.
 
 ## Ziel
 
