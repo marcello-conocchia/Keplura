@@ -137,7 +137,44 @@ public class SsrfGuard {
         if (isCgnat(addr) || isUniqueLocalV6(addr)) {
             return false; // spaces Java's isSiteLocalAddress does NOT cover
         }
+        byte[] bytes = addr.getAddress();
+        if (bytes.length == 4) {
+            int first = bytes[0] & 0xff;
+            int second = bytes[1] & 0xff;
+            // This network, reserved/broadcast space, and benchmarking networks are not public routes.
+            return first != 0 && first < 240 && !(first == 198 && (second == 18 || second == 19));
+        }
+        // RFC 8215 local-use translation permits network-specific mappings/prefix lengths.
+        // Without that configuration there is no unique IPv4 extraction; never dial this local-use range.
+        if ((bytes[0] & 0xff) == 0x00 && (bytes[1] & 0xff) == 0x64
+                && (bytes[2] & 0xff) == 0xff && (bytes[3] & 0xff) == 0x9b
+                && bytes[4] == 0 && bytes[5] == 1) return false; // 64:ff9b:1::/48
+        int embeddedOffset = -1;
+        if (zeroPrefix(bytes, 12)
+                || (zeroPrefix(bytes, 10) && bytes[10] == (byte) 0xff && bytes[11] == (byte) 0xff)) {
+            embeddedOffset = 12; // IPv4-compatible ::/96 or mapped ::ffff:0:0/96, including explicit Inet6Address
+        } else if (bytes[0] == 0 && bytes[1] == 0x64 && bytes[2] == (byte) 0xff && bytes[3] == (byte) 0x9b
+                && zeroRange(bytes, 4, 12)) {
+            embeddedOffset = 12; // RFC 6052 well-known NAT64 prefix 64:ff9b::/96
+        } else if (bytes[0] == 0x20 && bytes[1] == 0x02) {
+            embeddedOffset = 2; // 6to4 2002::/16: the IPv4 route is bits 16..47, not the final 32 bits
+        }
+        if (embeddedOffset >= 0) {
+            try {
+                // The embedded target receives exactly the same public-only policy, never admin CIDR exceptions.
+                return publicRouteAllowed(InetAddress.getByAddress(java.util.Arrays.copyOfRange(bytes, embeddedOffset, embeddedOffset + 4)));
+            } catch (UnknownHostException impossible) {
+                return false;
+            }
+        }
         return true; // a global routable address
+    }
+
+    private static boolean zeroPrefix(byte[] bytes, int length) { return zeroRange(bytes, 0, length); }
+
+    private static boolean zeroRange(byte[] bytes, int from, int to) {
+        for (int i = from; i < to; i++) if (bytes[i] != 0) return false;
+        return true;
     }
 
     /**

@@ -70,7 +70,7 @@ public class WebPageFetcher {
                         || (host.contains(":") && address.getAddress().length == 4)) throw refused();
             }
             int port = uri.getPort() < 0 ? (uri.getScheme().equals("https") ? 443 : 80) : uri.getPort();
-            try (Socket socket = new Socket()) {
+            try (Socket socket = new Socket(Proxy.NO_PROXY)) {
                 session.register(socket);
                 socket.setSoTimeout((int) timeout.toMillis());
                 dialer.connect(socket, addresses[0], port, (int) timeout.toMillis());

@@ -54,6 +54,31 @@ class SsrfGuardTest {
         assertThat(guard.routeAllowed(InetAddress.getByName("8.8.8.8"))).isTrue();
     }
 
+    @Test void embeddedPublicIpv4AndNativePublicAddressesStayAllowed() throws UnknownHostException {
+        for (String ip : new String[]{"8.8.8.8", "2001:4860:4860::8888", "64:ff9b::808:808", "2002:808:808::1", "::8.8.8.8",
+                "1.0.0.1", "198.17.255.255", "198.20.0.0"}) {
+            assertThat(SsrfGuard.publicRouteAllowed(InetAddress.getByName(ip))).as(ip).isTrue();
+        }
+    }
+
+    @Test void localUseTranslationIsClosedForEveryMappingAndOperatorExceptionsDoNotApply() throws UnknownHostException {
+        for (String ip : new String[]{"64:ff9b:1::808:808", "64:ff9b:1:808:8:800::", "64:ff9b:1:ffff:ffff:ffff:ffff:ffff",
+                "64:ff9b::7f00:1", "2002:7f00:1::1", "::127.0.0.1"}) {
+            var address = InetAddress.getByName(ip);
+            assertThat(SsrfGuard.publicRouteAllowed(address)).as(ip).isFalse();
+            assertThat(new SsrfGuard("127.0.0.0/8").routeAllowed(address)).as(ip).isFalse();
+        }
+    }
+
+    @Test void explicitMappedInet6ObjectsAlsoCheckTheEmbeddedIpv4() throws UnknownHostException {
+        byte[] bytes = new byte[16];
+        bytes[10] = (byte) 0xff; bytes[11] = (byte) 0xff;
+        bytes[12] = 127; bytes[15] = 1;
+        assertThat(SsrfGuard.publicRouteAllowed(java.net.Inet6Address.getByAddress(null, bytes, -1))).isFalse();
+        bytes[12] = 8; bytes[13] = 8; bytes[14] = 8; bytes[15] = 8;
+        assertThat(SsrfGuard.publicRouteAllowed(java.net.Inet6Address.getByAddress(null, bytes, -1))).isTrue();
+    }
+
     /**
      * Review-Runde-1 (blocking finding): Java's isSiteLocalAddress covers
      * only the DEPRECATED fec0::/10 — fc00::/7 (RFC 4193 ULA) falls through

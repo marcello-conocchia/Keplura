@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
 import java.net.*;
@@ -86,6 +87,52 @@ class WebPageFetcherTest {
         assertThatThrownBy(() -> fetcher.fetch("http://example.org/", List.of())).isInstanceOf(IOException.class);
         assertThat(connections).hasValue(0);
         assertThat(requests).hasValue(0);
+    }
+
+    static java.util.stream.Stream<String> embeddedOrSpecialRoutes() {
+        return java.util.stream.Stream.of(
+                "64:ff9b::7f00:1", "64:ff9b::a9fe:a9fe", "64:ff9b::a00:1", "64:ff9b::6440:1",
+                "2002:7f00:1::1", "2002:a9fe:a9fe::1", "2002:c0a8:1::1", "2002:6440:1::1",
+                "::127.0.0.1", "::169.254.169.254", "::10.0.0.1", "::100.64.0.1",
+                "64:ff9b:1::7f00:1", "64:ff9b:1::a9fe:a9fe", "64:ff9b:1:7f00:1::", "64:ff9b:1:a9fe:fe:a900::",
+                "0.0.0.1", "0.255.255.255", "240.0.0.0", "255.255.255.255", "198.18.0.0", "198.19.255.255",
+                "64:ff9b::1", "64:ff9b::f000:1", "2002:c612:1::1");
+    }
+
+    @ParameterizedTest @MethodSource("embeddedOrSpecialRoutes")
+    void embeddedAndSpecialLiteralsNeverReachTheDialer(String ip) {
+        fetcher = new WebPageFetcher(InetAddress::getAllByName,
+                (s, a, p, t) -> connections.incrementAndGet(), Duration.ofSeconds(1));
+        String url = "http://" + (ip.contains(":") ? "[" + ip + "]" : ip) + "/";
+        assertThatThrownBy(() -> fetcher.fetch(url, List.of())).isInstanceOf(IOException.class);
+        assertThat(connections).hasValue(0);
+        assertThat(requests).hasValue(0);
+    }
+
+    @ParameterizedTest @MethodSource("embeddedOrSpecialRoutes")
+    void embeddedAndSpecialDnsAnswersNeverReachTheDialer(String ip) {
+        fetcher = new WebPageFetcher(host -> new InetAddress[]{InetAddress.getByName(ip)},
+                (s, a, p, t) -> connections.incrementAndGet(), Duration.ofSeconds(1));
+        assertThatThrownBy(() -> fetcher.fetch("http://example.org/", List.of())).isInstanceOf(IOException.class);
+        assertThat(connections).hasValue(0);
+        assertThat(requests).hasValue(0);
+    }
+
+    @Test void ambientSocksProxySelectorIsNeverUsed() throws Exception {
+        var original = ProxySelector.getDefault();
+        var selected = new AtomicInteger();
+        try {
+            ProxySelector.setDefault(new ProxySelector() {
+                @Override public List<Proxy> select(URI uri) {
+                    selected.incrementAndGet();
+                    return List.of(new Proxy(Proxy.Type.SOCKS, new InetSocketAddress("127.0.0.1", server.getAddress().getPort())));
+                }
+                @Override public void connectFailed(URI uri, SocketAddress sa, IOException e) { }
+            });
+            assertThat(fetcher.fetch("http://example.org/", List.of()).text()).contains("Seitentext");
+            assertThat(selected).hasValue(0);
+            assertThat(connections).hasValue(1);
+        } finally { ProxySelector.setDefault(original); }
     }
 
     @ParameterizedTest
