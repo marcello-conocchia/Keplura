@@ -747,6 +747,10 @@ class ChatApiIntegrationTest {
         assertThat(after.toString()).doesNotContain(ATTACHMENT_SECRET);
         assertThat(exchange("POST",transcriptPath(f.org(),f.chat())+"/tool-calls/"+after.get(2).path("id").asString()+"/decision",
                 f.cookie(),Map.of("decision","confirm")).getStatusCode().value()).isEqualTo(409);
+        // TU-05d: an ordinary call never takes client text, and an answer only goes with "confirm".
+        String decisionPath=transcriptPath(f.org(),f.chat())+"/tool-calls/"+after.get(2).path("id").asString()+"/decision";
+        assertThat(exchange("POST",decisionPath,f.cookie(),Map.of("decision","confirm","answer","Ja")).getStatusCode().value()).isEqualTo(400);
+        assertThat(exchange("POST",decisionPath,f.cookie(),Map.of("decision","reject","answer","Ja")).getStatusCode().value()).isEqualTo(400);
         assertThat(f.external().invocations).hasValue(0);
     }
 

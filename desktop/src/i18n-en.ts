@@ -1105,4 +1105,16 @@ export const EN: Record<string, string> = {
   "Gilt, solange ein Chat keine eigene Werkzeugauswahl hat. Freigaben der Organisation bleiben maßgeblich.": "Applies while a chat has no own tool selection. The organization's approvals still apply.",
   "Das aktuelle Modell nutzt keine Werkzeuge. Eine Auswahl wirkt erst mit einem Modell, das Werkzeuge erlaubt.": "The current model uses no tools. A selection only takes effect with a model that allows tools.",
   "Das Modell bietet standardmäßig {0} von {1} Werkzeugen an.": "By default the model offers {0} of {1} tools.",
+  // TU-05d questions to the person
+  "Rückfrage": "Question",
+  "Beantwortet": "Answered",
+  "Nicht beantwortet": "Not answered",
+  "Die Rückfrage wird nicht mehr angezeigt.": "The question is no longer shown.",
+  "Rückfrage beantworten": "Answer the question",
+  "Eigene Antwort": "Your own answer",
+  "Antwort senden": "Send answer",
+  "Nicht beantworten": "Don't answer",
+  "Die Antwort setzt die Frage fort, bis {0}.": "The answer continues the question, until {0}.",
+  "Deine Antwort": "Your answer",
+  "Diese Antwort passt nicht zur Rückfrage.": "This answer does not fit the question.",
 };

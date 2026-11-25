@@ -167,8 +167,12 @@ public class ChatController {
         this.exportService = exportService;
     }
 
-    /** TU-02: body {"decision": "confirm" | "reject"} — nothing else is read (no arguments, targets or rights). */
-    public record ToolCallDecisionRequest(String decision) {
+    /**
+     * TU-02: body {"decision": "confirm" | "reject"} — nothing else is read (no arguments, targets or rights).
+     * TU-05d: a question card additionally takes {"answer": "..."} with "confirm"; the server checks it against the
+     * stored options. Any other card rejects an answer.
+     */
+    public record ToolCallDecisionRequest(String decision, String answer) {
     }
 
     /**
@@ -187,7 +191,11 @@ public class ChatController {
         if (!"confirm".equals(decision) && !"reject".equals(decision)) {
             return ResponseEntity.badRequest().body(new ErrorResponse("decision must be confirm or reject"));
         }
-        var outcome = chatService.decideToolCall(principal.userId(), orgId, conversationId, callId, "confirm".equals(decision));
+        String answer = body.answer();
+        if (answer != null && (!"confirm".equals(decision) || answer.length() > 4 * com.keplura.server.tool.UserQuestionToolAdapter.MAX_ANSWER)) {
+            return ResponseEntity.badRequest().body(new ErrorResponse("answer is only possible when confirming a question"));
+        }
+        var outcome = chatService.decideToolCall(principal.userId(), orgId, conversationId, callId, "confirm".equals(decision), answer);
         return switch (outcome) {
             case com.keplura.server.tool.ToolExecutionService.Decision.Done d -> {
                 var result = (tools.jackson.databind.node.ObjectNode) mapper.valueToTree(d.card());
@@ -197,6 +205,8 @@ public class ChatController {
             case com.keplura.server.tool.ToolExecutionService.Decision.Conflict c -> ResponseEntity.status(HttpStatus.CONFLICT).body(c.card());
             case com.keplura.server.tool.ToolExecutionService.Decision.NotFound n ->
                     ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("tool call not found"));
+            case com.keplura.server.tool.ToolExecutionService.Decision.Invalid i ->
+                    ResponseEntity.badRequest().body(new ErrorResponse(i.message()));
         };
     }
 

@@ -33,6 +33,10 @@ export interface ToolCallCard {
   mayContainInternal?: boolean;
   sourceUnavailable?: boolean;
   sourceTemporarilyUnavailable?: boolean;
+  /** TU-05d: "QUESTION" = a question to the person (answer instead of execute). */
+  kind?: "TOOL" | "QUESTION";
+  /** TU-05d: the question as stored; null when the inputs are no longer kept. */
+  question?: { text: string; options: string[]; freeText: boolean } | null;
 }
 
 export type Tone = "ok" | "wait" | "neutral" | "error" | "info";
