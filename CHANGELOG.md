@@ -12,6 +12,20 @@ the first tagged release (planned `0.1.0`, see [docs/RELEASING.md](docs/RELEASIN
 
 ### Added
 
+- Model tool defaults (TU-05b): admins decide per chat model whether it gets
+  tools at all (`AUTO`/`OFF`) and which tool kinds it offers by default while a
+  chat has no own selection. `OFF` also blocks already planned calls.
+
+- Tool search for large catalogs (TU-05c): above 12 approved tools the model
+  first gets `tool_search` and makes at most 8 matching tools visible per search.
+  It only searches the question's sealed catalog; the former silent cut at 32
+  tools is gone.
+
+- Structured questions (TU-05d): the model can ask the person one question with
+  up to six options or a free answer. The question card interrupts the answer;
+  the validated reply resumes it once. Afterwards at most one follow-up action is
+  proposed, and only with its own confirmation.
+
 - Chats can use the server's default tool selection or limit which approved tools
   the model receives. A changed selection cancels pending tool confirmations and
   applies from the next question.

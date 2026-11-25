@@ -8,7 +8,7 @@ Diese Reihenfolge ersetzt ältere allgemeine Angaben zur nächsten UI-/Roadmap-A
 
 ## Verbindliche Reihenfolge
 
-**TU-01 bis TU-04 sind abgeschlossen und auf main (TU-04e: PR #34, Merge 36014ca, 25.11.2026; vorherige Nachweise in PROJECT_STATE.md). TU-05a — Tool-Auswahl je Chat ist mit PR #36 abgeschlossen. Der Rest von TU-05 (TU-05b–d) ist in Umsetzung. TU-05 bis TU-07 bleiben offen.** Genau eine aktive Implementierungsaufgabe. Größere Schritte werden in kleine PRs zerlegt; nur die unmittelbar nächste Aufgabe wird konkret angelegt.
+**TU-01 bis TU-04 sind abgeschlossen und auf main (TU-04e: PR #34, Merge 36014ca, 25.11.2026; vorherige Nachweise in PROJECT_STATE.md). TU-05a — Tool-Auswahl je Chat ist mit PR #36 abgeschlossen. Der Rest von TU-05 (TU-05b–d) ist implementiert und wartet auf die unabhängige Prüfung (Codex), noch nicht gemergt. TU-05 bis TU-07 bleiben offen.** Genau eine aktive Implementierungsaufgabe. Größere Schritte werden in kleine PRs zerlegt; nur die unmittelbar nächste Aufgabe wird konkret angelegt.
 
 **Ausnahme (PO-Entscheidung 25.11.2026, Chat: „ja opption 1“):** Zusammengehörige Teilschritte desselben TU-Schritts dürfen auf PO-Anweisung in **einem PR mit getrennten Commits je Teilschritt** umgesetzt werden: eine gemeinsame Spec, ein CI-Lauf am Ende, eine Review-Runde (Klasse A weiterhin unabhängig). Erstmals angewendet auf TU-05b–d. Ohne ausdrückliche PO-Anweisung gilt weiter die Zerlegung in kleine PRs.
 
@@ -41,7 +41,7 @@ Nach jedem Merge PROJECT_STATE.md mit tatsächlichem Stand, Belegen und nächste
 
 ## Unmittelbar nächste Aufgabe
 
-**TU-05a — Tool-Auswahl je Chat**, siehe [Spec](tasks/TU-05a-chat-tool-selection.md). Abgeschlossen mit PR #36 (25.11.2026). Eine Person kann die für ihren Chat angebotenen Werkzeuge einschränken; die Auswahl erweitert niemals Freigaben oder Rechte und bleibt an den ursprünglichen Fragekatalog gebunden. Danach folgen Modellvorgaben, Tool-Suche bei großen Katalogen und strukturierte Rückfragen gemeinsam als [TU-05b–d](tasks/TU-05b-d-model-defaults-tool-search-questions.md) (PO-Entscheidung 25.11.2026: ein PR mit getrennten Commits; Claude implementiert, Codex prüft). In Umsetzung. TU-04 ist mit [TU-04e](tasks/TU-04e-web-fetch-tool.md) auf main abgeschlossen (PR #34, 36014ca; Claude: APPROVED, Code + Security auf 8387fc3, lokale Linux-CI Exit 0 unter ci/evidence/20261125-191631/).
+**TU-05a — Tool-Auswahl je Chat**, siehe [Spec](tasks/TU-05a-chat-tool-selection.md). Abgeschlossen mit PR #36 (25.11.2026). Eine Person kann die für ihren Chat angebotenen Werkzeuge einschränken; die Auswahl erweitert niemals Freigaben oder Rechte und bleibt an den ursprünglichen Fragekatalog gebunden. Danach folgen Modellvorgaben, Tool-Suche bei großen Katalogen und strukturierte Rückfragen gemeinsam als [TU-05b–d](tasks/TU-05b-d-model-defaults-tool-search-questions.md) (PO-Entscheidung 25.11.2026: ein PR mit getrennten Commits; Claude implementiert, Codex prüft). Implementiert, Prüfung offen, nicht gemergt. TU-04 ist mit [TU-04e](tasks/TU-04e-web-fetch-tool.md) auf main abgeschlossen (PR #34, 36014ca; Claude: APPROVED, Code + Security auf 8387fc3, lokale Linux-CI Exit 0 unter ci/evidence/20261125-191631/).
 
 ## Vergleichsquellen (abgerufen am 21.11.2026)
 

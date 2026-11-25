@@ -1,6 +1,6 @@
 # TU-05b–d — Modellvorgaben, Tool-Suche und strukturierte Rückfragen
 
-Status: **in Umsetzung.** Restumfang von TU-05 nach TU-05a (PR #36, Merge 3019e81), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). PO-Entscheidung vom 25.11.2026 im Chat: Option 1, alle drei Teile in **einem PR mit getrennten Commits**, ein CI-Lauf und eine Review-Runde am Ende. Claude implementiert, Codex prüft unabhängig (Code + Security).
+Status: **implementiert, wartet auf unabhängige Prüfung (Codex).** Draft-PR, nicht gemergt. Restumfang von TU-05 nach TU-05a (PR #36, Merge 3019e81), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). PO-Entscheidung vom 25.11.2026 im Chat: Option 1, alle drei Teile in **einem PR mit getrennten Commits**, ein CI-Lauf und eine Review-Runde am Ende. Claude implementiert, Codex prüft unabhängig (Code + Security).
 
 Klasse A: Admin-Einstellung am Modell, autorisierter Werkzeugkatalog, Unterbrechung und Fortsetzung der Werkzeugschleife.
 
@@ -18,7 +18,7 @@ Keine Stufe erweitert Rechte. Reihenfolge der Einschränkungen: Serverfreigabe �
 
 - `ai_model` erhält zwei Felder (Migration, nur neue Spalten mit Standardwerten):
   - `tool_use`: `AUTO` (Standard, bisheriges Verhalten) oder `OFF`. `OFF` bietet für dieses Modell **nie** Werkzeuge an, auch nicht durch eine Chat-Auswahl.
-  - `tool_defaults_json`: `NULL` = alle freigegebenen Werkzeugarten; sonst eine Liste von Werkzeugarten: `knowledge` (Wissenssuche und Dokumentstellen), `attachment` (Chat-Anhänge), `web` (Websuche und Webseitenabruf), `mcp` (MCP-Werkzeuge), `ask` (Rückfragen).
+  - `tool_defaults_json`: `NULL` = alle freigegebenen Werkzeugarten; sonst eine Liste von Werkzeugarten: `knowledge` (Wissenssuche und Dokumentstellen), `attachments` (Chat-Anhänge), `web` (Websuche und Webseitenabruf), `mcp` (MCP-Werkzeuge), `ask` (Rückfragen).
 - Maßgeblich ist das aktive Standard-Chatmodell, also dasselbe Modell, das die Antwort erzeugt. Ohne DB-Modell (ENV-Konfiguration) gilt `AUTO` ohne Einschränkung.
 - Ohne eigene Chat-Auswahl gilt die Modellvorgabe. Eine eigene Chat-Auswahl (TU-05a) ersetzt die Vorgabe der Werkzeugarten, nie aber `OFF` und nie die Serverfreigaben.
 - Jede Ausführung prüft `OFF` und die Vorgabe erneut.
@@ -40,6 +40,13 @@ Keine Stufe erweitert Rechte. Reihenfolge der Einschränkungen: Serverfreigabe �
 - Nach der Antwort läuft die Frage über den bestehenden einmaligen Fortsetzungsweg weiter. Die Antwort zählt wie der Fragetext als Herkunft der Person.
 - In der Fortsetzung sind Lesewerkzeuge erlaubt und **höchstens eine** Schreib- oder kritische Folgeaktion. Diese wird nur als Karte vorgelegt und braucht eine eigene konkrete Bestätigung, wie die Folgeaktion nach einer kritischen Bestätigung.
 - Die Rückfrage ist eine Werkzeugart (`ask`). Chat-Auswahl und Modellvorgabe können sie abschalten.
+
+## Umsetzungshinweise
+
+- V33 hat bewusst keine CHECK-Regel für `tool_use`: H2 kann die vorhandenen IN-Listen-CHECKs auf dem migrierten Schema nicht auswerten. Die Admin-API prüft die Werte, und der Werkzeugdienst behandelt jeden Wert außer `AUTO` sowie unlesbare Vorgaben als `OFF`.
+- `ask_user` wird nur angeboten, wenn mindestens ein anderes Werkzeug zulässig ist. Allein macht es aus einem normalen Chat keinen Werkzeug-Turn und erscheint auch nicht im Werkzeugmenü.
+- Rückfragekarten haben keinen Audit-Eintrag, weil nichts ausgeführt wird und keine Daten den Server verlassen. Die Antwort steht als Ergebnis auf der Karte.
+- Die Tool-Suche erzeugt keine Aufrufkarte. Sie zählt aber zum Limit von acht Aufrufen.
 
 ## Non-Goals
 
