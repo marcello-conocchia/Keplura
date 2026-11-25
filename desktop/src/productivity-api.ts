@@ -60,6 +60,14 @@ export interface ChatAttachment { id: number; filename: string; charCount: numbe
 export interface ChatContext { knowledgeBaseId: number | null; extraKnowledgeBaseIds: number[]; attachments: ChatAttachment[] }
 const convPath = (orgId: number, cid: number) => `/api/v1/orgs/${orgId}/chat/conversations/${cid}`;
 export const getChatContext = (orgId: number, cid: number) => call<ChatContext>("GET", `${convPath(orgId, cid)}/context`);
+export interface ChatToolSelection {
+  selectedIds: string[] | null;
+  tools: { id: string; name: string; source: string; risk: "READ" | "WRITE" | "CRITICAL" }[];
+}
+export const getChatToolSelection = (orgId: number, cid: number) =>
+  call<ChatToolSelection>("GET", `${convPath(orgId, cid)}/tool-selection`);
+export const setChatToolSelection = (orgId: number, cid: number, selectedIds: string[] | null) =>
+  call<ChatToolSelection>("PUT", `${convPath(orgId, cid)}/tool-selection`, { selectedIds });
 export const setChatKnowledgeBases = (orgId: number, cid: number, knowledgeBaseIds: number[]) =>
   call<ChatContext>("PUT", `${convPath(orgId, cid)}/knowledge-bases`, { knowledgeBaseIds });
 export function uploadChatAttachment(orgId: number, cid: number, file: File) {

@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.time.Instant;
 import java.util.concurrent.ThreadLocalRandom;
@@ -90,6 +91,25 @@ class AttachmentPostgresProbeTest {
     }
 
     @Autowired private com.keplura.server.chat.ChatContextService context;
+
+    @Test void changingToolSelectionCancelsPendingCardsAndDropsPrivateArgumentsOnPostgres() {
+        var f = fixture();
+        var ctx = tools.resolveContext(f.user(), f.org(), f.chat());
+        var read = attachments.definitionsFor(ctx).stream().filter(d -> d.toolName().equals("attachment_read")).findFirst().orElseThrow();
+        var pending = cards.create(ctx, f.prompt(), read, ToolExecutionService.definitionHash(read),
+                "{\"attachmentId\":" + f.attachment() + ",\"offset\":0}", ToolCallStore.Status.PENDING,
+                true, null, Instant.now(), null, true, true).orElseThrow();
+        var json = JsonMapper.builder().build();
+        var disabled = tools.setChatToolSelection(f.user(), f.org(), f.chat(), json.readTree("{\"selectedIds\":[]}"));
+        assertThat(disabled.selectedIds()).isEmpty();
+        assertThat(cards.isCurrentQuestion(f.chat(), f.prompt())).isFalse();
+        var cancelled = cards.find(pending.id()).orElseThrow();
+        assertThat(cancelled.status()).isEqualTo(ToolCallStore.Status.CANCELLED);
+        assertThat(cancelled.argumentsJson()).isNull();
+        tools.setChatToolSelection(f.user(), f.org(), f.chat(), json.readTree("{\"selectedIds\":null}"));
+        assertThat(tools.decide(f.user(), f.org(), f.chat(), pending.publicId(), true))
+                .isInstanceOf(ToolExecutionService.Decision.Conflict.class);
+    }
 
     /** The deletion itself cancels the card after commit and drops private arguments; the deletion always commits. */
     @Test void attachmentDeletionCancelsAndForgetsPrivateArgumentsOnPostgres() {

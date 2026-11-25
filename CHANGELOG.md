@@ -12,6 +12,10 @@ the first tagged release (planned `0.1.0`, see [docs/RELEASING.md](docs/RELEASIN
 
 ### Added
 
+- Chats can use the server's default tool selection or limit which approved tools
+  the model receives. A changed selection cancels pending tool confirmations and
+  applies from the next question.
+
 - Public page reading as a chat tool (TU-04e): `web_fetch` follows web-search
   results or URLs from the question and reads bounded HTML/XHTML/plain text.
   It uses the existing organization and per-question web permissions, blocks

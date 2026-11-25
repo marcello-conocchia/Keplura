@@ -1,6 +1,6 @@
 # TU-05a — Tool-Auswahl je Chat
 
-Status: **geplant, nicht gestartet.** Unmittelbar nächste einzelne Aufgabe nach TU-04 (PR #34, Merge 36014ca), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: autorisierter Werkzeugkatalog, Chat-Kontext und externe Aufrufe.
+Status: **abgeschlossen mit PR #36 (25.11.2026).** Unmittelbar nächste einzelne Aufgabe nach TU-04 (PR #34, Merge 36014ca), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: autorisierter Werkzeugkatalog, Chat-Kontext und externe Aufrufe.
 
 ## Ziel
 

@@ -847,6 +847,41 @@ class ChatApiIntegrationTest {
         assertThat(jdbc.queryForObject("select count(*) from tool_admin_event where org_id=?",Integer.class,Long.valueOf(a[1]))).isEqualTo(1);
     }
 
+    @Test void chatToolSelectionIsOwnerOnlyCsrfProtectedAndRestoredOverHttp() {
+        var owner = fixtureChain(true);
+        var other = fixtureChain(false);
+        String org = owner[1];
+        String chat = createConversation(owner[0], org, owner[2], Map.of("knowledgeBaseId", Long.valueOf(owner[3])));
+        String path = transcriptPath(org, chat) + "/tool-selection";
+        long member = jdbc.queryForObject("select user_id from membership where org_id=? and role='OWNER'", Long.class, Long.valueOf(other[1]));
+        jdbc.update("insert into membership(org_id,user_id,role,created_at) values(?,?,'MEMBER',current_timestamp)", Long.valueOf(org), member);
+        assertThat(exchange("GET", path, other[0], null).getStatusCode().value()).isEqualTo(404);
+        assertThat(exchange("PUT", path, other[0], Map.of("selectedIds", List.of())).getStatusCode().value()).isEqualTo(404);
+        assertThat(exchange("GET", transcriptPath(other[1], chat) + "/tool-selection", other[0], null).getStatusCode().value()).isEqualTo(404);
+        assertThat(rest.exchange(RequestEntity.put(URI.create(path)).header(HttpHeaders.COOKIE, owner[0])
+                .contentType(MediaType.APPLICATION_JSON).body(Map.of("selectedIds", List.of())), String.class)
+                .getStatusCode().value()).isEqualTo(403);
+        assertThat(body(exchange("GET", path, owner[0], null))).contains("\"selectedIds\":null", "\"tools\":[]");
+        assertThat(exchange("PUT", path, owner[0], Map.of("selectedIds", List.of("other:tool"))).getStatusCode().value()).isEqualTo(400);
+        assertThat(exchange("PUT", path, owner[0], Map.of()).getStatusCode().value()).isEqualTo(400);
+        assertThat(exchange("PUT", path, owner[0], Map.of("selectedIds", List.of("x".repeat(110 * 1024))))
+                .getStatusCode().value()).isEqualTo(413);
+        assertThat(exchange("PUT", "/api/v1/orgs/" + org + "/tools/settings", owner[0],
+                Map.of("knowledgeEnabled", true)).getStatusCode().value()).isEqualTo(200);
+
+        var json = tools.jackson.databind.json.JsonMapper.builder().build();
+        var options = json.readTree(body(exchange("GET", path, owner[0], null))).path("tools");
+        assertThat(options).isNotEmpty();
+        String choice = options.get(0).path("id").asString();
+        assertThat(exchange("PUT", path, owner[0], Map.of("selectedIds", List.of(choice))).getStatusCode().value()).isEqualTo(200);
+        assertThat(json.readTree(body(exchange("GET", path, owner[0], null))).path("selectedIds").get(0).asString()).isEqualTo(choice);
+        assertThat(exchange("PUT", path, owner[0], Map.of("selectedIds", List.of())).getStatusCode().value()).isEqualTo(200);
+        assertThat(body(exchange("GET", path, owner[0], null))).contains("\"selectedIds\":[]");
+        var defaults = new java.util.HashMap<String, Object>();
+        defaults.put("selectedIds", null);
+        assertThat(body(exchange("PUT", path, owner[0], defaults))).contains("\"selectedIds\":null");
+    }
+
     @Test void knowledgeToolIsOffWithoutAssignmentAndRejectsInjectedScope() {
         var a=fixtureChain(true); var b=fixtureChain(true);
         long org=Long.parseLong(a[1]);

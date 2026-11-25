@@ -61,6 +61,7 @@ public class ToolCallStore {
      */
     private static final String CURRENT_GENERATION = """
             not exists (select 1 from chat_message m where m.conversation_id = %1$s and m.role = 'user' and m.id > %2$s)
+            and not exists (select 1 from chat_conversation c where c.id = %1$s and c.tool_selection_cutoff >= %2$s)
             and not exists (select 1 from tool_call_stop s where s.conversation_id = %1$s and s.stopped_prompt_id >= %2$s)""";
 
     private final JdbcTemplate jdbc;
@@ -283,6 +284,14 @@ public class ToolCallStore {
         }
         jdbc.update("update tool_call set status = 'CANCELLED', decided_at = ?, " + DROP_PRIVATE + " where conversation_id = ? and status = 'PENDING' and prompt_message_id <= ?",
                 Timestamp.from(now), conversationId, stopped);
+    }
+
+    /** Selection changes invalidate the old generation and drop private arguments from its open cards. */
+    void cancelBeforeSelectionChange(long conversationId, Instant now) {
+        jdbc.update("update tool_call set status = 'CANCELLED', decided_at = ?, " + DROP_PRIVATE + " " + """
+                 where conversation_id = ? and status = 'PENDING' and prompt_message_id <=
+                 (select tool_selection_cutoff from chat_conversation where id = ?)""",
+                Timestamp.from(now), conversationId, conversationId);
     }
 
     /** Bereits verbrauchte Werkzeugzeit aller Aufrufe derselben Frage (laufende bis {@code now}). */

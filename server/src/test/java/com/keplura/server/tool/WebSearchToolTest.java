@@ -207,6 +207,26 @@ class WebSearchToolTest {
         assertThat(jdbc.queryForObject("select count(*) from tool_call where tool_name='web_search' and status<>'BLOCKED'", Integer.class)).isZero();
     }
 
+    @Test void selectedWebToolStillRequiresQuestionToggleAndLiveOrgApproval() {
+        var input = M.createObjectNode();
+        input.putArray("selectedIds").add(service.chatToolSelection(1L, 1L, 1L).tools().stream()
+                .filter(t -> t.name().equals("web_search")).findFirst().orElseThrow().id());
+        service.setChatToolSelection(1L, 1L, 1L, input);
+        var ctx = service.resolveContext(1L, 1L, 1L);
+        var withoutWeb = service.openTurn(ctx);
+        assertThat(withoutWeb.offered()).isEmpty();
+        assertThat(withoutWeb.call("web_search", "{\"query\":\"skip\"}").invoked()).isFalse();
+        var withWeb = service.openTurn(ctx, null, true);
+        assertThat(withWeb.offered()).containsOnlyKeys("web_search");
+        assertThat(withWeb.call("web_fetch", "{\"url\":\"http://example.org/page\"}").invoked()).isFalse();
+
+        jdbc.update("update org_tool_setting set web_search_enabled=false where org_id=1");
+        assertThat(service.openTurn(ctx, null, true).offered()).isEmpty();
+        assertThat(withWeb.call("web_search", "{\"query\":\"skip\"}").invoked()).isFalse();
+        assertThat(queries).isEmpty();
+        assertThat(pageConnections).hasValue(0);
+    }
+
     @Test void afterAnInternalResultAQueryWithInternalTextBecomesACardAndItsArgumentsAreDroppedLater() {
         var turn = turn(true);
         assertThat(turn.call("attachment_search", "{\"query\":\"Stichwort\"}").invoked()).isTrue();

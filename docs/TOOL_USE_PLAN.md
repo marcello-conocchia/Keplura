@@ -8,7 +8,7 @@ Diese Reihenfolge ersetzt ältere allgemeine Angaben zur nächsten UI-/Roadmap-A
 
 ## Verbindliche Reihenfolge
 
-**TU-01 bis TU-04 sind abgeschlossen und auf main (TU-04e: PR #34, Merge 36014ca, 25.11.2026; vorherige Nachweise in PROJECT_STATE.md). Nächste einzelne Implementierungsaufgabe: TU-05a — Tool-Auswahl je Chat, geplant und noch nicht gestartet. TU-05 bis TU-07 bleiben offen.** Genau eine aktive Implementierungsaufgabe. Größere Schritte werden in kleine PRs zerlegt; nur die unmittelbar nächste Aufgabe wird konkret angelegt.
+**TU-01 bis TU-04 sind abgeschlossen und auf main (TU-04e: PR #34, Merge 36014ca, 25.11.2026; vorherige Nachweise in PROJECT_STATE.md). TU-05a — Tool-Auswahl je Chat ist mit PR #36 abgeschlossen; der nächste kleinste TU-05-Schritt (Modellvorgaben) wird als Nächstes spezifiziert. TU-05 bis TU-07 bleiben offen.** Genau eine aktive Implementierungsaufgabe. Größere Schritte werden in kleine PRs zerlegt; nur die unmittelbar nächste Aufgabe wird konkret angelegt.
 
 | Schritt | Umfang | Abnahmeziel |
 | --- | --- | --- |
@@ -39,7 +39,7 @@ Nach jedem Merge PROJECT_STATE.md mit tatsächlichem Stand, Belegen und nächste
 
 ## Unmittelbar nächste Aufgabe
 
-**TU-05a — Tool-Auswahl je Chat**, siehe [Spec](tasks/TU-05a-chat-tool-selection.md). Geplant, nicht gestartet. Eine Person kann die für ihren Chat angebotenen Werkzeuge einschränken; die Auswahl erweitert niemals Freigaben oder Rechte und bleibt an den ursprünglichen Fragekatalog gebunden. Danach Modellvorgaben, Tool-Suche bei großen Katalogen und strukturierte Rückfragen jeweils als eigene kleine Aufgabe. TU-04 ist mit [TU-04e](tasks/TU-04e-web-fetch-tool.md) auf main abgeschlossen (PR #34, 36014ca; Claude: APPROVED, Code + Security auf 8387fc3, lokale Linux-CI Exit 0 unter ci/evidence/20261125-191631/).
+**TU-05a — Tool-Auswahl je Chat**, siehe [Spec](tasks/TU-05a-chat-tool-selection.md). Abgeschlossen mit PR #36 (25.11.2026). Eine Person kann die für ihren Chat angebotenen Werkzeuge einschränken; die Auswahl erweitert niemals Freigaben oder Rechte und bleibt an den ursprünglichen Fragekatalog gebunden. Danach Modellvorgaben, Tool-Suche bei großen Katalogen und strukturierte Rückfragen jeweils als eigene kleine Aufgabe. TU-04 ist mit [TU-04e](tasks/TU-04e-web-fetch-tool.md) auf main abgeschlossen (PR #34, 36014ca; Claude: APPROVED, Code + Security auf 8387fc3, lokale Linux-CI Exit 0 unter ci/evidence/20261125-191631/).
 
 ## Vergleichsquellen (abgerufen am 21.11.2026)
 

@@ -1467,6 +1467,56 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Conversation not yours/visible in this org
+  /api/v1/orgs/{orgId}/chat/conversations/{conversationId}/tool-selection:
+    parameters:
+      - $ref: "#/components/parameters/OrgIdPath"
+      - $ref: "#/components/parameters/ConversationIdPath"
+    get:
+      operationId: getChatToolSelection
+      summary: Read the tool selection and current options for an owned chat
+      responses:
+        "200":
+          description: Selection and approved options
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatToolSelection"
+        "401":
+          description: No valid session
+        "404":
+          description: Conversation unavailable to the caller in this organization
+    put:
+      operationId: putChatToolSelection
+      summary: Replace the selection for the next question in an owned chat
+      description: A changed selection also invalidates pending confirmations for earlier questions.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [selectedIds]
+              properties:
+                selectedIds:
+                  $ref: "#/components/schemas/ChatToolSelectionIds"
+      responses:
+        "200":
+          description: Saved selection and approved options
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatToolSelection"
+        "400":
+          description: Invalid selection or a selected ID is no longer available
+        "401":
+          description: No valid session
+        "403":
+          description: CSRF check failed
+        "404":
+          description: Conversation unavailable to the caller in this organization
+        "413":
+          description: Request body exceeds 100 KiB
   /api/v1/orgs/{orgId}/chat/conversations/{conversationId}/stream:
     post:
       operationId: streamChatTurn
@@ -1911,6 +1961,31 @@ components:
         type: integer
         format: int64
   schemas:
+    ChatToolSelectionIds:
+      type: [array, "null"]
+      description: Null follows server defaults. An empty array disables tool offers. IDs identify tools independently of their model function names.
+      items:
+        type: string
+        maxLength: 512
+      maxItems: 32
+      uniqueItems: true
+    ChatToolSelection:
+      type: object
+      required: [selectedIds, tools]
+      properties:
+        selectedIds:
+          $ref: "#/components/schemas/ChatToolSelectionIds"
+        tools:
+          type: array
+          description: Currently approved options. Per-question gates still apply and the model receives at most 32 tools.
+          items:
+            type: object
+            required: [id, name, source, risk]
+            properties:
+              id: { type: string }
+              name: { type: string }
+              source: { type: string }
+              risk: { type: string, enum: [READ, WRITE, CRITICAL] }
     # ---- ADMIN-KI (ADR-0008): admin surface shapes. The login response now
     # additionally carries `role` (USER | ADMIN) — see LoginResponse. ----
     AdminProvider:

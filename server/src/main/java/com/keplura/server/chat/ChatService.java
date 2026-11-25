@@ -596,8 +596,6 @@ public class ChatService {
 
         ChatMessage userRow = ChatMessage.userMessage(conversation.getId(), truncate(clean));
         messageRepository.saveAndFlush(userRow);
-        // TU-02: a new message ends every still-pending confirmation of this chat (never executed).
-        if (toolExecution != null) toolExecution.cancelPending(userId, conversation.getId());
         Instant now = Instant.now();
         if (Conversation.DEFAULT_TITLE.equals(conversation.getTitle())) {
             // first prompt of an untitled thread names it (guarded bulk update)
@@ -606,6 +604,8 @@ public class ChatService {
         } else {
             conversationRepository.touch(conversation.getId(), now);
         }
+        // Keep the same lock order as a tool selection change: conversation, then tool cards.
+        if (toolExecution != null) toolExecution.cancelPending(userId, conversation.getId());
 
         byte[] canonical = buildCanonicalBody(conversation, !kbIds.isEmpty(), hits, web, chat, userRow.getId());
         boolean noEvidence = !kbIds.isEmpty() && hits.isEmpty();
