@@ -1,6 +1,6 @@
 # TU-04e — Webseitenabruf als Werkzeug
 
-Status: **in Umsetzung (PO-Auftrag 25.11.2026), noch nicht gemergt.** Fünfte und letzte Aufgabe von TU-04 nach TU-04d (PR #32, Merge `ddc05a9`), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Laden beliebiger Adressen aus dem Internet (SSRF-Fläche), Verarbeitung fremder Inhalte, Modell-/Werkzeugschleife.
+Status: **implementiert und geprüft in Draft-PR #34, noch nicht gemergt (25.11.2026).** Fünfte und letzte Aufgabe von TU-04 nach TU-04d (PR #32, Merge `ddc05a9`), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Laden beliebiger Adressen aus dem Internet (SSRF-Fläche), Verarbeitung fremder Inhalte, Modell-/Werkzeugschleife.
 
 ## Ziel
 
@@ -69,3 +69,6 @@ Lokaler HTTP-Testserver und ein einstellbarer DNS-Resolver im Abrufer, damit Reb
 ## Workspace
 
 Eigener Worktree auf Branch `feat/tool-use-web-fetch` ab aktuellem main. Implementierung und unabhängige Prüfung nach PO-Zuweisung (TU-04c/d: Claude implementiert, Codex prüft). Genau eine Implementierungsaufgabe. Draft-PR, kein Merge durch den Entwickler.
+
+
+Nachweis: lokale Linux-CI auf Produktstand d64ec60 als uid 1500 mit acl, Exit 0 (92 Klassen, 936 Tests, 4 übersprungen; Desktop und Tauri grün), [MATRIX](../../ci/evidence/20261125-185440/MATRIX.md). Unabhängige Code-/Security-Freigabe auf 325ae46; beide Minor-Hinweise mit Regressionen in d64ec60 behoben, keine neue Prüfrunde gemäß AGENTS.md. Nur lokale Fixtures und geskriptetes Gateway, kein echter Modell-/Internetlauf oder Browser-/Feldtest. Details und Grenzen in PR #34.

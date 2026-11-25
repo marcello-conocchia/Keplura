@@ -12,6 +12,12 @@ the first tagged release (planned `0.1.0`, see [docs/RELEASING.md](docs/RELEASIN
 
 ### Added
 
+- Public page reading as a chat tool (TU-04e): `web_fetch` follows web-search
+  results or URLs from the question and reads bounded HTML/XHTML/plain text.
+  It uses the existing organization and per-question web permissions, blocks
+  internal addresses even with admin network exceptions, and asks for confirmation
+  before sending URLs derived from private content. No browser or login is used.
+
 - Bounded multi-step read tools (TU-03a): search, inspect results and read details
   within one question, with five model requests and eight total tool attempts.
   Follow-up mutations are blocked server-side; critical confirmations do not
