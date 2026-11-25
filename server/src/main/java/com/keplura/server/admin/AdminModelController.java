@@ -3,6 +3,7 @@ package com.keplura.server.admin;
 import com.keplura.server.admin.AdminModelService.ModelCreateRequest;
 import com.keplura.server.admin.AdminModelService.ModelDto;
 import com.keplura.server.admin.AdminModelService.ModelPatchRequest;
+import com.keplura.server.admin.AdminModelService.ModelToolsRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,6 +39,12 @@ public class AdminModelController {
     @PatchMapping("/{id}")
     public ModelDto update(@PathVariable Long id, @RequestBody ModelPatchRequest request) {
         return service.update(id, request);
+    }
+
+    /** TU-05b: tool use and default tool kinds of a chat model (full replace). */
+    @PutMapping("/{id}/tools")
+    public ModelDto updateTools(@PathVariable Long id, @RequestBody ModelToolsRequest request) {
+        return service.updateTools(id, request);
     }
 
     /**

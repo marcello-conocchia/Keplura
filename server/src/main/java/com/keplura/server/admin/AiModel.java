@@ -42,6 +42,8 @@ public class AiModel {
     public static final int MAX_TECHNICAL_ID_LENGTH = 300;
     public static final String TYPE_CHAT = "CHAT";
     public static final String TYPE_EMBEDDING = "EMBEDDING";
+    public static final String TOOL_USE_AUTO = "AUTO";
+    public static final String TOOL_USE_OFF = "OFF";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -77,6 +79,14 @@ public class AiModel {
     /** Consistency guard column: own id when {@code isDefault}, else NULL (see class doc). */
     @Column(name = "default_slot")
     private Long defaultSlot;
+
+    /** TU-05b: AUTO (default) or OFF — OFF never offers tools for this model. */
+    @Column(name = "tool_use", nullable = false, length = 10)
+    private String toolUse = TOOL_USE_AUTO;
+
+    /** TU-05b: null = every approved tool kind, otherwise a JSON array of tool kinds. */
+    @Column(name = "tool_defaults_json")
+    private String toolDefaultsJson;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -130,6 +140,20 @@ public class AiModel {
                 setDefault(false); // a disabled row can never hold the default slot
             }
         }
+    }
+
+    /** TU-05b: full replace of the tool policy; the service validates the values. */
+    public void applyToolPolicy(String toolUse, String toolDefaultsJson) {
+        this.toolUse = toolUse;
+        this.toolDefaultsJson = toolDefaultsJson;
+    }
+
+    public String getToolUse() {
+        return toolUse;
+    }
+
+    public String getToolDefaultsJson() {
+        return toolDefaultsJson;
     }
 
     /** Service-managed default flag; keeps {@code defaultSlot} in lock-step. */

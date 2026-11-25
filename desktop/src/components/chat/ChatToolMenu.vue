@@ -90,7 +90,9 @@ function toggleTool(id: string, checked: boolean) {
 
 function setDefault(isDefault: boolean) {
   error.value = "";
-  draft.value = isDefault ? null : selection.value?.tools.slice(0, MAX_SELECTED).map((tool) => tool.id) ?? [];
+  // Leaving the default starts from what the default offers now: the model's default kinds or every approved tool.
+  const start = selection.value?.modelDefaultIds ?? selection.value?.tools.map((tool) => tool.id) ?? [];
+  draft.value = isDefault ? null : start.slice(0, MAX_SELECTED);
 }
 
 async function save() {
@@ -133,6 +135,8 @@ async function save() {
             @update:model-value="(v) => setDefault(v === true)" @select.prevent>
             <span class="tool-menu-check">{{ draft === null ? "✓" : "" }}</span>{{ $t("Serverstandard verwenden") }}
           </DropdownMenuCheckboxItem>
+          <p v-if="selection.modelToolsOff" class="tool-menu-note" data-testid="chat-tool-model-off">{{ $t("Das aktuelle Modell nutzt keine Werkzeuge. Eine Auswahl wirkt erst mit einem Modell, das Werkzeuge erlaubt.") }}</p>
+          <p v-else-if="draft === null && selection.modelDefaultIds !== null" class="tool-menu-note" data-testid="chat-tool-model-defaults">{{ $t("Das Modell bietet standardmäßig {0} von {1} Werkzeugen an.", selection.modelDefaultIds.length, selection.tools.length) }}</p>
           <DropdownMenuItem v-if="draft !== null && draft.length > 0" class="ic-menu-item" :disabled="saving || disabled"
             @select.prevent="draft = []; error = ''">{{ $t("Alle Werkzeuge abwählen") }}</DropdownMenuItem>
           <DropdownMenuGroup v-if="draft !== null" class="chat-tool-list">

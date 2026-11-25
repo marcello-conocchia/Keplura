@@ -6,7 +6,7 @@
  */
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import {
-  createModel, fetchModels, fetchProviders, patchModel, setModelDefault,
+  createModel, fetchModels, fetchProviders, patchModel, setModelDefault, updateModelTools, MODEL_TOOL_KINDS,
   type AdminModel, type AdminProvider,
 } from "../../admin-api";
 import { useAuthStore } from "../../auth-store";
@@ -65,19 +65,35 @@ const editing = ref<AdminModel | null>(null);
 const formError = ref("");
 const saving = ref(false);
 const formDialog = ref<InstanceType<typeof AppDialog> | null>(null);
-const f = ref({ providerId: null as number | null, type: "CHAT" as AdminModel["modelType"], name: "", technical: "", dim: "", maxTokens: "" });
+const f = ref({ providerId: null as number | null, type: "CHAT" as AdminModel["modelType"], name: "", technical: "", dim: "", maxTokens: "",
+  toolUse: "AUTO" as AdminModel["toolUse"], toolAll: true, toolKinds: [] as string[] });
+const savedTools = ref("");
+function toolKindLabel(kind: string) {
+  switch (kind) {
+    case "knowledge": return tr("Wissenssuche und Dokumentstellen");
+    case "attachments": return tr("Chat-Anhänge");
+    case "web": return tr("Websuche und Webseitenabruf");
+    case "mcp": return tr("MCP-Werkzeuge");
+    default: return tr("Rückfragen an die Person");
+  }
+}
+function toolsOf(value: typeof f.value) { return JSON.stringify([value.toolUse, value.toolAll, [...value.toolKinds].sort()]); }
 const savedForm = ref("");
 const formDirty = computed(() => JSON.stringify(f.value) !== savedForm.value);
 
 function openCreate() {
   editing.value = null; formError.value = ""; note.value = "";
-  f.value = { providerId: enabledProviders.value[0]?.id ?? null, type: "CHAT", name: "", technical: "", dim: "", maxTokens: "" };
+  f.value = { providerId: enabledProviders.value[0]?.id ?? null, type: "CHAT", name: "", technical: "", dim: "", maxTokens: "",
+    toolUse: "AUTO", toolAll: true, toolKinds: [] };
+  savedTools.value = toolsOf(f.value);
   savedForm.value = JSON.stringify(f.value); formOpen.value = true;
 }
 function openEdit(m: AdminModel) {
   editing.value = m; formError.value = ""; note.value = "";
   f.value = { providerId: m.providerId, type: m.modelType, name: m.name, technical: m.technicalModelId,
-    dim: m.embeddingDim == null ? "" : String(m.embeddingDim), maxTokens: m.maxOutputTokens == null ? "" : String(m.maxOutputTokens) };
+    dim: m.embeddingDim == null ? "" : String(m.embeddingDim), maxTokens: m.maxOutputTokens == null ? "" : String(m.maxOutputTokens),
+    toolUse: m.toolUse ?? "AUTO", toolAll: m.toolDefaults == null, toolKinds: [...(m.toolDefaults ?? [])] };
+  savedTools.value = toolsOf(f.value);
   savedForm.value = JSON.stringify(f.value); formOpen.value = true;
 }
 
@@ -94,7 +110,14 @@ async function save() {
       : await createModel({ providerId: f.value.providerId, name: f.value.name.trim(), technicalModelId: f.value.technical.trim(),
           modelType: f.value.type, embeddingDim: f.value.type === "EMBEDDING" && Number.isFinite(dim) ? dim : null,
           maxOutputTokens: Number.isFinite(maxTok) ? maxTok : null });
-    if (outcome.kind === "ok") {
+    let saved = outcome;
+    if (outcome.kind === "ok" && outcome.value && outcome.value.modelType === "CHAT" && toolsOf(f.value) !== savedTools.value) {
+      saved = await updateModelTools(outcome.value.id, { toolUse: f.value.toolUse, toolDefaults: f.value.toolAll ? null : f.value.toolKinds });
+    }
+    if (saved.kind !== "ok" && outcome.kind === "ok") {
+      formError.value = saved.kind === "invalid" ? saved.message : tr("Die Werkzeugeinstellung konnte nicht gespeichert werden.");
+      await load();
+    } else if (outcome.kind === "ok") {
       const wasEdit = editing.value !== null;
       formOpen.value = false;
       show("ok", wasEdit ? tr("Modell aktualisiert.") : tr("Modell angelegt."));
@@ -175,7 +198,7 @@ function rowAction(m: AdminModel, action: string) { if (action === "edit") openE
           <article v-for="m in g.rows" :key="m.id" class="connection-record" :data-testid="`admin-model-row-${rowKey(m)}`">
             <header class="connection-record-header">
               <div class="connection-heading"><h3>{{ m.name }}</h3><code class="connection-address">{{ m.technicalModelId }}</code>
-                <p class="connection-meta">{{ $t("über {0}", providerName(m.providerId)) }}<template v-if="m.modelType === 'EMBEDDING'"> {{ $t("· Dimension {0}", m.embeddingDim ?? "?") }}</template><template v-if="m.maxOutputTokens != null"> {{ $t("· max. {0} Tokens", m.maxOutputTokens) }}</template><template v-if="isLive(m)"> · <span :data-testid="`admin-model-live-${rowKey(m)}`">{{ $t("wird genutzt") }}</span></template></p></div>
+                <p class="connection-meta">{{ $t("über {0}", providerName(m.providerId)) }}<template v-if="m.modelType === 'EMBEDDING'"> {{ $t("· Dimension {0}", m.embeddingDim ?? "?") }}</template><template v-if="m.maxOutputTokens != null"> {{ $t("· max. {0} Tokens", m.maxOutputTokens) }}</template><template v-if="isLive(m)"> · <span :data-testid="`admin-model-live-${rowKey(m)}`">{{ $t("wird genutzt") }}</span></template><template v-if="m.modelType === 'CHAT' && m.toolUse === 'OFF'"> {{ $t("· ohne Werkzeuge") }}</template><template v-else-if="m.modelType === 'CHAT' && m.toolDefaults != null"> {{ $t("· Werkzeuge eingeschränkt") }}</template></p></div>
               <div class="connection-actions">
                 <StatusPill v-if="m.isDefault" tone="ok" :data-testid="`admin-model-default-${rowKey(m)}`">{{ $t("Standard") }}</StatusPill>
                 <StatusPill v-if="!m.enabled" tone="neutral">{{ $t("Deaktiviert") }}</StatusPill>
@@ -208,6 +231,20 @@ function rowAction(m: AdminModel, action: string) { if (action === "edit") openE
         <Input id="admin-m-tech" v-model="f.technical" :label="$t('Technische Model-ID')" :placeholder="$t('z. B. qwen2.5:7b')" data-testid="admin-model-technical" required />
         <Input v-if="f.type === 'EMBEDDING' && !editing" id="admin-m-dim" v-model="f.dim" :label="$t('Embedding-Dimension')" type="number" :hint="$t('Muss zum Modell passen, z. B. 1024 für bge-m3.')" data-testid="admin-model-dim" />
         <Input id="admin-m-tokens" v-model="f.maxTokens" :label="$t('Maximale Antwortlänge in Tokens (optional)')" type="number" data-testid="admin-model-maxtokens" />
+        <fieldset v-if="f.type === 'CHAT'" class="connection-field" data-testid="admin-model-tools">
+          <legend>{{ $t("Werkzeuge") }}</legend>
+          <select id="admin-m-tool-use" v-model="f.toolUse" class="ic-native-control" data-testid="admin-model-tool-use">
+            <option value="AUTO">{{ $t("Werkzeuge erlauben") }}</option>
+            <option value="OFF">{{ $t("Keine Werkzeuge – für Modelle ohne Werkzeugunterstützung") }}</option>
+          </select>
+          <template v-if="f.toolUse === 'AUTO'">
+            <label class="connection-check"><input v-model="f.toolAll" type="checkbox" data-testid="admin-model-tool-all" />{{ $t("Alle freigegebenen Werkzeugarten standardmäßig anbieten") }}</label>
+            <template v-if="!f.toolAll">
+              <label v-for="kind in MODEL_TOOL_KINDS" :key="kind" class="connection-check"><input v-model="f.toolKinds" type="checkbox" :value="kind" :data-testid="`admin-model-tool-kind-${kind}`" />{{ toolKindLabel(kind) }}</label>
+            </template>
+          </template>
+          <span class="connection-hint">{{ $t("Gilt, solange ein Chat keine eigene Werkzeugauswahl hat. Freigaben der Organisation bleiben maßgeblich.") }}</span>
+        </fieldset>
         <div class="connection-submit">
           <Button variant="ghost" type="button" data-testid="admin-model-cancel" @click="formDialog?.requestClose()">{{ $t("Abbrechen") }}</Button>
           <Button variant="primary" type="submit" :busy="saving" data-testid="admin-model-save">{{ editing ? $t("Speichern") : $t("Hinzufügen") }}</Button>

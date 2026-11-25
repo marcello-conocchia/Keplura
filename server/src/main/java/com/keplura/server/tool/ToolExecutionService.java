@@ -179,12 +179,62 @@ public class ToolExecutionService {
 
     public record ChatToolOption(String id, String name, String source, ToolRisk risk) { }
 
-    /** A null selection follows the server defaults, an empty list explicitly disables tools. */
-    public record ChatToolSelection(List<String> selectedIds, List<ChatToolOption> tools) { }
+    /**
+     * A null selection follows the defaults, an empty list explicitly disables tools.
+     * {@code modelDefaultIds}: tools the current chat model offers by default (null = all approved);
+     * {@code modelToolsOff}: the current chat model never gets tools (TU-05b).
+     */
+    public record ChatToolSelection(List<String> selectedIds, List<ChatToolOption> tools,
+                                    List<String> modelDefaultIds, boolean modelToolsOff) { }
 
     public ChatToolSelection chatToolSelection(Long userId, Long orgId, Long conversationId) {
         ToolContext ctx = requireSelectionContext(userId, orgId, conversationId);
-        return selectionView(requireSelection(ctx).ids(), availableCatalog(ctx, true, null, Integer.MAX_VALUE));
+        return selectionView(requireSelection(ctx).ids(), availableCatalog(ctx, true, null, null, Integer.MAX_VALUE), modelPolicy());
+    }
+
+    /**
+     * TU-05b: tool policy of the chat model that answers (enabled default CHAT model on an enabled provider,
+     * same choice as the runtime resolver). No DB model = ENV path = no model restriction. Fails closed.
+     */
+    record ModelToolPolicy(boolean off, Set<String> kinds) {
+        static final ModelToolPolicy OPEN = new ModelToolPolicy(false, null);
+        static final ModelToolPolicy CLOSED = new ModelToolPolicy(true, Set.of());
+    }
+
+    private record PolicyKey() { }
+
+    ModelToolPolicy modelPolicy() {
+        try {
+            return ReferenceReadScope.memo(new PolicyKey(), this::readModelPolicy);
+        } catch (RuntimeException unavailable) {
+            log.warn("model tool policy unavailable ({})", unavailable.getClass().getSimpleName());
+            return ModelToolPolicy.CLOSED;
+        }
+    }
+
+    private ModelToolPolicy readModelPolicy() {
+        var rows = jdbc.query("""
+                select m.tool_use, m.tool_defaults_json from ai_model m join ai_provider p on p.id=m.provider_id
+                where m.model_type='CHAT' and m.is_default=true and m.enabled=true and p.enabled=true order by m.id""",
+                (rs, n) -> new String[]{rs.getString(1), rs.getString(2)});
+        if (rows.isEmpty()) return ModelToolPolicy.OPEN;
+        String use = rows.getFirst()[0];
+        String json = rows.getFirst()[1];
+        if (!"AUTO".equals(use)) return ModelToolPolicy.CLOSED; // OFF, or anything unknown
+        if (json == null) return ModelToolPolicy.OPEN;
+        JsonNode kinds = mapper.readTree(json);
+        if (!kinds.isArray()) return ModelToolPolicy.CLOSED;
+        Set<String> out = new TreeSet<>();
+        for (JsonNode kind : kinds) {
+            if (!kind.isString()) return ModelToolPolicy.CLOSED;
+            out.add(kind.asString());
+        }
+        return new ModelToolPolicy(false, Collections.unmodifiableSet(out));
+    }
+
+    /** Kinds that narrow the catalog: the model defaults apply only while the chat has no own selection. */
+    private static Set<String> defaultKinds(StoredSelection selection, ModelToolPolicy policy) {
+        return selection.ids() == null ? policy.kinds() : null;
     }
 
     @Transactional
@@ -192,7 +242,7 @@ public class ToolExecutionService {
         ToolContext ctx = requireSelectionContext(userId, orgId, conversationId);
         JsonNode ids = body == null ? null : body.get("selectedIds");
         if (body == null || !body.isObject() || body.size() != 1 || ids == null) throw invalidSelection();
-        var available = availableCatalog(ctx, true, null, Integer.MAX_VALUE);
+        var available = availableCatalog(ctx, true, null, null, Integer.MAX_VALUE);
         Set<String> selected = null;
         String serialized = null;
         if (!ids.isNull()) {
@@ -219,7 +269,7 @@ public class ToolExecutionService {
                 desired, ctx.conversationId(), ctx.orgId(), ctx.spaceId(), ctx.userId(),
                 Objects.requireNonNullElse(desired, ""));
         if (changed == 1) cards.cancelBeforeSelectionChange(ctx.conversationId(), wallClock.get());
-        return selectionView(requireSelection(ctx).ids(), availableCatalog(ctx, true, null, Integer.MAX_VALUE));
+        return selectionView(requireSelection(ctx).ids(), availableCatalog(ctx, true, null, null, Integer.MAX_VALUE), modelPolicy());
     }
 
     private ToolContext requireSelectionContext(Long userId, Long orgId, Long conversationId) {
@@ -261,13 +311,14 @@ public class ToolExecutionService {
         return selected;
     }
 
-    private static ChatToolSelection selectionView(Set<String> selected, Map<String, ToolDefinition> available) {
-        var tools = available.values().stream()
-                .filter(t -> t.id().length() <= MAX_SELECTION_ID_LENGTH)
-                .map(t -> new ChatToolOption(t.id(), t.toolName(), t.sourceName(), t.risk()))
-                .toList();
+    private static ChatToolSelection selectionView(Set<String> selected, Map<String, ToolDefinition> available,
+                                                   ModelToolPolicy policy) {
+        var visible = available.values().stream().filter(t -> t.id().length() <= MAX_SELECTION_ID_LENGTH).toList();
+        var tools = visible.stream().map(t -> new ChatToolOption(t.id(), t.toolName(), t.sourceName(), t.risk())).toList();
         var ids = selected == null ? null : tools.stream().map(ChatToolOption::id).filter(selected::contains).toList();
-        return new ChatToolSelection(ids, tools);
+        List<String> defaults = policy.off() ? List.of() : policy.kinds() == null ? null
+                : visible.stream().filter(t -> policy.kinds().contains(t.adapter())).map(ToolDefinition::id).toList();
+        return new ChatToolSelection(ids, tools, defaults, policy.off());
     }
 
     private static ChatException invalidSelection() {
@@ -483,7 +534,9 @@ public class ToolExecutionService {
                 || state.spaceId()!=ctx.spaceId()) return null;
         var selection = readSelection(ctx);
         if (selection == null || !selection.isCurrent(state.promptId())) return null;
-        Map<String, ToolDefinition> offered = availableCatalog(ctx, true, selection.ids(), Integer.MAX_VALUE);
+        var policy = modelPolicy();
+        if (policy.off()) return null;
+        Map<String, ToolDefinition> offered = availableCatalog(ctx, true, selection.ids(), defaultKinds(selection, policy), Integer.MAX_VALUE);
         JsonNode expected = mapper.readTree(state.catalog());
         if (!expected.isObject()) return null;
         for (var e : expected.properties()) {
@@ -592,16 +645,22 @@ public class ToolExecutionService {
     }
 
     private Map<String, ToolDefinition> catalog(ToolContext ctx, boolean webSearch) {
+        var policy = modelPolicy();
+        if (policy.off()) return Map.of();
         var selection = readSelection(ctx);
-        return selection == null ? Map.of() : availableCatalog(ctx, webSearch, selection.ids(), MAX_TOOLS_OFFERED);
+        return selection == null ? Map.of()
+                : availableCatalog(ctx, webSearch, selection.ids(), defaultKinds(selection, policy), MAX_TOOLS_OFFERED);
     }
 
-    private Map<String, ToolDefinition> availableCatalog(ToolContext ctx, boolean webSearch, Set<String> selected, int limit) {
+    /** {@code kinds}: optional adapter-kind narrowing (model defaults); never widens approvals. */
+    private Map<String, ToolDefinition> availableCatalog(ToolContext ctx, boolean webSearch, Set<String> selected,
+                                                         Set<String> kinds, int limit) {
         Map<String, ToolDefinition> out = new LinkedHashMap<>();
         if (selected != null && selected.isEmpty()) return out;
         Set<String> seenNames = new java.util.HashSet<>();
         for (ToolAdapter adapter : adapters.values()) {
             if (!webSearch && WebSearchToolAdapter.KIND.equals(adapter.kind())) continue;
+            if (kinds != null && !kinds.contains(adapter.kind())) continue;
             List<ToolDefinition> defs;
             try {
                 defs = adapter.definitionsFor(ctx);
@@ -645,6 +704,7 @@ public class ToolExecutionService {
     }
 
     private static final String CHANGED = "Das Werkzeug ist nicht mehr freigegeben oder wurde geändert. Es wurde nicht aufgerufen.";
+    static final String MODEL_OFF = "Für das aktuelle Modell sind Werkzeuge ausgeschaltet. Das Werkzeug wurde nicht aufgerufen.";
 
     /** {@code criticalAllowed}: nur der bestätigte Weg darf eine CRITICAL-Definition ausführen. */
     private Checked recheck(ToolContext ctx, String adapterKind, String toolId, String expectedHash, JsonNode args,
@@ -666,6 +726,10 @@ public class ToolExecutionService {
                     || (selection.ids() != null && !selection.ids().contains(toolId))) {
                 return Checked.no(CHANGED);
             }
+            var policy = modelPolicy();
+            if (policy.off()) return Checked.no(MODEL_OFF);
+            Set<String> kinds = defaultKinds(selection, policy);
+            if (kinds != null && !kinds.contains(adapterKind)) return Checked.no(CHANGED);
             return new Checked(null, fresh);
         } catch (RuntimeException e) {
             log.warn("tool authorization re-check failed ({})", e.getClass().getSimpleName());

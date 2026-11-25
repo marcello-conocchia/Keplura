@@ -43,7 +43,13 @@ export interface AdminModel {
   isDefault: boolean;
   createdAt: string;
   updatedAt: string;
+  /** TU-05b: chat models only — AUTO offers tools, OFF never does. */
+  toolUse: "AUTO" | "OFF";
+  /** null = every approved tool kind by default, otherwise these kinds. */
+  toolDefaults: string[] | null;
 }
+
+export const MODEL_TOOL_KINDS = ["knowledge", "attachments", "web", "mcp", "ask"] as const;
 
 export interface ConnectionTestOutcomeView {
   reachable: boolean;
@@ -170,6 +176,10 @@ export const patchModel = (id: number, input: {
   temperature?: number | null;
   enabled?: boolean | null;
 }) => sendJson<AdminModel>("PATCH", `/models/${id}`, input);
+
+/** TU-05b: full replace of a chat model's tool policy. */
+export const updateModelTools = (id: number, input: { toolUse: "AUTO" | "OFF"; toolDefaults: string[] | null }) =>
+  sendJson<AdminModel>("PUT", `/models/${id}/tools`, input);
 
 export const setModelDefault = (id: number) =>
   sendJson<AdminModel>("PUT", `/models/${id}/default`, null);

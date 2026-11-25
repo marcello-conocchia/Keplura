@@ -63,6 +63,10 @@ export const getChatContext = (orgId: number, cid: number) => call<ChatContext>(
 export interface ChatToolSelection {
   selectedIds: string[] | null;
   tools: { id: string; name: string; source: string; risk: "READ" | "WRITE" | "CRITICAL" }[];
+  /** TU-05b: tools the current chat model offers by default (null = every approved tool). */
+  modelDefaultIds: string[] | null;
+  /** TU-05b: the current chat model never gets tools. */
+  modelToolsOff: boolean;
 }
 export const getChatToolSelection = (orgId: number, cid: number) =>
   call<ChatToolSelection>("GET", `${convPath(orgId, cid)}/tool-selection`);
