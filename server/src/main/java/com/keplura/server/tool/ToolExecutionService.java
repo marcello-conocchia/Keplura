@@ -184,7 +184,7 @@ public class ToolExecutionService {
 
     public ChatToolSelection chatToolSelection(Long userId, Long orgId, Long conversationId) {
         ToolContext ctx = requireSelectionContext(userId, orgId, conversationId);
-        return selectionView(readSelection(ctx).ids(), availableCatalog(ctx, true, null, Integer.MAX_VALUE));
+        return selectionView(requireSelection(ctx).ids(), availableCatalog(ctx, true, null, Integer.MAX_VALUE));
     }
 
     @Transactional
@@ -219,7 +219,7 @@ public class ToolExecutionService {
                 desired, ctx.conversationId(), ctx.orgId(), ctx.spaceId(), ctx.userId(),
                 Objects.requireNonNullElse(desired, ""));
         if (changed == 1) cards.cancelBeforeSelectionChange(ctx.conversationId(), wallClock.get());
-        return selectionView(readSelection(ctx).ids(), availableCatalog(ctx, true, null, Integer.MAX_VALUE));
+        return selectionView(requireSelection(ctx).ids(), availableCatalog(ctx, true, null, Integer.MAX_VALUE));
     }
 
     private ToolContext requireSelectionContext(Long userId, Long orgId, Long conversationId) {
@@ -241,8 +241,13 @@ public class ToolExecutionService {
                 and exists(select 1 from membership m where m.org_id=c.org_id and m.user_id=c.created_by)
                 and exists(select 1 from space s where s.id=c.space_id and s.org_id=c.org_id)""",
                 (rs, n) -> new StoredSelection(parseSelection(rs.getString(1)), rs.getLong(2)),
-                ctx.conversationId(), ctx.orgId(), ctx.spaceId(), ctx.userId()).stream().findFirst()
-                .orElseThrow(() -> new ChatException(HttpStatus.NOT_FOUND, "conversation not found"));
+                ctx.conversationId(), ctx.orgId(), ctx.spaceId(), ctx.userId()).stream().findFirst().orElse(null);
+    }
+
+    private StoredSelection requireSelection(ToolContext ctx) {
+        var selection = readSelection(ctx);
+        if (selection == null) throw new ChatException(HttpStatus.NOT_FOUND, "conversation not found");
+        return selection;
     }
 
     private Set<String> parseSelection(String stored) {
@@ -477,7 +482,7 @@ public class ToolExecutionService {
         if (state.userId()!=ctx.userId() || state.orgId()!=ctx.orgId() || state.conversationId()!=ctx.conversationId()
                 || state.spaceId()!=ctx.spaceId()) return null;
         var selection = readSelection(ctx);
-        if (!selection.isCurrent(state.promptId())) return null;
+        if (selection == null || !selection.isCurrent(state.promptId())) return null;
         Map<String, ToolDefinition> offered = availableCatalog(ctx, true, selection.ids(), Integer.MAX_VALUE);
         JsonNode expected = mapper.readTree(state.catalog());
         if (!expected.isObject()) return null;
@@ -587,7 +592,8 @@ public class ToolExecutionService {
     }
 
     private Map<String, ToolDefinition> catalog(ToolContext ctx, boolean webSearch) {
-        return availableCatalog(ctx, webSearch, readSelection(ctx).ids(), MAX_TOOLS_OFFERED);
+        var selection = readSelection(ctx);
+        return selection == null ? Map.of() : availableCatalog(ctx, webSearch, selection.ids(), MAX_TOOLS_OFFERED);
     }
 
     private Map<String, ToolDefinition> availableCatalog(ToolContext ctx, boolean webSearch, Set<String> selected, int limit) {
@@ -656,7 +662,8 @@ public class ToolExecutionService {
             String invalid = ToolArgumentValidator.validate(fresh.inputSchema(), args);
             if (invalid != null) return Checked.no(invalid + " Das Werkzeug wurde nicht aufgerufen.");
             var selection = readSelection(ctx);
-            if (!selection.isCurrent(promptMessageId) || (selection.ids() != null && !selection.ids().contains(toolId))) {
+            if (selection == null || !selection.isCurrent(promptMessageId)
+                    || (selection.ids() != null && !selection.ids().contains(toolId))) {
                 return Checked.no(CHANGED);
             }
             return new Checked(null, fresh);
