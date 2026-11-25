@@ -111,21 +111,21 @@ public class WebPageFetcher {
                     if (!header.values().getOrDefault("content-encoding", "identity").equalsIgnoreCase("identity")) throw refused();
                     byte[] body = body(in, header.values());
                     session.check();
-                    if (mime.equals("text/plain")) {
-                        Charset charset = StandardCharsets.UTF_8;
-                        for (String param : type.split(";")) {
-                            if (param.strip().toLowerCase(Locale.ROOT).startsWith("charset=")) {
-                                try { charset = Charset.forName(param.strip().substring(8).replace("\"", "")); }
-                                catch (IllegalArgumentException e) { throw refused(); }
-                            }
+                    Charset charset = null;
+                    for (String param : type.split(";")) {
+                        if (param.strip().toLowerCase(Locale.ROOT).startsWith("charset=")) {
+                            try { charset = Charset.forName(param.strip().substring(8).replace("\"", "")); }
+                            catch (IllegalArgumentException e) { throw refused(); }
                         }
-                        return new Page("Webseite", uri.toASCIIString(), clean(new String(body, charset)));
+                    }
+                    if (mime.equals("text/plain")) {
+                        return new Page("Webseite", uri.toASCIIString(), clean(new String(body, charset == null ? StandardCharsets.UTF_8 : charset)));
                     }
                     // Jsoup parses bytes only: no network fetch, scripts, external entities or subresources.
-                    var document = Jsoup.parse(new ByteArrayInputStream(body), null, uri.toASCIIString());
+                    var document = Jsoup.parse(new ByteArrayInputStream(body), charset == null ? null : charset.name(), uri.toASCIIString());
                     String title = clean(document.title());
                     document.select("script,style,noscript,template").remove();
-                    return new Page(title, uri.toASCIIString(), clean(document.text()));
+                    return new Page(title, uri.toASCIIString(), clean(document.body().text()));
                 }
             }
         }

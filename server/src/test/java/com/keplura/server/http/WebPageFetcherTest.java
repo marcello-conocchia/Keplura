@@ -68,6 +68,15 @@ class WebPageFetcherTest {
         assertThat(fetcher.fetch("http://example.org/", List.of()).text()).isEqualTo("Grüße");
     }
 
+    @ParameterizedTest @ValueSource(strings = {"text/html", "application/xhtml+xml"})
+    void honorsTheHttpCharsetForHtmlWithoutAMetaTag(String mime) throws Exception {
+        type = mime + "; charset=ISO-8859-1";
+        body = "<title>Grüße</title><p>öffentliche Quelle</p>".getBytes(StandardCharsets.ISO_8859_1);
+        var page = fetcher.fetch("http://example.org/", List.of());
+        assertThat(page.title()).isEqualTo("Grüße");
+        assertThat(page.text()).contains("öffentliche Quelle");
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"127.0.0.1", "10.1.2.3", "172.16.0.1", "192.168.0.1", "169.254.169.254", "100.64.0.1",
             "0.0.0.0", "::1", "fc00::1", "fe80::1", "::", "224.0.0.1", "::ffff:127.0.0.1"})

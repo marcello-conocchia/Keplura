@@ -32,6 +32,7 @@ class WebSearchToolTest {
     private final AtomicInteger pageConnections = new AtomicInteger();
     private final List<String> pageRequests = new CopyOnWriteArrayList<>();
     private volatile String providerBody;
+    private volatile String pageTitle = "Vollständige Quelle";
     private String providerUrl;
     private JdbcTemplate jdbc;
     private WebSearchService search;
@@ -55,7 +56,7 @@ class WebSearchToolTest {
         });
         provider.createContext("/page", exchange -> {
             pageRequests.add(exchange.getRequestURI().toString());
-            byte[] bytes = ("<title>Vollständige Quelle</title><script>SCRIPT_SECRET</script><p>PAGE_TERM_8912 "
+            byte[] bytes = ("<title>" + pageTitle + "</title><script>SCRIPT_SECRET</script><p>PAGE_TERM_8912 "
                     + "Text ".repeat(2500) + "</p>").getBytes(StandardCharsets.UTF_8);
             exchange.getResponseHeaders().set("Content-Type", "text/html");
             exchange.sendResponseHeaders(200, bytes.length);
@@ -159,6 +160,13 @@ class WebSearchToolTest {
         assertThat(card("web_fetch").status()).isEqualTo("FAILED");
         assertThat(pageConnections).hasValue(0);
         assertThat(column("error")).containsExactly(WebSearchToolAdapter.FETCH_UNAVAILABLE);
+    }
+
+    @Test void longPageTitleCannotDisplaceTheUrlOrPageText() {
+        pageTitle = "TITLE ".repeat(2000);
+        turn(true).call("web_fetch", "{\"url\":\"http://example.org/page\"}");
+        assertThat(card("web_fetch").result()).contains("http://example.org/page", "PAGE_TERM_8912")
+                .hasSizeLessThanOrEqualTo(ToolExecutionService.MAX_RESULT_CHARS);
     }
 
     @Test void modelSearchesRephrasesAndSearchesAgainWithATermFromTheFirstHit() {
