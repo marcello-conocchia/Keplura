@@ -2,6 +2,7 @@ package com.keplura.server.chat;
 
 import com.keplura.server.auth.AuthPrincipal;
 import com.keplura.server.auth.AuthService;
+import com.keplura.server.tool.ToolExecutionService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.DeserializationFeature;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,14 +32,50 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/orgs/{orgId}/chat/conversations/{conversationId}")
 public class ChatContextController {
+    // 32 IDs of 512 UTF-16 units, at up to six bytes per JSON escape, plus framing.
+    private static final int MAX_SELECTION_BODY_BYTES = 100 * 1024;
+    private static final JsonMapper SELECTION_JSON = JsonMapper.builder()
+            .enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
+            .enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY)
+            .build();
 
     public record KnowledgeBasesRequest(List<Long> knowledgeBaseIds) {
     }
 
     private final ChatContextService service;
+    private final ToolExecutionService tools;
 
-    public ChatContextController(ChatContextService service) {
+    public ChatContextController(ChatContextService service, ToolExecutionService tools) {
         this.service = service;
+        this.tools = tools;
+    }
+
+    @GetMapping("/tool-selection")
+    public ToolExecutionService.ChatToolSelection toolSelection(@PathVariable("orgId") Long orgId,
+                                                               @PathVariable("conversationId") Long cid,
+                                                               HttpServletRequest request) {
+        return tools.chatToolSelection(user(request), orgId, cid);
+    }
+
+    @PutMapping("/tool-selection")
+    public ToolExecutionService.ChatToolSelection setToolSelection(@PathVariable("orgId") Long orgId,
+                                                                  @PathVariable("conversationId") Long cid,
+                                                                  HttpServletRequest request) throws IOException {
+        Long userId = user(request);
+        if (request.getContentLengthLong() > MAX_SELECTION_BODY_BYTES) throw selectionBodyTooLarge();
+        byte[] bytes = request.getInputStream().readNBytes(MAX_SELECTION_BODY_BYTES + 1);
+        if (bytes.length > MAX_SELECTION_BODY_BYTES) throw selectionBodyTooLarge();
+        JsonNode body;
+        try {
+            body = SELECTION_JSON.readTree(bytes);
+        } catch (RuntimeException malformed) {
+            throw new ChatException(HttpStatus.BAD_REQUEST, "request body is not valid JSON");
+        }
+        return tools.setChatToolSelection(userId, orgId, cid, body);
+    }
+
+    private static ChatException selectionBodyTooLarge() {
+        return new ChatException(HttpStatus.PAYLOAD_TOO_LARGE, "request body too large");
     }
 
     @GetMapping("/context")

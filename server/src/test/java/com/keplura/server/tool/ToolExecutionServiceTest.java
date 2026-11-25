@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Central execution path (TU-01): every blocked case must end WITHOUT an external call.
@@ -111,6 +112,59 @@ class ToolExecutionServiceTest {
 
     private int auditRows() {
         return jdbc.queryForObject("select count(*) from tool_call_log", Integer.class);
+    }
+
+    @Test void selectionNarrowsTheModelCatalogAndDistinguishesEmptyFromDefault() {
+        adapter.extra.add(adapter.def("lookup", ToolRisk.READ, true));
+        assertThat(service.chatToolSelection(user, orgId, chat).selectedIds()).isNull();
+        assertThat(turn().offered()).containsOnlyKeys("f__echo", "f__lookup");
+
+        var saved = service.setChatToolSelection(user, orgId, chat, M.readTree("""
+                {"selectedIds":["fake:1:lookup"]}
+                """));
+        assertThat(saved.selectedIds()).containsExactly("fake:1:lookup");
+        var selectedTurn = turn();
+        assertThat(selectedTurn.offered()).containsOnlyKeys("f__lookup");
+        assertThat(selectedTurn.call("f__echo", "{\"message\":\"skip\"}").invoked()).isFalse();
+        assertThat(adapter.invocations).hasValue(0);
+        assertThat(selectedTurn.call("f__lookup", "{\"message\":\"run\"}").invoked()).isTrue();
+
+        assertThat(service.setChatToolSelection(user, orgId, chat, M.readTree("{\"selectedIds\":[]}"))
+                .selectedIds()).isEmpty();
+        assertThat(service.hasTools(user, orgId, chat)).isFalse();
+        assertThat(turn().offered()).isEmpty();
+        assertThat(turn().call("f__lookup", "{\"message\":\"skip\"}").invoked()).isFalse();
+
+        service.setChatToolSelection(user, orgId, chat, M.readTree("{\"selectedIds\":null}"));
+        assertThat(turn().offered()).containsOnlyKeys("f__echo", "f__lookup");
+        assertThat(adapter.invocations).hasValue(1);
+    }
+
+    @Test void rejectsUnknownUnapprovedAndModelAliasIdsAndRechecksRevocation() {
+        adapter.extra.add(adapter.def("disabled", ToolRisk.READ, false));
+        for (String id : List.of("fake:1:disabled", "fake:2:echo", "f__echo")) {
+            var body = M.createObjectNode();
+            body.putArray("selectedIds").add(id);
+            assertThatThrownBy(() -> service.setChatToolSelection(user, orgId, chat, body))
+                    .isInstanceOf(com.keplura.server.chat.ChatException.class);
+        }
+        assertThat(service.chatToolSelection(user, orgId, chat).selectedIds()).isNull();
+        service.setChatToolSelection(user, orgId, chat, M.readTree("{\"selectedIds\":[\"fake:1:echo\"]}"));
+        var planned = turn();
+        adapter.approved = false;
+        assertThat(turn().offered()).isEmpty();
+        assertThat(planned.call("f__echo", "{\"message\":\"skip\"}").invoked()).isFalse();
+        assertThat(adapter.invocations).hasValue(0);
+    }
+
+    @Test void selectionCannotExpandAnAlreadyOpenedCatalog() {
+        adapter.extra.add(adapter.def("lookup", ToolRisk.READ, true));
+        service.setChatToolSelection(user, orgId, chat, M.readTree("{\"selectedIds\":[\"fake:1:echo\"]}"));
+        var planned = turn();
+        service.setChatToolSelection(user, orgId, chat, M.readTree("{\"selectedIds\":[\"fake:1:lookup\"]}"));
+        assertThat(planned.call("f__lookup", "{\"message\":\"skip\"}").invoked()).isFalse();
+        assertThat(planned.call("f__echo", "{\"message\":\"skip\"}").invoked()).isFalse();
+        assertThat(adapter.invocations).hasValue(0);
     }
 
     @Test void approvedReadToolRunsWithAuditBeforeExecution() {

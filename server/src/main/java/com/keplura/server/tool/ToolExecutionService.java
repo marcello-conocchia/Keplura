@@ -1,11 +1,14 @@
 package com.keplura.server.tool;
 
 import com.keplura.server.search.ReferenceReadScope;
+import com.keplura.server.chat.ChatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
@@ -24,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -50,6 +55,7 @@ public class ToolExecutionService {
     public static final int MAX_TOOLS_OFFERED = 32;
     public static final int MAX_RESULT_CHARS = 8000;
     public static final int MAX_ARGUMENT_CHARS = 16_000;
+    private static final int MAX_SELECTION_ID_LENGTH = 512;
     public static final Duration MAX_TOOL_TIME_PER_TURN = Duration.ofSeconds(120);
     private static final Pattern FUNCTION_NAME = Pattern.compile("[a-zA-Z0-9_-]{1,64}");
 
@@ -169,6 +175,98 @@ public class ToolExecutionService {
      */
     public ToolTurn openTurn(ToolContext ctx, Long promptMessageId, boolean webSearch) {
         return new ToolTurn(ctx, ctx == null ? Map.of() : catalog(ctx, webSearch), promptMessageId);
+    }
+
+    public record ChatToolOption(String id, String name, String source, ToolRisk risk) { }
+
+    /** A null selection follows the server defaults, an empty list explicitly disables tools. */
+    public record ChatToolSelection(List<String> selectedIds, List<ChatToolOption> tools) { }
+
+    public ChatToolSelection chatToolSelection(Long userId, Long orgId, Long conversationId) {
+        ToolContext ctx = requireSelectionContext(userId, orgId, conversationId);
+        return selectionView(readSelection(ctx).ids(), availableCatalog(ctx, true, null, Integer.MAX_VALUE));
+    }
+
+    @Transactional
+    public ChatToolSelection setChatToolSelection(Long userId, Long orgId, Long conversationId, JsonNode body) {
+        ToolContext ctx = requireSelectionContext(userId, orgId, conversationId);
+        JsonNode ids = body == null ? null : body.get("selectedIds");
+        if (body == null || !body.isObject() || body.size() != 1 || ids == null) throw invalidSelection();
+        var available = availableCatalog(ctx, true, null, Integer.MAX_VALUE);
+        Set<String> selected = null;
+        String serialized = null;
+        if (!ids.isNull()) {
+            if (!ids.isArray() || ids.size() > MAX_TOOLS_OFFERED) throw invalidSelection();
+            Set<String> known = available.values().stream().map(ToolDefinition::id).collect(java.util.stream.Collectors.toSet());
+            selected = new TreeSet<>();
+            ArrayNode canonical = mapper.createArrayNode();
+            for (JsonNode id : ids) {
+                if (!id.isString() || id.asString().length() > MAX_SELECTION_ID_LENGTH
+                        || !known.contains(id.asString()) || !selected.add(id.asString())) throw invalidSelection();
+            }
+            selected.forEach(canonical::add);
+            serialized = canonical.toString();
+        }
+        String desired = serialized;
+        int changed = jdbc.update("""
+                update chat_conversation c set tool_selection_json=?,
+                tool_selection_cutoff=greatest(c.tool_selection_cutoff, coalesce(
+                  (select max(m.id) from chat_message m where m.conversation_id=c.id and m.role='user'),0))
+                where c.id=? and c.org_id=? and c.space_id=? and c.created_by=?
+                and exists(select 1 from membership m where m.org_id=c.org_id and m.user_id=c.created_by)
+                and exists(select 1 from space s where s.id=c.space_id and s.org_id=c.org_id)
+                and coalesce(c.tool_selection_json,'')<>?""",
+                desired, ctx.conversationId(), ctx.orgId(), ctx.spaceId(), ctx.userId(),
+                Objects.requireNonNullElse(desired, ""));
+        if (changed == 1) cards.cancelBeforeSelectionChange(ctx.conversationId(), wallClock.get());
+        return selectionView(readSelection(ctx).ids(), availableCatalog(ctx, true, null, Integer.MAX_VALUE));
+    }
+
+    private ToolContext requireSelectionContext(Long userId, Long orgId, Long conversationId) {
+        ToolContext ctx = readContext(userId, orgId, conversationId);
+        if (ctx == null) throw new ChatException(HttpStatus.NOT_FOUND, "conversation not found");
+        return ctx;
+    }
+
+    private record StoredSelection(Set<String> ids, long cutoff) {
+        boolean isCurrent(Long promptId) {
+            return promptId == null || promptId > cutoff;
+        }
+    }
+
+    private StoredSelection readSelection(ToolContext ctx) {
+        return jdbc.query("""
+                select c.tool_selection_json, c.tool_selection_cutoff from chat_conversation c
+                where c.id=? and c.org_id=? and c.space_id=? and c.created_by=?
+                and exists(select 1 from membership m where m.org_id=c.org_id and m.user_id=c.created_by)
+                and exists(select 1 from space s where s.id=c.space_id and s.org_id=c.org_id)""",
+                (rs, n) -> new StoredSelection(parseSelection(rs.getString(1)), rs.getLong(2)),
+                ctx.conversationId(), ctx.orgId(), ctx.spaceId(), ctx.userId()).stream().findFirst()
+                .orElseThrow(() -> new ChatException(HttpStatus.NOT_FOUND, "conversation not found"));
+    }
+
+    private Set<String> parseSelection(String stored) {
+        if (stored == null) return null;
+        JsonNode ids = mapper.readTree(stored);
+        if (!ids.isArray() || ids.size() > MAX_TOOLS_OFFERED) throw new IllegalStateException("invalid stored tool selection");
+        Set<String> selected = new TreeSet<>();
+        for (JsonNode id : ids) {
+            if (!id.isString() || !selected.add(id.asString())) throw new IllegalStateException("invalid stored tool selection");
+        }
+        return selected;
+    }
+
+    private static ChatToolSelection selectionView(Set<String> selected, Map<String, ToolDefinition> available) {
+        var tools = available.values().stream()
+                .filter(t -> t.id().length() <= MAX_SELECTION_ID_LENGTH)
+                .map(t -> new ChatToolOption(t.id(), t.toolName(), t.sourceName(), t.risk()))
+                .toList();
+        var ids = selected == null ? null : tools.stream().map(ChatToolOption::id).filter(selected::contains).toList();
+        return new ChatToolSelection(ids, tools);
+    }
+
+    private static ChatException invalidSelection() {
+        return new ChatException(HttpStatus.BAD_REQUEST, "invalid chat tool selection");
     }
 
     public record Continuation(ToolTurn turn, ToolQuestionStore.State state, String decision) { }
@@ -378,7 +476,9 @@ public class ToolExecutionService {
     private Map<String, ToolDefinition> boundCatalog(ToolContext ctx, ToolQuestionStore.State state) {
         if (state.userId()!=ctx.userId() || state.orgId()!=ctx.orgId() || state.conversationId()!=ctx.conversationId()
                 || state.spaceId()!=ctx.spaceId()) return null;
-        Map<String, ToolDefinition> offered = catalog(ctx, true); // narrowed to the stored original catalog below
+        var selection = readSelection(ctx);
+        if (!selection.isCurrent(state.promptId())) return null;
+        Map<String, ToolDefinition> offered = availableCatalog(ctx, true, selection.ids(), Integer.MAX_VALUE);
         JsonNode expected = mapper.readTree(state.catalog());
         if (!expected.isObject()) return null;
         for (var e : expected.properties()) {
@@ -487,7 +587,13 @@ public class ToolExecutionService {
     }
 
     private Map<String, ToolDefinition> catalog(ToolContext ctx, boolean webSearch) {
+        return availableCatalog(ctx, webSearch, readSelection(ctx).ids(), MAX_TOOLS_OFFERED);
+    }
+
+    private Map<String, ToolDefinition> availableCatalog(ToolContext ctx, boolean webSearch, Set<String> selected, int limit) {
         Map<String, ToolDefinition> out = new LinkedHashMap<>();
+        if (selected != null && selected.isEmpty()) return out;
+        Set<String> seenNames = new java.util.HashSet<>();
         for (ToolAdapter adapter : adapters.values()) {
             if (!webSearch && WebSearchToolAdapter.KIND.equals(adapter.kind())) continue;
             List<ToolDefinition> defs;
@@ -499,10 +605,12 @@ public class ToolExecutionService {
             }
             if(defs==null) continue;
             for (ToolDefinition d : defs) {
-                if (out.size() >= MAX_TOOLS_OFFERED) return out;
+                if (out.size() >= limit) return out;
                 if (d == null || !adapter.kind().equals(d.adapter()) || d.functionName() == null
-                        || !FUNCTION_NAME.matcher(d.functionName()).matches() || out.containsKey(d.functionName())) continue;
-                if (blockReason(d) == null) out.put(d.functionName(), d);
+                        || d.id() == null || !FUNCTION_NAME.matcher(d.functionName()).matches()) continue;
+                if (blockReason(d) == null && seenNames.add(d.functionName()) && (selected == null || selected.contains(d.id()))) {
+                    out.put(d.functionName(), d);
+                }
             }
         }
         return out;
@@ -534,7 +642,7 @@ public class ToolExecutionService {
 
     /** {@code criticalAllowed}: nur der bestätigte Weg darf eine CRITICAL-Definition ausführen. */
     private Checked recheck(ToolContext ctx, String adapterKind, String toolId, String expectedHash, JsonNode args,
-                            boolean criticalAllowed) {
+                            boolean criticalAllowed, Long promptMessageId) {
         try {
             ToolContext now = resolveContext(ctx.userId(), ctx.orgId(), ctx.conversationId());
             if (!ctx.equals(now)) return Checked.no("Der Zugriff auf diesen Chat besteht nicht mehr. Das Werkzeug wurde nicht aufgerufen.");
@@ -547,6 +655,10 @@ public class ToolExecutionService {
             }
             String invalid = ToolArgumentValidator.validate(fresh.inputSchema(), args);
             if (invalid != null) return Checked.no(invalid + " Das Werkzeug wurde nicht aufgerufen.");
+            var selection = readSelection(ctx);
+            if (!selection.isCurrent(promptMessageId) || (selection.ids() != null && !selection.ids().contains(toolId))) {
+                return Checked.no(CHANGED);
+            }
             return new Checked(null, fresh);
         } catch (RuntimeException e) {
             log.warn("tool authorization re-check failed ({})", e.getClass().getSimpleName());
@@ -744,7 +856,7 @@ public class ToolExecutionService {
                 : row.parentCallId()!=null && dependentParent(ctx, row.promptMessageId(), row.parentCallId(), true)==null ? Checked.no(CHANGED)
                 : row.risk()!=ToolRisk.CRITICAL && !(row.risk()==ToolRisk.WRITE && row.parentCallId()!=null)
                   && !(row.risk()==ToolRisk.READ && row.disclosureConfirmation() && row.parentCallId()==null) ? Checked.no(CHANGED)
-                : recheck(bound, row.adapter(), row.toolId(), row.definitionHash(), args, true);
+                : recheck(bound, row.adapter(), row.toolId(), row.definitionHash(), args, true, row.promptMessageId());
         if (checked.reason() != null) {
             cards.finish(row.id(), ToolCallStore.Status.BLOCKED, null, checked.reason(), wallClock.get());
             return new Decision.Done(view(reload(row), wallClock.get()));
@@ -987,7 +1099,7 @@ public class ToolExecutionService {
             boolean disclosure = t.risk()==ToolRisk.READ && !t.internal() && requiresDisclosure(promptMessageId,t,args);
             boolean privateArgs = privateArguments(promptMessageId,t,args);
             // A CRITICAL plan only becomes a pending card here; it is never executed in the turn.
-            Checked checked = recheck(ctx, t.adapter(), t.id(), hash, args, critical);
+            Checked checked = recheck(ctx, t.adapter(), t.id(), hash, args, critical, promptMessageId);
             if (checked.reason() != null) return blocked(checked.reason(), t, args);
             Instant now = wallClock.get();
             if (critical || dependent || disclosure) {
@@ -1023,7 +1135,7 @@ public class ToolExecutionService {
             }
             JsonNode boundArgs = args;
             Executed done = serialized(ctx, promptMessageId, () -> {
-                Checked fresh = recheck(ctx, t.adapter(), t.id(), hash, boundArgs, false);
+                Checked fresh = recheck(ctx, t.adapter(), t.id(), hash, boundArgs, false, promptMessageId);
                 String reason = !active() ? "Der Chat wurde weitergeführt oder gestoppt. Das Werkzeug wurde nicht aufgerufen."
                         : timeExhausted() ? "Das Zeitbudget für Werkzeuge in dieser Antwort ist aufgebraucht." : fresh.reason();
                 Executed result = reason == null ? execute(ctx, fresh.fresh(), boundArgs, card.id())

@@ -27,6 +27,7 @@ import { copyText } from "./ui/clipboard";
 import SourcePreview from "./SourcePreview.vue";
 import TemplateMenu from "./chat/TemplateMenu.vue";
 import ChatContextBar from "./chat/ChatContextBar.vue";
+import ChatToolMenu from "./chat/ChatToolMenu.vue";
 import ToolCallCard from "./chat/ToolCallCard.vue";
 import { cardsPromptAt, groupByPrompt, replaceCard, type ToolCallCard as ToolCallCardDto } from "../tool-cards";
 import { webSearchStatus } from "../productivity-api";
@@ -87,7 +88,7 @@ function cardsAt(index: number): ToolCallCardDto[] {
 }
 /** One decision at a time; the server consumes the pending call exactly once anyway. */
 async function decideCard(card: ToolCallCardDto, decision: "confirm" | "reject") {
-  if (decidingCard.value !== null || streaming.value) return;
+  if (decidingCard.value !== null || streaming.value || toolSelectionSaving.value) return;
   const s = scoped();
   const conversationId = activeId.value;
   if (!s || conversationId === null) return;
@@ -141,6 +142,7 @@ async function decideCard(card: ToolCallCardDto, decision: "confirm" | "reject")
 const prompt = ref("");
 const composerKb = ref<number | null>(null);
 const contextBusy = ref(false);
+const toolSelectionSaving = ref(false);
 const listError = ref("");
 
 const conversations = computed(() => auth.conversations);
@@ -179,8 +181,20 @@ const canSend = computed(
     prompt.value.trim() !== "" &&
     !streaming.value &&
     !contextBusy.value &&
+    !toolSelectionSaving.value &&
     auth.selectedOrgId !== null && auth.selectedSpaceId !== null,
 );
+
+async function refreshAfterToolSelection(cid: number) {
+  const orgId = auth.selectedOrgId;
+  if (orgId === null || activeId.value !== cid) return;
+  const previous = toolCalls.value;
+  const read = await fetchTranscript(orgId, cid);
+  if (read.kind === "ok" && auth.selectedOrgId === orgId && activeId.value === cid
+      && !streaming.value && decidingCard.value === null && toolCalls.value === previous) {
+    toolCalls.value = read.transcript.toolCalls ?? [];
+  }
+}
 
 /** True when the active conversation is a grounded (KB) chat — the composer
  *  context line and empty-state copy read this, never a raw kb id (card §4). */
@@ -319,11 +333,14 @@ async function ensureConversation(): Promise<number | null> {
 async function newConversation(withKb: boolean): Promise<boolean> {
   const s = scoped();
   if (!s) return false;
+  const previousChat = activeId.value;
   notice.value = "";
   const kbId = withKb ? composerKb.value : null;
   const outcome = await createConversation(s.orgId, s.spaceId, kbId);
+  if (auth.selectedOrgId !== s.orgId || auth.selectedSpaceId !== s.spaceId) return false;
   if (outcome.kind === "created") {
     auth.rememberConversation(outcome.conversation);
+    if (activeId.value !== previousChat) return false;
     activeId.value = outcome.conversation.id;
     resetTranscript();
     return true;
@@ -1081,7 +1098,7 @@ onUnmounted(() => {
                 v-for="c in cardsAt(mi)"
                 :key="c.id"
                 :card="c"
-                :busy="decidingCard === c.id"
+                :busy="decidingCard === c.id || toolSelectionSaving"
                 :error="cardError?.id === c.id ? cardError.message : null"
                 @decide="(d) => decideCard(c, d)"
               />
@@ -1124,6 +1141,10 @@ onUnmounted(() => {
               <ChatContextBar :conversation-id="activeId" :primary-kb-id="composerKb"
                 :disabled="!scoped() || streaming || contextBusy" :ensure-conversation="ensureConversation"
                 @error="(m: string) => (notice = m)" />
+              <ChatToolMenu :org-id="auth.selectedOrgId" :conversation-id="activeId" :ensure-conversation="ensureConversation"
+                :disabled="!scoped() || streaming || contextBusy || decidingCard !== null"
+                @saving="(v) => (toolSelectionSaving = v)"
+                @saved="refreshAfterToolSelection" />
               <TemplateMenu compact :current-prompt="prompt" :disabled="!scoped()" @insert="insertTemplate" />
               <button v-if="webAvailable" type="button" class="web-toggle" :class="{ on: webOn }" :aria-pressed="webOn"
                 :disabled="streaming || contextBusy" :title="$t('Im Web suchen')" :aria-label="$t('Im Web suchen')"

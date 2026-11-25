@@ -208,6 +208,25 @@ class ToolConfirmationTest {
         return service.decide(user, orgId, chat, cardId, true);
     }
 
+    @Test void savingSameSelectionKeepsTheCardButChangingAndRestoringNeverRevivesIt() {
+        var enabled = M.readTree("{\"selectedIds\":[\"fake:1:delete\"]}");
+        service.setChatToolSelection(user, orgId, chat, enabled);
+        var oldCard = planCritical("old");
+        service.setChatToolSelection(user, orgId, chat, enabled);
+        assertThat(service.cards(user, orgId, chat).getLast().status()).isEqualTo("PENDING");
+
+        service.setChatToolSelection(user, orgId, chat, M.readTree("{\"selectedIds\":[]}"));
+        service.setChatToolSelection(user, orgId, chat, enabled);
+        assertThat(service.cards(user, orgId, chat).getLast().status()).isEqualTo("CANCELLED");
+        assertThat(confirm(oldCard.id())).isInstanceOf(ToolExecutionService.Decision.Conflict.class);
+        assertThat(fake.invocations).hasValue(0);
+
+        promptId = userMessage("New question");
+        var fresh = planCritical("new");
+        assertThat(confirm(fresh.id())).isInstanceOf(ToolExecutionService.Decision.Done.class);
+        assertThat(fake.invocations).hasValue(1);
+    }
+
     @Test void criticalIsOfferedButOnlyPlannedInTheTurn() {
         assertThat(turn().offered()).containsKeys("f__delete", "f__read");
         var card = planCritical("T-1");
