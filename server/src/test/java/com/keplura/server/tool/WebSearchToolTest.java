@@ -29,6 +29,8 @@ class WebSearchToolTest {
     private HttpServer provider;
     private final List<String> queries = new CopyOnWriteArrayList<>();
     private final AtomicInteger providerStatus = new AtomicInteger(200);
+    private final AtomicInteger pageConnections = new AtomicInteger();
+    private final List<String> pageRequests = new CopyOnWriteArrayList<>();
     private volatile String providerBody;
     private String providerUrl;
     private JdbcTemplate jdbc;
@@ -51,6 +53,14 @@ class WebSearchToolTest {
             exchange.sendResponseHeaders(providerStatus.get(), body.length);
             try (var out = exchange.getResponseBody()) { out.write(body); }
         });
+        provider.createContext("/page", exchange -> {
+            pageRequests.add(exchange.getRequestURI().toString());
+            byte[] bytes = ("<title>Vollständige Quelle</title><script>SCRIPT_SECRET</script><p>PAGE_TERM_8912 "
+                    + "Text ".repeat(2500) + "</p>").getBytes(StandardCharsets.UTF_8);
+            exchange.getResponseHeaders().set("Content-Type", "text/html");
+            exchange.sendResponseHeaders(200, bytes.length);
+            try (var out = exchange.getResponseBody()) { out.write(bytes); }
+        });
         provider.start();
         providerUrl = "http://127.0.0.1:" + provider.getAddress().getPort();
 
@@ -68,7 +78,8 @@ class WebSearchToolTest {
                 "Stichwort " + SECRET);
         search = new WebSearchService("searxng", providerUrl, "", 5, "blocked.test", 2);
         com.keplura.server.websearch.WebSearchTestSupport.withGuard(search, new SsrfGuard("127.0.0.1/32"));
-        service = new ToolExecutionService(jdbc, List.of(new AttachmentToolAdapter(jdbc), new WebSearchToolAdapter(jdbc, search)),
+        service = new ToolExecutionService(jdbc, List.of(new AttachmentToolAdapter(jdbc), new WebSearchToolAdapter(jdbc, search,
+                com.keplura.server.http.WebPageFetcherTestSupport.local(provider, pageConnections))),
                 new ToolAuditLog(jdbc));
     }
 
@@ -88,6 +99,66 @@ class WebSearchToolTest {
     }
     private List<String> column(String name) {
         return jdbc.queryForList("select " + name + " from tool_call order by id", String.class);
+    }
+
+    @Test void fetchRunsThroughCentralCardsAndExternalTextIsBoundedPublicProvenance() {
+        var turn = turn(true);
+        assertThat(turn.offered()).containsKeys("web_search", "web_fetch");
+        var result = turn.call("web_fetch", "{\"url\":\"http://example.org/page\"}");
+        assertThat(result.invoked()).isTrue();
+        assertThat(result.text()).contains("Vollständige Quelle", "http://example.org/page", "PAGE_TERM_8912")
+                .doesNotContain("SCRIPT_SECRET");
+        assertThat(card("web_fetch").result())
+                .hasSizeLessThanOrEqualTo(ToolExecutionService.MAX_RESULT_CHARS);
+        assertThat(card("web_fetch").status()).isEqualTo("SUCCEEDED");
+        assertThat(card("web_fetch").argumentsText()).contains("http://example.org/page");
+        assertThat(card("web_fetch").risk()).isEqualTo("READ");
+        assertThat(pageConnections).hasValue(1);
+        // Mark the question as internal afterwards; the page remains literal external provenance.
+        turn.call("attachment_search", "{\"query\":\"Stichwort\"}");
+        assertThat(turn.call("web_search", "{\"query\":\"PAGE_TERM_8912\"}").invoked()).isTrue();
+        assertThat(queries).containsExactly("PAGE_TERM_8912");
+    }
+
+    @Test void internalUrlNeedsOneConcreteConfirmationAndPrivateArgumentsAreDeleted() {
+        var turn = turn(true);
+        turn.call("attachment_search", "{\"query\":\"Stichwort\"}");
+        String url = "http://example.org/page?q=" + SECRET;
+        assertThat(turn.call("web_fetch", M.createObjectNode().put("url", url).toString()).invoked()).isFalse();
+        var pending = card("web_fetch");
+        assertThat(pending.status()).isEqualTo("PENDING");
+        assertThat(pageConnections).hasValue(0);
+        service.decide(1L, 1L, 1L, pending.id(), true);
+        service.decide(1L, 1L, 1L, pending.id(), true);
+        assertThat(pageConnections).hasValue(1);
+        assertThat(pageRequests).containsExactly("/page?q=" + SECRET);
+        assertThat(column("arguments_json")).allSatisfy(v -> assertThat(String.valueOf(v)).doesNotContain(SECRET));
+    }
+
+    @Test void fetchIsNeitherOfferedNorDialledWithoutEachConditionOrAfterRevocation() {
+        assertThat(offered(false)).doesNotContainKey("web_fetch");
+        assertThat(service.openTurn(service.resolveContext(1L,1L,1L), null, false)
+                .call("web_fetch", "{\"url\":\"http://example.org/page\"}").invoked()).isFalse();
+        var turn = turn(true);
+        jdbc.update("update org_tool_setting set web_search_enabled=false,web_revision=web_revision+1 where org_id=1");
+        assertThat(offered(true)).doesNotContainKey("web_fetch");
+        assertThat(turn.call("web_fetch", "{\"url\":\"http://example.org/page\"}").invoked()).isFalse();
+        var none = new WebSearchService("none", "", "", 5, "", 2);
+        service = new ToolExecutionService(jdbc, List.of(new WebSearchToolAdapter(jdbc, none,
+                com.keplura.server.http.WebPageFetcherTestSupport.local(provider, pageConnections))), new ToolAuditLog(jdbc));
+        jdbc.update("update org_tool_setting set web_search_enabled=true where org_id=1");
+        assertThat(offered(true)).doesNotContainKey("web_fetch");
+        assertThat(service.openTurn(service.resolveContext(1L,1L,1L), null, true)
+                .call("web_fetch", "{\"url\":\"http://example.org/page\"}").invoked()).isFalse();
+        assertThat(pageConnections).hasValue(0);
+    }
+
+    @Test void fetchBlockedDomainFailsWithFixedErrorAndNoDial() {
+        var outcome = turn(true).call("web_fetch", "{\"url\":\"http://blocked.test/page\"}");
+        assertThat(outcome.text()).contains(WebSearchToolAdapter.FETCH_UNAVAILABLE);
+        assertThat(card("web_fetch").status()).isEqualTo("FAILED");
+        assertThat(pageConnections).hasValue(0);
+        assertThat(column("error")).containsExactly(WebSearchToolAdapter.FETCH_UNAVAILABLE);
     }
 
     @Test void modelSearchesRephrasesAndSearchesAgainWithATermFromTheFirstHit() {

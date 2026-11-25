@@ -125,6 +125,11 @@ public class SsrfGuard {
         if (explicitlyAllowed(addr)) {
             return true;
         }
+        return publicRouteAllowed(addr);
+    }
+
+    /** Untrusted page URLs never inherit operator exceptions for configured admin targets. */
+    public static boolean publicRouteAllowed(InetAddress addr) {
         if (addr.isAnyLocalAddress() || addr.isLoopbackAddress() || addr.isLinkLocalAddress()
                 || addr.isSiteLocalAddress() || addr.isMulticastAddress()) {
             return false;

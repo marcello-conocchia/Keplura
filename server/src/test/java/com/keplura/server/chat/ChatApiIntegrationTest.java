@@ -186,7 +186,7 @@ class ChatApiIntegrationTest {
                     try(var out=exchange.getResponseBody()) { out.write(bytes); }
                     return;
                 }
-                if(stubToolMode.equals("web")) {
+                if(stubToolMode.equals("web") || stubToolMode.equals("web-fetch")) {
                     var json=tools.jackson.databind.json.JsonMapper.builder().build();
                     var response=json.createObjectNode();
                     var message=response.putArray("choices").addObject().putObject("message");
@@ -196,9 +196,12 @@ class ChatApiIntegrationTest {
                         var found=java.util.regex.Pattern.compile("ORBITAL_TERM_[0-9]+").matcher(lastBody.get());
                         query=(found.find()?found.group():"nichts gefunden")+" Hersteller";
                     }
-                    if(query!=null) message.putArray("tool_calls").addObject().put("id","call").put("type","function")
+                    if(turn==2 && stubToolMode.equals("web-fetch"))
+                        message.putArray("tool_calls").addObject().put("id","fetch").put("type","function")
+                                .putObject("function").put("name","web_fetch").put("arguments","{\"url\":\"http://example.org/eins\"}");
+                    else if(query!=null) message.putArray("tool_calls").addObject().put("id","call").put("type","function")
                             .putObject("function").put("name","web_search").put("arguments",json.createObjectNode().put("query",query).toString());
-                    else message.put("content","Web answer");
+                    else message.put("content", lastBody.get().contains("PAGE_BODY_4521") ? "Web answer PAGE_BODY_4521" : "Web answer");
                     byte[] bytes=response.toString().getBytes(StandardCharsets.UTF_8);
                     exchange.getResponseHeaders().set("Content-Type","application/json");
                     exchange.sendResponseHeaders(200,bytes.length);
@@ -548,6 +551,10 @@ class ChatApiIntegrationTest {
 
     /** Scripted search provider behind the real adapter; the platform provider of this context stays "none". */
     private WebFixture webFixture(boolean orgSwitch) {
+        return webFixture(orgSwitch, new com.keplura.server.http.WebPageFetcher());
+    }
+
+    private WebFixture webFixture(boolean orgSwitch, com.keplura.server.http.WebPageFetcher fetcher) {
         String[] scope=fixtureChain(false);
         if(orgSwitch) {
             var enabled=exchange("PUT","/api/v1/orgs/"+scope[1]+"/tools/settings",scope[0],Map.of("webSearchEnabled",true));
@@ -558,14 +565,43 @@ class ChatApiIntegrationTest {
         var provider=new com.keplura.server.websearch.WebSearchService("searxng","https://search.example","",5,"",2) {
             @Override public java.util.List<WebResult> search(Config c,String q) {
                 queries.add(q);
-                return java.util.List.of(new WebResult("Erster Treffer","https://example.org/eins","Quellbegriff ORBITAL_TERM_5521 steht hier."));
+                return java.util.List.of(new WebResult("Erster Treffer",(stubToolMode.equals("web-fetch") ? "http" : "https")+"://example.org/eins","Quellbegriff ORBITAL_TERM_5521 steht hier."));
             }
         };
         chatService.setToolExecutionService(new com.keplura.server.tool.ToolExecutionService(jdbc,
-                java.util.List.of(new com.keplura.server.tool.WebSearchToolAdapter(jdbc,provider)),new com.keplura.server.tool.ToolAuditLog(jdbc)));
+                java.util.List.of(new com.keplura.server.tool.WebSearchToolAdapter(jdbc,provider,fetcher)),new com.keplura.server.tool.ToolAuditLog(jdbc)));
         String chat=createConversation(scope[0],scope[1],scope[2],Map.of());
         stubToolMode="web";
         return new WebFixture(scope[0],scope[1],chat,queries);
+    }
+
+    @Test void webSearchThenFetchFeedsThePageTextIntoTheFinalAnswer() throws Exception {
+        var page = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        var dials = new AtomicInteger();
+        page.createContext("/eins", exchange -> {
+            byte[] bytes = "<title>Quelle</title><p>PAGE_BODY_4521</p>".getBytes(StandardCharsets.UTF_8);
+            exchange.getResponseHeaders().set("Content-Type", "text/html");
+            exchange.sendResponseHeaders(200, bytes.length);
+            try (var out = exchange.getResponseBody()) { out.write(bytes); }
+        });
+        page.start();
+        try {
+            var fetcher = com.keplura.server.http.WebPageFetcherTestSupport.local(page, dials);
+            var f = webFixture(true, fetcher);
+            stubToolMode = "web-fetch";
+            var response = exchange("POST",streamPath(f.org(),f.chat()),f.cookie(),Map.of("prompt","Wer baut Satelliten?","webSearch",true));
+            assertThat(response.getStatusCode().value()).isEqualTo(200);
+            assertThat(response.getBody()).contains("Web answer PAGE_BODY_4521");
+            assertThat(dials).hasValue(1);
+            assertThat(f.queries()).containsExactly("Satelliten Hersteller Europa");
+            assertThat(toolBodies.get(2)).contains("PAGE_BODY_4521");
+            assertThat(toolBodies.getLast()).contains("PAGE_BODY_4521", "\"tool_choice\":\"none\"");
+            var cards = tools.jackson.databind.json.JsonMapper.builder().build()
+                    .readTree(exchange("GET",transcriptPath(f.org(),f.chat()),f.cookie(),null).getBody()).path("toolCalls");
+            assertThat(cards.get(1).path("tool").asString()).isEqualTo("web_fetch");
+            assertThat(cards.get(1).path("status").asString()).isEqualTo("SUCCEEDED");
+            assertThat(cards.get(1).path("argumentsText").asString()).contains("example.org/eins");
+        } finally { page.stop(0); }
     }
 
     @Test void webSearchToolSearchesRephrasesSearchesAgainAndAnswers() {

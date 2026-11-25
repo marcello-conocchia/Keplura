@@ -1,6 +1,6 @@
 # TU-04e — Webseitenabruf als Werkzeug
 
-Status: **geplant, nicht gestartet.** Fünfte und letzte Aufgabe von TU-04 nach TU-04d (PR #32, Merge `ddc05a9`), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Laden beliebiger Adressen aus dem Internet (SSRF-Fläche), Verarbeitung fremder Inhalte, Modell-/Werkzeugschleife.
+Status: **in Umsetzung (PO-Auftrag 25.11.2026), noch nicht gemergt.** Fünfte und letzte Aufgabe von TU-04 nach TU-04d (PR #32, Merge `ddc05a9`), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Laden beliebiger Adressen aus dem Internet (SSRF-Fläche), Verarbeitung fremder Inhalte, Modell-/Werkzeugschleife.
 
 ## Ziel
 
