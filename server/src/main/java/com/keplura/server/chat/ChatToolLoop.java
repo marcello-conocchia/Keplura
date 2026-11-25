@@ -176,7 +176,7 @@ final class ChatToolLoop {
                 String args = raw.isString() ? raw.asString()
                         : raw.isMissingNode() || raw.isNull() ? "{}" : mapper.writeValueAsString(raw);
                 ObjectNode planned = accepted.addObject().put("id", id).put("type", "function");
-                planned.putObject("function").put("name",turn.offered().containsKey(name)?name:"unknown")
+                planned.putObject("function").put("name",turn.offers(name)?name:"unknown")
                         .put("arguments","{}");
                 var outcome = turn.call(name, args);
                 if(outcome.argumentCardId()!=null) planned.put("_keplura_arguments",outcome.argumentCardId());
