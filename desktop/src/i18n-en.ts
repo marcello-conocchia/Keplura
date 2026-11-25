@@ -699,7 +699,7 @@ export const EN: Record<string, string> = {
   "Die internen Fundstellen sind vorübergehend nicht verfügbar. Bitte erneut laden.": "Internal sources are temporarily unavailable. Please reload.",
   "Wissenssuche, Dokumentstellen und Chat-Anhänge als Werkzeuge für diese Organisation freigeben": "Enable knowledge search, document reading and chat attachments as tools for this organization",
   "Internes Ziel für diese Organisation – Daten bleiben im Haus": "Internal destination for this organization – data stays in-house",
-  "Websuche als Werkzeug freigeben – nur bei Fragen mit „Im Web suchen“": "Enable web search as a tool – only for questions with “Search the web”",
+  "Websuche und Webseitenabruf als Werkzeuge freigeben – nur bei Fragen mit „Im Web suchen“": "Enable web search and page fetching as tools – only for questions with “Search the web”",
   "keine Websuche eingerichtet": "no web search configured",
   "Werkzeugeinstellungen benötigen die Organisationsverwaltung.": "Tool settings require organization administration.",
   "Folgeaktion zu {0}": "Follow-up action to {0}",
