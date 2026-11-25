@@ -1,6 +1,6 @@
 # TU-04e — Webseitenabruf als Werkzeug
 
-Status: **implementiert und geprüft in Draft-PR #34, noch nicht gemergt (25.11.2026).** Fünfte und letzte Aufgabe von TU-04 nach TU-04d (PR #32, Merge `ddc05a9`), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Laden beliebiger Adressen aus dem Internet (SSRF-Fläche), Verarbeitung fremder Inhalte, Modell-/Werkzeugschleife.
+Status: **Review-Korrektur in Draft-PR #34 (8387fc3); neue lokale Linux-CI grün, Claudes Nachprüfung von Befund 1 offen, Merge gesperrt (25.11.2026).** Fünfte und letzte Aufgabe von TU-04 nach TU-04d (PR #32, Merge `ddc05a9`), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Laden beliebiger Adressen aus dem Internet (SSRF-Fläche), Verarbeitung fremder Inhalte, Modell-/Werkzeugschleife.
 
 ## Ziel
 
@@ -71,4 +71,6 @@ Lokaler HTTP-Testserver und ein einstellbarer DNS-Resolver im Abrufer, damit Reb
 Eigener Worktree auf Branch `feat/tool-use-web-fetch` ab aktuellem main. Implementierung und unabhängige Prüfung nach PO-Zuweisung (TU-04c/d: Claude implementiert, Codex prüft). Genau eine Implementierungsaufgabe. Draft-PR, kein Merge durch den Entwickler.
 
 
-Nachweis: lokale Linux-CI auf Produktstand d64ec60 als uid 1500 mit acl, Exit 0 (92 Klassen, 936 Tests, 4 übersprungen; Desktop und Tauri grün), [MATRIX](../../ci/evidence/20261125-185440/MATRIX.md). Unabhängige Code-/Security-Freigabe auf 325ae46; beide Minor-Hinweise mit Regressionen in d64ec60 behoben, keine neue Prüfrunde gemäß AGENTS.md. Nur lokale Fixtures und geskriptetes Gateway, kein echter Modell-/Internetlauf oder Browser-/Feldtest. Details und Grenzen in PR #34.
+Historischer Nachweis vor Claudes Review: lokale Linux-CI auf Produktstand d64ec60 als uid 1500 mit acl, Exit 0 (92 Klassen, 936 Tests, 4 übersprungen; Desktop und Tauri grün), [MATRIX](../../ci/evidence/20261125-185440/MATRIX.md). Unabhängige Code-/Security-Freigabe auf 325ae46; beide Minor-Hinweise mit Regressionen in d64ec60 behoben, keine neue Prüfrunde gemäß AGENTS.md. Nur lokale Fixtures und geskriptetes Gateway, kein echter Modell-/Internetlauf oder Browser-/Feldtest. Details und Grenzen in PR #34.
+
+Aktueller Nachweis nach Claudes Review: Produktkorrektur 8387fc3 (Befunde 1–3); neue vollständige lokale Linux-CI Exit 0, uid 1500 mit acl, 92 Klassen, 990 Tests, 4 übersprungen, Desktop/Tauri grün. [MATRIX](../../ci/evidence/20261125-191631/MATRIX.md). Literal- und DNS-Regressionen mit Verbindungszähler, SOCKS-Regression und öffentliche Gegenbeispiele. 64:ff9b:1::/48 wird als lokales Übersetzungspräfix vollständig gesperrt; seine Abbildung ist netzspezifisch. Claudes gezielte Nachprüfung von Befund 1 steht weiterhin aus; kein Merge.

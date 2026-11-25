@@ -1,0 +1,959 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------< com.keplura:keplura-server >---------------------
+[INFO] Building Keplura Server 0.1.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-cli) @ keplura-server ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.keplura.server.LegacyEnvironmentPostProcessorTest
+WARN Keplura: veraltete Umgebungsvariablen erkannt, bitte auf KEPLURA_* umbenennen: [INTRACORE_GATEWAY_BASE_URL, INTRACORE_SECRETS_MASTER_KEY]
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.326 s -- in com.keplura.server.LegacyEnvironmentPostProcessorTest
+[INFO] Running com.keplura.server.search.OfficeFormatsTest
+[INFO] Tests run: 17, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.026 s -- in com.keplura.server.search.OfficeFormatsTest
+[INFO] Running com.keplura.server.search.LocalRerankerTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.354 s -- in com.keplura.server.search.LocalRerankerTest
+[INFO] Running com.keplura.server.knowledge.KnowledgeBaseServiceTest
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (/home/ci/.m2/repository/net/bytebuddy/byte-buddy-agent/1.18.11/byte-buddy-agent-1.18.11.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.326 s -- in com.keplura.server.knowledge.KnowledgeBaseServiceTest
+[INFO] Running com.keplura.server.mcp.McpSchemaFailClosedTest
+19:19:41.665 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-schema-b112a0a6-7e68-4f22-9825-3df901086f21 (H2 2.4)
+19:19:41.731 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:41.786 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:41.790 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.035s)
+19:19:41.797 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:41.852 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:41.869 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:41.904 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:41.918 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:41.934 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:41.951 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:41.970 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:41.988 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:42.000 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:42.017 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:42.035 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:42.048 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:42.057 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:42.091 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:42.105 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:42.118 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:42.132 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:42.141 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:42.158 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:42.164 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:42.178 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:42.184 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:42.193 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:42.207 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:42.214 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:42.226 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:42.235 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:42.244 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:42.256 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:42.271 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:42.279 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:42.291 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.213s)
+19:19:42.299 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+19:19:42.579 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-schema-c062a114-bdbd-4185-ac35-d58a77c43272 (H2 2.4)
+19:19:42.588 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:42.603 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:42.603 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.011s)
+19:19:42.605 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:42.612 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:42.616 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:42.621 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:42.626 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:42.633 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:42.640 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:42.646 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:42.652 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:42.658 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:42.665 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:42.673 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:42.678 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:42.681 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:42.693 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:42.699 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:42.707 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:42.716 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:42.721 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:42.732 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:42.736 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:42.742 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:42.745 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:42.751 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:42.759 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:42.764 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:42.770 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:42.775 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:42.782 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:42.788 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:42.800 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:42.806 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:42.812 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.091s)
+19:19:42.812 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+19:19:43.010 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-schema-6a073c2c-06c0-4229-bca2-1d4fb068a8f7 (H2 2.4)
+19:19:43.015 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:43.024 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:43.025 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.007s)
+19:19:43.026 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:43.029 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:43.031 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:43.035 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:43.038 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:43.042 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:43.046 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:43.050 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:43.054 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:43.058 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:43.062 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:43.065 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:43.069 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:43.072 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:43.080 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:43.086 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:43.091 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:43.097 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:43.100 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:43.107 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:43.111 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:43.115 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:43.118 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:43.121 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:43.126 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:43.129 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:43.136 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:43.142 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:43.146 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:43.151 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:43.158 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:43.161 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:43.163 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.056s)
+19:19:43.164 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+19:19:43.355 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-schema-05d4b7fe-7c3c-4cb6-9135-d1d9fcb6429e (H2 2.4)
+19:19:43.359 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:43.368 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:43.369 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.007s)
+19:19:43.369 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:43.371 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:43.372 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:43.374 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:43.376 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:43.380 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:43.384 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:43.388 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:43.391 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:43.394 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:43.399 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:43.404 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:43.408 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:43.409 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:43.417 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:43.422 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:43.426 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:43.432 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:43.436 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:43.443 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:43.445 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:43.458 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:43.460 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:43.463 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:43.468 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:43.471 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:43.477 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:43.481 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:43.485 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:43.490 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:43.497 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:43.502 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:43.505 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.059s)
+19:19:43.506 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+19:19:43.692 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-schema-617c49f2-856f-4377-835f-2fafda66a4d8 (H2 2.4)
+19:19:43.698 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:43.708 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:43.708 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.006s)
+19:19:43.709 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:43.710 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:43.712 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:43.714 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:43.717 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:43.720 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:43.723 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:43.725 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:43.728 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:43.730 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:43.735 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:43.738 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:43.741 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:43.743 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:43.749 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:43.752 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:43.756 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:43.760 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:43.762 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:43.766 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:43.768 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:43.772 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:43.773 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:43.775 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:43.779 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:43.780 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:43.784 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:43.787 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:43.790 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:43.795 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:43.799 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:43.801 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:43.804 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.033s)
+19:19:43.804 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+19:19:43.975 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-schema-46c51713-9ec3-43c4-95f6-1ea60ed6ec23 (H2 2.4)
+19:19:43.978 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:43.985 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:43.985 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.005s)
+19:19:43.986 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:43.987 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:43.988 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:43.990 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:43.992 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:43.994 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:43.997 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:43.999 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:44.002 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:44.004 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:44.007 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:44.009 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:44.011 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:44.013 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:44.018 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:44.021 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:44.024 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:44.028 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:44.030 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:44.035 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:44.037 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:44.040 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:44.042 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:44.043 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:44.046 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:44.049 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:44.053 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:44.055 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:44.057 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:44.059 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:44.062 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:44.064 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:44.066 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.021s)
+19:19:44.066 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+19:19:44.240 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-schema-39c8bb24-4dd0-4fe7-ad99-b5bf5e7d91be (H2 2.4)
+19:19:44.242 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:44.247 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:44.248 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.004s)
+19:19:44.248 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:44.250 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:44.250 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:44.252 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:44.253 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:44.255 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:44.257 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:44.258 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:44.260 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:44.262 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:44.263 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:44.266 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:44.268 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:44.270 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:44.273 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:44.275 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:44.277 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:44.281 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:44.282 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:44.286 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:44.287 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:44.290 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:44.292 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:44.293 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:44.296 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:44.298 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:44.301 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:44.303 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:44.306 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:44.309 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:44.313 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:44.317 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:44.319 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.018s)
+19:19:44.319 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+19:19:44.493 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-schema-fce0e51c-755e-4abb-b251-edc1f9055c9f (H2 2.4)
+19:19:44.496 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:44.502 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:44.502 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.004s)
+19:19:44.504 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:44.505 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:44.506 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:44.508 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:44.510 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:44.512 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:44.515 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:44.518 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:44.521 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:44.523 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:44.526 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:44.530 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:44.532 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:44.533 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:44.538 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:44.541 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:44.546 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:44.550 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:44.552 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:44.555 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:44.556 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:44.558 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:44.560 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:44.562 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:44.564 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:44.566 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:44.568 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:44.570 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:44.573 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:44.576 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:44.579 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:44.582 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:44.585 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.022s)
+19:19:44.585 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+19:19:44.768 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-schema-8156d729-63a5-4ebb-a2b4-9ddbde4cc9b0 (H2 2.4)
+19:19:44.771 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:44.778 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:44.778 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.005s)
+19:19:44.779 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:44.781 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:44.782 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:44.784 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:44.786 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:44.788 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:44.790 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:44.792 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:44.796 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:44.798 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:44.800 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:44.803 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:44.805 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:44.806 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:44.810 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:44.812 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:44.815 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:44.818 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:44.821 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:44.824 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:44.827 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:44.831 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:44.833 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:44.835 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:44.838 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:44.839 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:44.842 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:44.845 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:44.848 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:44.851 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:44.856 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:44.859 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:44.861 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.020s)
+19:19:44.861 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+19:19:45.030 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-schema-2bbb0aca-b8df-4b8f-95bf-2391b1e5efa3 (H2 2.4)
+19:19:45.032 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:45.037 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:45.037 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.003s)
+19:19:45.038 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:45.039 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:45.040 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:45.042 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:45.043 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:45.045 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:45.046 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:45.048 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:45.049 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:45.051 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:45.053 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:45.055 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:45.057 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:45.059 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:45.062 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:45.065 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:45.067 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:45.069 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:45.071 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:45.075 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:45.076 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:45.078 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:45.079 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:45.080 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:45.083 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:45.084 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:45.086 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:45.088 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:45.090 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:45.092 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:45.096 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:45.098 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:45.099 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.013s)
+19:19:45.099 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.976 s -- in com.keplura.server.mcp.McpSchemaFailClosedTest
+[INFO] Running com.keplura.server.mcp.McpToolAdapterTest
+19:19:45.272 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-adapter-251df6a5-c9b5-4f3c-8ebd-0ebbd843af39 (H2 2.4)
+19:19:45.275 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:45.280 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:45.280 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.003s)
+19:19:45.281 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:45.282 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:45.284 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:45.285 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:45.287 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:45.288 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:45.290 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:45.292 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:45.293 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:45.295 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:45.296 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:45.299 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:45.301 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:45.302 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:45.307 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:45.309 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:45.312 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:45.316 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:45.317 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:45.321 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:45.323 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:45.325 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:45.327 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:45.329 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:45.331 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:45.333 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:45.336 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:45.338 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:45.340 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:45.342 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:45.346 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:45.348 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:45.350 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.018s)
+19:19:45.492 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-adapter-71dde4a4-58f1-44bc-851b-cd8bee39aa02 (H2 2.4)
+19:19:45.508 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:45.531 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:45.532 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.017s)
+19:19:45.535 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:45.544 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:45.549 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:45.562 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:45.574 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:45.582 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:45.590 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:45.596 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:45.605 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:45.610 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:45.621 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:45.628 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:45.635 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:45.639 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:45.651 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:45.659 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:45.666 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:45.674 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:45.680 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:45.686 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:45.691 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:45.697 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:45.701 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:45.704 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:45.710 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:45.714 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:45.721 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:45.726 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:45.730 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:45.737 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:45.744 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:45.747 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:45.750 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.085s)
+19:19:45.791 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-adapter-a55b20b0-5c90-4cb4-95f4-647f3be09f0e (H2 2.4)
+19:19:45.795 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:45.809 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:45.809 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.010s)
+19:19:45.810 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:45.812 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:45.814 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:45.816 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:45.818 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:45.820 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:45.824 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:45.826 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:45.831 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:45.835 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:45.839 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:45.845 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:45.850 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:45.854 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:45.862 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:45.867 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:45.872 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:45.878 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:45.882 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:45.891 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:45.895 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:45.900 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:45.902 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:45.905 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:45.910 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:45.914 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:45.921 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:45.927 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:45.931 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:45.936 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:45.943 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:45.954 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:45.957 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.058s)
+19:19:45.986 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-adapter-a05829ca-52ec-461f-82c9-c929fd4c8b89 (H2 2.4)
+19:19:45.989 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:45.996 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:45.996 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.005s)
+19:19:45.997 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:45.999 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:46.001 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:46.003 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:46.005 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:46.008 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:46.013 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:46.017 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:46.021 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:46.024 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:46.028 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:46.032 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:46.035 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:46.039 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:46.044 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:46.049 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:46.053 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:46.058 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:46.061 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:46.065 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:46.069 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:46.074 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:46.076 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:46.078 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:46.082 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:46.084 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:46.088 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:46.092 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:46.096 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:46.101 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:46.108 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:46.111 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:46.113 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.043s)
+19:19:46.136 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-adapter-51edd1c3-e8b2-48ed-9df4-88d32c29825f (H2 2.4)
+19:19:46.142 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:46.149 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:46.150 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.004s)
+19:19:46.150 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:46.154 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:46.155 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:46.158 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:46.161 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:46.164 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:46.166 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:46.169 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:46.173 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:46.175 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:46.179 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:46.183 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:46.186 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:46.188 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:46.193 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:46.196 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:46.202 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:46.207 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:46.209 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:46.214 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:46.217 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:46.221 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:46.224 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:46.226 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:46.230 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:46.234 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:46.240 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:46.244 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:46.248 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:46.252 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:46.257 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:46.261 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:46.264 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.033s)
+19:19:46.289 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-adapter-256920ba-7744-41a3-ac35-d707e5b587be (H2 2.4)
+19:19:46.295 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:46.303 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:46.303 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.004s)
+19:19:46.304 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:46.306 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:46.307 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:46.310 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:46.313 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:46.316 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:46.318 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:46.320 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:46.323 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:46.326 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:46.329 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:46.332 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:46.335 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:46.336 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:46.342 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:46.345 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:46.349 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:46.353 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:46.356 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:46.361 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:46.363 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:46.368 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:46.371 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:46.373 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:46.376 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:46.378 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:46.382 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:46.386 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:46.388 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:46.391 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:46.395 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:46.397 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:46.399 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.032s)
+19:19:46.419 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-adapter-7e03be61-6da0-4571-9214-68d882a1afb5 (H2 2.4)
+19:19:46.422 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:46.428 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:46.428 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.004s)
+19:19:46.429 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:46.430 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:46.431 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:46.433 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:46.435 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:46.437 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:46.438 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:46.440 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:46.442 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:46.445 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:46.448 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:46.452 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:46.454 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:46.456 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:46.460 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:46.463 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:46.466 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:46.470 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:46.472 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:46.475 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:46.477 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:46.481 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:46.484 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:46.486 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:46.489 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:46.490 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:46.494 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:46.497 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:46.500 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:46.504 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:46.508 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:46.511 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:46.512 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.022s)
+19:19:46.545 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-adapter-912619ed-f76d-4359-ae4c-ecee7b7cffe8 (H2 2.4)
+19:19:46.548 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:46.555 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:46.555 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.004s)
+19:19:46.555 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:46.557 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:46.558 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:46.560 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:46.561 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:46.563 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:46.565 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:46.567 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:46.570 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:46.571 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:46.573 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:46.576 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:46.577 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:46.578 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:46.583 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:46.586 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:46.589 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:46.592 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:46.594 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:46.596 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:46.597 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:46.600 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:46.601 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:46.603 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:46.606 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:46.608 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:46.611 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:46.614 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:46.616 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:46.618 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:46.621 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:46.623 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:46.624 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.018s)
+19:19:46.640 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-adapter-c92c9a8d-8ee2-42c9-946e-a37ca46d1087 (H2 2.4)
+19:19:46.643 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:46.649 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:46.650 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.005s)
+19:19:46.650 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:46.652 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:46.653 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:46.654 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:46.656 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:46.658 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:46.659 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:46.661 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:46.663 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:46.665 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:46.675 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:46.680 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:46.681 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:46.682 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:46.706 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:46.712 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:46.714 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:46.717 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:46.718 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:46.721 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:46.722 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:46.725 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:46.726 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:46.727 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:46.729 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:46.731 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:46.733 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:46.734 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:46.736 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:46.738 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:46.741 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:46.743 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:46.744 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.018s)
+19:19:46.761 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-adapter-275119a7-9c35-4bef-bba0-cd944e7c4553 (H2 2.4)
+19:19:46.765 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:46.772 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:46.772 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.005s)
+19:19:46.773 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:46.774 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:46.775 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:46.776 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:46.777 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:46.778 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:46.780 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:46.781 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:46.782 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:46.783 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:46.785 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:46.787 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:46.788 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:46.789 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:46.792 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:46.793 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:46.795 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:46.796 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:46.798 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:46.801 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:46.802 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:46.804 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:46.805 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:46.807 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:46.809 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:46.811 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:46.813 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:46.816 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:46.818 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:46.820 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:46.822 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:46.823 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:46.824 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.008s)
+19:19:46.845 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-adapter-719a2f9d-0547-4985-bb07-1a8155898afd (H2 2.4)
+19:19:46.848 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:46.853 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:46.853 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.003s)
+19:19:46.853 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:46.854 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:46.855 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:46.857 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:46.859 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:46.861 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:46.864 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:46.866 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:46.869 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:46.871 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:46.873 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:46.875 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:46.877 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:46.878 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:46.882 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:46.884 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:46.886 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:46.889 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:46.890 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:46.892 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:46.894 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:46.896 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:46.897 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:46.898 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:46.900 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:46.901 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:46.903 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:46.905 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:46.907 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:46.910 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:46.913 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:46.916 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:46.918 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.013s)
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.674 s -- in com.keplura.server.mcp.McpToolAdapterTest
+[INFO] Running com.keplura.server.mcp.McpClientTest
+19:19:46.944 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+19:19:46.946 [main] WARN com.keplura.server.admin.SsrfGuard -- SSRF guard refused a dial target (policy veto)
+19:19:46.950 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+19:19:46.998 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+19:19:47.067 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+19:19:47.216 [main] INFO com.keplura.server.admin.SsrfGuard -- SSRF allow-list active with 1 operator CIDR(s)
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.330 s -- in com.keplura.server.mcp.McpClientTest
+[INFO] Running com.keplura.server.mcp.McpAdminConcurrencyTest
+19:19:47.283 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-admin-433f47ae-960d-466e-96eb-8f4e3a8d4261 (H2 2.4)
+19:19:47.286 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:47.291 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:47.291 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.003s)
+19:19:47.291 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:47.292 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:47.293 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:47.294 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:47.295 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:47.297 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:47.299 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:47.301 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:47.303 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:47.304 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:47.305 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:47.307 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:47.308 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:47.308 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:47.310 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:47.312 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:47.315 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:47.316 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:47.317 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:47.319 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:47.320 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:47.323 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:47.323 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:47.324 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:47.326 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:47.328 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:47.329 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:47.331 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:47.333 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:47.334 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:47.337 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:47.339 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:47.340 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.006s)
+19:19:47.356 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-admin-f579eca8-4327-42b3-a45e-85a1c888be07 (H2 2.4)
+19:19:47.359 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:47.363 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:47.364 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.003s)
+19:19:47.364 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:47.366 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:47.367 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:47.368 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:47.370 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:47.372 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:47.374 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:47.376 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:47.377 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:47.378 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:47.380 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:47.382 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:47.383 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:47.384 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:47.387 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:47.389 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:47.392 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:47.394 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:47.395 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:47.403 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:47.405 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:47.406 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:47.407 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:47.408 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:47.410 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:47.411 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:47.413 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:47.415 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:47.417 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:47.418 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:47.421 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:47.422 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:47.423 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.006s)
+19:19:47.444 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:mcp-admin-82027645-896a-4912-b794-29a7553f4568 (H2 2.4)
+19:19:47.447 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+19:19:47.451 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+19:19:47.451 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 30 migrations (execution time 00:00.003s)
+19:19:47.452 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+19:19:47.454 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema "PUBLIC": << Empty Schema >>
+19:19:47.455 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "1 - baseline"
+19:19:47.456 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "2 - spaces"
+19:19:47.458 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "3 - knowledge"
+19:19:47.460 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "4 - chunks"
+19:19:47.461 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "6 - chat"
+19:19:47.463 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "7 - document index status"
+19:19:47.465 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "8 - org invites"
+19:19:47.467 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "9 - user role"
+19:19:47.470 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "10 - ai provider model"
+19:19:47.471 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "11 - oidc provider"
+19:19:47.474 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "12 - document index status async"
+19:19:47.475 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "13 - chunk source location"
+19:19:47.477 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "14 - chat message feedback"
+19:19:47.479 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "15 - user must change password"
+19:19:47.480 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "16 - datasources and access"
+19:19:47.483 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "17 - quality questions"
+19:19:47.484 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "18 - data source sharepoint"
+19:19:47.486 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "19 - prompt templates"
+19:19:47.487 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "20 - chat kbs attachments"
+19:19:47.489 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "21 - web search settings"
+19:19:47.490 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "22 - mcp servers"
+19:19:47.491 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "23 - mcp stage2"
+19:19:47.493 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "24 - datasource exclude patterns longer"
+19:19:47.494 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "25 - tool foundation"
+19:19:47.495 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "26 - tool call cards"
+19:19:47.497 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "27 - tool question continuation"
+19:19:47.499 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "28 - tool dependent action"
+19:19:47.501 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "29 - knowledge tool and provenance"
+19:19:47.504 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "30 - tool call private arguments"
+19:19:47.505 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema "PUBLIC" to version "31 - web search tool"
+19:19:47.506 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 30 migrations to schema "PUBLIC", now at version v31 (execution time 00:00.008s)
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.243 s -- in com.keplura.server.mcp.McpAdminConcurrencyTest
+[INFO] Running com.keplura.server.directory.LdapDirectoryClientTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.105 s -- in com.keplura.server.directory.LdapDirectoryClientTest
+[INFO] Running com.keplura.server.datasource.LocalSourceConnectorTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.092 s -- in com.keplura.server.datasource.LocalSourceConnectorTest
+[INFO] Running com.keplura.server.datasource.NativeLocalReaderReasonTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.032 s -- in com.keplura.server.datasource.NativeLocalReaderReasonTest
+[INFO] Running com.keplura.server.auth.LoginRateLimiterTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.014 s -- in com.keplura.server.auth.LoginRateLimiterTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 83, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  17.900 s
+[INFO] Finished at: 2026-11-25T19:19:47Z
+[INFO] ------------------------------------------------------------------------
