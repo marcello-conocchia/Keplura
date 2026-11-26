@@ -200,6 +200,31 @@ export const SERVER_EN: Record<string, string> = {
   "Die Antwort konnte nicht erstellt werden. Bitte spaeter erneut versuchen.": "The answer could not be generated. Please try again later.",
   // templates
   "Nur wer die Vorlage angelegt hat oder Verwalter:innen dürfen sie ändern.": "Only the creator of the template or administrators may change it.",
+  // TU-06 adapters, connections and artifacts
+  "Die persönliche Verbindung ist abgelaufen und konnte nicht erneuert werden. Bitte unter „Verbindungen“ neu verbinden. Das Werkzeug wurde nicht aufgerufen.": "The personal connection has expired and could not be renewed. Please reconnect under “Connections”. The tool was not called.",
+  "Für dieses Werkzeug fehlt deine persönliche Verbindung. Bitte unter „Verbindungen“ verbinden. Das Werkzeug wurde nicht aufgerufen.": "Your personal connection for this tool is missing. Please connect under “Connections”. The tool was not called.",
+  "Dieser Dateityp ist nicht erlaubt.": "This file type is not allowed.",
+  "Der Dateityp passt nicht zum Inhalt.": "The file type does not match the content.",
+  "Markup wie HTML, SVG oder XML ist nicht erlaubt.": "Markup such as HTML, SVG or XML is not allowed.",
+  "Die Datei ist größer als 5 MB.": "The file is larger than 5 MB.",
+  "Das Bild ist größer als 40 Megapixel.": "The image is larger than 40 megapixels.",
+  "Die Dateien dieser Frage überschreiten zusammen 10 MB.": "The files of this question exceed 10 MB in total.",
+  "Die Datei ist nicht gültig kodiert.": "The file is not validly encoded.",
+  "Die Datei ist leer.": "The file is empty.",
+  "Die Bildgröße ist nicht lesbar.": "The image size cannot be read.",
+  "Der Dateityp ist nicht erkennbar.": "The file type cannot be recognized.",
+  "Die JSON-Datei ist ungültig.": "The JSON file is invalid.",
+  "Die Textdatei ist kein gültiges UTF-8.": "The text file is not valid UTF-8.",
+  "Die Textdatei enthält Steuerzeichen.": "The text file contains control characters.",
+  "Die Operation hat keine operationId und ist nicht nutzbar.": "The operation has no operationId and cannot be used.",
+  "Header- und Cookie-Parameter werden nicht unterstützt. Die Operation bleibt gesperrt.": "Header and cookie parameters are not supported. The operation stays blocked.",
+  "Formular- und Datei-Uploads werden nicht unterstützt. Nur JSON-Körper sind möglich.": "Form and file uploads are not supported. Only JSON bodies are possible.",
+  "Externe Referenzen werden nicht unterstützt. Die Operation bleibt gesperrt.": "External references are not supported. The operation stays blocked.",
+  "Nur OpenAPI-Dokumente im JSON-Format werden unterstützt (kein YAML).": "Only OpenAPI documents in JSON format are supported (no YAML).",
+  "Nur OpenAPI 3.0 und 3.1 werden unterstützt.": "Only OpenAPI 3.0 and 3.1 are supported.",
+  "Das OpenAPI-Dokument ist größer als 1 MB.": "The OpenAPI document is larger than 1 MB.",
+  "Ein Pfadparameter ist leer oder enthält unzulässige Zeichen. Das Werkzeug wurde nicht aufgerufen.": "A path parameter is empty or contains forbidden characters. The tool was not called.",
+  "Der Werkzeugserver hat weitergeleitet. Weiterleitungen werden nicht verfolgt.": "The tool server redirected. Redirects are not followed.",
 };
 
 /** Texts with numbers or names inside; third value true = catch-all, only for error/message fields. */

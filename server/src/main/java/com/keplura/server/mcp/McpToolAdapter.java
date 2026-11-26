@@ -135,6 +135,13 @@ public class McpToolAdapter implements ToolAdapter {
 
     @Override
     public String invoke(com.keplura.server.tool.ToolContext context, ToolDefinition tool, JsonNode arguments) {
+        return invokeWithArtifacts(context, tool, arguments, null).text();
+    }
+
+    /** TU-06d: images and embedded resource blobs become artifacts of the card; the model gets placeholders only. */
+    @Override
+    public Result invokeWithArtifacts(com.keplura.server.tool.ToolContext context, ToolDefinition tool, JsonNode arguments,
+                                      Long promptMessageId) {
         var rows = jdbc.queryForList("select url, token_enc from mcp_server where id = ? and enabled = true", tool.sourceId());
         if (rows.isEmpty()) throw new ToolNotStartedException("Der MCP-Server ist nicht mehr aktiv.");
         Object url = rows.getFirst().get("url");
@@ -167,7 +174,9 @@ public class McpToolAdapter implements ToolAdapter {
             }
         }
         try {
-            return client.callTool(urlText, token, tool.toolName(), arguments);
+            var result = client.callToolWithContent(urlText, token, tool.toolName(), arguments);
+            if (result == null) throw new ToolInvocationException("Der Werkzeug-Aufruf ist fehlgeschlagen.");
+            return new Result(result.text(), result.artifacts());
         } catch (McpClient.McpException e) {
             throw new ToolInvocationException(e.getMessage());
         } catch (RuntimeException e) {

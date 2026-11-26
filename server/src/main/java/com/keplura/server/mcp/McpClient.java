@@ -25,6 +25,8 @@ public class McpClient {
 
     public static final String PROTOCOL = "2025-06-18";
     static final int MAX_BYTES = 2_000_000;
+    /** TU-06d: a tools/call response may carry up to four base64 files of 5 MB each (10 MB per question). */
+    static final int MAX_CALL_BYTES = 16_000_000;
 
     public record Tool(String name, String description, JsonNode inputSchema) {
     }
@@ -57,7 +59,7 @@ public class McpClient {
                 throw new McpException("Die MCP-Initialisierung wurde abgelehnt oder die Protokollversion wird nicht unterstützt.");
             }
             post(url, token, first.sessionId, notification("notifications/initialized"));
-            Exchange r = post(url, token, first.sessionId, rpc(2, method, params));
+            Exchange r = post(url, token, first.sessionId, rpc(2, method, params), "tools/call".equals(method) ? MAX_CALL_BYTES : MAX_BYTES);
             if (r.body.has("error")) throw new McpException("Der MCP-Server hat die Anfrage abgelehnt.");
             return r.body.path("result");
         } finally {
@@ -88,16 +90,45 @@ public class McpClient {
 
     /** Für Stufe 2 (Chat): Werkzeug aufrufen, Text-Inhalte zusammenfügen. */
     public String callTool(String url, String token, String name, JsonNode arguments) {
+        return callToolWithContent(url, token, name, arguments).text();
+    }
+
+    /** Text plus TU-06d artifacts ({@code image} and embedded {@code resource} blobs). */
+    public record CallResult(String text, List<com.keplura.server.tool.ToolAdapter.Artifact> artifacts) { }
+
+    public CallResult callToolWithContent(String url, String token, String name, JsonNode arguments) {
         ObjectNode p = mapper.createObjectNode();
         p.put("name", name);
         p.set("arguments", arguments == null ? mapper.createObjectNode() : arguments);
         JsonNode result = session(url, token, "tools/call", p);
         if (result.path("isError").asBoolean(false)) throw new McpException("Das Werkzeug konnte die Anfrage nicht ausführen.");
         StringBuilder sb = new StringBuilder();
+        List<com.keplura.server.tool.ToolAdapter.Artifact> files = new ArrayList<>();
         for (JsonNode c : result.path("content")) {
-            if ("text".equals(c.path("type").asString(""))) sb.append(c.path("text").asString("")).append('\n');
+            String type = c.path("type").asString("");
+            if ("text".equals(type)) sb.append(c.path("text").asString("")).append('\n');
+            else if ("image".equals(type) || "audio".equals(type)) {
+                files.add(artifact(type, c.path("mimeType").asString(""), c.path("data")));
+            } else if ("resource".equals(type)) {
+                JsonNode r = c.path("resource");
+                if (r.path("blob").isString()) files.add(artifact(r.path("uri").asString(""), r.path("mimeType").asString(""), r.path("blob")));
+                else if (r.path("text").isString()) sb.append(r.path("text").asString("")).append('\n');
+            }
+            if (files.size() > 64) break;
         }
-        return safe(sb.toString().strip(), token);
+        return new CallResult(safe(sb.toString().strip(), token), List.copyOf(files));
+    }
+
+    private static com.keplura.server.tool.ToolAdapter.Artifact artifact(String name, String mimeType, JsonNode data) {
+        String encoded = data.isString() ? data.asString() : "";
+        if ((long) encoded.length() > (com.keplura.server.tool.ToolArtifactStore.MAX_BYTES / 3 + 2) * 4) {
+            return new com.keplura.server.tool.ToolAdapter.Artifact(name, mimeType, null, "Die Datei ist größer als 5 MB.");
+        }
+        try {
+            return new com.keplura.server.tool.ToolAdapter.Artifact(name, mimeType, java.util.Base64.getDecoder().decode(encoded));
+        } catch (IllegalArgumentException e) {
+            return new com.keplura.server.tool.ToolAdapter.Artifact(name, mimeType, null, "Die Datei ist nicht gültig kodiert.");
+        }
     }
 
     private static String safe(String text, String token) {
@@ -108,6 +139,10 @@ public class McpClient {
     }
 
     private Exchange post(String url, String token, String sessionId, ObjectNode payload) {
+        return post(url, token, sessionId, payload, MAX_BYTES);
+    }
+
+    private Exchange post(String url, String token, String sessionId, ObjectNode payload, int maxBytes) {
         try {
             guard.validateForDial(url);
             HttpRequest.Builder b = HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofSeconds(20))
@@ -119,7 +154,7 @@ public class McpClient {
             if (!"initialize".equals(payload.path("method").asString(""))) b.header("MCP-Protocol-Version", PROTOCOL);
             HttpResponse<java.io.InputStream> r = http.send(b.build(), HttpResponse.BodyHandlers.ofInputStream());
             String sid = r.headers().firstValue("Mcp-Session-Id").orElse(sessionId);
-            try (var input = new com.keplura.server.http.BoundedHttpBody(r.body(), MAX_BYTES, Duration.ofSeconds(20))) {
+            try (var input = new com.keplura.server.http.BoundedHttpBody(r.body(), maxBytes, Duration.ofSeconds(20))) {
                 if ((r.statusCode() == 202 || r.statusCode() == 204) && !payload.has("id")) {
                     return new Exchange(sid, mapper.createObjectNode());
                 }

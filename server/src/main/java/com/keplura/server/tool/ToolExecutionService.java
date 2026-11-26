@@ -81,7 +81,8 @@ public class ToolExecutionService {
                                String argumentsText, List<ArgumentField> argumentFields, String status,
                                boolean needsConfirmation, String result, String error, Instant createdAt,
                                Instant expiresAt, String parentCallId, String parentTool,boolean mayContainInternal,boolean sourceUnavailable,boolean sourceTemporarilyUnavailable,
-                               String kind, UserQuestionToolAdapter.Question question) {
+                               String kind, UserQuestionToolAdapter.Question question,
+                               List<ToolArtifactStore.View> artifacts) {
     }
 
     /** TU-05d card kinds: an ordinary tool call or a question to the person. */
@@ -109,6 +110,7 @@ public class ToolExecutionService {
     private final ToolAuditLog audit;
     private final ToolCallStore cards;
     private final ToolQuestionStore questions;
+    private final ToolArtifactStore artifacts;
     private final LongSupplier nanoClock;
     private final Supplier<Instant> wallClock;
     private final ObjectMapper mapper = JsonMapper.builder().build();
@@ -138,6 +140,7 @@ public class ToolExecutionService {
         this.audit = audit;
         this.cards = cards;
         this.questions = new ToolQuestionStore(jdbc);
+        this.artifacts = new ToolArtifactStore(jdbc);
         this.nanoClock = nanoClock;
         this.wallClock = wallClock;
     }
@@ -814,8 +817,21 @@ public class ToolExecutionService {
         String text = null;
         try {
             var row=cards.find(cardId).orElseThrow();
-            text = Objects.requireNonNullElse(adapter.invoke(ctx,t,args,row.promptMessageId()), "");
-            if (text.length() > MAX_RESULT_CHARS) text = text.substring(0, MAX_RESULT_CHARS) + "\n[gekürzt]";
+            var result = adapter.invokeWithArtifacts(ctx,t,args,row.promptMessageId());
+            text = Objects.requireNonNullElse(result == null ? null : result.text(), "");
+            // TU-06d: files and images are verified and stored on the card; the model only reads placeholders.
+            String notes = "";
+            if (result != null && result.artifacts() != null && !result.artifacts().isEmpty() && !adapter.referencesOnly()) {
+                try {
+                    notes = artifacts.store(row, result.artifacts(), t.internal());
+                } catch (RuntimeException e) {
+                    log.warn("tool artifacts not stored ({})", e.getClass().getSimpleName());
+                    notes = "\n[Dateien aus dem Ergebnis konnten nicht gespeichert werden und wurden verworfen.]";
+                }
+            }
+            int room = Math.max(0, MAX_RESULT_CHARS - notes.length() - 16); // "[gekürzt]" must not cut the notes
+            if (text.length() > room) text = text.substring(0, room) + "\n[gekürzt]";
+            text = text + notes;
             if(row.promptMessageId()!=null) {
                 if(adapter.referencesOnly() && mapper.readTree(text).isArray() && !mapper.readTree(text).isEmpty()) {
                     questions.markInternal(row.promptMessageId());
@@ -914,6 +930,7 @@ public class ToolExecutionService {
     }
 
     public void deleteCards(Long conversationId) {
+        artifacts.deleteConversation(conversationId);
         questions.delete(conversationId);
         jdbc.update("delete from tool_execution_guard where conversation_id=?",conversationId);
         cards.deleteConversation(conversationId);
@@ -1104,7 +1121,13 @@ public class ToolExecutionService {
                 r.needsConfirmation(), sourceUnavailable?null:result, sourceUnavailable?null:r.error(),
                 r.createdAt(), status == ToolCallStore.Status.PENDING ? r.expiresAt() : null,
                 parent==null ? null : parent.publicId(), parent==null ? null : parent.toolName(),r.disclosureConfirmation(),sourceUnavailable,access==ReferenceAccess.UNAVAILABLE,
-                ASK_KIND.equals(r.adapter()) ? KIND_QUESTION : KIND_TOOL, questionOf(r, sourceUnavailable));
+                ASK_KIND.equals(r.adapter()) ? KIND_QUESTION : KIND_TOOL, questionOf(r, sourceUnavailable),
+                sourceUnavailable || status != ToolCallStore.Status.SUCCEEDED ? List.of() : artifactsOf(r));
+    }
+
+    private List<ToolArtifactStore.View> artifactsOf(ToolCallStore.Row r) {
+        try { return artifacts.forCard(r.id()); }
+        catch (RuntimeException e) { return List.of(); }
     }
 
     private UserQuestionToolAdapter.Question questionOf(ToolCallStore.Row r, boolean sourceUnavailable) {

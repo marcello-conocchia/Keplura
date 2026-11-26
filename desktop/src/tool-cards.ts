@@ -37,6 +37,17 @@ export interface ToolCallCard {
   kind?: "TOOL" | "QUESTION";
   /** TU-05d: the question as stored; null when the inputs are no longer kept. */
   question?: { text: string; options: string[]; freeText: boolean } | null;
+  /** TU-06d: verified files/images of the result (bytes only via the owner-checked download). */
+  artifacts?: ToolArtifact[];
+}
+
+export interface ToolArtifact { id: string; name: string; mediaType: string | null; size: number; image: boolean; droppedReason: string | null }
+
+/** Human size for a file chip, e.g. "12 KB". */
+export function artifactSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.floor(bytes / 1024)} KB`;
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }
 
 export type Tone = "ok" | "wait" | "neutral" | "error" | "info";

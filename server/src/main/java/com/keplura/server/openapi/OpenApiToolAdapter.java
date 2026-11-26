@@ -142,6 +142,12 @@ public class OpenApiToolAdapter implements ToolAdapter {
 
     @Override
     public String invoke(ToolContext context, ToolDefinition tool, JsonNode arguments) {
+        return invokeWithArtifacts(context, tool, arguments, null).text();
+    }
+
+    /** TU-06d: a binary response (image, PDF, CSV, ...) becomes an artifact of the card; the model gets a placeholder. */
+    @Override
+    public Result invokeWithArtifacts(ToolContext context, ToolDefinition tool, JsonNode arguments, Long promptMessageId) {
         Server server = servers(context.spaceId()).stream().filter(s -> s.id() == tool.sourceId()).findFirst().orElse(null);
         if (server == null) throw new ToolNotStartedException("Der Werkzeugserver ist nicht mehr aktiv.");
         OpenApiDocument.Operation op = OpenApiDocument.fromJson(server.operationsJson()).stream()
@@ -161,12 +167,19 @@ public class OpenApiToolAdapter implements ToolAdapter {
         String body = op.hasBody() && arguments != null && arguments.has("body") ? arguments.get("body").toString() : null;
         OpenApiClient.Response response;
         try {
-            response = client.call(op.method(), url, token, body, false);
+            response = client.call(op.method(), url, token, body, true);
         } catch (OpenApiClient.OpenApiException e) {
             if (!e.started()) throw new ToolNotStartedException(e.getMessage() + " Das Werkzeug wurde nicht aufgerufen.");
             throw new ToolInvocationException(e.getMessage());
         }
-        return result(response, token);
+        int status = response.status();
+        if (status / 100 == 2 && (response.tooLarge() || response.body().length > 0) && !OpenApiClient.isText(response.contentType())) {
+            var file = response.tooLarge()
+                    ? new Artifact("antwort", response.contentType(), null, "Die Datei ist größer als 5 MB.")
+                    : new Artifact("antwort", response.contentType(), response.body());
+            return new Result("Der Werkzeugserver hat eine Datei geliefert.", List.of(file));
+        }
+        return new Result(result(response, token));
     }
 
     private String bearer(Server server) {

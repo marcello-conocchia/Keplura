@@ -43,6 +43,28 @@ public interface ToolAdapter {
     /** Servers of this context with approved tools that are not offered because the person's connection is missing. */
     default List<ConnectionHint> missingConnections(ToolContext context) { return List.of(); }
 
+    /**
+     * TU-06d: one file or image from a tool result. {@code invalidReason}: the adapter already knows it is unusable
+     * (e.g. invalid encoding, too large to decode); the central store then only notes it on the card.
+     */
+    record Artifact(String name, String declaredType, byte[] data, String invalidReason) {
+        public Artifact(String name, String declaredType, byte[] data) { this(name, declaredType, data, null); }
+        @Override public String toString() { return "Artifact[" + declaredType + ", " + (data == null ? 0 : data.length) + " bytes]"; }
+    }
+
+    /** Text for the model plus artifacts for the card (TU-06d). */
+    record Result(String text, List<Artifact> artifacts) {
+        public Result(String text) { this(text, List.of()); }
+    }
+
+    /**
+     * Like {@link #invoke(ToolContext, ToolDefinition, JsonNode, Long)}, additionally with image/file artifacts.
+     * The central service verifies, stores and limits them; the model only gets a placeholder.
+     */
+    default Result invokeWithArtifacts(ToolContext context, ToolDefinition tool, JsonNode arguments, Long promptMessageId) {
+        return new Result(invoke(context, tool, arguments, promptMessageId), List.of());
+    }
+
     /** Reference-only adapters never persist private excerpts in cards or loop checkpoints. */
     default boolean referencesOnly() { return false; }
 

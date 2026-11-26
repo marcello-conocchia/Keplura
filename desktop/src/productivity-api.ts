@@ -166,4 +166,14 @@ export const listOAuthClients = () => call<OAuthClientView[]>("GET", "/api/v1/ad
 export const putOAuthClient = (kind: ConnectionKind, serverId: number, input: OAuthClientInput) =>
   call<OAuthClientView>("PUT", `/api/v1/admin/oauth-clients/${kind}/${serverId}`, input);
 export const deleteOAuthClient = (kind: ConnectionKind, serverId: number) => call<void>("DELETE", `/api/v1/admin/oauth-clients/${kind}/${serverId}`);
+/** TU-06d: bytes of one verified tool artifact; null on any refusal (404 for everyone but the owner). */
+export async function fetchToolArtifact(orgId: number, cid: number, artifactId: string): Promise<Blob | null> {
+  try {
+    const r = await desktopFetch(`${serverUrl}${convPath(orgId, cid)}/tool-artifacts/${encodeURIComponent(artifactId)}`,
+      { signal: AbortSignal.timeout(30000) });
+    return r.ok ? await r.blob() : null;
+  } catch {
+    return null;
+  }
+}
 export const listMcpCalls = () => call<{ called_at: string; server_name: string; tool_name: string; duration_ms: number; ok: boolean; error: string | null; user_id: number; risk: ToolRisk | null }[]>("GET", `${MCP}/calls`);

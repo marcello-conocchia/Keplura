@@ -1183,4 +1183,9 @@ export const EN: Record<string, string> = {
   // TU-06c stdio bridge
   "· isolierte stdio-Bridge (internes Ziel)": "· isolated stdio bridge (internal target)",
   "Isolierte stdio-Bridge des Deployments (Adresse http://mcp-bridge:8090/mcp/<name>, Bridge-Token als Zugangsschlüssel)": "Isolated stdio bridge of the deployment (address http://mcp-bridge:8090/mcp/<name>, bridge token as access key)",
+  // TU-06d tool artifacts
+  "Dateien aus dem Ergebnis": "Files from the result",
+  "Verworfen: {0}": "Dropped: {0}",
+  "Bild aus dem Werkzeugergebnis: {0}": "Image from the tool result: {0}",
+  "Die Datei ist nicht mehr verfügbar.": "The file is no longer available.",
 };

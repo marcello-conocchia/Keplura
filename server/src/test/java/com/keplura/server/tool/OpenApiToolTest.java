@@ -256,9 +256,19 @@ class OpenApiToolTest {
         java.util.Arrays.fill(responseBody, (byte) 'a');
         responseType = "text/plain";
         assertThat(turn().call(fn("getItem"), "{\"id\":\"1\"}").text()).contains("keine gültige, begrenzte Antwort");
+        // TU-06d: a binary answer becomes a card artifact only after the magic-byte check; the model gets a placeholder.
         responseBody = new byte[]{(byte) 0x89, 'P', 'N', 'G'};
         responseType = "image/png";
-        assertThat(turn().call(fn("getItem"), "{\"id\":\"1\"}").text()).contains("nicht unterstützten Antworttyp");
+        assertThat(turn().call(fn("getItem"), "{\"id\":\"1\"}").text()).contains("[Datei verworfen:");
+        responseBody = ToolArtifactTest.png(3, 3);
+        var image = turn().call(fn("getItem"), "{\"id\":\"1\"}");
+        assertThat(image.text()).contains("[Datei-Ergebnis: antwort.png (image/png").doesNotContain("IHDR");
+        responseBody = "<html>x</html>".getBytes(StandardCharsets.UTF_8);
+        responseType = "text/html";
+        assertThat(turn().call(fn("getItem"), "{\"id\":\"1\"}").text()).contains("Dieser Dateityp ist nicht erlaubt.");
+        responseBody = new byte[OpenApiClient.MAX_BINARY_BYTES + 5];
+        responseType = "application/pdf";
+        assertThat(turn().call(fn("getItem"), "{\"id\":\"1\"}").text()).contains("größer als 5 MB");
     }
 
     @Test void refreshKeepsApprovalsOnlyForUnchangedOperations() {

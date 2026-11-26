@@ -28,7 +28,10 @@ public class OpenApiClient {
     /** Binary results (TU-06d artifacts); never more than one artifact's limit. */
     public static final int MAX_BINARY_BYTES = 5_000_000;
 
-    public record Response(int status, String contentType, byte[] body) { }
+    /** {@code tooLarge}: a binary body exceeded {@link #MAX_BINARY_BYTES}; it was not kept (TU-06d notes it). */
+    public record Response(int status, String contentType, byte[] body, boolean tooLarge) {
+        public Response(int status, String contentType, byte[] body) { this(status, contentType, body, false); }
+    }
 
     public static class OpenApiException extends RuntimeException {
         private final boolean started;
@@ -90,9 +93,13 @@ public class OpenApiClient {
             HttpResponse<java.io.InputStream> r = http.send(request, HttpResponse.BodyHandlers.ofInputStream());
             String contentType = r.headers().firstValue("Content-Type").orElse("").toLowerCase(Locale.ROOT).strip();
             int cap = maxBytes;
-            if (binaryAllowed && isText(contentType)) cap = Math.min(maxBytes, MAX_TEXT_BYTES);
-            try (var input = new BoundedHttpBody(r.body(), cap, CALL_TIMEOUT)) {
-                byte[] body = r.statusCode() / 100 == 2 ? input.readAllBytes() : new byte[0];
+            boolean binary = binaryAllowed && !isText(contentType);
+            if (binaryAllowed && !binary) cap = Math.min(maxBytes, MAX_TEXT_BYTES);
+            // A binary body may reach the cap by one byte: then it is dropped and noted instead of failing the call.
+            try (var input = new BoundedHttpBody(r.body(), binary ? cap + 1 : cap, CALL_TIMEOUT)) {
+                if (r.statusCode() / 100 != 2) return new Response(r.statusCode(), contentType, new byte[0]);
+                byte[] body = binary ? input.readNBytes(cap + 1) : input.readAllBytes();
+                if (binary && body.length > cap) return new Response(r.statusCode(), contentType, new byte[0], true);
                 return new Response(r.statusCode(), contentType, body);
             }
         } catch (HttpTimeoutException e) {

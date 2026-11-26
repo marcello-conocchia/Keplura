@@ -458,9 +458,9 @@ class OAuthConnectionTest {
         assertThat(callback(r, aliceSession)).isEqualTo(200);
         assertThat(status(r, aliceSession)).isEqualTo("CONNECTED");
         var used = new AtomicReference<String>();
-        when(mcpClient.callTool(eq("http://127.0.0.1:9/mcp"), anyString(), eq("inbox"), any())).thenAnswer(i -> {
+        when(mcpClient.callToolWithContent(eq("http://127.0.0.1:9/mcp"), anyString(), eq("inbox"), any())).thenAnswer(i -> {
             used.set(i.getArgument(1));
-            return "3 neue Mails";
+            return new McpClient.CallResult("3 neue Mails", List.of());
         });
         var out = turn(alice, aliceChat).call("s" + mcp + "__inbox", "{}");
         assertThat(out.invoked()).isTrue();
