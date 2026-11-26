@@ -45,6 +45,8 @@ deploy/.env.production
 # Sicherung der Umbenennung (install.sh, ADR-0013) und weitere Kopien: gleiche Geheimnisse.
 deploy/.env.production.*
 !deploy/.env.production.example
+# TU-06c: the operator's own stdio bridge declaration stays local
+deploy/mcp-bridge/servers.json
 !.env.example
 
 # M3c: server-side document storage (dev/prod runs write here — uploaded

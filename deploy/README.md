@@ -355,3 +355,65 @@ Java-Klasse starten (nicht im Java-Source-Launcher, dessen eigener Classloader
 den paketinternen Store-Konstruktor nicht verwenden kann). Zugangsdaten kommen
 aus der lokalen ENV-Datei; Argumente sind nur Organisations-, Arbeitsbereichs-
 und Wissensbasis-ID aus dem Qualitätsprotokoll. Das Werkzeug schreibt keine Daten.
+
+## 10. Isolierte MCP-stdio-Bridge (optional, TU-06c)
+
+PO-Entscheidung 26.11.2026 „Bridge im Container“: stdio-MCP-Server laufen
+**nie im Keplura-Serverprozess** und werden **nie über die Web-Oberfläche**
+eingetragen. Der Betreiber deklariert sie in einer Datei des Deployments; ein
+eigener, standardmäßig **deaktivierter** Dienst `mcp-bridge` startet sie und
+stellt jeden als Streamable HTTP bereit. Keplura bindet die Bridge über den
+vorhandenen MCP-HTTP-Adapter an, mit allen Freigaben und Risikoklassen je
+Werkzeug.
+
+**Was die Bridge erzwingt:** nur deklarierte Programme mit absolutem Pfad als
+Argumentliste (keine Shell, keine Launcher wie `sh`, `bash`, `env`), Umgebung
+geleert bis auf `PATH`, `LANG`, `HOME` und die deklarierten Variablen
+(`KEPLURA_*`, `SPRING_*`, `LD_PRELOAD` u. a. abgelehnt), festes
+Arbeitsverzeichnis, je MCP-Sitzung ein frischer Prozess (kein Zustand zwischen
+Aufrufen oder Personen, ein Absturz beendet nur diese Sitzung), Zeitlimit je
+Aufruf (Standard 30 s, höchstens 120 s), begrenzte Ausgabe (Standard 4 MB je
+Nachricht), höchstens 4 gleichzeitige Sitzungen je Server, Leerlauf- und
+Höchstdauer je Sitzung, gemeinsames Token für jede Anfrage, Start als root
+wird verweigert. **Was der Container erzwingt** (`compose.prod.yml`):
+Nicht-root-Benutzer, nur lesbares Dateisystem bis auf `/work` (und `/tmp` im
+RAM), alle Capabilities entzogen, `no-new-privileges`, CPU-, Speicher- und
+Prozesslimit, Netz `mcp-bridge` ohne Route nach außen.
+
+**Einrichten:**
+
+1. Eigenes Image mit den stdio-Programmen auf Basis des Server-Images bauen,
+   z. B.:
+
+   ```dockerfile
+   FROM keplura-server:local
+   USER root
+   RUN apt-get update && apt-get install -y --no-install-recommends nodejs npm \
+    && npm install -g --prefix /opt/mcp @modelcontextprotocol/server-filesystem \
+    && mkdir -p /work/files && chown -R 65534:65534 /work \
+    && rm -rf /var/lib/apt/lists/*
+   USER 65534
+   ```
+
+2. `deploy/mcp-bridge/servers.example.json` nach
+   `deploy/mcp-bridge/servers.json` kopieren und anpassen (die Datei ist
+   git-ignoriert). Unbekannte Schlüssel oder Werte außerhalb der Grenzen
+   lassen die Bridge nicht starten.
+3. In `.env.production` setzen: `KEPLURA_BRIDGE_TOKEN` (zufällig, mindestens
+   32 Zeichen, z. B. `openssl rand -hex 32`), `KEPLURA_MCP_BRIDGE_IMAGE` und
+   den Bridge-Netzbereich in `KEPLURA_ADMIN_SSRF_ALLOW_CIDRS`
+   (Standard `172.31.250.0/24`), damit die SSRF-Prüfung des Servers die
+   Bridge erreichen darf.
+4. Starten: `docker compose -f compose.prod.yml --env-file .env.production
+   --profile mcp-bridge up -d mcp-bridge server`
+5. In Keplura unter Administration → MCP-Server einen Server mit der Adresse
+   `http://mcp-bridge:8090/mcp/<name>` und dem Token als Zugangsschlüssel
+   anlegen und „isolierte stdio-Bridge“ ankreuzen. Die Einträge gelten damit
+   standardmäßig als internes Ziel (Organisationen können das umstellen).
+   Werkzeuge bleiben wie immer gesperrt, bis der Admin Risikoklasse und
+   Freigabe je Werkzeug setzt.
+
+Grenzen ehrlich benannt: Ausgehende Verbindungen der stdio-Programme sind
+durch das interne Netz gesperrt; einzelne freigegebene Ziele brauchen ein
+zusätzliches, vom Betreiber definiertes Netz. Die Bridge-Ausgabe wird nicht
+geprüft oder bereinigt; sie ist Fremdinhalt wie jede MCP-Antwort.

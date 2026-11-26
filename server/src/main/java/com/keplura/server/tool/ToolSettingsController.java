@@ -48,10 +48,10 @@ public class ToolSettingsController {
     private List<Boundary> boundaries(long orgId,String kind) {
         String server=kind.equals("openapi")?"openapi_server":"mcp_server";
         return jdbc.query("""
-            select s.id,s.name,coalesce(b.internal,false) from %1$s s
+            select s.id,s.name,coalesce(b.internal,%4$s) from %1$s s
             left join %2$s b on b.server_id=s.id and b.org_id=?
             where s.all_spaces=true or exists(select 1 from %3$s x join space p on p.id=x.space_id where x.server_id=s.id and p.org_id=?)
-            order by s.id""".formatted(server,boundaryTable(kind),server+"_space"),
+            order by s.id""".formatted(server,boundaryTable(kind),server+"_space",kind.equals("mcp")?"s.bridge":"false"),
             (rs,n)->new Boundary(rs.getLong(1),rs.getString(2),rs.getBoolean(3),kind),orgId,orgId);
     }
     private static String boundaryTable(String kind) { return kind.equals("openapi")?"openapi_org_boundary":"mcp_org_boundary"; }

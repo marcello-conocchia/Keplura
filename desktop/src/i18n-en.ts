@@ -1180,4 +1180,7 @@ export const EN: Record<string, string> = {
   "Token für das Dokument (optional)": "Token for the document (optional)",
   "Verbindung nötig": "Connection needed",
   "{0}: unter „Verbindungen“ verbinden": "{0}: connect under “Connections”",
+  // TU-06c stdio bridge
+  "· isolierte stdio-Bridge (internes Ziel)": "· isolated stdio bridge (internal target)",
+  "Isolierte stdio-Bridge des Deployments (Adresse http://mcp-bridge:8090/mcp/<name>, Bridge-Token als Zugangsschlüssel)": "Isolated stdio bridge of the deployment (address http://mcp-bridge:8090/mcp/<name>, bridge token as access key)",
 };

@@ -1,0 +1,14 @@
+{
+  "servers": [
+    {
+      "name": "files",
+      "command": ["/usr/bin/node", "/opt/mcp/filesystem/dist/index.js", "/work/files"],
+      "env": { "NODE_ENV": "production" },
+      "workdir": "/work/files",
+      "timeoutSeconds": 30,
+      "maxOutputBytes": 4000000,
+      "maxSessions": 4,
+      "idleSeconds": 60
+    }
+  ]
+}
