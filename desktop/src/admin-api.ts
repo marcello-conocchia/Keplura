@@ -49,7 +49,7 @@ export interface AdminModel {
   toolDefaults: string[] | null;
 }
 
-export const MODEL_TOOL_KINDS = ["knowledge", "attachments", "web", "mcp", "ask"] as const;
+export const MODEL_TOOL_KINDS = ["knowledge", "attachments", "web", "mcp", "openapi", "ask"] as const;
 
 export interface ConnectionTestOutcomeView {
   reachable: boolean;

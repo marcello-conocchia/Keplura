@@ -74,6 +74,7 @@ function toolKindLabel(kind: string) {
     case "attachments": return tr("Chat-Anhänge");
     case "web": return tr("Websuche und Webseitenabruf");
     case "mcp": return tr("MCP-Werkzeuge");
+    case "openapi": return tr("OpenAPI-Werkzeuge");
     default: return tr("Rückfragen an die Person");
   }
 }

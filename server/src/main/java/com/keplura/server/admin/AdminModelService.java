@@ -39,7 +39,7 @@ public class AdminModelService {
     }
 
     /** Tool kinds a chat model may default to (adapter kinds of the central tool service). */
-    public static final List<String> TOOL_KINDS = List.of("knowledge", "attachments", "web", "mcp", "ask");
+    public static final List<String> TOOL_KINDS = List.of("knowledge", "attachments", "web", "mcp", "openapi", "ask");
 
     public record ModelCreateRequest(Long providerId, String name, String technicalModelId,
                                      String modelType, Integer embeddingDim,

@@ -122,8 +122,13 @@ public class McpToolAdapter implements ToolAdapter {
 
     /** OpenAI-Funktionsnamen: ^[a-zA-Z0-9_-]{1,64}$, eindeutig je Server. */
     static String functionName(Long serverId, String tool) {
+        return functionName("s", serverId, tool);
+    }
+
+    /** Shared by all admin-server adapters ({@code s} = MCP, {@code o} = OpenAPI). */
+    public static String functionName(String kindPrefix, Long serverId, String tool) {
         String clean = tool.replaceAll("[^a-zA-Z0-9_-]", "_");
-        String prefix = "s" + serverId + "__";
+        String prefix = kindPrefix + serverId + "__";
         if (clean.equals(tool) && prefix.length() + clean.length() <= 64) return prefix + clean;
         String suffix = sha256(tool).substring(0, 12);
         int room = 64 - prefix.length() - suffix.length() - 1;
@@ -135,7 +140,7 @@ public class McpToolAdapter implements ToolAdapter {
         return sha256(serverId + "\n" + url + "\n" + (tokenEnc == null ? "" : tokenEnc));
     }
 
-    private static String sha256(String s) {
+    public static String sha256(String s) {
         try {
             return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(s.getBytes(StandardCharsets.UTF_8)));
         } catch (NoSuchAlgorithmException impossible) {
@@ -143,12 +148,12 @@ public class McpToolAdapter implements ToolAdapter {
         }
     }
 
-    static Set<String> approvals(String lines) {
+    public static Set<String> approvals(String lines) {
         return lines == null || lines.isBlank() ? Set.of() : new LinkedHashSet<>(Arrays.asList(lines.split("\n")));
     }
 
     /** {@code tool_risks}: JSON-Objekt Werkzeugname → READ/WRITE/CRITICAL. Unlesbar = alles unklassifiziert. */
-    static Map<String, ToolRisk> risks(String json) {
+    public static Map<String, ToolRisk> risks(String json) {
         Map<String, ToolRisk> out = new LinkedHashMap<>();
         if (json == null || json.isBlank()) return out;
         try {
@@ -164,7 +169,7 @@ public class McpToolAdapter implements ToolAdapter {
         return out;
     }
 
-    static String risksJson(Map<String, ToolRisk> risks) {
+    public static String risksJson(Map<String, ToolRisk> risks) {
         Map<String, String> plain = new LinkedHashMap<>();
         risks.forEach((k, v) -> plain.put(k, v.name()));
         return plain.isEmpty() ? null : JsonMapper.builder().build().writeValueAsString(plain);

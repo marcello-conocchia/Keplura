@@ -112,9 +112,9 @@ export interface McpServer {
 }
 const MCP = "/api/v1/admin/mcp-servers";
 export const listMcpServers = () => call<McpServer[]>("GET", MCP);
-export interface OrgToolSettings { knowledgeEnabled: boolean; webSearchEnabled: boolean; webSearchAvailable: boolean; servers: {serverId: number; name: string; internal: boolean}[] }
+export interface OrgToolSettings { knowledgeEnabled: boolean; webSearchEnabled: boolean; webSearchAvailable: boolean; servers: {serverId: number; name: string; internal: boolean; kind: "mcp" | "openapi"}[] }
 export const getOrgToolSettings = (orgId: number) => call<OrgToolSettings>("GET", `/api/v1/orgs/${orgId}/tools/settings`);
-export const updateOrgToolSettings = (orgId: number,input: {knowledgeEnabled?: boolean; webSearchEnabled?: boolean; serverId?: number; internal?: boolean}) =>
+export const updateOrgToolSettings = (orgId: number,input: {knowledgeEnabled?: boolean; webSearchEnabled?: boolean; serverId?: number; internal?: boolean; kind?: "mcp" | "openapi"}) =>
   call<OrgToolSettings>("PUT", `/api/v1/orgs/${orgId}/tools/settings`, input);
 export const createMcpServer = (input: { name: string; url: string; token: string | null }) => call<McpServer>("POST", MCP, input, 60000);
 export const updateMcpServer = (id: number, input: { name?: string; url?: string; token?: string | null; enabled?: boolean; enabledTools?: string[]; allSpaces?: boolean; spaceIds?: number[]; toolRisks?: Record<string, ToolRisk | ""> }) =>
@@ -122,4 +122,24 @@ export const updateMcpServer = (id: number, input: { name?: string; url?: string
 export const refreshMcpServer = (id: number) => call<McpServer>("POST", `${MCP}/${id}/refresh`, undefined, 60000);
 export const deleteMcpServer = (id: number) => call<void>("DELETE", `${MCP}/${id}`);
 export const listMcpSpaces = () => call<{ id: number; name: string; orgName: string }[]>("GET", `${MCP}/spaces`);
+/** TU-06a: OpenAPI tool servers; operations are tools only after an admin class and approval. */
+export interface OpenApiTool {
+  name: string | null; method: string; path: string; description: string;
+  enabled: boolean; risk: ToolRisk | null; usable: boolean; problem: string | null;
+}
+export type OpenApiAuthMode = "none" | "bearer";
+export interface OpenApiServer {
+  id: number; name: string; specUrl: string; baseUrl: string; authMode: OpenApiAuthMode; hasToken: boolean; enabled: boolean;
+  tools: OpenApiTool[]; lastCheckedAt: string | null; lastError: string | null; allSpaces: boolean; spaceIds: number[];
+}
+export interface OpenApiInput {
+  name?: string; specUrl?: string; baseUrl?: string; authMode?: OpenApiAuthMode; token?: string | null; enabled?: boolean;
+  enabledTools?: string[]; allSpaces?: boolean; spaceIds?: number[]; toolRisks?: Record<string, ToolRisk | "">;
+}
+const OPENAPI = "/api/v1/admin/openapi-servers";
+export const listOpenApiServers = () => call<OpenApiServer[]>("GET", OPENAPI);
+export const createOpenApiServer = (input: OpenApiInput) => call<OpenApiServer>("POST", OPENAPI, input, 60000);
+export const updateOpenApiServer = (id: number, input: OpenApiInput) => call<OpenApiServer>("PATCH", `${OPENAPI}/${id}`, input);
+export const refreshOpenApiServer = (id: number) => call<OpenApiServer>("POST", `${OPENAPI}/${id}/refresh`, undefined, 60000);
+export const deleteOpenApiServer = (id: number) => call<void>("DELETE", `${OPENAPI}/${id}`);
 export const listMcpCalls = () => call<{ called_at: string; server_name: string; tool_name: string; duration_ms: number; ok: boolean; error: string | null; user_id: number; risk: ToolRisk | null }[]>("GET", `${MCP}/calls`);

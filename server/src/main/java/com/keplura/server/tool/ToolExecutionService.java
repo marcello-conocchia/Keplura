@@ -255,6 +255,9 @@ public class ToolExecutionService {
     /** TU-05d questions to the person stay visible in search mode; everything else is found by tool_search. */
     static final String ASK_KIND = "ask";
 
+    /** Admin servers with an org boundary ("internal"): a changed boundary closes the running question (TU-06a). */
+    static final Set<String> BOUNDARY_KINDS = Set.of("mcp", "openapi");
+
     private static boolean alwaysVisible(ToolDefinition t) {
         return ASK_KIND.equals(t.adapter());
     }
@@ -1266,7 +1269,7 @@ public class ToolExecutionService {
             try {
                 return ctx.equals(resolveContext(ctx.userId(), ctx.orgId(), ctx.conversationId()))
                         && referencesReadable(ctx,promptMessageId)
-                        && offered.values().stream().filter(t -> "mcp".equals(t.adapter())).allMatch(t -> {
+                        && offered.values().stream().filter(t -> BOUNDARY_KINDS.contains(t.adapter())).allMatch(t -> {
                             ToolDefinition fresh = currentById(ctx,t.adapter(),t.id());
                             return fresh != null && fresh.internal()==t.internal()
                                     && boundaryRevision(fresh).equals(boundaryRevision(t));
