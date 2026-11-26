@@ -1,6 +1,6 @@
 # TU-05b–d — Modellvorgaben, Tool-Suche und strukturierte Rückfragen
 
-Status: **implementiert, wartet auf unabhängige Prüfung (Codex).** Draft-PR, nicht gemergt. Restumfang von TU-05 nach TU-05a (PR #36, Merge 3019e81), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). PO-Entscheidung vom 25.11.2026 im Chat: Option 1, alle drei Teile in **einem PR mit getrennten Commits**, ein CI-Lauf und eine Review-Runde am Ende. Claude implementiert, Codex prüft unabhängig (Code + Security).
+Status: **abgeschlossen mit PR #37 (26.11.2026).** Codex: APPROVED (Code + Security) auf 94ebf13 nach einer Prüfrunde mit zwei behobenen Major-Befunden. Restumfang von TU-05 nach TU-05a (PR #36, Merge 3019e81), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). PO-Entscheidung vom 25.11.2026 im Chat: Option 1, alle drei Teile in **einem PR mit getrennten Commits**, ein CI-Lauf und eine Review-Runde am Ende. Claude implementiert, Codex prüft unabhängig (Code + Security).
 
 Klasse A: Admin-Einstellung am Modell, autorisierter Werkzeugkatalog, Unterbrechung und Fortsetzung der Werkzeugschleife.
 
