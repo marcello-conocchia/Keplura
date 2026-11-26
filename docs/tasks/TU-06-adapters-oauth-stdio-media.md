@@ -1,6 +1,6 @@
 # TU-06 — OpenAPI-Adapter, persönliche OAuth-Verbindungen, isolierter MCP-stdio-Adapter, Bild- und Dateiergebnisse
 
-Status: **spezifiziert, nicht gestartet.** Nächster Schritt nach TU-05 (PR #37, Merge 88e3e60), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). PO-Entscheidung vom 26.11.2026 im Chat: „ja spezifiziere TU-06 alles in einem PR“. Umsetzung als **ein PR mit einem Commit je Teilschritt** (Regel aus TU-05b–d): eine Spec, ein CI-Lauf am Ende, eine Review-Runde. Implementierung und unabhängige Prüfung nach PO-Zuweisung.
+Status: **implementiert, Prüfung offen, nicht gemergt** (Draft-PR, Branch `feat/tool-use-tu06`, 26.11.2026; Commits TU-06a c7566ab, TU-06b 08dfa73, TU-06c 19d01fa, TU-06d 37ea701). Claude implementiert, Codex prüft unabhängig (Code + Security). Abweichungen und offene Punkte stehen unten unter „Umsetzung“. Ursprünglicher Status: spezifiziert, nicht gestartet. Nächster Schritt nach TU-05 (PR #37, Merge 88e3e60), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). PO-Entscheidung vom 26.11.2026 im Chat: „ja spezifiziere TU-06 alles in einem PR“. Umsetzung als **ein PR mit einem Commit je Teilschritt** (Regel aus TU-05b–d): eine Spec, ein CI-Lauf am Ende, eine Review-Runde. Implementierung und unabhängige Prüfung nach PO-Zuweisung.
 
 Klasse A in jedem Teilschritt: neue externe Ziele (SSRF-Fläche), Zugangsdaten und Tokens, Prozessisolation, Verarbeitung und Auslieferung fremder Binärdaten.
 
@@ -91,6 +91,13 @@ Neue Anbindungen laufen über den vorhandenen kontrollierten Weg von `ToolExecut
 ## PO-Entscheidungen
 
 - **26.11.2026, stdio-Isolation (TU-06c):** „Bridge im Container“. stdio-Server laufen in einer eigenen Bridge im separaten Container, deklariert vom Betreiber im Deployment und angebunden über den vorhandenen MCP-HTTP-Adapter. Verworfen wurde die Alternative, Prozesse aus dem Keplura-Server in einer Sandbox (z. B. bubblewrap) zu starten. Die Regel „keine Prozessstarts im Serverprozess“ bleibt damit unverändert.
+
+## Umsetzung (26.11.2026, Prüfung offen)
+
+- **TU-06a:** Tabellen `openapi_server`, `openapi_server_space`, `openapi_org_boundary` (V35). Parser nur JSON (kein YAML-Parser als Abhängigkeit vorhanden, daher Non-Goal, in der Oberfläche benannt). Fingerprint je Werkzeug enthält zusätzlich die genaue Operation (Methode, Pfad, Parameter, Schema), damit eine geänderte Methode nie unter alter Freigabe läuft. Antworten ≤ 2 MB Text bzw. ≤ 5 MB Binär (TU-06d).
+- **TU-06b:** Tabellen `tool_oauth_client`, `tool_oauth_connection`, `tool_oauth_flow` (V36). Verbindungen sind an Person **und Organisation** gebunden. Der Callback nimmt nur den Code an; eingelöst wird er durch die startende Sitzung beim Statusabruf (Bindung an Sitzung, Person, Org, Server, Client-Revision). Ein Admin-Token eines persönlichen Servers dient nur dem Laden der Werkzeugliste bzw. des Dokuments. Keplura kennt keine Kontodeaktivierung; Austritt und Entfernen aus der Organisation löschen die Verbindungen, ohne Mitgliedschaft ist eine Verbindung sofort unbrauchbar. Desktop-App: Ohne zusätzliches Tauri-Plugin (keine neue Abhängigkeit) wird der Anmeldelink angezeigt und kann kopiert werden; im Web öffnet er sich in einem neuen Tab. Restrisiko: Wer seinen Anmeldelink an eine andere Person weitergibt, kann deren Konto an sich binden, wenn deren Browser keine Keplura-Sitzung hat (mit fremder Keplura-Sitzung wird abgelehnt).
+- **TU-06c:** Bridge-Modus `--mcp-stdio-bridge` ohne Spring, Konfiguration `deploy/mcp-bridge/servers.json`, Dienst `mcp-bridge` (Profil, standardmäßig aus) in `deploy/compose.prod.yml`, internes Netz ohne Ausgang, Doku `deploy/README.md` Abschnitt 10. Abweichung: statt eines Dauerprozesses je Server startet die Bridge **je MCP-Sitzung einen frischen Prozess** (keine geteilten Zustände zwischen Aufrufen oder Personen; „Neustart nach Absturz“ ergibt sich je Sitzung). MCP-Einträge mit „isolierte stdio-Bridge“ (V37) gelten standardmäßig als internes Ziel.
+- **TU-06d:** Tabelle `tool_artifact` (V38), Prüfung nach Magic Bytes, Download `GET /api/v1/orgs/{org}/chat/conversations/{chat}/tool-artifacts/{id}`. Die Antwortobergrenze für MCP-`tools/call` steigt dafür von 2 MB auf 16 MB.
 
 ## Workspace
 

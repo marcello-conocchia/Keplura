@@ -1,0 +1,37 @@
+ci-local gate — run 20261126-204758  (repo: /home/ci/Keplura)
+head: 37ea701 | suites: none
+[native reader] 20:47:58: cargo build + cargo test --locked
+[1/4] server  20:48:02: mvn package (skipTests) + chunked surefire, forkCount=1, chunk=12
+  manifest: 100 test classes -> chunks of 12
+  chunk 1 (12 classes) 20:48:17
+  chunk 2 (12 classes) 20:49:12
+  chunk 3 (12 classes) 20:49:44
+    chunk 3 FAILED (test): [ERROR] Tests run: 140, Failures: 2, Errors: 1, Skipped: 0
+[ERROR] Tests run: 9, Failures: 2, Errors: 1, Skipped: 0, Time elapsed: 2.713 s <<< FAILURE! -- in com.keplura.server.datasource.ExposureScanServiceTest
+[ERROR] com.keplura.server.datasource.ExposureScanServiceTest.reportsBroadAndSensitiveFilesWithoutReadingContents -- Time elapsed: 0.016 s <<< FAILURE!
+[ERROR] com.keplura.server.datasource.ExposureScanServiceTest.realLinuxFolderSeparatesWorldReadableFromPrivateFiles(Path) -- Time elapsed: 0.015 s <<< ERROR!
+[ERROR] com.keplura.server.datasource.ExposureScanServiceTest.forgetRemovesExcludedFindings -- Time elapsed: 2.026 s <<< FAILURE!
+[ERROR] Failures: 
+[ERROR]   ExposureScanServiceTest.forgetRemovesExcludedFindings:172 
+[ERROR]   ExposureScanServiceTest.reportsBroadAndSensitiveFilesWithoutReadingContents:78 
+[ERROR] Errors: 
+[ERROR]   ExposureScanServiceTest.realLinuxFolderSeparatesWorldReadableFromPrivateFiles:142 ? InvalidPath Malformed input or input contains unmappable characters: K?ndigung Meier.md
+[ERROR] Tests run: 140, Failures: 2, Errors: 1, Skipped: 0
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.6:test (default-cli) on project keplura-server: There are test failures.
+[ERROR] 
+[ERROR] See /home/ci/Keplura/server/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+
+================= RESULT MATRIX =================
+STAGE                        RESULT NOTE
+server:local-reader          PASS   locked Rust build and FD snapshot regressions
+server:package               PASS   compile + fat jar
+server:chunk-1               PASS   12 classes — [INFO] Tests run: 213, Failures: 0, Errors: 0, Skipped: 4
+server:chunk-2               PASS   12 classes — [INFO] Tests run: 93, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-3               FAIL   [ERROR] Tests run: 140, Failures: 2, Errors: 1, Skipped: 0 — test
+-------------------------------------------------
+failed stages : 1
+exit code     : 1  (0 green / 1 test-fail / 2 gate-integrity / 3 resource-infra)
+evidence      : /home/ci/Keplura/ci/evidence/20261126-204758
+=================================================
