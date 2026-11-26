@@ -1,6 +1,7 @@
 package com.keplura.server.mcp;
 
 import com.keplura.server.admin.SecretCipher;
+import com.keplura.server.oauth.OAuthConnectionService;
 import com.keplura.server.tool.ToolAdapter;
 import com.keplura.server.tool.ToolDefinition;
 import com.keplura.server.tool.ToolRisk;
@@ -37,12 +38,19 @@ public class McpToolAdapter implements ToolAdapter {
     private final JdbcTemplate jdbc;
     private final SecretCipher cipher;
     private final McpClient client;
+    private final OAuthConnectionService oauth;
     private final ObjectMapper mapper = JsonMapper.builder().build();
 
     public McpToolAdapter(JdbcTemplate jdbc, SecretCipher cipher, McpClient client) {
+        this(jdbc, cipher, client, null);
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public McpToolAdapter(JdbcTemplate jdbc, SecretCipher cipher, McpClient client, OAuthConnectionService oauth) {
         this.jdbc = jdbc;
         this.cipher = cipher;
         this.client = client;
+        this.oauth = oauth;
     }
 
     @Override
@@ -50,32 +58,73 @@ public class McpToolAdapter implements ToolAdapter {
         return KIND;
     }
 
-    @Override
-    public List<ToolDefinition> definitions(Long spaceId) {
-        List<ToolDefinition> out = new ArrayList<>();
-        if (spaceId == null) return out;
-        jdbc.query("""
+    private record Server(long id, String name, String url, String tokenEnc, String toolsJson, String enabledTools,
+                          String toolRisks, boolean internal, long revision, boolean personal) { }
+
+    private List<Server> servers(Long spaceId) {
+        return jdbc.query("""
                 select s.id, s.name, s.url, s.token_enc, s.tools_json, s.enabled_tools, s.tool_risks,
-                       coalesce(b.internal,false),coalesce(b.revision,0) from mcp_server s
+                       coalesce(b.internal,false),coalesce(b.revision,0),
+                       exists(select 1 from tool_oauth_client k where k.kind='mcp' and k.server_id=s.id) from mcp_server s
                 left join mcp_org_boundary b on b.server_id=s.id and b.org_id=(select org_id from space where id=?)
                 where s.enabled = true and (s.all_spaces = true
                    or exists (select 1 from mcp_server_space x where x.server_id = s.id and x.space_id = ?))
-                order by s.id""", rs -> {
-            String json = rs.getString(5);
-            if (json == null || json.isBlank()) return;
-            long serverId = rs.getLong(1);
-            Set<String> approved = approvals(rs.getString(6));
-            Map<String, ToolRisk> risks = risks(rs.getString(7));
-            String fingerprint = fingerprint(serverId, rs.getString(3), rs.getString(4))+":boundary:"+rs.getLong(9);
-            for (JsonNode t : mapper.readTree(json)) {
+                order by s.id""", (rs, n) -> new Server(rs.getLong(1), rs.getString(2), rs.getString(3), rs.getString(4),
+                rs.getString(5), rs.getString(6), rs.getString(7), rs.getBoolean(8), rs.getLong(9), rs.getBoolean(10)),
+                spaceId, spaceId);
+    }
+
+    /** Without a person (no context) personal servers offer nothing: fail closed. */
+    @Override
+    public List<ToolDefinition> definitions(Long spaceId) {
+        return definitions(spaceId, null);
+    }
+
+    @Override
+    public List<ToolDefinition> definitionsFor(com.keplura.server.tool.ToolContext context) {
+        return definitions(context.spaceId(), context);
+    }
+
+    private List<ToolDefinition> definitions(Long spaceId, com.keplura.server.tool.ToolContext context) {
+        List<ToolDefinition> out = new ArrayList<>();
+        if (spaceId == null) return out;
+        for (Server s : servers(spaceId)) {
+            if (s.toolsJson() == null || s.toolsJson().isBlank()) continue;
+            String access = "";
+            if (s.personal()) {
+                // TU-06b: tools of a personal server exist for this person only with an own, valid connection.
+                var connection = context == null || oauth == null ? null
+                        : oauth.connection(context.userId(), context.orgId(), KIND, s.id()).orElse(null);
+                if (connection == null) continue;
+                access = OAuthConnectionService.fingerprintPart(connection);
+            }
+            Set<String> approved = approvals(s.enabledTools());
+            Map<String, ToolRisk> risks = risks(s.toolRisks());
+            String fingerprint = fingerprint(s.id(), s.url(), s.tokenEnc()) + access + ":boundary:" + s.revision();
+            for (JsonNode t : mapper.readTree(s.toolsJson())) {
                 String name = t.path("name").asString("");
                 if (name.isEmpty()) continue;
                 JsonNode schema = schemaOf(t);
-                out.add(new ToolDefinition(KIND + ":" + serverId + ":" + name, KIND, functionName(serverId, name), name,
-                        serverId, rs.getString(2), t.path("description").asString(""), schema, risks.get(name),
-                        approved.contains(name), fingerprint,rs.getBoolean(8)));
+                out.add(new ToolDefinition(KIND + ":" + s.id() + ":" + name, KIND, functionName(s.id(), name), name,
+                        s.id(), s.name(), t.path("description").asString(""), schema, risks.get(name),
+                        approved.contains(name), fingerprint, s.internal()));
             }
-        }, spaceId, spaceId);
+        }
+        return out;
+    }
+
+    @Override
+    public List<ConnectionHint> missingConnections(com.keplura.server.tool.ToolContext context) {
+        List<ConnectionHint> out = new ArrayList<>();
+        if (context == null || context.spaceId() == null) return out;
+        for (Server s : servers(context.spaceId())) {
+            if (!s.personal() || s.toolsJson() == null) continue;
+            Map<String, ToolRisk> risks = risks(s.toolRisks());
+            boolean usable = approvals(s.enabledTools()).stream().anyMatch(risks::containsKey);
+            if (usable && (oauth == null || oauth.connection(context.userId(), context.orgId(), KIND, s.id()).isEmpty())) {
+                out.add(new ConnectionHint(KIND, s.id(), s.name()));
+            }
+        }
         return out;
     }
 
@@ -94,14 +143,28 @@ public class McpToolAdapter implements ToolAdapter {
         String encText = enc == null ? null : enc.toString();
         var revisions=jdbc.queryForList("select revision from mcp_org_boundary where server_id=? and org_id=?",Long.class,tool.sourceId(),context.orgId());
         long revision=revisions.isEmpty()?0:revisions.getFirst();
-        if (!(fingerprint(tool.sourceId(), urlText, encText)+":boundary:"+revision).equals(tool.fingerprint())) {
+        boolean personal = jdbc.queryForObject("select count(*) from tool_oauth_client where kind='mcp' and server_id=?",
+                Integer.class, tool.sourceId()) > 0;
+        OAuthConnectionService.Connection connection = null;
+        if (personal) {
+            connection = oauth == null ? null
+                    : oauth.connection(context.userId(), context.orgId(), KIND, tool.sourceId()).orElse(null);
+            if (connection == null) throw new ToolNotStartedException(OAuthConnectionService.MISSING);
+        }
+        String access = connection == null ? "" : OAuthConnectionService.fingerprintPart(connection);
+        if (!(fingerprint(tool.sourceId(), urlText, encText)+access+":boundary:"+revision).equals(tool.fingerprint())) {
             throw new ToolNotStartedException("Das Verbindungsziel hat sich geändert. Das Werkzeug wurde nicht aufgerufen.");
         }
         String token;
-        try {
-            token = encText == null ? "" : cipher.decrypt(encText);
-        } catch (RuntimeException e) {
-            throw new ToolNotStartedException("Der Zugang zum MCP-Server ist nicht lesbar. Das Werkzeug wurde nicht aufgerufen.");
+        if (connection != null) {
+            // The admin key of a personal server is only for loading the tool list, never for a person's call.
+            token = oauth.accessToken(context.userId(), context.orgId(), KIND, tool.sourceId(), connection.id());
+        } else {
+            try {
+                token = encText == null ? "" : cipher.decrypt(encText);
+            } catch (RuntimeException e) {
+                throw new ToolNotStartedException("Der Zugang zum MCP-Server ist nicht lesbar. Das Werkzeug wurde nicht aufgerufen.");
+            }
         }
         try {
             return client.callTool(urlText, token, tool.toolName(), arguments);

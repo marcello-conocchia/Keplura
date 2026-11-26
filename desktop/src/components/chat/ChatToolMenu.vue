@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, ref, watch } from "vue";
+import { inject, nextTick, onBeforeUnmount, ref, watch } from "vue";
+import { NAVIGATE_KEY, type AppView } from "../../navigation";
 import {
   DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel,
   DropdownMenuPortal, DropdownMenuRoot, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -14,6 +15,7 @@ const props = defineProps<{
   ensureConversation: () => Promise<number | null>;
 }>();
 const emit = defineEmits<{ saving: [boolean]; saved: [number] }>();
+const navigate = inject<((view: AppView) => void) | null>(NAVIGATE_KEY, null);
 const open = ref(false);
 const selection = ref<ChatToolSelection | null>(null);
 const draft = ref<string[] | null>(null);
@@ -147,6 +149,13 @@ async function save() {
               <span class="tool-menu-name">{{ tool.name }} <small>{{ tool.source }}</small></span>
             </DropdownMenuCheckboxItem>
           </DropdownMenuGroup>
+          <template v-if="selection.connectionsRequired?.length">
+            <DropdownMenuLabel class="ic-menu-label">{{ $t("Verbindung nötig") }}</DropdownMenuLabel>
+            <DropdownMenuItem v-for="hint in selection.connectionsRequired" :key="`${hint.kind}-${hint.serverId}`" class="ic-menu-item"
+              data-testid="chat-tool-connection-needed" @select="open = false; navigate?.('verbindungen')">
+              {{ $t("{0}: unter „Verbindungen“ verbinden", hint.name) }}
+            </DropdownMenuItem>
+          </template>
           <p v-if="selection.tools.length === 0" class="tool-menu-note">{{ $t("Für diesen Chat sind keine Werkzeuge freigegeben.") }}</p>
           <p class="tool-menu-note">{{ $t("Eine Änderung gilt ab der nächsten Frage und beendet offene Bestätigungen.") }}</p>
           <DropdownMenuSeparator />

@@ -71,6 +71,11 @@ public class OpenApiAdminController {
         this.tx = new TransactionTemplate(transactionManager);
     }
 
+    private com.keplura.server.oauth.OAuthConnectionService oauth;
+
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    void setOauth(com.keplura.server.oauth.OAuthConnectionService oauth) { this.oauth = oauth; }
+
     @GetMapping
     public List<ServerView> list() {
         return jdbc.query("""
@@ -99,8 +104,11 @@ public class OpenApiAdminController {
         String err = validate(in.name(), in.specUrl(), in.baseUrl(), mode);
         if (err != null) return bad(err);
         String enc = null;
-        if (OpenApiToolAdapter.AUTH_BEARER.equals(mode)) {
-            if (in.token() == null || in.token().isBlank()) return bad("Bitte ein Token angeben oder die Zugangsart „keiner“ wählen.");
+        if (OpenApiToolAdapter.AUTH_BEARER.equals(mode) && (in.token() == null || in.token().isBlank())) {
+            return bad("Bitte ein Token angeben oder die Zugangsart „keiner“ wählen.");
+        }
+        if (!OpenApiToolAdapter.AUTH_NONE.equals(mode) && in.token() != null && !in.token().isBlank()) {
+            // oauth: the optional admin token only loads the document, calls use the person's connection.
             if (!cipher.available()) return bad("Tokens können nicht gespeichert werden: KEPLURA_SECRETS_MASTER_KEY fehlt.");
             enc = cipher.encrypt(in.token().strip());
         }
@@ -147,9 +155,11 @@ public class OpenApiAdminController {
         boolean tokenChanged = in.token() != null || !mode.equals(cur.authMode());
         if (tokenChanged) {
             String enc = null;
-            if (OpenApiToolAdapter.AUTH_BEARER.equals(mode)) {
-                String token = in.token();
-                if (token == null || token.isBlank()) return bad("Bitte ein Token angeben oder die Zugangsart „keiner“ wählen.");
+            String token = in.token();
+            if (OpenApiToolAdapter.AUTH_BEARER.equals(mode) && (token == null || token.isBlank())) {
+                return bad("Bitte ein Token angeben oder die Zugangsart „keiner“ wählen.");
+            }
+            if (!OpenApiToolAdapter.AUTH_NONE.equals(mode) && token != null && !token.isBlank()) {
                 if (!cipher.available()) return bad("Tokens können nicht gespeichert werden: KEPLURA_SECRETS_MASTER_KEY fehlt.");
                 enc = cipher.encrypt(token.strip());
             }
@@ -162,6 +172,11 @@ public class OpenApiAdminController {
             // A new target or identity is a new trust boundary: never carry classes or approvals over.
             jdbc.update("update openapi_server set operations_json = null, enabled_tools = null, tool_risks = null, "
                     + "last_checked_at = null, last_error = null where id = ?", id);
+        }
+        // TU-06b: a new target or leaving personal access ends every personal connection of this server.
+        if (oauth != null) {
+            if (!OpenApiToolAdapter.AUTH_OAUTH.equals(mode)) oauth.removeClient("openapi", id);
+            else if (!baseUrl.strip().equals(cur.baseUrl()) || !specUrl.strip().equals(cur.specUrl())) oauth.invalidate("openapi", id);
         }
         if (!changedTarget && (in.enabledTools() != null || in.toolRisks() != null)) {
             Map<String, ToolView> known = new LinkedHashMap<>();
@@ -200,6 +215,8 @@ public class OpenApiAdminController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         jdbc.update("delete from openapi_server where id = ?", id);
+        if (oauth != null) oauth.removeClient("openapi", id);
+        else jdbc.update("delete from tool_oauth_client where kind='openapi' and server_id=?", id);
         return ResponseEntity.noContent().build();
     }
 

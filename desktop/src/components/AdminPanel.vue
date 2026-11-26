@@ -7,6 +7,7 @@ import AccessPanel from "./admin/AccessPanel.vue";
 import WebSearchPanel from "./admin/WebSearchPanel.vue";
 import McpPanel from "./admin/McpPanel.vue";
 import OpenApiPanel from "./admin/OpenApiPanel.vue";
+import OAuthClientsPanel from "./admin/OAuthClientsPanel.vue";
 import ProvidersPanel from "./admin/ProvidersPanel.vue";
 import ModelsPanel from "./admin/ModelsPanel.vue";
 import SearchSettingsPanel from "./admin/SearchSettingsPanel.vue";
@@ -21,7 +22,7 @@ import PageHeader from "./layout/PageHeader.vue";
  * Alle Autorisierung liegt beim Server (Session + CSRF + Rolle, docs/adr/0008 §6);
  * meldet ein Bereich 403, zeigt der Rahmen einmal den ehrlichen Hinweis.
  */
-type Section = "provider" | "modell" | "rag" | "status" | "backup" | "directory" | "datasources" | "quality" | "websearch" | "mcp" | "openapi" | "access";
+type Section = "provider" | "modell" | "rag" | "status" | "backup" | "directory" | "datasources" | "quality" | "websearch" | "mcp" | "openapi" | "oauth" | "access";
 const section = ref<Section>("provider");
 /** 403 aus einem Bereich: die Admin-Rolle fehlt oder ist abgelaufen. */
 const forbidden = ref(false);
@@ -39,7 +40,7 @@ const forbidden = ref(false);
     <div class="admin-mobile-nav"><label for="admin-section-select">{{ $t("Administrationsbereich") }}</label>
       <select id="admin-section-select" v-model="section" class="ic-native-control" data-testid="admin-section-select">
         <optgroup :label="$t('KI und Wissen')"><option value="provider">{{ $t("KI-Anbieter") }}</option><option value="modell">{{ $t("Modelle") }}</option><option value="rag">{{ $t("Suche und Wissen") }}</option></optgroup>
-        <optgroup :label="$t('Verbindungen')"><option value="datasources">{{ $t("Datenquellen") }}</option><option value="websearch">{{ $t("Websuche") }}</option><option value="mcp">{{ $t("MCP-Server") }}</option><option value="openapi">{{ $t("OpenAPI-Server") }}</option><option value="directory">{{ $t("Verzeichnis") }}</option><option value="access">{{ $t("Zugriff prüfen") }}</option></optgroup>
+        <optgroup :label="$t('Verbindungen')"><option value="datasources">{{ $t("Datenquellen") }}</option><option value="websearch">{{ $t("Websuche") }}</option><option value="mcp">{{ $t("MCP-Server") }}</option><option value="openapi">{{ $t("OpenAPI-Server") }}</option><option value="oauth">{{ $t("Persönliche Verbindungen") }}</option><option value="directory">{{ $t("Verzeichnis") }}</option><option value="access">{{ $t("Zugriff prüfen") }}</option></optgroup>
         <optgroup :label="$t('Betrieb')"><option value="status">{{ $t("Systemstatus") }}</option><option value="quality">{{ $t("Antwortqualität") }}</option><option value="backup">{{ $t("Datensicherung") }}</option></optgroup>
       </select>
     </div>
@@ -54,6 +55,7 @@ const forbidden = ref(false);
       <button type="button" :class="{ act: section === 'websearch' }" data-testid="admin-tab-websearch" @click="section = 'websearch'">{{ $t("Websuche") }}</button>
       <button type="button" :class="{ act: section === 'mcp' }" data-testid="admin-tab-mcp" @click="section = 'mcp'">{{ $t("MCP-Server") }}</button>
       <button type="button" :class="{ act: section === 'openapi' }" data-testid="admin-tab-openapi" @click="section = 'openapi'">{{ $t("OpenAPI-Server") }}</button>
+      <button type="button" :class="{ act: section === 'oauth' }" data-testid="admin-tab-oauth" @click="section = 'oauth'">{{ $t("Persönliche Verbindungen") }}</button>
       <button type="button" :class="{ act: section === 'directory' }" data-testid="admin-tab-directory" @click="section = 'directory'">{{ $t("Verzeichnis") }}</button>
       <button type="button" :class="{ act: section === 'access' }" data-testid="admin-tab-access" @click="section = 'access'">{{ $t("Zugriff prüfen") }}</button>
       <span class="admin-nav-label">{{ $t("Betrieb") }}</span>
@@ -74,6 +76,7 @@ const forbidden = ref(false);
     <WebSearchPanel v-else-if="section === 'websearch'" />
     <McpPanel v-else-if="section === 'mcp'" />
     <OpenApiPanel v-else-if="section === 'openapi'" />
+    <OAuthClientsPanel v-else-if="section === 'oauth'" />
     </div>
   </section>
   </PageContainer>

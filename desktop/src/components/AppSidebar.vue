@@ -140,6 +140,7 @@ function openKb(kbId: number) {
             </DropdownMenuItem>
             <DropdownMenuSeparator class="ic-menu-sep" />
             <DropdownMenuItem class="ic-menu-item" @select="emit('navigate', 'team')">{{ $t("Organisationen verwalten") }}</DropdownMenuItem>
+            <DropdownMenuItem class="ic-menu-item" data-testid="sidebar-connections" @select="emit('navigate', 'verbindungen')">{{ $t("Persönliche Verbindungen") }}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenuPortal>
       </DropdownMenuRoot>

@@ -67,6 +67,8 @@ export interface ChatToolSelection {
   modelDefaultIds: string[] | null;
   /** TU-05b: the current chat model never gets tools. */
   modelToolsOff: boolean;
+  /** TU-06b: servers whose approved tools need the person's own connection first. */
+  connectionsRequired: { kind: ConnectionKind; serverId: number; name: string }[];
 }
 export const getChatToolSelection = (orgId: number, cid: number) =>
   call<ChatToolSelection>("GET", `${convPath(orgId, cid)}/tool-selection`);
@@ -127,7 +129,7 @@ export interface OpenApiTool {
   name: string | null; method: string; path: string; description: string;
   enabled: boolean; risk: ToolRisk | null; usable: boolean; problem: string | null;
 }
-export type OpenApiAuthMode = "none" | "bearer";
+export type OpenApiAuthMode = "none" | "bearer" | "oauth";
 export interface OpenApiServer {
   id: number; name: string; specUrl: string; baseUrl: string; authMode: OpenApiAuthMode; hasToken: boolean; enabled: boolean;
   tools: OpenApiTool[]; lastCheckedAt: string | null; lastError: string | null; allSpaces: boolean; spaceIds: number[];
@@ -142,4 +144,24 @@ export const createOpenApiServer = (input: OpenApiInput) => call<OpenApiServer>(
 export const updateOpenApiServer = (id: number, input: OpenApiInput) => call<OpenApiServer>("PATCH", `${OPENAPI}/${id}`, input);
 export const refreshOpenApiServer = (id: number) => call<OpenApiServer>("POST", `${OPENAPI}/${id}/refresh`, undefined, 60000);
 export const deleteOpenApiServer = (id: number) => call<void>("DELETE", `${OPENAPI}/${id}`);
+/** TU-06b: personal OAuth connections. Tokens never reach the desktop; only connected yes/no. */
+export type ConnectionKind = "mcp" | "openapi";
+export interface PersonalConnection { kind: ConnectionKind; serverId: number; name: string; connected: boolean; connectedSince: string | null }
+export type ConnectionFlowStatus = "PENDING" | "CONNECTED" | "FAILED" | "EXPIRED";
+export const listConnections = (orgId: number) => call<PersonalConnection[]>("GET", `/api/v1/orgs/${orgId}/connections`);
+export const startConnection = (orgId: number, kind: ConnectionKind, serverId: number) =>
+  call<{ flowId: string; authorizationUrl: string }>("POST", `/api/v1/orgs/${orgId}/connections/${kind}/${serverId}/start`);
+export const connectionStatus = (orgId: number, flowId: string) =>
+  call<{ status: ConnectionFlowStatus }>("GET", `/api/v1/orgs/${orgId}/connections/flows/${encodeURIComponent(flowId)}`);
+export const disconnectConnection = (orgId: number, kind: ConnectionKind, serverId: number) =>
+  call<void>("DELETE", `/api/v1/orgs/${orgId}/connections/${kind}/${serverId}`);
+export interface OAuthClientView {
+  kind: ConnectionKind; serverId: number; serverName: string; configured: boolean; authorizeUrl: string | null; tokenUrl: string | null;
+  revokeUrl: string | null; clientId: string | null; hasClientSecret: boolean; scopes: string | null; connectedCount: number;
+}
+export interface OAuthClientInput { authorizeUrl: string; tokenUrl: string; revokeUrl: string | null; clientId: string; clientSecret: string | null; scopes: string | null }
+export const listOAuthClients = () => call<OAuthClientView[]>("GET", "/api/v1/admin/oauth-clients");
+export const putOAuthClient = (kind: ConnectionKind, serverId: number, input: OAuthClientInput) =>
+  call<OAuthClientView>("PUT", `/api/v1/admin/oauth-clients/${kind}/${serverId}`, input);
+export const deleteOAuthClient = (kind: ConnectionKind, serverId: number) => call<void>("DELETE", `/api/v1/admin/oauth-clients/${kind}/${serverId}`);
 export const listMcpCalls = () => call<{ called_at: string; server_name: string; tool_name: string; duration_ms: number; ok: boolean; error: string | null; user_id: number; risk: ToolRisk | null }[]>("GET", `${MCP}/calls`);

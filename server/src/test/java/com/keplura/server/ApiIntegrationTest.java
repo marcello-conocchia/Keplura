@@ -93,4 +93,19 @@ class ApiIntegrationTest {
         assertThat(headers.getDate()).isGreaterThan(0L);
         assertThat(headers.getFirst("Content-Length")).isNotNull();
     }
+
+    /** TU-06b: the OAuth callback is reachable without a session, reflects nothing and sets strict headers. */
+    @Test
+    void oauthCallbackNeedsNoSessionButConnectionEndpointsDo() {
+        ResponseEntity<String> callback = rest.getForEntity(
+                "/api/v1/oauth/connections/callback?state=<script>x</script>&code=c", String.class);
+        assertThat(callback.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(callback.getBody()).doesNotContain("<script>").doesNotContain("state");
+        assertThat(callback.getHeaders().getFirst("Content-Security-Policy")).isEqualTo("default-src 'none'; frame-ancestors 'none'");
+        assertThat(callback.getHeaders().getFirst("Cache-Control")).isEqualTo("no-store");
+        assertThat(rest.getForEntity("/api/v1/orgs/1/connections", String.class).getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(rest.postForEntity("/api/v1/orgs/1/connections/openapi/1/start", null, String.class).getStatusCode())
+                .isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(rest.getForEntity("/api/v1/admin/oauth-clients", String.class).getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
 }

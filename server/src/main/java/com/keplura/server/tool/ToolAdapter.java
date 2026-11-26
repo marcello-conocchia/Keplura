@@ -37,6 +37,12 @@ public interface ToolAdapter {
         return invoke(context, tool, arguments);
     }
 
+    /** TU-06b: a server whose tools need the person's own connection, which is missing (shown in the tool menu). */
+    record ConnectionHint(String kind, long serverId, String name) { }
+
+    /** Servers of this context with approved tools that are not offered because the person's connection is missing. */
+    default List<ConnectionHint> missingConnections(ToolContext context) { return List.of(); }
+
     /** Reference-only adapters never persist private excerpts in cards or loop checkpoints. */
     default boolean referencesOnly() { return false; }
 

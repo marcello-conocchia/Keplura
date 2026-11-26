@@ -199,11 +199,25 @@ public class ToolExecutionService {
      * {@code modelToolsOff}: the current chat model never gets tools (TU-05b).
      */
     public record ChatToolSelection(List<String> selectedIds, List<ChatToolOption> tools,
-                                    List<String> modelDefaultIds, boolean modelToolsOff) { }
+                                    List<String> modelDefaultIds, boolean modelToolsOff,
+                                    List<ToolAdapter.ConnectionHint> connectionsRequired) { }
 
     public ChatToolSelection chatToolSelection(Long userId, Long orgId, Long conversationId) {
         ToolContext ctx = requireSelectionContext(userId, orgId, conversationId);
-        return selectionView(requireSelection(ctx).ids(), selectable(ctx), modelPolicy());
+        return selectionView(requireSelection(ctx).ids(), selectable(ctx), modelPolicy(), missingConnections(ctx));
+    }
+
+    /** TU-06b: servers whose approved tools this person only gets after connecting personally. Fails closed (empty). */
+    private List<ToolAdapter.ConnectionHint> missingConnections(ToolContext ctx) {
+        List<ToolAdapter.ConnectionHint> out = new java.util.ArrayList<>();
+        for (ToolAdapter adapter : adapters.values()) {
+            try {
+                for (var hint : adapter.missingConnections(ctx)) if (hint != null && out.size() < MAX_TOOLS_OFFERED) out.add(hint);
+            } catch (RuntimeException e) {
+                log.warn("tool adapter {} connection hints unavailable ({})", adapter.kind(), e.getClass().getSimpleName());
+            }
+        }
+        return List.copyOf(out);
     }
 
     /**
@@ -299,7 +313,7 @@ public class ToolExecutionService {
                 desired, ctx.conversationId(), ctx.orgId(), ctx.spaceId(), ctx.userId(),
                 Objects.requireNonNullElse(desired, ""));
         if (changed == 1) cards.cancelBeforeSelectionChange(ctx.conversationId(), wallClock.get());
-        return selectionView(requireSelection(ctx).ids(), selectable(ctx), modelPolicy());
+        return selectionView(requireSelection(ctx).ids(), selectable(ctx), modelPolicy(), missingConnections(ctx));
     }
 
     private ToolContext requireSelectionContext(Long userId, Long orgId, Long conversationId) {
@@ -342,13 +356,13 @@ public class ToolExecutionService {
     }
 
     private static ChatToolSelection selectionView(Set<String> selected, Map<String, ToolDefinition> available,
-                                                   ModelToolPolicy policy) {
+                                                   ModelToolPolicy policy, List<ToolAdapter.ConnectionHint> hints) {
         var visible = available.values().stream().filter(t -> t.id().length() <= MAX_SELECTION_ID_LENGTH).toList();
         var tools = visible.stream().map(t -> new ChatToolOption(t.id(), t.toolName(), t.sourceName(), t.risk())).toList();
         var ids = selected == null ? null : tools.stream().map(ChatToolOption::id).filter(selected::contains).toList();
         List<String> defaults = policy.off() ? List.of() : policy.kinds() == null ? null
                 : visible.stream().filter(t -> policy.kinds().contains(t.adapter())).map(ToolDefinition::id).toList();
-        return new ChatToolSelection(ids, tools, defaults, policy.off());
+        return new ChatToolSelection(ids, tools, defaults, policy.off(), policy.off() ? List.of() : hints);
     }
 
     private static ChatException invalidSelection() {

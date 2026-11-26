@@ -57,7 +57,7 @@ async function add() {
   busy.value = true; connectError.value = ""; message.value = "";
   try {
     const r = await createOpenApiServer({ name: name.value, specUrl: specUrl.value, baseUrl: baseUrl.value, authMode: authMode.value,
-      token: authMode.value === "bearer" ? token.value.trim() : null });
+      token: authMode.value !== "none" && token.value.trim() ? token.value.trim() : null });
     if (r.kind !== "ok") { connectError.value = r.kind === "error" ? r.message : tr("Deine Sitzung ist abgelaufen."); return; }
     expandedId.value = r.value.id; token.value = ""; connectOpen.value = false;
     await load();
@@ -108,7 +108,7 @@ async function confirmRemove() {
     <div v-if="loaded" class="connection-list">
       <p v-if="!servers.length" class="connection-empty">{{ $t("Noch kein OpenAPI-Server verbunden. Neue Operationen bleiben zunächst gesperrt, bis du sie freigibst.") }}</p>
       <article v-for="s in servers" :key="s.id" class="connection-record" data-testid="admin-openapi-server">
-        <header class="connection-record-header"><div class="connection-heading"><h3>{{s.name}}</h3><code class="connection-address">{{s.baseUrl}}</code><p class="connection-meta">{{ $t("Dokument: {0}", s.specUrl) }}<span v-if="s.authMode==='bearer'"> {{ $t("· Zugangsschlüssel hinterlegt") }}</span></p></div><div class="connection-actions"><StatusPill :tone="s.enabled?'info':'neutral'">{{s.enabled?$t("Aktiv"):$t("Pausiert")}}</StatusPill><Button size="compact" :disabled="working.has(s.id)" :busy="working.has(s.id)" data-testid="openapi-refresh" @click="refresh(s)">{{ $t("Neu laden") }}</Button><ActionMenu :label="$t('Aktionen für {0}', s.name)" :disabled="working.has(s.id)" :items="[{id:'toggle',label:s.enabled?$t('Pausieren'):$t('Aktivieren')},{id:'remove',label:$t('Entfernen'),danger:true}]" @select="action=>action==='toggle'?patch(s,{enabled:!s.enabled}):requestRemove(s)" /></div></header>
+        <header class="connection-record-header"><div class="connection-heading"><h3>{{s.name}}</h3><code class="connection-address">{{s.baseUrl}}</code><p class="connection-meta">{{ $t("Dokument: {0}", s.specUrl) }}<span v-if="s.authMode==='bearer'"> {{ $t("· Zugangsschlüssel hinterlegt") }}</span><span v-if="s.authMode==='oauth'"> {{ $t("· persönliche Anmeldung je Person") }}</span></p></div><div class="connection-actions"><StatusPill :tone="s.enabled?'info':'neutral'">{{s.enabled?$t("Aktiv"):$t("Pausiert")}}</StatusPill><Button size="compact" :disabled="working.has(s.id)" :busy="working.has(s.id)" data-testid="openapi-refresh" @click="refresh(s)">{{ $t("Neu laden") }}</Button><ActionMenu :label="$t('Aktionen für {0}', s.name)" :disabled="working.has(s.id)" :items="[{id:'toggle',label:s.enabled?$t('Pausieren'):$t('Aktivieren')},{id:'remove',label:$t('Entfernen'),danger:true}]" @select="action=>action==='toggle'?patch(s,{enabled:!s.enabled}):requestRemove(s)" /></div></header>
         <p v-if="s.lastError" class="connection-note error" style="margin-top:12px">{{serverText(s.lastError)}}</p>
         <details class="connection-details mcp-tools" :open="expandedId===s.id"><summary>{{ $t("Operationen · {0} von {1} freigegeben", s.tools.filter(t=>t.enabled).length, s.tools.length) }}</summary>
           <div class="connection-options"><p v-if="!s.tools.length" class="connection-hint">{{ $t("Das Dokument enthält noch keine Operationen.") }}</p>
@@ -130,8 +130,9 @@ async function confirmRemove() {
         <Input id="openapi-name" v-model="name" :label="$t('Name der Verbindung')" required maxlength="120" :disabled="busy" />
         <Input id="openapi-spec" v-model="specUrl" :label="$t('Adresse des OpenAPI-Dokuments (JSON)')" type="url" required maxlength="500" :placeholder="$t('https://api.firma.local/openapi.json')" :disabled="busy" />
         <Input id="openapi-base" v-model="baseUrl" :label="$t('Feste Basis-Adresse für Aufrufe')" type="url" required maxlength="500" :placeholder="$t('https://api.firma.local/v1')" :disabled="busy" />
-        <label class="connection-check">{{ $t("Zugang") }} <select v-model="authMode" class="ic-native-control" :disabled="busy"><option value="none">{{ $t("Keiner") }}</option><option value="bearer">{{ $t("Bearer-Token (verschlüsselt gespeichert)") }}</option></select></label>
-        <Input v-if="authMode==='bearer'" id="openapi-token" v-model="token" :label="$t('Bearer-Token')" type="password" autocomplete="off" :disabled="busy" />
+        <label class="connection-check">{{ $t("Zugang") }} <select v-model="authMode" class="ic-native-control" :disabled="busy"><option value="none">{{ $t("Keiner") }}</option><option value="bearer">{{ $t("Bearer-Token (verschlüsselt gespeichert)") }}</option><option value="oauth">{{ $t("Persönlich (OAuth, je Person)") }}</option></select></label>
+        <p v-if="authMode==='oauth'" class="connection-hint">{{ $t("Den OAuth-Client richtest du danach unter „Persönliche Verbindungen“ ein. Ein optionales Token unten dient nur zum Laden des Dokuments.") }}</p>
+        <Input v-if="authMode!=='none'" id="openapi-token" v-model="token" :label="authMode==='bearer'?$t('Bearer-Token'):$t('Token für das Dokument (optional)')" type="password" autocomplete="off" :disabled="busy" />
         <div class="connection-submit"><Button :disabled="busy" @click="connectDialog?.requestClose()">{{ $t("Abbrechen") }}</Button><Button variant="primary" type="submit" :disabled="busy" :busy="busy">{{busy?$t("Dokument wird geladen …"):$t("Verbinden")}}</Button></div>
       </form>
     </AppDialog>

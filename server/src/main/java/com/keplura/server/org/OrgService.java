@@ -175,6 +175,9 @@ public class OrgService {
         events.publishEvent(new OrgDeletingEvent(orgId));
         jdbc.update("delete from org_invite where org_id = ?", orgId);
         jdbc.update("delete from membership where org_id = ?", orgId);
+        // TU-06b: personal OAuth connections never outlive the organization.
+        jdbc.update("delete from tool_oauth_connection where org_id = ?", orgId);
+        jdbc.update("delete from tool_oauth_flow where org_id = ?", orgId);
         organizationRepository.delete(org);
         organizationRepository.flush();
     }
@@ -198,6 +201,9 @@ public class OrgService {
         }
         membershipRepository.delete(target);
         membershipRepository.flush();
+        // TU-06b: whoever leaves (or is removed) loses their personal connections of this organization at once.
+        jdbc.update("delete from tool_oauth_connection where user_id = ? and org_id = ?", memberUserId, orgId);
+        jdbc.update("delete from tool_oauth_flow where user_id = ? and org_id = ?", memberUserId, orgId);
     }
 
     private OrgMembership requireOwner(Long callerUserId, Long orgId) {

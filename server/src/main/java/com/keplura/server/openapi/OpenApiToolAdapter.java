@@ -31,42 +31,77 @@ public class OpenApiToolAdapter implements ToolAdapter {
     public static final String KIND = "openapi";
     public static final String AUTH_NONE = "none";
     public static final String AUTH_BEARER = "bearer";
-    public static final Set<String> AUTH_MODES = Set.of(AUTH_NONE, AUTH_BEARER);
+    /** TU-06b: each person uses an own OAuth connection; an admin token may only load the document. */
+    public static final String AUTH_OAUTH = "oauth";
+    public static final Set<String> AUTH_MODES = Set.of(AUTH_NONE, AUTH_BEARER, AUTH_OAUTH);
 
     private final JdbcTemplate jdbc;
     private final SecretCipher cipher;
     private final OpenApiClient client;
+    private final com.keplura.server.oauth.OAuthConnectionService oauth;
 
     public OpenApiToolAdapter(JdbcTemplate jdbc, SecretCipher cipher, OpenApiClient client) {
+        this(jdbc, cipher, client, null);
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public OpenApiToolAdapter(JdbcTemplate jdbc, SecretCipher cipher, OpenApiClient client,
+                              com.keplura.server.oauth.OAuthConnectionService oauth) {
         this.jdbc = jdbc;
         this.cipher = cipher;
         this.client = client;
+        this.oauth = oauth;
     }
 
     @Override
     public String kind() { return KIND; }
 
     record Server(long id, String name, String specUrl, String baseUrl, String authMode, String tokenEnc,
-                  String operationsJson, String enabledTools, String toolRisks, boolean internal, long revision) { }
+                  String operationsJson, String enabledTools, String toolRisks, boolean internal, long revision,
+                  boolean hasClient) {
+        boolean personal() { return AUTH_OAUTH.equals(authMode()); }
+    }
 
     private List<Server> servers(Long spaceId) {
         return jdbc.query("""
                 select s.id, s.name, s.spec_url, s.base_url, s.auth_mode, s.token_enc, s.operations_json, s.enabled_tools,
-                       s.tool_risks, coalesce(b.internal,false), coalesce(b.revision,0) from openapi_server s
+                       s.tool_risks, coalesce(b.internal,false), coalesce(b.revision,0),
+                       exists(select 1 from tool_oauth_client k where k.kind='openapi' and k.server_id=s.id) from openapi_server s
                 left join openapi_org_boundary b on b.server_id=s.id and b.org_id=(select org_id from space where id=?)
                 where s.enabled = true and (s.all_spaces = true
                    or exists (select 1 from openapi_server_space x where x.server_id = s.id and x.space_id = ?))
                 order by s.id""", (rs, n) -> new Server(rs.getLong(1), rs.getString(2), rs.getString(3), rs.getString(4),
                 rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8), rs.getString(9), rs.getBoolean(10),
-                rs.getLong(11)), spaceId, spaceId);
+                rs.getLong(11), rs.getBoolean(12)), spaceId, spaceId);
+    }
+
+    /** Without a person (no context) personal servers offer nothing: fail closed. */
+    @Override
+    public List<ToolDefinition> definitions(Long spaceId) {
+        return definitions(spaceId, null);
     }
 
     @Override
-    public List<ToolDefinition> definitions(Long spaceId) {
+    public List<ToolDefinition> definitionsFor(ToolContext context) {
+        return definitions(context.spaceId(), context);
+    }
+
+    private com.keplura.server.oauth.OAuthConnectionService.Connection connection(ToolContext context, Server s) {
+        if (context == null || oauth == null || !s.hasClient()) return null;
+        return oauth.connection(context.userId(), context.orgId(), KIND, s.id()).orElse(null);
+    }
+
+    private List<ToolDefinition> definitions(Long spaceId, ToolContext context) {
         List<ToolDefinition> out = new ArrayList<>();
         if (spaceId == null) return out;
         for (Server s : servers(spaceId)) {
             if (!AUTH_MODES.contains(s.authMode())) continue; // unknown access mode: nothing usable
+            String access = "";
+            if (s.personal()) {
+                var connection = connection(context, s);
+                if (connection == null) continue; // TU-06b: not offered without the person's own connection
+                access = com.keplura.server.oauth.OAuthConnectionService.fingerprintPart(connection);
+            }
             Set<String> approved = McpToolAdapter.approvals(s.enabledTools());
             Map<String, ToolRisk> risks = McpToolAdapter.risks(s.toolRisks());
             for (OpenApiDocument.Operation op : OpenApiDocument.fromJson(s.operationsJson())) {
@@ -74,17 +109,30 @@ public class OpenApiToolAdapter implements ToolAdapter {
                 out.add(new ToolDefinition(KIND + ":" + s.id() + ":" + op.operationId(), KIND,
                         McpToolAdapter.functionName("o", s.id(), op.operationId()), op.operationId(), s.id(), s.name(),
                         op.description(), op.inputSchema(), risks.get(op.operationId()), approved.contains(op.operationId()),
-                        fingerprint(s, op), s.internal()));
+                        fingerprint(s, op, access), s.internal()));
             }
         }
         return out;
     }
 
+    @Override
+    public List<ConnectionHint> missingConnections(ToolContext context) {
+        List<ConnectionHint> out = new ArrayList<>();
+        if (context == null || context.spaceId() == null) return out;
+        for (Server s : servers(context.spaceId())) {
+            if (!s.personal() || !s.hasClient()) continue;
+            Map<String, ToolRisk> risks = McpToolAdapter.risks(s.toolRisks());
+            boolean usable = McpToolAdapter.approvals(s.enabledTools()).stream().anyMatch(risks::containsKey);
+            if (usable && connection(context, s) == null) out.add(new ConnectionHint(KIND, s.id(), s.name()));
+        }
+        return out;
+    }
+
     /** Server identity, base URL, document URL, access and the exact operation; boundary revision last. */
-    static String fingerprint(Server s, OpenApiDocument.Operation op) {
+    static String fingerprint(Server s, OpenApiDocument.Operation op, String access) {
         String server = McpToolAdapter.sha256(s.id() + "\n" + s.baseUrl() + "\n" + s.specUrl() + "\n" + s.authMode()
                 + "\n" + (s.tokenEnc() == null ? "" : s.tokenEnc()));
-        return server + ":op:" + McpToolAdapter.sha256(OpenApiDocument.canonical(op)) + ":boundary:" + s.revision();
+        return server + ":op:" + McpToolAdapter.sha256(OpenApiDocument.canonical(op)) + access + ":boundary:" + s.revision();
     }
 
     @Override
@@ -98,11 +146,18 @@ public class OpenApiToolAdapter implements ToolAdapter {
         if (server == null) throw new ToolNotStartedException("Der Werkzeugserver ist nicht mehr aktiv.");
         OpenApiDocument.Operation op = OpenApiDocument.fromJson(server.operationsJson()).stream()
                 .filter(o -> tool.toolName().equals(o.operationId()) && o.problem() == null).findFirst().orElse(null);
-        if (op == null || !fingerprint(server, op).equals(tool.fingerprint())) {
+        var connection = server.personal() ? connection(context, server) : null;
+        if (server.personal() && connection == null) {
+            throw new ToolNotStartedException(com.keplura.server.oauth.OAuthConnectionService.MISSING);
+        }
+        String access = connection == null ? "" : com.keplura.server.oauth.OAuthConnectionService.fingerprintPart(connection);
+        if (op == null || !fingerprint(server, op, access).equals(tool.fingerprint())) {
             throw new ToolNotStartedException("Das Verbindungsziel hat sich geändert. Das Werkzeug wurde nicht aufgerufen.");
         }
         String url = url(server.baseUrl(), op, arguments);
-        String token = bearer(server);
+        String token = connection != null
+                ? oauth.accessToken(context.userId(), context.orgId(), KIND, server.id(), connection.id())
+                : bearer(server);
         String body = op.hasBody() && arguments != null && arguments.has("body") ? arguments.get("body").toString() : null;
         OpenApiClient.Response response;
         try {

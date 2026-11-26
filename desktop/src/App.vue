@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onBeforeUnmount, ref, watch } from "vue";
+import { computed, nextTick, onMounted, onBeforeUnmount, provide, ref, watch } from "vue";
 import LoginView from "./components/LoginView.vue";
 import AccessShell from "./components/layout/AccessShell.vue";
 import KnowledgeView from "./components/KnowledgeView.vue";
 import TeamView from "./components/TeamView.vue";
+import ConnectionsView from "./components/ConnectionsView.vue";
 import ChatView from "./components/ChatView.vue";
 import ChangePasswordView from "./components/ChangePasswordView.vue";
 import OnboardingView from "./components/OnboardingView.vue";
@@ -11,7 +12,7 @@ import AdminPanel from "./components/AdminPanel.vue";
 import AppSidebar from "./components/AppSidebar.vue";
 import CommandPalette from "./components/CommandPalette.vue";
 import AppIcon from "./components/ui/AppIcon.vue";
-import type { AppView } from "./navigation";
+import { NAVIGATE_KEY, type AppView } from "./navigation";
 import { useAuthStore } from "./auth-store";
 import { useThemeStore } from "./theme-store";
 import { initFullscreenState, toggleFullscreen, useFullscreen } from "./fullscreen";
@@ -48,11 +49,12 @@ const menuOpen = ref(false);
 const menuPanel = ref<HTMLElement | null>(null);
 const menuButton = ref<HTMLButtonElement | null>(null);
 const menuMedia = window.matchMedia("(max-width: 760px)");
-const viewTitle = computed(() => ({chat:tr("Chat"),wissen:tr("Wissen"),team:tr("Team"),admin:tr("Administration")})[activeView.value]);
+const viewTitle = computed(() => ({chat:tr("Chat"),wissen:tr("Wissen"),team:tr("Team"),admin:tr("Administration"),verbindungen:tr("Persönliche Verbindungen")})[activeView.value]);
 function resizeMenu() { mobile.value = menuMedia.matches; if (!mobile.value) menuOpen.value = false; }
 async function closeMenu() { menuOpen.value = false; await nextTick(); menuButton.value?.focus(); }
 async function openMenu() { menuOpen.value = true; await nextTick(); menuPanel.value?.querySelector<HTMLElement>("button")?.focus(); }
 function navigate(view: ActiveView) { activeView.value = view; if (mobile.value) void closeMenu(); }
+provide(NAVIGATE_KEY, navigate);
 function menuKeys(event: KeyboardEvent) {
   if (!mobile.value || !menuOpen.value) return;
   // Portal menus own Escape first; their selection remains a normal UI action.
@@ -236,6 +238,7 @@ const mustChangePassword = computed(() => auth.user?.mustChangePassword === true
       />
       <ChatView v-else-if="activeView === 'chat'" />
       <TeamView v-else-if="activeView === 'team'" />
+      <ConnectionsView v-else-if="activeView === 'verbindungen'" />
       <KnowledgeView v-else />
     </template>
     <LoginView v-else :status="status" @retry="checkServer" />

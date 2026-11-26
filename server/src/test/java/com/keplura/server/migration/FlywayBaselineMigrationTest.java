@@ -81,7 +81,8 @@ class FlywayBaselineMigrationTest {
         // V33 (TU-05b) adds the chat model tool policy (tool_use with default, nullable default kinds).
         // V34 (TU-05c) stores which tools of a sealed question catalog tool_search made visible.
         // V35 (TU-06a) adds the OpenAPI tool server tables (own tables, MCP tables unchanged).
-        assertThat(result.migrationsExecuted).isEqualTo(34);
+        // V36 (TU-06b) adds OAuth client configuration, personal connections and authorization flows.
+        assertThat(result.migrationsExecuted).isEqualTo(35);
 
         JdbcTemplate jdbc = new JdbcTemplate(ds);
         assertThat(jdbc.queryForList("SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name <> 'flyway_schema_history'", String.class))
@@ -96,7 +97,8 @@ class FlywayBaselineMigrationTest {
                         "chat_conversation_kb", "chat_attachment", "web_search_settings", "mcp_server",
                         "mcp_server_space", "mcp_call_log", "tool_call_log", "tool_call", "tool_call_stop",
                         "tool_question", "tool_execution_guard", "org_tool_setting", "mcp_org_boundary", "tool_admin_event",
-                        "openapi_server", "openapi_server_space", "openapi_org_boundary");
+                        "openapi_server", "openapi_server_space", "openapi_org_boundary",
+                        "tool_oauth_client", "tool_oauth_connection", "tool_oauth_flow");
         assertThat(jdbc.queryForObject(
                 "SELECT count(*) FROM information_schema.columns WHERE table_name='chat_message' AND column_name='prompt_message_id' AND is_nullable='YES'",
                 Long.class)).isEqualTo(1L);
@@ -180,7 +182,7 @@ class FlywayBaselineMigrationTest {
         assertThat(jdbc.queryForList(
                 "SELECT version FROM flyway_schema_history WHERE version IS NOT NULL ORDER BY installed_rank",
                 String.class))
-                .containsExactly("1", "2", "3", "4", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35");
+                .containsExactly("1", "2", "3", "4", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36");
         // M4b: both chat tables have identity PKs, the citation blob and status
         // are NOT NULL (an assistant row without an honest end state must be
         // impossible at the schema level), and the list-read index exists.
