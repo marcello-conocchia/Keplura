@@ -222,6 +222,20 @@ class UserQuestionLoopTest {
         assertThat(confirmed.continuationToken()).isNull();
     }
 
+    /** Review finding 1: an open question interrupts everything planned after it in the same model batch. */
+    @Test void nothingRunsAfterAQuestionInTheSameBatch() throws Exception {
+        script = (i, b) -> i == 0
+                ? plan(call(ASK, QUESTION), call("write", "{\"invoice\":\"R-1\"}"), call("search", "{}"))
+                : answer("Welche Rechnung?");
+        run();
+        assertThat(adapter.calls).isEmpty();
+        var cards = execution.cards(1L, 1L, 1L);
+        assertThat(cards.stream().filter(c -> c.status().equals("PENDING")))
+                .singleElement().matches(c -> c.kind().equals(ToolExecutionService.KIND_QUESTION));
+        assertThat(cards.stream().filter(c -> c.tool().equals("write") || c.tool().equals("search")))
+                .hasSize(2).allMatch(c -> c.status().equals("BLOCKED"));
+    }
+
     @Test void aQuestionAloneNeverTurnsAnOrdinaryChatIntoAToolTurn() {
         var only = new ToolExecutionService(jdbc, List.of(new UserQuestionToolAdapter()), new ToolAuditLog(jdbc));
         assertThat(only.openTurn(only.resolveContext(1L, 1L, 1L), 1L).offered()).isEmpty();

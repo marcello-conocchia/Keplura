@@ -151,6 +151,35 @@ class ToolSearchLoopTest {
         assertThat(visible.size()).isEqualTo(ToolExecutionService.TOOL_SEARCH_HITS);
     }
 
+    /** Review finding 2: action tools found by a pure search round stay usable in the next round. */
+    @Test void actionToolsFoundInASearchOnlyRoundCanStillBePlanned() throws Exception {
+        manyTools(14, "general helper");
+        adapter.add("pay_invoice", ToolRisk.CRITICAL, "Pays an invoice", true);
+        adapter.add("archive_invoice", ToolRisk.WRITE, "Archives an invoice", true);
+        script = (i, b) -> switch (i) {
+            case 0 -> plan(call(ToolExecutionService.TOOL_SEARCH, "{\"query\":\"invoice\"}"));
+            case 1 -> plan(call("archive_invoice", "{}"), call("pay_invoice", "{}"));
+            default -> answer("Zahlung wartet auf Bestätigung.");
+        };
+        run();
+        assertThat(toolNames(requests.get(1))).contains("archive_invoice", "pay_invoice");
+        assertThat(adapter.calls).containsExactly("archive_invoice"); // approved WRITE runs as in a first round
+        assertThat(execution.cards(1L, 1L, 1L)).anyMatch(c -> c.tool().equals("pay_invoice") && c.status().equals("PENDING"));
+    }
+
+    @Test void afterAnActingRoundFoundActionToolsStayBlocked() throws Exception {
+        manyTools(14, "general helper");
+        adapter.add("archive_invoice", ToolRisk.WRITE, "Archives an invoice", true);
+        script = (i, b) -> switch (i) {
+            case 0 -> plan(call(ToolExecutionService.TOOL_SEARCH, "{\"query\":\"invoice\"}"), call("tool_3", "{}"));
+            case 1 -> plan(call("archive_invoice", "{}"));
+            default -> answer("done");
+        };
+        run();
+        assertThat(adapter.calls).doesNotContain("archive_invoice");
+        assertThat(execution.cards(1L, 1L, 1L)).anyMatch(c -> c.tool().equals("archive_invoice") && c.status().equals("BLOCKED"));
+    }
+
     @Test void revealedToolsStayVisibleInTheConfirmedContinuation() throws Exception {
         manyTools(14, "general helper");
         adapter.add("pay_invoice", ToolRisk.CRITICAL, "Pays an invoice", true);

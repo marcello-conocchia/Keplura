@@ -1113,6 +1113,11 @@ public class ToolExecutionService {
         private boolean dependentProposed;
         /** TU-05d: at most one question per question turn, none in continuations, none next to a confirmation. */
         private boolean askPending;
+        /**
+         * TU-05c: true while every call so far was {@link #TOOL_SEARCH}. Search results are tool metadata (already part
+         * of the sealed, admin-approved catalog), so a pure search round does not end the planning phase.
+         */
+        private boolean onlySearched = true;
         private boolean questionsBlocked;
         /** TU-05c: null = every offered tool is visible; otherwise only these (plus {@link #TOOL_SEARCH}). */
         private java.util.LinkedHashSet<String> visible;
@@ -1232,7 +1237,8 @@ public class ToolExecutionService {
         /** Round policy belongs to the service: every round after the first is READ-only. */
         public boolean beginRound() {
             if (!active() || modelRequests >= 5) return false;
-            if (modelRequests > 0) readOnly = true;
+            // Every round after the first ACTING round is READ-only; a round that only searched tools does not count.
+            if (modelRequests > 0 && !onlySearched) readOnly = true;
             if (persisted && !questions.model(promptMessageId)) return false;
             modelRequests++;
             return true;
@@ -1329,7 +1335,13 @@ public class ToolExecutionService {
             if (++attempts > MAX_CALLS_PER_TURN || (persisted && !questions.attempt(promptMessageId))) {
                 return blocked("Die Höchstzahl von acht Werkzeug-Aufrufen je Antwort ist erreicht.", t, null);
             }
+            // TU-05d: an open question interrupts the question turn; nothing else runs until the person answers.
+            if (askPending) {
+                return blocked("Die Rückfrage wartet auf die Antwort der Person. Bis dahin wird nichts weiter ausgeführt "
+                        + "oder gesucht. Dieser Aufruf wurde nicht ausgeführt.", t, null);
+            }
             if (searching) return search(rawArguments);
+            onlySearched = false;
             if (t == null) return blocked("Unbekanntes oder nicht freigegebenes Werkzeug.", null, null);
             if (visible != null && !visible.contains(functionName)) {
                 return blocked("Dieses Werkzeug ist noch nicht freigeschaltet. Suche es zuerst mit „" + TOOL_SEARCH + "“. "
