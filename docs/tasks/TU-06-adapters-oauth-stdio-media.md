@@ -41,7 +41,7 @@ Neue Anbindungen laufen über den vorhandenen kontrollierten Weg von `ToolExecut
 ### TU-06c Isolierter MCP-stdio-Adapter
 
 - stdio-MCP-Server laufen **nie im Keplura-Serverprozess und werden nie über die Web-Oberfläche als Befehl eingetragen**. Das wäre eine Befehlsausführung aus der Weboberfläche.
-- **Gesetzter Standard (PO-Bestätigung offen, siehe unten):** eine eigene **Bridge** im Server-Jar (`--mcp-stdio-bridge`), die in einem **eigenen Container** des Deployments läuft:
+- **PO-Entscheidung 26.11.2026 (Chat: „Bridge im Container“):** eine eigene **Bridge** im Server-Jar (`--mcp-stdio-bridge`), die in einem **eigenen Container** des Deployments läuft:
   - Der Betreiber deklariert die stdio-Server ausschließlich in einer Konfigurationsdatei des Deployments (Befehl als Argumentliste, keine Shell, feste Umgebungsvariablen, Arbeitsverzeichnis).
   - Die Bridge startet je Server einen Prozess und stellt ihn als **Streamable HTTP** im internen Netz bereit.
   - Isolation: eigener Nicht-root-Benutzer, nur lesbares Dateisystem bis auf ein Arbeitsverzeichnis, kein ausgehendes Netz außer ausdrücklich freigegebenen Zielen, CPU-/Speicher-/Prozesslimits über den Container, Zeitlimit je Aufruf, begrenzte Ausgabe, Neustart nach Absturz, Umgebung ohne Keplura-Geheimnisse.
@@ -88,9 +88,9 @@ Neue Anbindungen laufen über den vorhandenen kontrollierten Weg von `ToolExecut
 - Desktop: Typprüfung und Übersetzungsprüfung im vorhandenen Build.
 - Volle CI einmal am Ende. Keine Browser- oder Feldtests ohne PO-Auftrag.
 
-## Offene PO-Bestätigung
+## PO-Entscheidungen
 
-**stdio-Isolation (TU-06c).** Der gesetzte Standard ist eine Bridge im eigenen Container, betrieben vom Betreiber über das Deployment. Die Alternative wäre, dass der Keplura-Server die Prozesse selbst in einer Sandbox (z. B. bubblewrap) startet. Das bräuchte ein zusätzliches Systemwerkzeug auf dem Host und würde die Regel „keine Prozessstarts im Serverprozess“ aufweichen. Bis zur Bestätigung gilt der Standard.
+- **26.11.2026, stdio-Isolation (TU-06c):** „Bridge im Container“. stdio-Server laufen in einer eigenen Bridge im separaten Container, deklariert vom Betreiber im Deployment und angebunden über den vorhandenen MCP-HTTP-Adapter. Verworfen wurde die Alternative, Prozesse aus dem Keplura-Server in einer Sandbox (z. B. bubblewrap) zu starten. Die Regel „keine Prozessstarts im Serverprozess“ bleibt damit unverändert.
 
 ## Workspace
 
