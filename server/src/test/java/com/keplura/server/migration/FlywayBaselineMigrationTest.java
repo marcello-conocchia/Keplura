@@ -78,7 +78,9 @@ class FlywayBaselineMigrationTest {
         // V28 binds a single dependent proposal to its first confirmed action.
         // V29 knowledge tool/provenance, V30 (TU-04c) marks private arguments, V31 (TU-04d) web search switch — all additive.
         // V32 (TU-05a) adds the nullable chat selection and its confirmation cutoff.
-        assertThat(result.migrationsExecuted).isEqualTo(31);
+        // V33 (TU-05b) adds the chat model tool policy (tool_use with default, nullable default kinds).
+        // V34 (TU-05c) stores which tools of a sealed question catalog tool_search made visible.
+        assertThat(result.migrationsExecuted).isEqualTo(33);
 
         JdbcTemplate jdbc = new JdbcTemplate(ds);
         assertThat(jdbc.queryForList("SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name <> 'flyway_schema_history'", String.class))
@@ -107,6 +109,15 @@ class FlywayBaselineMigrationTest {
                 Long.class)).isEqualTo(1L);
         assertThat(jdbc.queryForObject(
                 "SELECT count(*) FROM information_schema.columns WHERE table_name='chat_conversation' AND column_name='tool_selection_cutoff' AND is_nullable='NO'",
+                Long.class)).isEqualTo(1L);
+        assertThat(jdbc.queryForObject(
+                "SELECT count(*) FROM information_schema.columns WHERE table_name='ai_model' AND column_name='tool_use' AND is_nullable='NO'",
+                Long.class)).isEqualTo(1L);
+        assertThat(jdbc.queryForObject(
+                "SELECT count(*) FROM information_schema.columns WHERE table_name='ai_model' AND column_name='tool_defaults_json' AND is_nullable='YES'",
+                Long.class)).isEqualTo(1L);
+        assertThat(jdbc.queryForObject(
+                "SELECT count(*) FROM information_schema.columns WHERE table_name='tool_question' AND column_name='visible_tools_json' AND is_nullable='YES'",
                 Long.class)).isEqualTo(1L);
         // V4 must stay vendor-free on this leg: no pgvector twin table on H2
         assertThat(jdbc.queryForList("SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name = 'kb_chunk_embedding'", String.class))
@@ -167,7 +178,7 @@ class FlywayBaselineMigrationTest {
         assertThat(jdbc.queryForList(
                 "SELECT version FROM flyway_schema_history WHERE version IS NOT NULL ORDER BY installed_rank",
                 String.class))
-                .containsExactly("1", "2", "3", "4", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32");
+                .containsExactly("1", "2", "3", "4", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34");
         // M4b: both chat tables have identity PKs, the citation blob and status
         // are NOT NULL (an assistant row without an honest end state must be
         // impossible at the schema level), and the list-read index exists.

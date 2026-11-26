@@ -632,6 +632,8 @@ export type ToolCallDecisionOutcome =
   | { kind: "conflict"; card: ToolCallCard }
   | { kind: "gone" }
   | { kind: "expired" }
+  /** TU-05d: the answer does not fit the question; nothing was consumed. */
+  | { kind: "invalid" }
   | { kind: "error" };
 
 /**
@@ -644,6 +646,8 @@ export async function decideToolCall(
   conversationId: number,
   callId: string,
   decision: "confirm" | "reject",
+  /** TU-05d: only for a question card together with "confirm"; the server checks it against the options. */
+  answer?: string,
 ): Promise<ToolCallDecisionOutcome> {
   let response: Response;
   try {
@@ -652,7 +656,7 @@ export async function decideToolCall(
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ decision }),
+        body: JSON.stringify(answer === undefined ? { decision } : { decision, answer }),
         signal: AbortSignal.timeout(120000),
       },
     );
@@ -661,6 +665,7 @@ export async function decideToolCall(
   }
   if (response.status === 401) return { kind: "expired" };
   if (response.status === 404) return { kind: "gone" };
+  if (response.status === 400 && answer !== undefined) return { kind: "invalid" };
   if (response.status === 200 || response.status === 409) {
     try {
       const { continuationToken, ...card } = (await response.json()) as ToolCallCard & { continuationToken?: string };

@@ -234,6 +234,52 @@ class AdminApiIntegrationTest {
         assertThat((Object) JsonPath.read(offer.getBody(), "$.available")).isEqualTo(false);
     }
 
+    // ---- TU-05b model tool policy -------------------------------------------
+
+    private ResponseEntity<String> putTools(Long id, String body, String cookies, String csrf) {
+        return rest.exchange(RequestEntity.put(URI.create("/api/v1/admin/models/" + id + "/tools"))
+                .header(HttpHeaders.COOKIE, cookies).header("X-CSRF-Token", csrf)
+                .contentType(MediaType.APPLICATION_JSON).body(body), String.class);
+    }
+
+    @Test
+    void modelToolPolicyIsAdminOnlyValidatedAndRoundTrips() {
+        Long providerId = ((Number) (Object) JsonPath.read(rest.exchange(adminPost("/api/v1/admin/providers",
+                "{\"name\":\"P\",\"providerType\":\"api\",\"baseUrl\":\"https://api.example.com/v1\"}",
+                adminCookies, adminCsrf), String.class).getBody(), "$.id")).longValue();
+        Long chat = createModel(providerId, "C", "CHAT");
+        ResponseEntity<String> embeddingCreated = rest.exchange(adminPost("/api/v1/admin/models",
+                "{\"providerId\":" + providerId + ",\"name\":\"E\",\"technicalModelId\":\"e\","
+                        + "\"modelType\":\"EMBEDDING\",\"embeddingDim\":384}", adminCookies, adminCsrf), String.class);
+        assertThat(embeddingCreated.getStatusCode().value()).isEqualTo(200);
+        Long embedding = ((Number) (Object) JsonPath.read(embeddingCreated.getBody(), "$.id")).longValue();
+
+        ResponseEntity<String> created = adminGet("/api/v1/admin/models", adminCookies);
+        assertThat(created.getBody()).contains("\"toolUse\":\"AUTO\"").contains("\"toolDefaults\":null");
+
+        ResponseEntity<String> saved = putTools(chat, "{\"toolUse\":\"AUTO\",\"toolDefaults\":[\"web\",\"knowledge\"]}",
+                adminCookies, adminCsrf);
+        assertThat(saved.getStatusCode().value()).isEqualTo(200);
+        assertThat((Object) JsonPath.read(saved.getBody(), "$.toolDefaults")).asString().contains("knowledge", "web");
+        assertThat(models.findById(chat).orElseThrow().getToolDefaultsJson()).isEqualTo("[\"knowledge\",\"web\"]");
+
+        ResponseEntity<String> off = putTools(chat, "{\"toolUse\":\"OFF\",\"toolDefaults\":null}", adminCookies, adminCsrf);
+        assertThat((Object) JsonPath.read(off.getBody(), "$.toolUse")).isEqualTo("OFF");
+        assertThat(models.findById(chat).orElseThrow().getToolDefaultsJson()).isNull();
+
+        for (String invalid : new String[]{"{\"toolUse\":\"ON\"}", "{\"toolDefaults\":[]}",
+                "{\"toolUse\":\"AUTO\",\"toolDefaults\":[\"shell\"]}",
+                "{\"toolUse\":\"AUTO\",\"toolDefaults\":[\"web\",\"web\"]}",
+                "{\"toolUse\":\"AUTO\",\"toolDefaults\":[null]}"}) {
+            ResponseEntity<String> rejected = putTools(chat, invalid, adminCookies, adminCsrf);
+            assertThat(rejected.getStatusCode().value()).as(invalid).isEqualTo(400);
+        }
+        assertThat(putTools(embedding, "{\"toolUse\":\"OFF\"}", adminCookies, adminCsrf).getStatusCode().value()).isEqualTo(400);
+        assertThat(putTools(chat, "{\"toolUse\":\"AUTO\"}", userCookies, userCsrf).getStatusCode().value()).isEqualTo(403);
+        assertThat(putTools(chat, "{\"toolUse\":\"AUTO\"}", adminCookies, "wrong").getStatusCode().value()).isEqualTo(403);
+        assertThat(models.findById(chat).orElseThrow().getToolUse()).isEqualTo("OFF");
+    }
+
     private Long createModel(Long providerId, String name, String type) {
         ResponseEntity<String> response = rest.exchange(adminPost("/api/v1/admin/models",
                 "{\"providerId\":" + providerId + ",\"name\":\"" + name + "\","

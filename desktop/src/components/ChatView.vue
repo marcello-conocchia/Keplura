@@ -87,7 +87,7 @@ function cardsAt(index: number): ToolCallCardDto[] {
   return prompt == null ? [] : cardsByPrompt.value.get(prompt) ?? [];
 }
 /** One decision at a time; the server consumes the pending call exactly once anyway. */
-async function decideCard(card: ToolCallCardDto, decision: "confirm" | "reject") {
+async function decideCard(card: ToolCallCardDto, decision: "confirm" | "reject", answer?: string) {
   if (decidingCard.value !== null || streaming.value || toolSelectionSaving.value) return;
   const s = scoped();
   const conversationId = activeId.value;
@@ -95,7 +95,7 @@ async function decideCard(card: ToolCallCardDto, decision: "confirm" | "reject")
   decidingCard.value = card.id;
   cardError.value = null;
   try {
-    const outcome = await decideToolCall(s.orgId, conversationId, card.id, decision);
+    const outcome = await decideToolCall(s.orgId, conversationId, card.id, decision, answer);
     if (activeId.value !== conversationId) return;
     if (outcome.kind === "ok" || outcome.kind === "conflict") {
       toolCalls.value = replaceCard(toolCalls.value, outcome.card);
@@ -129,6 +129,8 @@ async function decideCard(card: ToolCallCardDto, decision: "confirm" | "reject")
       }
     } else if (outcome.kind === "expired") {
       auth.dropExpiredSession();
+    } else if (outcome.kind === "invalid") {
+      cardError.value = { id: card.id, message: tr("Diese Antwort passt nicht zur Rückfrage.") };
     } else {
       // Unknown outcome: never retry automatically — re-read what the server knows.
       cardError.value = { id: card.id, message: tr("Die Entscheidung konnte nicht bestätigt werden. Der Stand wird neu geladen.") };
@@ -1100,7 +1102,7 @@ onUnmounted(() => {
                 :card="c"
                 :busy="decidingCard === c.id || toolSelectionSaving"
                 :error="cardError?.id === c.id ? cardError.message : null"
-                @decide="(d) => decideCard(c, d)"
+                @decide="(d, answer) => decideCard(c, d, answer)"
               />
             </div>
           </template>

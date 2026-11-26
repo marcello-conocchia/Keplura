@@ -4,7 +4,7 @@
  * honest status and the result (foreign content, plain text) or a generic error. A pending
  * action shows Confirm / Reject; the server binds and executes exactly the shown call.
  */
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import Button from "../ui/Button.vue";
 import StatusPill from "../ui/StatusPill.vue";
 import { tr, serverText, dateLocale } from "../../i18n";
@@ -13,7 +13,7 @@ import {
 } from "../../tool-cards";
 
 const props = defineProps<{ card: ToolCallCard; busy: boolean; error?: string | null }>();
-const emit = defineEmits<{ decide: [decision: "confirm" | "reject"] }>();
+const emit = defineEmits<{ decide: [decision: "confirm" | "reject", answer?: string] }>();
 
 const meta = computed(() => statusMeta(props.card.status));
 const args = computed(() => argumentEntries(props.card.argumentFields));
@@ -21,6 +21,14 @@ const hidden = computed(() => hiddenArgumentCount(props.card.argumentFields));
 const partial = computed(() => summaryIsPartial(props.card.argumentFields));
 const decidable = computed(() => canDecide(props.card));
 const headingId = computed(() => `tool-call-${props.card.id}`);
+/** TU-05d: a question to the person is answered, not executed. */
+const isQuestion = computed(() => props.card.kind === "QUESTION");
+const freeAnswer = ref("");
+const MAX_ANSWER = 1000;
+function sendFree() {
+  const text = freeAnswer.value.trim();
+  if (text && text.length <= MAX_ANSWER) emit("decide", "confirm", text);
+}
 const deadline = computed(() =>
   props.card.expiresAt ? new Date(props.card.expiresAt).toLocaleTimeString(dateLocale(), { hour: "2-digit", minute: "2-digit" }) : "");
 </script>
@@ -35,16 +43,45 @@ const deadline = computed(() =>
   >
     <header class="tool-card-head">
       <h4 :id="headingId" class="tool-card-title">
-        <span class="tool-card-kicker">{{ $t("Werkzeug") }}</span>
-        <code>{{ card.tool }}</code>
-        <span class="tool-card-source">· {{ card.source }}</span>
+        <span class="tool-card-kicker">{{ isQuestion ? $t("Rückfrage") : $t("Werkzeug") }}</span>
+        <code v-if="!isQuestion">{{ card.tool }}</code>
+        <span v-if="!isQuestion" class="tool-card-source">· {{ card.source }}</span>
       </h4>
-      <span class="tool-card-pills">
+      <span v-if="isQuestion" class="tool-card-pills">
+        <StatusPill :tone="meta.tone" data-testid="chat-tool-call-status">{{ card.status === "SUCCEEDED" ? $t("Beantwortet") : card.status === "REJECTED" ? $t("Nicht beantwortet") : $t(meta.label) }}</StatusPill>
+      </span>
+      <span v-else class="tool-card-pills">
         <StatusPill :tone="card.risk === 'CRITICAL' ? 'error' : card.risk === 'WRITE' ? 'wait' : 'neutral'" data-testid="chat-tool-call-risk">{{ $t(riskLabel(card.risk)) }}</StatusPill>
         <StatusPill :tone="meta.tone" data-testid="chat-tool-call-status">{{ $t(meta.label) }}</StatusPill>
       </span>
     </header>
 
+    <template v-if="isQuestion">
+      <p v-if="card.question" class="tool-card-question" data-testid="chat-tool-question">{{ card.question.text }}</p>
+      <p v-else class="tool-card-note">{{ $t("Die Rückfrage wird nicht mehr angezeigt.") }}</p>
+      <div v-if="decidable && card.question" class="tool-card-confirm" role="group" :aria-label="$t('Rückfrage beantworten')">
+        <div v-if="card.question.options.length" class="tool-card-actions">
+          <Button v-for="(option, i) in card.question.options" :key="i" size="compact" :busy="busy" :disabled="busy"
+            :data-testid="`chat-tool-question-option-${i}`" @click="emit('decide', 'confirm', option)">{{ option }}</Button>
+        </div>
+        <form v-if="card.question.freeText" class="tool-card-free" @submit.prevent="sendFree">
+          <textarea v-model="freeAnswer" class="ic-native-control" rows="2" :maxlength="MAX_ANSWER" :disabled="busy"
+            :aria-label="$t('Eigene Antwort')" :placeholder="$t('Eigene Antwort')" data-testid="chat-tool-question-free"></textarea>
+          <Button size="compact" type="submit" :busy="busy" :disabled="busy || !freeAnswer.trim()" data-testid="chat-tool-question-send">{{ $t("Antwort senden") }}</Button>
+        </form>
+        <div class="tool-card-actions">
+          <Button variant="ghost" size="compact" :disabled="busy" data-testid="chat-tool-question-skip" @click="emit('decide', 'reject')">{{ $t("Nicht beantworten") }}</Button>
+        </div>
+        <p class="tool-card-note">{{ $t("Die Antwort setzt die Frage fort, bis {0}.", deadline) }}</p>
+      </div>
+      <div v-if="card.status === 'SUCCEEDED' && card.result" class="tool-card-result">
+        <p class="tool-card-kicker">{{ $t("Deine Antwort") }}</p>
+        <pre data-testid="chat-tool-question-answer">{{ card.result }}</pre>
+      </div>
+      <p v-if="error" class="tool-card-alert" role="alert">{{ error }}</p>
+      <p v-if="card.error" class="tool-card-note" data-testid="chat-tool-call-error">{{ serverText(card.error) }}</p>
+    </template>
+    <template v-else>
     <p v-if="card.mayContainInternal" class="tool-card-note" data-testid="chat-tool-call-disclosure">{{ $t("Enthält möglicherweise interne Inhalte.") }}</p>
 
     <p v-if="card.parentCallId" class="tool-card-note" data-testid="chat-tool-call-parent">
@@ -91,6 +128,7 @@ const deadline = computed(() =>
       <p class="tool-card-kicker">{{ $t("Ergebnis (Fremdinhalt)") }}</p>
       <pre data-testid="chat-tool-call-result">{{ card.result }}</pre>
     </div>
+    </template>
   </section>
 </template>
 
@@ -113,5 +151,8 @@ const deadline = computed(() =>
 .tool-card-full pre { margin: 4px 0 0; max-height: 20rem; overflow: auto; padding: 8px 10px; border-radius: var(--ic-radius-small); background: var(--ic-surface-subtle); color: var(--ic-text); font: 400 12px/18px var(--ic-font-mono); white-space: pre-wrap; overflow-wrap: anywhere; }
 .tool-card-full summary { cursor: pointer; }
 .tool-card-result pre { margin: 4px 0 0; max-height: 16rem; overflow: auto; padding: 8px 10px; border-radius: var(--ic-radius-small); background: var(--ic-surface-subtle); color: var(--ic-text); font: 400 12px/18px var(--ic-font-mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+.tool-card-question { margin: 0; color: var(--ic-text); font: 500 14px/20px var(--ic-font); white-space: pre-wrap; overflow-wrap: anywhere; }
+.tool-card-free { display: grid; gap: 6px; }
+.tool-card-free textarea { width: 100%; resize: vertical; font: 400 13px/20px var(--ic-font); }
 @media (max-width: 500px) { .tool-card-args { grid-template-columns: minmax(0, 1fr); } }
 </style>

@@ -30,8 +30,16 @@ public class AdminModelService {
     public record ModelDto(Long id, Long providerId, String providerName, String name,
                            String technicalModelId, String modelType,
                            Integer embeddingDim, Integer maxOutputTokens, BigDecimal temperature,
-                           boolean enabled, boolean isDefault, String createdAt, String updatedAt) {
+                           boolean enabled, boolean isDefault, String createdAt, String updatedAt,
+                           String toolUse, List<String> toolDefaults) {
     }
+
+    /** TU-05b: full replace. {@code toolDefaults} null = every approved tool kind. */
+    public record ModelToolsRequest(String toolUse, List<String> toolDefaults) {
+    }
+
+    /** Tool kinds a chat model may default to (adapter kinds of the central tool service). */
+    public static final List<String> TOOL_KINDS = List.of("knowledge", "attachments", "web", "mcp", "ask");
 
     public record ModelCreateRequest(Long providerId, String name, String technicalModelId,
                                      String modelType, Integer embeddingDim,
@@ -100,6 +108,49 @@ public class AdminModelService {
         models.saveAndFlush(model);
         log.info("admin updated model id={} enabled={}", model.getId(), model.isEnabled());
         return toDto(model);
+    }
+
+    /**
+     * TU-05b: whether this chat model gets tools at all and which tool kinds it offers by default.
+     * A narrowing only: approvals, chat selection and per-question conditions still apply.
+     */
+    @Transactional
+    public ModelDto updateTools(Long id, ModelToolsRequest req) {
+        AiModel model = requireModel(id);
+        if (!AiModel.TYPE_CHAT.equals(model.getModelType())) {
+            throw AdminException.invalid("tool settings only apply to CHAT models");
+        }
+        if (req == null || req.toolUse() == null
+                || !(AiModel.TOOL_USE_AUTO.equals(req.toolUse()) || AiModel.TOOL_USE_OFF.equals(req.toolUse()))) {
+            throw AdminException.invalid("toolUse must be AUTO or OFF");
+        }
+        String json = null;
+        if (req.toolDefaults() != null) {
+            var kinds = new java.util.TreeSet<String>();
+            for (String kind : req.toolDefaults()) {
+                if (kind == null || !TOOL_KINDS.contains(kind) || !kinds.add(kind)) {
+                    throw AdminException.invalid("toolDefaults must list distinct kinds of " + TOOL_KINDS);
+                }
+            }
+            json = TOOL_JSON.writeValueAsString(List.copyOf(kinds));
+        }
+        model.applyToolPolicy(req.toolUse(), json);
+        models.saveAndFlush(model);
+        log.info("admin updated model tool policy id={} toolUse={}", model.getId(), req.toolUse());
+        return toDto(model);
+    }
+
+    private static final tools.jackson.databind.json.JsonMapper TOOL_JSON = tools.jackson.databind.json.JsonMapper.builder().build();
+
+    private static List<String> toolDefaults(String json) {
+        if (json == null) return null;
+        try {
+            var out = new java.util.ArrayList<String>();
+            for (var node : TOOL_JSON.readTree(json)) out.add(node.asString());
+            return List.copyOf(out);
+        } catch (RuntimeException e) {
+            return List.of(); // unreadable = nothing by default; the tool service fails closed as well
+        }
     }
 
     /**
@@ -177,6 +228,7 @@ public class AdminModelService {
         return new ModelDto(m.getId(), m.getProviderId(), providerName, m.getName(),
                 m.getTechnicalModelId(), m.getModelType(), m.getEmbeddingDim(),
                 m.getMaxOutputTokens(), m.getTemperature(), m.isEnabled(), m.isDefault(),
-                m.getCreatedAt().toString(), m.getUpdatedAt().toString());
+                m.getCreatedAt().toString(), m.getUpdatedAt().toString(),
+                m.getToolUse(), toolDefaults(m.getToolDefaultsJson()));
     }
 }

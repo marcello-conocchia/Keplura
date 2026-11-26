@@ -1791,6 +1791,41 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdminErrorResponse"
+  /api/v1/admin/models/{id}/tools:
+    put:
+      operationId: setAdminModelTools
+      summary: Tool use and default tool kinds of a chat model (TU-05b)
+      description: >-
+        Full replace. Applies to CHAT models only. The answering default chat model narrows the
+        tool catalog: OFF offers nothing; default kinds apply while a chat has no own selection.
+        Every execution re-checks the policy.
+      parameters:
+        - $ref: "#/components/parameters/AdminIdPath"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminModelToolsRequest"
+      responses:
+        "200":
+          description: Updated row
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminModel"
+        "400":
+          description: Unknown toolUse, unknown or duplicate kinds, or not a CHAT model
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminErrorResponse"
+        "404":
+          description: No such model
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminErrorResponse"
   /api/v1/admin/models/{id}/default:
     put:
       operationId: setAdminModelDefault
@@ -1971,8 +2006,15 @@ components:
       uniqueItems: true
     ChatToolSelection:
       type: object
-      required: [selectedIds, tools]
+      required: [selectedIds, tools, modelDefaultIds, modelToolsOff]
       properties:
+        modelDefaultIds:
+          type: ["array", "null"]
+          description: TU-05b. Tools the current chat model offers by default; null = every approved tool.
+          items: { type: string }
+        modelToolsOff:
+          type: boolean
+          description: TU-05b. The current chat model never gets tools; a chat selection cannot change that.
         selectedIds:
           $ref: "#/components/schemas/ChatToolSelectionIds"
         tools:
@@ -2108,6 +2150,32 @@ components:
           type: string
         updatedAt:
           type: string
+        toolUse:
+          type: string
+          enum: [AUTO, OFF]
+          description: TU-05b, chat models. OFF never offers tools for this model, not even through a chat selection.
+        toolDefaults:
+          type: ["array", "null"]
+          description: >-
+            TU-05b. null = every approved tool kind; otherwise the tool kinds offered by default
+            while a chat has no own selection. Narrows only, never widens approvals.
+          items:
+            type: string
+            enum: [knowledge, attachments, web, mcp, ask]
+    AdminModelToolsRequest:
+      type: object
+      required: [toolUse]
+      properties:
+        toolUse:
+          type: string
+          enum: [AUTO, OFF]
+        toolDefaults:
+          type: ["array", "null"]
+          description: Full replace. null or omitted = every approved tool kind. Distinct values only.
+          maxItems: 5
+          items:
+            type: string
+            enum: [knowledge, attachments, web, mcp, ask]
     AdminModelCreateRequest:
       type: object
       required: [providerId, name, technicalModelId, modelType]

@@ -118,8 +118,14 @@ public class ChatService {
 
     public com.keplura.server.tool.ToolExecutionService.Decision decideToolCall(Long userId, Long orgId, Long conversationId,
                                                                                String callId, boolean confirm) {
+        return decideToolCall(userId, orgId, conversationId, callId, confirm, null);
+    }
+
+    /** TU-05d: {@code answer} only for a question card; the tool service validates it. */
+    public com.keplura.server.tool.ToolExecutionService.Decision decideToolCall(Long userId, Long orgId, Long conversationId,
+                                                                               String callId, boolean confirm, String answer) {
         if (toolExecution == null) return new com.keplura.server.tool.ToolExecutionService.Decision.NotFound();
-        return toolExecution.decide(userId, orgId, conversationId, callId, confirm);
+        return toolExecution.decide(userId, orgId, conversationId, callId, confirm, answer);
     }
 
     /** TU-03a: bounded READ followups; the action planner sees only the current instruction. */
