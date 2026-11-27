@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,16 +16,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.net.URI;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Persönliche Verbindungen (TU-06b). {@code /api/v1/orgs/{orgId}/connections/**} läuft hinter Session + CSRF; die
  * Person muss Mitglied der Organisation sein. Die Anmeldung läuft wie der OIDC-Login (ADR-0009) im App-Fenster selbst:
  * Der Callback {@value OAuthConnectionService#CALLBACK_PATH} ist ohne API-Sitzung erreichbar (Navigations-Cookies der
  * Webview), nimmt nur den Code einer offenen, frischen Anmeldung an, spiegelt nie Parameter zurück und leitet mit
- * einem Einmal-Code im Fragment auf die FESTE App-Adresse zurück. Abgeschlossen wird erst, wenn die startende Sitzung
+ * einem Einmal-Code im Fragment auf die beim Start gewählte App-Adresse zurück. Abgeschlossen wird erst, wenn die startende Sitzung
  * diesen Code vorlegt ({@code POST .../connections/complete}). Ein weitergegebener Anmeldelink nützt damit niemandem.
  */
 @RestController
@@ -96,13 +97,15 @@ public class OAuthConnectionController {
 
     @PostMapping("/api/v1/orgs/{orgId}/connections/{kind}/{serverId}/start")
     public ResponseEntity<?> start(@PathVariable("orgId") long orgId, @PathVariable("kind") String kind,
-                                   @PathVariable("serverId") long serverId, HttpServletRequest request) {
+                                   @PathVariable("serverId") long serverId,
+                                   @RequestParam(name = "desktop", defaultValue = "false") boolean desktop,
+                                   HttpServletRequest request) {
         long user = member(orgId, request);
         var target = available(orgId).stream().filter(a -> a.kind().equals(kind) && a.id() == serverId).findFirst();
         if (target.isEmpty()) return ResponseEntity.notFound().build();
         try {
             var started = oauth.start(user, orgId, kind, serverId, request.getSession(false).getId(), callbackUri(request),
-                    kind.equals("mcp") ? target.get().target() : null);
+                    appRedirectUri(desktop, request), kind.equals("mcp") ? target.get().target() : null);
             oauth.sweepFlows();
             return ResponseEntity.ok(new StartView(started.flowId(), started.authorizationUrl()));
         } catch (OAuthConnectionService.OAuthException e) {
@@ -127,8 +130,7 @@ public class OAuthConnectionController {
                                                  HttpServletRequest request) {
         long user = member(orgId, request);
         if (in == null || in.handoff() == null) return ResponseEntity.notFound().build();
-        return oauth.complete(user, request.getSession(false).getId(), in.handoff())
-                .filter(c -> c.orgId() == orgId)
+        return oauth.complete(user, orgId, request.getSession(false).getId(), in.handoff())
                 .map(c -> ResponseEntity.ok(new CompleteView(c.status().name(), c.kind(), c.serverId())))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -142,8 +144,8 @@ public class OAuthConnectionController {
     }
 
     /**
-     * 302 to the fixed app address with {@code #oauth=<handoff>} (or {@code #oauth-error}); no parameter is reflected,
-     * nothing is rendered from the authorization server. Without a configured app address: fixed failure page.
+     * 302 to the app address bound to the flow, with {@code #oauth=<handoff>} or {@code #oauth-error}.
+     * An unknown flow returns to the server's own web UI with an error fragment.
      */
     @GetMapping(OAuthConnectionService.CALLBACK_PATH)
     public ResponseEntity<String> callback(@RequestParam(name = "state", required = false) String state,
@@ -153,27 +155,34 @@ public class OAuthConnectionController {
         HttpSession session = request.getSession(false);
         Object principal = session == null ? null : session.getAttribute(AuthService.SESSION_PRINCIPAL_ATTR);
         Long browserUser = principal instanceof AuthPrincipal p ? p.userId() : null;
-        java.util.Optional<String> handoff;
+        Optional<OAuthConnectionService.CallbackReturn> result;
         try {
-            handoff = oauth.callback(state, code, error, browserUser);
+            result = oauth.callback(state, code, error, browserUser);
         } catch (RuntimeException e) {
-            handoff = java.util.Optional.empty();
+            result = Optional.empty();
         }
+        String target = result.map(OAuthConnectionService.CallbackReturn::appRedirectUri).orElse("/");
+        String fragment = result.map(OAuthConnectionService.CallbackReturn::handoff)
+                .map(handoff -> "#oauth=" + handoff).orElse("#oauth-error");
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(target + fragment))
+                .header("Referrer-Policy", "no-referrer").header("Cache-Control", "no-store").build();
+    }
+
+    private String appRedirectUri(boolean desktop, HttpServletRequest request) {
         var props = oidcProperties.getIfAvailable();
-        if (props != null && props.desktopRedirectUri() != null) {
-            String target = props.desktopRedirectUri() + handoff.map(h -> "#oauth=" + h).orElse("#oauth-error");
-            return ResponseEntity.status(HttpStatus.FOUND).location(java.net.URI.create(target))
-                    .header("Referrer-Policy", "no-referrer").header("Cache-Control", "no-store").build();
+        String configured = props == null ? null : props.desktopRedirectUri();
+        if (desktop) {
+            if (configured == null) throw new OAuthConnectionService.OAuthException("Die App-Rückkehradresse ist nicht eingerichtet.");
+            return configured;
         }
-        String html = "<!doctype html><html lang=\"de\"><head><meta charset=\"utf-8\"><title>Keplura</title></head><body><p>"
-                + "Die Verbindung konnte nicht hergestellt werden. Bitte starte sie in Keplura erneut.</p></body></html>";
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .contentType(new MediaType("text", "html", java.nio.charset.StandardCharsets.UTF_8))
-                .header("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'")
-                .header("X-Content-Type-Options", "nosniff")
-                .header("Referrer-Policy", "no-referrer")
-                .header("Cache-Control", "no-store")
-                .body(html);
+        // The deployed web app shares the callback's origin, including behind TLS termination. A separate dev
+        // frontend may return to the configured address only when the start request came from that exact origin.
+        if (configured != null) {
+            URI app = URI.create(configured);
+            String origin = app.getScheme() + "://" + app.getRawAuthority();
+            if (origin.equals(request.getHeader("Origin"))) return configured;
+        }
+        return "/";
     }
 
     /** Same derivation as the OIDC callback: the fixed public origin wins, never a caller parameter. */

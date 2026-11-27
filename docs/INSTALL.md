@@ -82,6 +82,12 @@ keplura.example.com {
 }
 ```
 
+For personal OAuth tool connections behind a reverse proxy, set
+`KEPLURA_OIDC_PUBLIC_BASE_URL` in `deploy/.env.production` to the public HTTPS
+origin. Register `/api/v1/oauth/connections/callback` on that origin with the
+provider. The browser returns to the web app on the same origin. For a native
+deployment, set `KEPLURA_OIDC_DESKTOP_REDIRECT_URI` to the installed app's origin.
+
 Any reverse proxy works as long as it passes `/api/...` including
 Server-Sent Events (disable response buffering for `/api/v1/orgs/*/chat/...`).
 

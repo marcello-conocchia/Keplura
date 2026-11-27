@@ -166,8 +166,10 @@ public final class PinnedHttp {
                 out.write(payload);
                 out.flush();
                 InputStream in = new BufferedInputStream(connection.getInputStream(), 4096);
-                Header header = readHeaders(in);
-                if (header.status() / 100 != 2) return new Response(header.status(), header.values(), new byte[0], false);
+                Header header = readFinalHeaders(in);
+                if (header.status() / 100 != 2 || header.status() == 204 || header.status() == 205 || method.equals("HEAD")) {
+                    return new Response(header.status(), header.values(), new byte[0], false);
+                }
                 if (!header.values().getOrDefault("content-encoding", "identity").equalsIgnoreCase("identity")) {
                     throw new IOException("encoded body", null);
                 }
@@ -190,8 +192,18 @@ public final class PinnedHttp {
         Oversize() { super("oversize", null); }
     }
 
-    static Header readHeaders(InputStream in) throws IOException {
+    static Header readFinalHeaders(InputStream in) throws IOException {
         int[] budget = {MAX_HEADERS};
+        for (;;) {
+            Header header = readHeaders(in, budget);
+            if (header.status() == 101 || header.status() < 100 || header.status() > 599) {
+                throw new IOException("unsupported response status", null);
+            }
+            if (header.status() >= 200) return header;
+        }
+    }
+
+    private static Header readHeaders(InputStream in, int[] budget) throws IOException {
         String status = line(in, budget);
         if (!status.matches("HTTP/1\\.[01] [0-9]{3}( .*)?")) throw new IOException("bad status line", null);
         Map<String, String> headers = new HashMap<>();

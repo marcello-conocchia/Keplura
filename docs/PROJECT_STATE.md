@@ -416,6 +416,8 @@ Dokument (inkl. PDF/DOCX) → RAG-Suche mit Citations → Chat mit SSE-Streaming
 
 - **27.11.2026, Chat — Systembrowser in der Desktop-App (TU-06b), überholt durch den Eintrag oben:** Auf die Optionen „eigener PR nach #39“ / „noch in #39“ / „weglassen“ wählt der PO „Eigener PR nach #39“. TU-06 (PR #39) bleibt ohne neue Abhängigkeit; `tauri-plugin-opener` (nur `https://*`) folgt als eigene Klasse-A-Aufgabe [TU-06e](tasks/TU-06e-desktop-system-browser.md) nach dem Merge von TU-06, vor TU-07. Keine Gate-Ausnahme.
 
+- **27.11.2026, Chat — Rollen ab TU-06c: Codex implementiert, Claude prüft unabhängig (Code + Security).**
+
 - **21.11.2026, Chat — Rollentausch für TU-03a:** PO beauftragt Codex mit der Implementierung und Claude mit dem unabhängigen Code-/Security-Review, anschließend „okay dann starte“. Eigener Worktree/Branch und finale Linux-CI bleiben Pflicht; kein Selbst-Approve oder Merge durch den Entwickler. Keine sonstige Gate-, Budget-, Release- oder Deployment-Ausnahme.
 
 - **21.11.2026, Chat — Tool Use als nächste Arbeitspriorität:** PO fordert mindestens den Tool-Use-Umfang von Open WebUI und beauftragt, den vorgeschlagenen Plan für die nächsten Tage fest zu verankern. Reihenfolge, Umfang und Grenzen: [TOOL_USE_PLAN.md](TOOL_USE_PLAN.md). Erste Aufgabe TU-01; eine aktive Implementierung. Keine pauschale Freigabe aller M5–M9-Visionen, keine Gate-/Provider-/Budget-Ausnahme, kein Release/Deployment.

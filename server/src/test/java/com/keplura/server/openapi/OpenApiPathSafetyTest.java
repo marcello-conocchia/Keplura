@@ -30,6 +30,10 @@ class OpenApiPathSafetyTest {
         assertThat(OpenApiToolAdapter.containedIn(base, base + "/items/%2e%2e")).isFalse();
         assertThat(OpenApiToolAdapter.containedIn(base, base + "/items/%252e%252e")).isFalse(); // decoded twice
         assertThat(OpenApiToolAdapter.containedIn(base, base + "/items/a%2fb")).isFalse();
+        assertThat(OpenApiToolAdapter.containedIn(base, base + "/items/..%3bparam")).isFalse();
+        assertThat(OpenApiToolAdapter.containedIn(base, base + "/items/..%253bparam")).isFalse();
+        assertThat(OpenApiToolAdapter.containedIn(base, base + "/items/..%25253bparam")).isFalse();
+        assertThat(OpenApiToolAdapter.containedIn(base + "%3bparam", base + "%3bparam/items")).isFalse();
         assertThat(OpenApiToolAdapter.containedIn(base, "https://api.example.com/tenant/v10/x")).isFalse();
         assertThat(OpenApiToolAdapter.containedIn(base, "https://other.example.com/tenant/v1/x")).isFalse();
     }

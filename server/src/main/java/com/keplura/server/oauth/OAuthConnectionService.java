@@ -4,9 +4,11 @@ import com.keplura.server.admin.SecretCipher;
 import com.keplura.server.tool.ToolAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.net.URLEncoder;
@@ -77,11 +79,19 @@ public class OAuthConnectionService {
 
     public record Started(String flowId, String authorizationUrl) { }
 
+    public record CallbackReturn(String appRedirectUri, String handoff) {
+        @Override public String toString() { return "CallbackReturn[redacted]"; }
+    }
+
     /** Status of one flow as the starting session sees it. */
     public enum FlowStatus { PENDING, CONNECTED, FAILED, EXPIRED }
 
-    /** Result of presenting a handoff: the flow's organization and server, and how it ended. */
-    public record Completion(long orgId, String kind, long serverId, FlowStatus status) { }
+    public record Completion(String kind, long serverId, FlowStatus status) { }
+
+    private record PendingExchange(long id, String kind, long serverId, long revision, String verifierEnc,
+                                   String redirectUri, String codeEnc, String status, Instant expiresAt, String sessionHash) {
+        Completion result(FlowStatus outcome) { return new Completion(kind, serverId, outcome); }
+    }
 
     public static class OAuthException extends RuntimeException {
         public OAuthException(String message) { super(message, null, false, false); }
@@ -141,7 +151,7 @@ public class OAuthConnectionService {
 
     private Client putClientInTx(String kind, long serverId, String authorizeUrl, String tokenUrl, String revokeUrl,
                                  String clientId, String clientSecret, String scopes) {
-        jdbc.queryForList("select revision from tool_oauth_client where kind=? and server_id=? for update", Long.class, kind, serverId);
+        lockClient(kind, serverId);
         var current = client(kind, serverId);
         String secretEnc = current.map(Client::clientSecretEnc).orElse(null);
         if (clientSecret != null) secretEnc = clientSecret.isBlank() ? null : cipher.encrypt(clientSecret.strip());
@@ -203,7 +213,13 @@ public class OAuthConnectionService {
         });
     }
 
-    /** Flows first: a running exchange re-checks its flow row before storing (see {@link #complete}). */
+    /** Operations locking both rows take the client lock before touching flows or connections. */
+    private Optional<Long> lockClient(String kind, long serverId) {
+        return jdbc.queryForList("select revision from tool_oauth_client where kind=? and server_id=? for update",
+                Long.class, kind, serverId).stream().findFirst();
+    }
+
+    /** Flows before connections: a running exchange re-checks its flow row before storing. */
     private void dropConnections(String kind, long serverId) {
         jdbc.update("delete from tool_oauth_flow where kind=? and server_id=?", kind, serverId);
         jdbc.update("delete from tool_oauth_connection where kind=? and server_id=?", kind, serverId);
@@ -288,9 +304,7 @@ public class OAuthConnectionService {
                 }
                 Integer updated = tx.execute(st -> {
                     // Lock the client row: a concurrent admin change waits, or has already replaced the generation.
-                    var current = jdbc.queryForList("select revision from tool_oauth_client where kind=? and server_id=? for update",
-                            Long.class, kind, serverId);
-                    if (current.isEmpty() || current.getFirst() != client.revision()) return 0;
+                    if (lockClient(kind, serverId).orElse(0L) != client.revision()) return 0;
                     return jdbc.update("""
                             update tool_oauth_connection set access_token_enc=?, refresh_token_enc=?, expires_at=?, updated_at=?
                             where id=? and client_revision=?""",
@@ -348,23 +362,20 @@ public class OAuthConnectionService {
     /** Person disconnects: tokens are deleted first (effective at once), then revoked best effort. */
     public boolean disconnect(long userId, long orgId, String kind, long serverId) {
         if (!KINDS.contains(kind)) return false;
-        // Flows first, in one transaction: an exchange still running finds its flow gone and stores nothing.
-        var rows = tx.execute(st -> {
+        var row = tx.execute(st -> {
+            lockClient(kind, serverId);
             jdbc.update("delete from tool_oauth_flow where user_id=? and org_id=? and kind=? and server_id=?", userId, orgId, kind, serverId);
-            var found = jdbc.query("select id, access_token_enc, refresh_token_enc from tool_oauth_connection where user_id=? and org_id=? and kind=? and server_id=?",
-                    (rs, n) -> new String[]{rs.getString(1), rs.getString(2), rs.getString(3)}, userId, orgId, kind, serverId);
+            var found = tokenRow(userId, orgId, kind, serverId);
             jdbc.update("delete from tool_oauth_connection where user_id=? and org_id=? and kind=? and server_id=?", userId, orgId, kind, serverId);
             return found;
         });
-        if (rows == null || rows.isEmpty()) return false;
-        var client = client(kind, serverId);
-        if (client.isPresent() && client.get().revokeUrl() != null) {
-            String[] row = rows.getFirst();
+        if (row == null) return false;
+        Client client = row.client();
+        if (client.revokeUrl() != null) {
             try {
-                boolean refresh = row[2] != null;
-                String token = cipher.decrypt(refresh ? row[2] : row[1]);
-                tokens.revoke(client.get().revokeUrl(), client.get().clientId(), secret(client.get()), token,
-                        refresh ? "refresh_token" : "access_token");
+                boolean refresh = row.refreshEnc() != null;
+                String token = cipher.decrypt(refresh ? row.refreshEnc() : row.accessEnc());
+                tokens.revoke(client.revokeUrl(), client.clientId(), secret(client), token, refresh ? "refresh_token" : "access_token");
             } catch (RuntimeException e) {
                 log.warn("personal oauth revocation skipped ({})", e.getClass().getSimpleName());
             }
@@ -375,7 +386,8 @@ public class OAuthConnectionService {
     // ---- authorization flow ----
 
     /** Starts a flow for the person; the caller has already proven org membership and server availability. */
-    public Started start(long userId, long orgId, String kind, long serverId, String sessionId, String redirectUri, String resource) {
+    public Started start(long userId, long orgId, String kind, long serverId, String sessionId, String redirectUri,
+                         String appRedirectUri, String resource) {
         Client client = client(kind, serverId).orElseThrow(() -> new OAuthException("Für diesen Server ist keine persönliche Verbindung eingerichtet."));
         if (!cipher.available()) throw new OAuthException("Verbindungen können nicht gespeichert werden: KEPLURA_SECRETS_MASTER_KEY fehlt.");
         String state = randomUrlSafe(32);
@@ -387,9 +399,9 @@ public class OAuthConnectionService {
         jdbc.update("delete from tool_oauth_flow where user_id=? and org_id=? and kind=? and server_id=?", userId, orgId, kind, serverId);
         jdbc.update("""
                 insert into tool_oauth_flow(public_id, state_hash, session_hash, user_id, org_id, kind, server_id, client_revision,
-                  verifier_enc, redirect_uri, status, created_at, expires_at) values (?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                  verifier_enc, redirect_uri, app_redirect_uri, status, created_at, expires_at) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
                 flowId, sha256Hex(state), sha256Hex(sessionId), userId, orgId, kind, serverId, client.revision(),
-                cipher.encrypt(verifier), redirectUri, STARTED, Timestamp.from(now), Timestamp.from(now.plus(FLOW_TTL)));
+                cipher.encrypt(verifier), redirectUri, appRedirectUri, STARTED, Timestamp.from(now), Timestamp.from(now.plus(FLOW_TTL)));
         StringBuilder url = new StringBuilder(client.authorizeUrl()).append(client.authorizeUrl().contains("?") ? '&' : '?');
         url.append("response_type=code&client_id=").append(enc(client.clientId()))
                 .append("&redirect_uri=").append(enc(redirectUri))
@@ -402,24 +414,26 @@ public class OAuthConnectionService {
 
     /**
      * The authorization server redirected the browser back. Records the code for the matching, fresh, unconsumed
-     * flow and returns a one-time handoff for the fixed app address (only its SHA-256 is stored), or empty.
+     * flow and returns a one-time handoff for the recorded app address (only the handoff's SHA-256 is stored).
      * {@code browserUserId}: the person of a Keplura session in that browser, if any; a different person ends the
      * flow.
      */
-    public Optional<String> callback(String state, String code, String error, Long browserUserId) {
+    public Optional<CallbackReturn> callback(String state, String code, String error, Long browserUserId) {
         if (state == null || state.isEmpty() || state.length() > 200) return Optional.empty();
-        var flows = jdbc.query("select id, user_id, status, expires_at from tool_oauth_flow where state_hash=?",
-                (rs, n) -> new Object[]{rs.getLong(1), rs.getLong(2), rs.getString(3), rs.getTimestamp(4).toInstant()}, sha256Hex(state));
+        record CallbackFlow(long id, long owner, Instant expiresAt, String appRedirectUri) { }
+        var flows = jdbc.query("select id, user_id, expires_at, app_redirect_uri from tool_oauth_flow where state_hash=?",
+                (rs, n) -> new CallbackFlow(rs.getLong(1), rs.getLong(2), rs.getTimestamp(3).toInstant(), rs.getString(4)), sha256Hex(state));
         if (flows.isEmpty()) return Optional.empty();
-        long id = (long) flows.getFirst()[0];
-        long owner = (long) flows.getFirst()[1];
-        boolean fresh = ((Instant) flows.getFirst()[3]).isAfter(clock.get());
+        var flow = flows.getFirst();
+        long id = flow.id();
+        long owner = flow.owner();
+        boolean fresh = flow.expiresAt().isAfter(clock.get());
         boolean ok = fresh && error == null && code != null && !code.isEmpty() && code.length() <= 4000
                 && (browserUserId == null || browserUserId == owner);
         if (!ok) {
             jdbc.update("update tool_oauth_flow set status=?, code_enc=null, handoff_hash=null where id=? and status in (?, ?)",
                     FAILED, id, STARTED, RETURNED);
-            return Optional.empty();
+            return Optional.of(new CallbackReturn(flow.appRedirectUri(), null));
         }
         // Single use: only a STARTED flow takes a code; a second callback with the same state fails the flow.
         String handoff = HexFormat.of().formatHex(randomBytes(32));
@@ -427,9 +441,9 @@ public class OAuthConnectionService {
                 RETURNED, cipher.encrypt(code), sha256Hex(handoff), id, STARTED);
         if (taken != 1) {
             jdbc.update("update tool_oauth_flow set status=?, code_enc=null, handoff_hash=null where id=? and status=?", FAILED, id, RETURNED);
-            return Optional.empty();
+            return Optional.of(new CallbackReturn(flow.appRedirectUri(), null));
         }
-        return Optional.of(handoff);
+        return Optional.of(new CallbackReturn(flow.appRedirectUri(), handoff));
     }
 
     /** Status for the starting session; read-only (the exchange needs the handoff, see {@link #complete}). */
@@ -447,80 +461,83 @@ public class OAuthConnectionService {
     /**
      * The app presents the handoff from the URL fragment. Only the person AND session that started the flow can
      * redeem it, exactly once; the tokens are bound to the flow's person, organization, server and generation.
-     * Unknown handoff or other session/person: empty.
+     * Unknown handoff or other organization/session/person: empty.
      */
-    public Optional<Completion> complete(long userId, String sessionId, String handoff) {
+    public Optional<Completion> complete(long userId, long orgId, String sessionId, String handoff) {
         if (handoff == null || !handoff.matches("[0-9a-f]{64}")) return Optional.empty();
+        String handoffHash = sha256Hex(handoff);
         var rows = jdbc.query("""
-                select id, org_id, kind, server_id, client_revision, verifier_enc, redirect_uri, code_enc, status, expires_at, session_hash
-                from tool_oauth_flow where handoff_hash=? and user_id=?""", (rs, n) -> new Object[]{rs.getLong(1), rs.getLong(2),
-                rs.getString(3), rs.getLong(4), rs.getLong(5), rs.getString(6), rs.getString(7), rs.getString(8), rs.getString(9),
-                rs.getTimestamp(10).toInstant(), rs.getString(11)}, sha256Hex(handoff), userId);
-        if (rows.isEmpty() || !sameHash((String) rows.getFirst()[10], sessionId)) return Optional.empty();
-        Object[] r = rows.getFirst();
-        long id = (long) r[0];
-        long orgId = (long) r[1];
-        String kind = (String) r[2];
-        long serverId = (long) r[3];
-        long revision = (long) r[4];
-        if (!RETURNED.equals(r[8])) return Optional.of(new Completion(orgId, kind, serverId, FlowStatus.FAILED));
-        if (!((Instant) r[9]).isAfter(clock.get())) {
-            failed(id);
-            return Optional.of(new Completion(orgId, kind, serverId, FlowStatus.EXPIRED));
+                select id, kind, server_id, client_revision, verifier_enc, redirect_uri, code_enc, status, expires_at, session_hash
+                from tool_oauth_flow f where handoff_hash=? and user_id=? and org_id=?
+                and exists(select 1 from membership m where m.user_id=f.user_id and m.org_id=f.org_id)""",
+                (rs, n) -> new PendingExchange(rs.getLong(1), rs.getString(2), rs.getLong(3), rs.getLong(4),
+                        rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8), rs.getTimestamp(9).toInstant(),
+                        rs.getString(10)), handoffHash, userId, orgId);
+        if (rows.isEmpty() || !sameHash(rows.getFirst().sessionHash(), sessionId)) return Optional.empty();
+        var flow = rows.getFirst();
+        if (!RETURNED.equals(flow.status())) return Optional.of(flow.result(FlowStatus.FAILED));
+        if (!flow.expiresAt().isAfter(clock.get())) {
+            failed(flow.id());
+            return Optional.of(flow.result(FlowStatus.EXPIRED));
         }
-        // Claim the exchange exactly once.
-        if (jdbc.update("update tool_oauth_flow set status=?, code_enc=null, handoff_hash=null where id=? and status=?",
-                EXCHANGING, id, RETURNED) != 1) {
-            return Optional.of(new Completion(orgId, kind, serverId, FlowStatus.FAILED));
+        // Claim once. A membership removed between lookup and claim must not trigger a provider request.
+        if (jdbc.update("""
+                update tool_oauth_flow set status=?, code_enc=null, handoff_hash=null
+                where id=? and status=? and handoff_hash=?
+                and exists(select 1 from membership m where m.user_id=? and m.org_id=?)""",
+                EXCHANGING, flow.id(), RETURNED, handoffHash, userId, orgId) != 1) {
+            return Optional.empty();
         }
-        var client = client(kind, serverId);
-        if (client.isEmpty() || client.get().revision() != revision) {
-            failed(id);
-            return Optional.of(new Completion(orgId, kind, serverId, FlowStatus.FAILED));
+        var client = client(flow.kind(), flow.serverId());
+        if (client.isEmpty() || client.get().revision() != flow.revision()) {
+            failed(flow.id());
+            return Optional.of(flow.result(FlowStatus.FAILED));
         }
         OAuthTokenClient.Tokens got;
         try {
-            got = tokens.exchange(client.get().tokenUrl(), client.get().clientId(), secret(client.get()), cipher.decrypt((String) r[7]),
-                    (String) r[6], cipher.decrypt((String) r[5]));
+            got = tokens.exchange(client.get().tokenUrl(), client.get().clientId(), secret(client.get()),
+                    cipher.decrypt(flow.codeEnc()), flow.redirectUri(), cipher.decrypt(flow.verifierEnc()));
         } catch (OAuthTokenClient.TokenException e) {
             log.warn("personal oauth code exchange failed (rejected={})", e.rejected());
-            failed(id);
-            return Optional.of(new Completion(orgId, kind, serverId, FlowStatus.FAILED));
+            failed(flow.id());
+            return Optional.of(flow.result(FlowStatus.FAILED));
         } catch (RuntimeException e) {
-            failed(id);
-            return Optional.of(new Completion(orgId, kind, serverId, FlowStatus.FAILED));
+            failed(flow.id());
+            return Optional.of(flow.result(FlowStatus.FAILED));
         }
+        try {
+            if (storeConnection(userId, orgId, flow, got)) return Optional.of(flow.result(FlowStatus.CONNECTED));
+        } catch (DataAccessException | TransactionException e) {
+            log.warn("personal oauth connection could not be stored ({})", e.getClass().getSimpleName());
+        }
+        failed(flow.id());
+        return Optional.of(flow.result(FlowStatus.FAILED));
+    }
+
+    private boolean storeConnection(long userId, long orgId, PendingExchange flow, OAuthTokenClient.Tokens got) {
         Instant now = clock.get();
-        Boolean stored = tx.execute(st -> {
-            // The flow must still be the claimed one (disconnect and admin changes delete it FIRST), and the client
-            // row is locked at exactly the flow's generation while the tokens are written.
-            if (jdbc.update("update tool_oauth_flow set status=?, verifier_enc='-' where id=? and status=?", DONE, id, EXCHANGING) != 1) {
-                return false;
-            }
-            var current = jdbc.queryForList("select revision from tool_oauth_client where kind=? and server_id=? for update",
-                    Long.class, kind, serverId);
-            if (current.isEmpty() || current.getFirst() != revision) { st.setRollbackOnly(); return false; }
-            jdbc.update("delete from tool_oauth_connection where user_id=? and org_id=? and kind=? and server_id=?", userId, orgId, kind, serverId);
+        return Boolean.TRUE.equals(tx.execute(st -> {
+            // Admin changes lock the client first, then delete flows and connections. Disconnect follows the same order.
+            if (lockClient(flow.kind(), flow.serverId()).orElse(0L) != flow.revision()) return false;
+            if (jdbc.update("update tool_oauth_flow set status=?, verifier_enc='-' where id=? and status=?",
+                    DONE, flow.id(), EXCHANGING) != 1) return false;
+            jdbc.update("delete from tool_oauth_connection where user_id=? and org_id=? and kind=? and server_id=?",
+                    userId, orgId, flow.kind(), flow.serverId());
             int n = jdbc.update("""
                     insert into tool_oauth_connection(user_id, org_id, kind, server_id, client_revision, access_token_enc, refresh_token_enc,
                       expires_at, created_at, updated_at)
-                    select ?,?,?,?,?,?,?,?,?,? from tool_oauth_client k where k.kind=? and k.server_id=? and k.revision=?
-                    and exists(select 1 from membership m where m.user_id=? and m.org_id=?)""",
-                    userId, orgId, kind, serverId, revision, cipher.encrypt(got.accessToken()),
+                    select ?,?,?,?,?,?,?,?,?,? where exists(select 1 from membership m where m.user_id=? and m.org_id=?)""",
+                    userId, orgId, flow.kind(), flow.serverId(), flow.revision(), cipher.encrypt(got.accessToken()),
                     got.refreshToken() == null ? null : cipher.encrypt(got.refreshToken()), expiry(got, now), Timestamp.from(now),
-                    Timestamp.from(now), kind, serverId, revision, userId, orgId);
+                    Timestamp.from(now), userId, orgId);
             if (n != 1) { st.setRollbackOnly(); return false; }
             return true;
-        });
-        if (!Boolean.TRUE.equals(stored)) {
-            failed(id);
-            return Optional.of(new Completion(orgId, kind, serverId, FlowStatus.FAILED));
-        }
-        return Optional.of(new Completion(orgId, kind, serverId, FlowStatus.CONNECTED));
+        }));
     }
 
     private void failed(long flowId) {
-        jdbc.update("update tool_oauth_flow set status=?, code_enc=null, handoff_hash=null where id=?", FAILED, flowId);
+        jdbc.update("update tool_oauth_flow set status=?, code_enc=null, handoff_hash=null where id=? and status in (?,?)",
+                FAILED, flowId, RETURNED, EXCHANGING);
     }
 
     /** Expired or finished flows are removed (never a token in there; only hashes and encrypted one-time values). */

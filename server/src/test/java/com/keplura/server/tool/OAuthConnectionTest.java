@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpSession;
 import tools.jackson.databind.json.JsonMapper;
@@ -45,6 +47,8 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
@@ -61,7 +65,8 @@ import static org.mockito.Mockito.when;
 
 /**
  * TU-06b: personal OAuth connections (Authorization Code + PKCE S256) against a local authorization server and a
- * local OpenAPI resource server, both counting requests, through the real {@link ToolExecutionService} on H2.
+ * local OpenAPI resource server, both counting requests, through the real {@link ToolExecutionService}.
+ * H2 by default. KEPLURA_TEST_POSTGRES_URL runs the same tests in an isolated PostgreSQL schema and verifies lock order.
  */
 class OAuthConnectionTest {
 
@@ -94,6 +99,8 @@ class OAuthConnectionTest {
     private final AtomicReference<Instant> now = new AtomicReference<>(Instant.parse("2026-11-26T10:00:00Z"));
 
     private JdbcTemplate jdbc;
+    private JdbcTemplate postgresAdmin;
+    private String postgresSchema;
     private SecretCipher cipher;
     private OAuthConnectionService oauth;
     private OAuthConnectionController connections;
@@ -214,8 +221,7 @@ class OAuthConnectionTest {
         });
         resource.start();
 
-        var ds = new org.h2.jdbcx.JdbcDataSource();
-        ds.setURL("jdbc:h2:mem:oauth-" + java.util.UUID.randomUUID() + ";MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1");
+        var ds = dataSource();
         org.flywaydb.core.Flyway.configure().dataSource(ds).locations("classpath:db/migration").load().migrate();
         jdbc = new JdbcTemplate(ds);
         orgId = id("insert into organization (name, created_at) values ('Org', current_timestamp)");
@@ -257,15 +263,36 @@ class OAuthConnectionTest {
         ((Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME)).addAppender(logs);
     }
 
+    private javax.sql.DataSource dataSource() {
+        String url = System.getenv("KEPLURA_TEST_POSTGRES_URL");
+        if (url == null || url.isBlank()) {
+            var ds = new org.h2.jdbcx.JdbcDataSource();
+            ds.setURL("jdbc:h2:mem:oauth-" + UUID.randomUUID() + ";MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1");
+            return ds;
+        }
+        String user = System.getenv().getOrDefault("KEPLURA_TEST_POSTGRES_USER", "keplura");
+        String password = System.getenv().getOrDefault("KEPLURA_TEST_POSTGRES_PASSWORD", "");
+        postgresAdmin = new JdbcTemplate(new DriverManagerDataSource(url, user, password));
+        postgresSchema = "oauth_test_" + UUID.randomUUID().toString().replace("-", "");
+        postgresAdmin.execute("create schema " + postgresSchema);
+        var ds = new DriverManagerDataSource(url, user, password);
+        var properties = new Properties();
+        properties.setProperty("currentSchema", postgresSchema);
+        properties.setProperty("ApplicationName", postgresSchema);
+        ds.setConnectionProperties(properties);
+        return ds;
+    }
+
     private OAuthClientAdminController.Input clientInput(String scopes) {
         String a = "http://127.0.0.1:" + as.getAddress().getPort();
         return new OAuthClientAdminController.Input(a + "/authorize", a + "/token", a + "/revoke", "keplura-client", CLIENT_SECRET, scopes);
     }
 
     @AfterEach void stop() {
-        ((Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME)).detachAppender(logs);
+        if (logs != null) ((Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME)).detachAppender(logs);
         as.stop(0);
         resource.stop(0);
+        if (postgresSchema != null) postgresAdmin.execute("drop schema if exists " + postgresSchema + " cascade");
     }
 
     private long id(String sql) {
@@ -283,9 +310,12 @@ class OAuthConnectionTest {
 
     /** Start in Keplura, let the AS authenticate {@code login}, return what came back to the callback URL. */
     private Redirect authorize(MockHttpSession session, String kind, long server, String login) throws Exception {
-        var started = connections.start(orgId, kind, server, request(session));
+        var started = connections.start(orgId, kind, server, false, request(session));
         assertThat(started.getStatusCode().value()).isEqualTo(200);
-        var view = (OAuthConnectionController.StartView) started.getBody();
+        return authorize((OAuthConnectionController.StartView) started.getBody(), login);
+    }
+
+    private Redirect authorize(OAuthConnectionController.StartView view, String login) throws Exception {
         lastAuthorization = view.authorizationUrl();
         try (var http = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NEVER).proxy(HttpClient.Builder.NO_PROXY).build()) {
             var response = http.send(HttpRequest.newBuilder(URI.create(view.authorizationUrl() + "&login=" + login)).build(),
@@ -301,8 +331,8 @@ class OAuthConnectionTest {
         var response = connections.callback(state, code, null, request(browser));
         assertThat(response.getStatusCode().value()).isEqualTo(302);
         String location = response.getHeaders().getLocation().toString();
-        assertThat(location).startsWith(APP + "#oauth");
-        return location.startsWith(APP + "#oauth=") ? location.substring((APP + "#oauth=").length()) : null;
+        assertThat(location).startsWith("/#oauth");
+        return location.startsWith("/#oauth=") ? location.substring("/#oauth=".length()) : null;
     }
 
     private String callback(Redirect r, MockHttpSession browser) {
@@ -401,7 +431,7 @@ class OAuthConnectionTest {
 
     /** Review finding 1: a forwarded authorization link must not bind the other person's provider account. */
     @Test void forwardedAuthorizationLinkOpenedInAnotherSignedOutBrowserBindsNothing() throws Exception {
-        var started = connections.start(orgId, "openapi", serverId, request(aliceSession));
+        var started = connections.start(orgId, "openapi", serverId, false, request(aliceSession));
         var view = (OAuthConnectionController.StartView) started.getBody();
         // Alice forwards the link; Bob opens it in a different browser without a Keplura session and authorizes.
         try (var http = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NEVER).proxy(HttpClient.Builder.NO_PROXY).build()) {
@@ -421,6 +451,95 @@ class OAuthConnectionTest {
     }
 
     /** Review finding 2: disconnect while the code exchange is still running stores nothing afterwards. */
+    @Test void wrongOrganizationDoesNotConsumeTheHandoffOrContactTheProvider() throws Exception {
+        long otherOrg = id("insert into organization (name, created_at) values ('Andere Org', current_timestamp)");
+        jdbc.update("insert into membership (org_id, user_id, role, created_at) values (?, ?, 'MEMBER', current_timestamp)", otherOrg, alice);
+        var r = authorize(aliceSession, "openapi", serverId, "alice");
+        var handoff = callback(r, null);
+        var wrong = connections.complete(otherOrg, new OAuthConnectionController.CompleteInput(handoff), request(aliceSession));
+        assertThat(wrong.getStatusCode().value()).isEqualTo(404);
+        assertThat(tokenRequests).hasValue(0);
+        assertThat(oauth.connection(alice, orgId, "openapi", serverId)).isEmpty();
+        assertThat(complete(handoff, aliceSession)).isEqualTo("CONNECTED");
+        assertThat(oauth.connection(alice, otherOrg, "openapi", serverId)).isEmpty();
+        assertThat(tokenRequests).hasValue(1);
+    }
+
+    @Test void callbackKeepsTheAppReturnSelectedAtStart() throws Exception {
+        var beans = new StaticListableBeanFactory();
+        String publicOrigin = "https://keplura.example.test";
+        beans.addBean("oidcProperties", new OidcProperties(APP, publicOrigin, 600, 60));
+        var controller = new OAuthConnectionController(jdbc, oauth, beans.getBeanProvider(OidcProperties.class));
+
+        var web = request(aliceSession);
+        web.addHeader("Origin", publicOrigin);
+        URI callback = URI.create(publicOrigin + OAuthConnectionService.CALLBACK_PATH);
+        URI landing = callback.resolve(returnLocation(controller, false, web, callback.toString()));
+        assertThat(landing.toString()).startsWith(publicOrigin + "/#oauth=");
+        assertThat(complete(landing.getFragment().substring("oauth=".length()), aliceSession)).isEqualTo("CONNECTED");
+
+        var dev = request(aliceSession);
+        dev.addHeader("Origin", "http://localhost:1420");
+        assertThat(returnLocation(controller, false, dev, callback.toString())).startsWith(APP + "#oauth=");
+        assertThat(returnLocation(controller, true, request(aliceSession), callback.toString())).startsWith(APP + "#oauth=");
+        var otherOrigin = request(aliceSession);
+        otherOrigin.addHeader("Origin", "https://unrelated.example.test");
+        assertThat(returnLocation(controller, false, otherOrigin, callback.toString())).startsWith("/#oauth=");
+    }
+
+    private String returnLocation(OAuthConnectionController controller, boolean desktop,
+                                  MockHttpServletRequest request, String expectedCallback) throws Exception {
+        var start = controller.start(orgId, "openapi", serverId, desktop, request);
+        assertThat(start.getStatusCode().value()).isEqualTo(200);
+        var view = (OAuthConnectionController.StartView) start.getBody();
+        assertThat(form(URI.create(view.authorizationUrl()).getRawQuery()).get("redirect_uri")).isEqualTo(expectedCallback);
+        var authorization = authorize(view, "alice");
+        var callback = controller.callback(authorization.state(), authorization.code(), null, request(null));
+        assertThat(callback.getStatusCode().value()).isEqualTo(302);
+        return callback.getHeaders().getLocation().toString();
+    }
+
+    @Test void adminChangeAndCompletionTakeTheClientLockInTheSameOrder() throws Exception {
+        var r = authorize(aliceSession, "openapi", serverId, "alice");
+        var handoff = callback(r, null);
+        tokenArrived = new CountDownLatch(1);
+        tokenGate = new CountDownLatch(1);
+        var result = new AtomicReference<String>();
+        Thread exchange = Thread.ofVirtual().start(() -> result.set(complete(handoff, aliceSession)));
+        try {
+            assertThat(tokenArrived.await(5, TimeUnit.SECONDS)).isTrue();
+            var admin = new TransactionTemplate(new DataSourceTransactionManager(jdbc.getDataSource()));
+            admin.executeWithoutResult(st -> {
+                jdbc.queryForObject("select revision from tool_oauth_client where kind='openapi' and server_id=? for update",
+                        Long.class, serverId);
+                tokenGate.countDown();
+                if (postgresAdmin != null) awaitBlockedCompletion();
+                var changed = clientInput("read write");
+                oauth.putClient("openapi", serverId, changed.authorizeUrl(), changed.tokenUrl(),
+                        changed.revokeUrl(), changed.clientId(), null, changed.scopes());
+            });
+        } finally {
+            tokenGate.countDown();
+            exchange.join(Duration.ofSeconds(10));
+        }
+        assertThat(result).hasValue("FAILED");
+        assertThat(oauth.connection(alice, orgId, "openapi", serverId)).isEmpty();
+    }
+
+    /** PostgreSQL observes finalization blocked on the admin's client lock before the admin deletes the flow. */
+    private void awaitBlockedCompletion() {
+        long deadline = System.nanoTime() + Duration.ofSeconds(5).toNanos();
+        do {
+            Boolean blocked = postgresAdmin.queryForObject("""
+                    select exists(select 1 from pg_stat_activity where application_name=?
+                      and wait_event_type='Lock' and query like '%tool_oauth_client%for update%')""",
+                    Boolean.class, postgresSchema);
+            if (Boolean.TRUE.equals(blocked)) return;
+            java.util.concurrent.locks.LockSupport.parkNanos(Duration.ofMillis(10).toNanos());
+        } while (System.nanoTime() < deadline);
+        throw new AssertionError("Completion did not wait on the client row");
+    }
+
     @Test void disconnectDuringARunningExchangeIsNotUndone() throws Exception {
         var r = authorize(aliceSession, "openapi", serverId, "alice");
         String handoff = callback(r, null);
@@ -472,6 +591,9 @@ class OAuthConnectionTest {
                 old.get("expires_at"), old.get("created_at"), old.get("updated_at"));
         assertThat(oauth.connection(alice, orgId, "openapi", serverId)).isEmpty();
         assertThat(turn(alice, aliceChat).offered()).isEmpty();
+        assertThat(oauth.disconnect(alice, orgId, "openapi", serverId)).isFalse();
+        assertThat(revokeRequests).hasValue(0); // an old token never goes to a newer client's revocation endpoint
+        assertThat(jdbc.queryForObject("select count(*) from tool_oauth_connection", Integer.class)).isZero();
     }
 
     /** Review finding 4: OAuth endpoints and personal resource calls are HTTPS-only before anything is sent. */
@@ -513,7 +635,9 @@ class OAuthConnectionTest {
         model += turn(bob, bobChat).call(fn(), "{}").text();
         assertThat(refreshRequests).hasValueGreaterThanOrEqualTo(1);
 
-        String db = String.join("\n", jdbc.queryForList("SCRIPT", String.class));
+        String db = postgresAdmin == null ? String.join("\n", jdbc.queryForList("SCRIPT", String.class))
+                : List.of("tool_oauth_client", "tool_oauth_connection", "tool_oauth_flow", "tool_call", "tool_call_log")
+                    .stream().map(table -> jdbc.queryForList("select * from " + table).toString()).reduce("", String::concat);
         String api = M.writeValueAsString(List.of(connections.list(orgId, request(aliceSession)), connections.list(orgId, request(bobSession)),
                 clients.list(), openapi.list(), service.cards(alice, orgId, aliceChat), service.cards(bob, orgId, bobChat),
                 service.chatToolSelection(alice, orgId, aliceChat)));

@@ -2071,12 +2071,14 @@ paths:
     post:
       operationId: startPersonalConnection
       summary: TU-06b. Start Authorization Code + PKCE (S256) bound to this session, person, org and server
-      parameters: [{ $ref: "#/components/parameters/CsrfHeader" }]
+      parameters:
+        - { $ref: "#/components/parameters/CsrfHeader" }
+        - { name: desktop, in: query, schema: { type: boolean, default: false }, description: Use the configured native app return address }
       responses:
         "200":
           description: >-
-            Flow id and the authorization URL. The app navigates its OWN window there (top-level, like the OIDC
-            login); the callback returns to the fixed app address with a one-time handoff.
+            Flow id and the authorization URL. The app navigates its own window there. The callback returns to the
+            app address selected at start with a one-time handoff.
           content:
             application/json:
               schema:
@@ -2154,16 +2156,15 @@ paths:
       summary: TU-06b. Redirect target of the authorization server; needs no API session
       description: >-
         Records the code of an open, fresh, unconsumed flow only. A Keplura session of another person ends the
-        flow. 302 to the fixed app address (keplura.oidc.desktop-redirect-uri) with `#oauth=<handoff>` or
-        `#oauth-error`; no parameter is reflected; no-store, no-referrer. Without a configured app address a fixed
-        HTML failure page.
+        flow. 302 to the flow's bound app address (same-origin web or configured desktop return) with
+        `#oauth=<handoff>` or `#oauth-error`. Unknown flows return to the web app with `#oauth-error`.
+        The response uses no-store and no-referrer.
       parameters:
         - { name: state, in: query, required: false, schema: { type: string } }
         - { name: code, in: query, required: false, schema: { type: string } }
         - { name: error, in: query, required: false, schema: { type: string } }
       responses:
         "302": { description: "Back to the app with the one-time handoff, or with #oauth-error (wrong or used state, other person, expired, provider error)" }
-        "400": { description: "No app address configured", content: { text/html: { schema: { type: string } } } }
   /api/v1/orgs/{orgId}/chat/conversations/{conversationId}/tool-artifacts/{artifactId}:
     parameters:
       - $ref: "#/components/parameters/OrgIdPath"

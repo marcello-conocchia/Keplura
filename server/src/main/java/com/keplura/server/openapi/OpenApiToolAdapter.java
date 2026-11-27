@@ -255,8 +255,8 @@ public class OpenApiToolAdapter implements ToolAdapter {
 
     /**
      * Base-path containment after canonicalization: same scheme/host/port, the normalized path equals the raw path
-     * (no dot segments) and stays below the base path, and no segment turns into ".", ".." or a separator even
-     * after decoding it twice (an upstream that decodes and normalizes again cannot leave the prefix).
+     * (no dot segments) and stays below the base path. Check both the base and suffix for traversal, separators
+     * and matrix parameters across two levels of decoding. Reject remaining escapes rather than leave them to upstreams.
      */
     static boolean containedIn(String base, String full) {
         try {
@@ -268,11 +268,12 @@ public class OpenApiToolAdapter implements ToolAdapter {
             String prefix = b.getRawPath() == null ? "" : b.getRawPath();
             if (prefix.endsWith("/")) prefix = prefix.substring(0, prefix.length() - 1);
             if (!(raw.equals(prefix) || raw.startsWith(prefix + "/"))) return false;
-            for (String segment : raw.substring(prefix.length()).split("/", -1)) {
+            for (String segment : raw.split("/", -1)) {
                 String once = decode(segment);
                 String twice = once == null ? null : decode(once);
-                for (String s : java.util.Arrays.asList(segment, once, twice)) {
-                    if (s == null || s.equals(".") || s.equals("..") || s.contains("/") || s.contains("\\")
+                if (twice == null || twice.contains("%")) return false;
+                for (String s : List.of(segment, once, twice)) {
+                    if (s.equals(".") || s.equals("..") || s.contains("/") || s.contains("\\") || s.contains(";")
                             || s.chars().anyMatch(c -> c < 0x20 || c == 0x7f)) return false;
                 }
             }

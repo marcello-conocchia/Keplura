@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -83,6 +84,22 @@ class PinnedHttpTest {
                 .isInstanceOf(OpenApiClient.OpenApiException.class)
                 .satisfies(e -> assertThat(((OpenApiClient.OpenApiException) e).started()).isFalse());
         assertThat(requests).hasValue(1);
+    }
+
+    @Test void interimResponsesShareTheHeaderBudgetAndAreNotFinal() throws Exception {
+        String hints = "HTTP/1.1 103 Early Hints\r\nLink: </style.css>; rel=preload\r\n\r\n";
+        String response = hints + "HTTP/1.1 100 Continue\r\n\r\nHTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK";
+        var input = new ByteArrayInputStream(response.getBytes(StandardCharsets.US_ASCII));
+        var header = PinnedHttp.readFinalHeaders(input);
+        assertThat(header.status()).isEqualTo(200);
+        assertThat(header.values()).doesNotContainKey("link");
+        assertThat(PinnedHttp.readBody(input, header.values(), 2)).isEqualTo(new byte[]{'O', 'K'});
+
+        var oversized = new ByteArrayInputStream(hints.repeat(1000).getBytes(StandardCharsets.US_ASCII));
+        assertThatThrownBy(() -> PinnedHttp.readFinalHeaders(oversized)).isInstanceOf(java.io.IOException.class);
+        var upgrade = new ByteArrayInputStream("HTTP/1.1 101 Switching Protocols\r\n\r\n".getBytes(StandardCharsets.US_ASCII));
+        assertThatThrownBy(() -> PinnedHttp.readFinalHeaders(upgrade)).isInstanceOf(java.io.IOException.class)
+                .hasMessage("unsupported response status");
     }
 
     @Test void oversizeBodiesFailOrAreReportedAsTruncated() throws Exception {

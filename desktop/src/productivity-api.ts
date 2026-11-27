@@ -1,5 +1,5 @@
 // Chat-Produktivität: Vorlagen, globale Suche, Anhänge (PO-Freigabe 14.11.2026).
-import { desktopFetch } from "./transport";
+import { desktopFetch, inTauri } from "./transport";
 import { serverUrl } from "./api";
 import { tr, serverText, translateServer } from "./i18n";
 
@@ -150,7 +150,7 @@ export interface PersonalConnection { kind: ConnectionKind; serverId: number; na
 export type ConnectionFlowStatus = "PENDING" | "CONNECTED" | "FAILED" | "EXPIRED";
 export const listConnections = (orgId: number) => call<PersonalConnection[]>("GET", `/api/v1/orgs/${orgId}/connections`);
 export const startConnection = (orgId: number, kind: ConnectionKind, serverId: number) =>
-  call<{ flowId: string; authorizationUrl: string }>("POST", `/api/v1/orgs/${orgId}/connections/${kind}/${serverId}/start`);
+  call<{ flowId: string; authorizationUrl: string }>("POST", `/api/v1/orgs/${orgId}/connections/${kind}/${serverId}/start?desktop=${inTauri()}`);
 export const connectionStatus = (orgId: number, flowId: string) =>
   call<{ status: ConnectionFlowStatus }>("GET", `/api/v1/orgs/${orgId}/connections/flows/${encodeURIComponent(flowId)}`);
 export const completeConnection = (orgId: number, handoff: string) =>

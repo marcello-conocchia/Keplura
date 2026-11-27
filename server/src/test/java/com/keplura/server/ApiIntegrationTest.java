@@ -108,7 +108,7 @@ class ApiIntegrationTest {
                     + "/api/v1/oauth/connections/callback?state=%3Cscript%3Ex%3C%2Fscript%3E&code=c")).build(),
                     java.net.http.HttpResponse.BodyHandlers.ofString());
             assertThat(callback.statusCode()).isEqualTo(302);
-            assertThat(callback.headers().firstValue("Location").orElseThrow()).endsWith("#oauth-error")
+            assertThat(callback.headers().firstValue("Location").orElseThrow()).isEqualTo("/#oauth-error")
                     .doesNotContain("script").doesNotContain("state");
             assertThat(callback.body()).doesNotContain("<script>");
             assertThat(callback.headers().firstValue("Cache-Control").orElseThrow()).isEqualTo("no-store");
