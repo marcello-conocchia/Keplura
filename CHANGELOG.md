@@ -25,14 +25,10 @@ the first tagged release (planned `0.1.0`, see [docs/RELEASING.md](docs/RELEASIN
   server and never reach the model, cards, audit, logs or API responses. Without
   an own connection the tool is not offered; the tool menu shows "connection
   needed". Disconnecting, admin changes, deleting the server or leaving the
-  organization take effect immediately.
-
-- Isolated MCP stdio bridge (TU-06c): stdio MCP servers declared by the operator
-  run in a separate, disabled-by-default `mcp-bridge` container (bridge mode of
-  the server jar, non-root, read-only file system, no Keplura secrets, shared
-  token, per-call timeouts and output limits) and are connected through the
-  existing MCP HTTP adapter. The Keplura server process never starts them and
-  the web UI never accepts commands.
+  organization take effect immediately. The sign-in runs in the app window like
+  the OIDC login and returns with a one-time code that only the starting session
+  can redeem. OAuth endpoints and personal servers are HTTPS-only, and OpenAPI
+  and token requests connect to the checked IP address only.
 
 - Image and file results (TU-06d): images and files from MCP and OpenAPI results
   become verified artifacts of the tool call card (allowlist by magic bytes, no

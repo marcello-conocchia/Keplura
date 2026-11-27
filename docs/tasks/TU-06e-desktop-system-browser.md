@@ -1,6 +1,6 @@
 # TU-06e — Anmeldung für persönliche Verbindungen im Systembrowser öffnen (Desktop)
 
-Status: **spezifiziert, nicht gestartet.** Folgeaufgabe zu [TU-06](TU-06-adapters-oauth-stdio-media.md) (TU-06b). Start erst, wenn TU-06 (PR #39) auf main ist (genau eine aktive Implementierung). PO-Entscheidung 27.11.2026 im Chat: „Eigener PR nach #39“ (statt eines fünften Commits in #39 oder des dauerhaften Verzichts).
+Status: **entfällt (PO-Entscheidung 27.11.2026).** Auf Review-Befund 1 (Blocker) zu TU-06 hat der PO gewählt: „Wie OIDC-Login“. Die Anmeldung für persönliche Verbindungen läuft seitdem im App-Fenster selbst und kehrt mit einem Einmal-Code zurück, ohne Systembrowser und ohne `tauri-plugin-opener`. Damit ist diese Aufgabe gegenstandslos. Sie bleibt nur als Verlauf erhalten. Ursprünglich: Folgeaufgabe zu [TU-06](TU-06-adapters-oauth-stdio-media.md), PO 27.11.2026 „Eigener PR nach #39“. Falls ein Anbieter Anmeldungen in eingebetteten App-Fenstern verweigert (z. B. Google), wird ein Weg über Systembrowser und Loopback (RFC 8252) als neue Aufgabe spezifiziert.
 
 Klasse A: neue Laufzeitabhängigkeit, und die App öffnet eine vom Server gelieferte Adresse außerhalb der App.
 
