@@ -1932,6 +1932,221 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdminSeedResult"
+  # ---- TU-06 (implemented, review pending): OpenAPI tool servers, personal OAuth connections, tool artifacts ----
+  /api/v1/admin/openapi-servers:
+    get:
+      operationId: listOpenApiServers
+      summary: TU-06a. List OpenAPI tool servers with their operation snapshot (ADMIN)
+      description: >-
+        Operations without operationId or with unsupported parameters stay listed with `usable=false`
+        and a fixed `problem` text. Tokens are never returned (`hasToken` only).
+      responses:
+        "200":
+          description: Servers
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/OpenApiServer" } }
+        "401": { description: "No valid session" }
+        "403": { description: "Not an admin or CSRF check failed" }
+    post:
+      operationId: createOpenApiServer
+      summary: TU-06a. Create a server and load its JSON OpenAPI 3.0/3.1 document (at most 1 MB)
+      parameters: [{ $ref: "#/components/parameters/CsrfHeader" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/OpenApiServerInput" }
+      responses:
+        "201":
+          description: Created; a failed document load is reported in `lastError`
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OpenApiServer" }
+        "400": { description: "Invalid name, URL (http(s), no credentials, base URL without query) or access mode" }
+  /api/v1/admin/openapi-servers/{id}:
+    parameters: [{ $ref: "#/components/parameters/AdminIdPath" }]
+    patch:
+      operationId: updateOpenApiServer
+      summary: TU-06a. Change target, access, approvals, risk classes or spaces
+      description: A changed document URL, base URL or access clears every class and approval (new trust boundary).
+      parameters: [{ $ref: "#/components/parameters/CsrfHeader" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/OpenApiServerInput" }
+      responses:
+        "200":
+          description: Updated server
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OpenApiServer" }
+        "400": { description: "Invalid input or unknown risk class" }
+        "404": { description: "Unknown server" }
+    delete:
+      operationId: deleteOpenApiServer
+      summary: TU-06a. Delete the server with its approvals, OAuth client and personal connections
+      parameters: [{ $ref: "#/components/parameters/CsrfHeader" }]
+      responses:
+        "204": { description: "Deleted" }
+  /api/v1/admin/openapi-servers/{id}/refresh:
+    parameters: [{ $ref: "#/components/parameters/AdminIdPath" }]
+    post:
+      operationId: refreshOpenApiServer
+      summary: TU-06a. Reload the document; approvals survive only for unchanged operations
+      parameters: [{ $ref: "#/components/parameters/CsrfHeader" }]
+      responses:
+        "200":
+          description: Server after the reload
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OpenApiServer" }
+        "404": { description: "Unknown server" }
+  /api/v1/admin/oauth-clients:
+    get:
+      operationId: listOAuthClients
+      summary: TU-06b. OAuth client per MCP server and per OpenAPI server in access mode "oauth" (ADMIN)
+      description: Shows only the number of connected people, never tokens, account names or the client secret.
+      responses:
+        "200":
+          description: Clients
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/OAuthClient" } }
+        "401": { description: "No valid session" }
+        "403": { description: "Not an admin" }
+  /api/v1/admin/oauth-clients/{kind}/{serverId}:
+    parameters:
+      - { name: kind, in: path, required: true, schema: { type: string, enum: [mcp, openapi] } }
+      - { name: serverId, in: path, required: true, schema: { type: integer, format: int64 } }
+    put:
+      operationId: putOAuthClient
+      summary: TU-06b. Create or change the client; any change removes every connection of this server
+      parameters: [{ $ref: "#/components/parameters/CsrfHeader" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/OAuthClientInput" }
+      responses:
+        "200":
+          description: Saved client
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OAuthClient" }
+        "400": { description: "Invalid endpoint, client id or scopes; OpenAPI server not in access mode \"oauth\"" }
+        "404": { description: "Unknown server" }
+    delete:
+      operationId: deleteOAuthClient
+      summary: TU-06b. Switch personal access off; the client and every connection are removed at once
+      parameters: [{ $ref: "#/components/parameters/CsrfHeader" }]
+      responses:
+        "204": { description: "Removed" }
+  /api/v1/orgs/{orgId}/connections:
+    parameters: [{ $ref: "#/components/parameters/OrgIdPath" }]
+    get:
+      operationId: listPersonalConnections
+      summary: TU-06b. Personal servers usable in this organization and whether the caller is connected
+      responses:
+        "200":
+          description: Connection states (no tokens)
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/PersonalConnection" } }
+        "401": { description: "No valid session" }
+        "404": { description: "Caller is not a member of the organization" }
+  /api/v1/orgs/{orgId}/connections/{kind}/{serverId}/start:
+    parameters:
+      - $ref: "#/components/parameters/OrgIdPath"
+      - { name: kind, in: path, required: true, schema: { type: string, enum: [mcp, openapi] } }
+      - { name: serverId, in: path, required: true, schema: { type: integer, format: int64 } }
+    post:
+      operationId: startPersonalConnection
+      summary: TU-06b. Start Authorization Code + PKCE (S256) bound to this session, person, org and server
+      parameters: [{ $ref: "#/components/parameters/CsrfHeader" }]
+      responses:
+        "200":
+          description: Flow id for status polling and the authorization URL to open in a browser
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [flowId, authorizationUrl]
+                properties:
+                  flowId: { type: string, format: uuid }
+                  authorizationUrl: { type: string, format: uri }
+        "404": { description: "Server not available to the caller in this organization" }
+        "503": { description: "No client configured or no master key for encrypted storage" }
+  /api/v1/orgs/{orgId}/connections/flows/{flowId}:
+    parameters:
+      - $ref: "#/components/parameters/OrgIdPath"
+      - { name: flowId, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: personalConnectionStatus
+      summary: TU-06b. Status of a flow for the STARTING session; exchanges a returned code exactly once
+      responses:
+        "200":
+          description: Flow status
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status: { type: string, enum: [PENDING, CONNECTED, FAILED, EXPIRED] }
+        "404": { description: "Unknown flow, or another session or person" }
+  /api/v1/orgs/{orgId}/connections/{kind}/{serverId}:
+    parameters:
+      - $ref: "#/components/parameters/OrgIdPath"
+      - { name: kind, in: path, required: true, schema: { type: string, enum: [mcp, openapi] } }
+      - { name: serverId, in: path, required: true, schema: { type: integer, format: int64 } }
+    delete:
+      operationId: disconnectPersonalConnection
+      summary: TU-06b. Delete the caller's tokens at once, then revoke them at the provider (best effort)
+      parameters: [{ $ref: "#/components/parameters/CsrfHeader" }]
+      responses:
+        "204": { description: "Disconnected (also when nothing was connected)" }
+  /api/v1/oauth/connections/callback:
+    get:
+      operationId: personalConnectionCallback
+      summary: TU-06b. Redirect target of the authorization server; needs no session
+      description: >-
+        Records the code of an open, fresh, unconsumed flow only. A Keplura session of another person ends the
+        flow. Fixed HTML page, no parameter is reflected; strict CSP, no-store, no-referrer.
+      parameters:
+        - { name: state, in: query, required: false, schema: { type: string } }
+        - { name: code, in: query, required: false, schema: { type: string } }
+        - { name: error, in: query, required: false, schema: { type: string } }
+      responses:
+        "200": { description: "Code accepted", content: { text/html: { schema: { type: string } } } }
+        "400": { description: "Refused (wrong or used state, other person, expired, provider error)", content: { text/html: { schema: { type: string } } } }
+  /api/v1/orgs/{orgId}/chat/conversations/{conversationId}/tool-artifacts/{artifactId}:
+    parameters:
+      - $ref: "#/components/parameters/OrgIdPath"
+      - $ref: "#/components/parameters/ConversationIdPath"
+      - { name: artifactId, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: downloadToolArtifact
+      summary: TU-06d. Bytes of a verified tool result file, only for the owner of the chat
+      description: >-
+        Content-Type is the type verified by magic bytes (PNG, JPEG, WebP, GIF, PDF, CSV, text, JSON).
+        Always `X-Content-Type-Options: nosniff`, `Content-Security-Policy: sandbox; default-src 'none'`,
+        `Cache-Control: private, no-store`; non-images are always `Content-Disposition: attachment`.
+      responses:
+        "200":
+          description: File bytes
+          content:
+            image/png: { schema: { type: string, format: binary } }
+            image/jpeg: { schema: { type: string, format: binary } }
+            image/webp: { schema: { type: string, format: binary } }
+            image/gif: { schema: { type: string, format: binary } }
+            application/pdf: { schema: { type: string, format: binary } }
+            text/csv: { schema: { type: string } }
+            text/plain: { schema: { type: string } }
+            application/json: { schema: { type: string } }
+        "401": { description: "No valid session" }
+        "404": { description: "Unknown, dropped or not the caller's artifact (other person, org or chat)" }
 components:
   parameters:
     CsrfHeader:
@@ -2006,8 +2221,18 @@ components:
       uniqueItems: true
     ChatToolSelection:
       type: object
-      required: [selectedIds, tools, modelDefaultIds, modelToolsOff]
+      required: [selectedIds, tools, modelDefaultIds, modelToolsOff, connectionsRequired]
       properties:
+        connectionsRequired:
+          type: array
+          description: TU-06b. Servers whose approved tools this person only gets after connecting personally ("Verbindung nötig").
+          items:
+            type: object
+            required: [kind, serverId, name]
+            properties:
+              kind: { type: string, enum: [mcp, openapi] }
+              serverId: { type: integer, format: int64 }
+              name: { type: string }
         modelDefaultIds:
           type: ["array", "null"]
           description: TU-05b. Tools the current chat model offers by default; null = every approved tool.
@@ -2028,6 +2253,83 @@ components:
               name: { type: string }
               source: { type: string }
               risk: { type: string, enum: [READ, WRITE, CRITICAL] }
+    OpenApiServer:
+      type: object
+      required: [id, name, specUrl, baseUrl, authMode, hasToken, enabled, tools, allSpaces, spaceIds]
+      properties:
+        id: { type: integer, format: int64 }
+        name: { type: string }
+        specUrl: { type: string }
+        baseUrl: { type: string, description: "Fixed target of every call; the document's servers list is ignored." }
+        authMode: { type: string, enum: [none, bearer, oauth] }
+        hasToken: { type: boolean }
+        enabled: { type: boolean }
+        lastCheckedAt: { type: ["string", "null"], format: date-time }
+        lastError: { type: ["string", "null"] }
+        allSpaces: { type: boolean }
+        spaceIds: { type: array, items: { type: integer, format: int64 } }
+        tools:
+          type: array
+          items:
+            type: object
+            required: [method, path, enabled, usable]
+            properties:
+              name: { type: ["string", "null"], description: "operationId; null = not usable" }
+              method: { type: string }
+              path: { type: string }
+              description: { type: string }
+              enabled: { type: boolean, description: "Effectively approved (classified, usable, ticked)." }
+              risk: { type: ["string", "null"], enum: [READ, WRITE, CRITICAL, null] }
+              usable: { type: boolean }
+              problem: { type: ["string", "null"] }
+    OpenApiServerInput:
+      type: object
+      description: All fields optional on PATCH; token null = unchanged, "" = remove.
+      properties:
+        name: { type: string, maxLength: 120 }
+        specUrl: { type: string, maxLength: 500 }
+        baseUrl: { type: string, maxLength: 500 }
+        authMode: { type: string, enum: [none, bearer, oauth] }
+        token: { type: ["string", "null"], writeOnly: true }
+        enabled: { type: boolean }
+        enabledTools: { type: array, items: { type: string } }
+        allSpaces: { type: boolean }
+        spaceIds: { type: array, items: { type: integer, format: int64 } }
+        toolRisks: { type: object, additionalProperties: { type: string, enum: [READ, WRITE, CRITICAL, ""] } }
+    OAuthClient:
+      type: object
+      required: [kind, serverId, serverName, configured, hasClientSecret, connectedCount]
+      properties:
+        kind: { type: string, enum: [mcp, openapi] }
+        serverId: { type: integer, format: int64 }
+        serverName: { type: string }
+        configured: { type: boolean }
+        authorizeUrl: { type: ["string", "null"] }
+        tokenUrl: { type: ["string", "null"] }
+        revokeUrl: { type: ["string", "null"] }
+        clientId: { type: ["string", "null"] }
+        hasClientSecret: { type: boolean }
+        scopes: { type: ["string", "null"] }
+        connectedCount: { type: integer }
+    OAuthClientInput:
+      type: object
+      required: [authorizeUrl, tokenUrl, clientId]
+      properties:
+        authorizeUrl: { type: string, maxLength: 500 }
+        tokenUrl: { type: string, maxLength: 500 }
+        revokeUrl: { type: ["string", "null"], maxLength: 500 }
+        clientId: { type: string, maxLength: 300 }
+        clientSecret: { type: ["string", "null"], writeOnly: true, description: "null = unchanged, \"\" = remove" }
+        scopes: { type: ["string", "null"], maxLength: 1000 }
+    PersonalConnection:
+      type: object
+      required: [kind, serverId, name, connected]
+      properties:
+        kind: { type: string, enum: [mcp, openapi] }
+        serverId: { type: integer, format: int64 }
+        name: { type: string }
+        connected: { type: boolean }
+        connectedSince: { type: ["string", "null"], format: date-time }
     # ---- ADMIN-KI (ADR-0008): admin surface shapes. The login response now
     # additionally carries `role` (USER | ADMIN) — see LoginResponse. ----
     AdminProvider:
