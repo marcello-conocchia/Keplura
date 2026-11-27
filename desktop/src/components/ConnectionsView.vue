@@ -1,16 +1,14 @@
 <script setup lang="ts">
 /**
  * Persönliche Verbindungen (TU-06b): jede Person verbindet sich selbst mit Werkzeugservern, die der Admin für
- * „persönlich (OAuth)“ eingerichtet hat. Die Anmeldung läuft im Browser; die App fragt danach den Status ab.
+ * „persönlich (OAuth)“ eingerichtet hat. Die Anmeldung läuft wie der OIDC-Login im App-Fenster selbst; zurück in
+ * der App löst sie den Einmal-Code ein (siehe connection-return.ts und App.vue).
  * Tokens erreichen die App nie — sie sieht nur „verbunden“ oder „nicht verbunden“.
  */
 import { onBeforeUnmount, ref, watch } from "vue";
 import { useAuthStore } from "../auth-store";
-import {
-  connectionStatus, disconnectConnection, listConnections, startConnection, type PersonalConnection,
-} from "../productivity-api";
-import { inTauri } from "../transport";
-import { copyText } from "./ui/clipboard";
+import { disconnectConnection, listConnections, startConnection, type PersonalConnection } from "../productivity-api";
+import { connectionNotice, rememberConnectionOrg } from "../connection-return";
 import PageContainer from "./layout/PageContainer.vue";
 import PageHeader from "./layout/PageHeader.vue";
 import Button from "./ui/Button.vue";
@@ -23,14 +21,16 @@ const loading = ref(false);
 const error = ref("");
 const note = ref("");
 const busy = ref<string | null>(null);
-/** The open sign-in: link shown as fallback when no browser window could be opened. */
-const pending = ref<{ key: string; url: string; flowId: string } | null>(null);
-let timer: ReturnType<typeof setTimeout> | null = null;
 let disposed = false;
 const key = (c: PersonalConnection) => `${c.kind}-${c.serverId}`;
+onBeforeUnmount(() => { disposed = true; });
 
-function stopPolling() { if (timer) clearTimeout(timer); timer = null; }
-onBeforeUnmount(() => { disposed = true; stopPolling(); });
+// Rückkehr aus der Anmeldung: Ergebnis einmal anzeigen.
+if (connectionNotice.value) {
+  if (connectionNotice.value.ok) note.value = tr("Verbunden. Die Werkzeuge stehen ab der nächsten Frage zur Verfügung.");
+  else error.value = tr("Die Verbindung konnte nicht hergestellt werden. Bitte erneut versuchen.");
+  connectionNotice.value = null;
+}
 
 async function load() {
   const org = auth.selectedOrgId;
@@ -43,7 +43,7 @@ async function load() {
   if (r.kind === "ok") items.value = r.value;
   else error.value = tr("Verbindungen konnten nicht geladen werden.");
 }
-watch(() => auth.selectedOrgId, () => { stopPolling(); pending.value = null; void load(); }, { immediate: true });
+watch(() => auth.selectedOrgId, () => { void load(); }, { immediate: true });
 
 async function connect(c: PersonalConnection) {
   const org = auth.selectedOrgId;
@@ -52,27 +52,10 @@ async function connect(c: PersonalConnection) {
   try {
     const r = await startConnection(org, c.kind, c.serverId);
     if (r.kind !== "ok") { error.value = r.kind === "error" ? r.message : tr("Deine Sitzung ist abgelaufen."); return; }
-    pending.value = { key: key(c), url: r.value.authorizationUrl, flowId: r.value.flowId };
-    // Web: a new tab. Desktop: the system browser is not reachable without an extra plugin, so the link is shown to copy.
-    if (!inTauri()) window.open(r.value.authorizationUrl, "_blank", "noopener,noreferrer");
-    poll(org, r.value.flowId, Date.now());
+    // Same window, top-level navigation (like the OIDC login): the server sends us back with a one-time code.
+    rememberConnectionOrg(org);
+    window.location.assign(r.value.authorizationUrl);
   } finally { busy.value = null; }
-}
-
-function poll(org: number, flowId: string, started: number) {
-  stopPolling();
-  timer = setTimeout(async () => {
-    if (disposed || org !== auth.selectedOrgId || pending.value?.flowId !== flowId) return;
-    const r = await connectionStatus(org, flowId);
-    if (disposed || pending.value?.flowId !== flowId) return;
-    const status = r.kind === "ok" ? r.value.status : "FAILED";
-    if (status === "PENDING" && Date.now() - started < 10 * 60 * 1000) { poll(org, flowId, started); return; }
-    pending.value = null;
-    if (status === "CONNECTED") note.value = tr("Verbunden. Die Werkzeuge stehen ab der nächsten Frage zur Verfügung.");
-    else error.value = status === "EXPIRED" || status === "PENDING" ? tr("Die Anmeldung ist abgelaufen. Bitte erneut verbinden.")
-      : tr("Die Verbindung konnte nicht hergestellt werden. Bitte erneut versuchen.");
-    await load();
-  }, 2000);
 }
 
 async function disconnect(c: PersonalConnection) {
@@ -84,9 +67,6 @@ async function disconnect(c: PersonalConnection) {
     if (r.kind === "ok") { note.value = tr("Getrennt. Deine Zugangsdaten für {0} wurden gelöscht.", c.name); await load(); }
     else error.value = r.kind === "error" ? r.message : tr("Deine Sitzung ist abgelaufen.");
   } finally { busy.value = null; }
-}
-async function copyLink() {
-  if (pending.value) note.value = (await copyText(pending.value.url)) ? tr("Link kopiert. Öffne ihn in deinem Browser.") : tr("Kopieren nicht möglich.");
 }
 </script>
 
@@ -105,14 +85,9 @@ async function copyLink() {
           <div class="connection-actions">
             <StatusPill :tone="c.connected ? 'ok' : 'neutral'">{{ c.connected ? $t("Verbunden") : $t("Nicht verbunden") }}</StatusPill>
             <Button v-if="c.connected" size="compact" :disabled="busy !== null" @click="disconnect(c)">{{ $t("Trennen") }}</Button>
-            <Button v-else variant="primary" size="compact" :disabled="busy !== null || pending !== null" :busy="busy === key(c)" @click="connect(c)">{{ $t("Verbinden") }}</Button>
+            <Button v-else variant="primary" size="compact" :disabled="busy !== null" :busy="busy === key(c)" @click="connect(c)">{{ $t("Verbinden") }}</Button>
           </div>
         </header>
-        <div v-if="pending?.key === key(c)" class="connection-note" role="status">
-          <p>{{ $t("Melde dich im Browser an. Keplura prüft danach automatisch, ob die Verbindung steht.") }}</p>
-          <p><a :href="pending.url" target="_blank" rel="noopener noreferrer">{{ $t("Anmeldung im Browser öffnen") }}</a></p>
-          <Button size="compact" @click="copyLink">{{ $t("Link kopieren") }}</Button>
-        </div>
       </article>
     </section>
   </PageContainer>

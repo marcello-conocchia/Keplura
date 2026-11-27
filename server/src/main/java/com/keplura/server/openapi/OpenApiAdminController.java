@@ -195,7 +195,8 @@ public class OpenApiAdminController {
                 }
             }
             if (in.enabledTools() != null) {
-                approved = new LinkedHashSet<>(in.enabledTools().stream().filter(known::containsKey).distinct().toList());
+                approved = new LinkedHashSet<>(in.enabledTools().stream().filter(java.util.Objects::nonNull)
+                        .filter(OpenApiDocument::safeOperationId).filter(known::containsKey).distinct().toList());
             }
             approved.removeIf(t -> !known.containsKey(t) || risks.get(t) == null || !known.get(t).usable());
             jdbc.update("update openapi_server set enabled_tools = ?, tool_risks = ? where id = ?",

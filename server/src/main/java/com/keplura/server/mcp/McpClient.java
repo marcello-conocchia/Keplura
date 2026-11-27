@@ -108,15 +108,17 @@ public class McpClient {
             String type = c.path("type").asString("");
             if ("text".equals(type)) sb.append(c.path("text").asString("")).append('\n');
             else if ("image".equals(type) || "audio".equals(type)) {
-                files.add(artifact(type, c.path("mimeType").asString(""), c.path("data")));
+                files.add(artifact(null, c.path("mimeType").asString(""), c.path("data")));
             } else if ("resource".equals(type)) {
                 JsonNode r = c.path("resource");
-                if (r.path("blob").isString()) files.add(artifact(r.path("uri").asString(""), r.path("mimeType").asString(""), r.path("blob")));
+                // The resource URI is never used (no name, no metadata): it could echo the bearer token.
+                if (r.path("blob").isString()) files.add(artifact(null, r.path("mimeType").asString(""), r.path("blob")));
                 else if (r.path("text").isString()) sb.append(r.path("text").asString("")).append('\n');
             }
             if (files.size() > 64) break;
         }
-        return new CallResult(safe(sb.toString().strip(), token), List.copyOf(files));
+        return new CallResult(safe(sb.toString().strip(), token),
+                com.keplura.server.tool.ToolArtifactStore.withoutCredential(List.copyOf(files), token));
     }
 
     private static com.keplura.server.tool.ToolAdapter.Artifact artifact(String name, String mimeType, JsonNode data) {

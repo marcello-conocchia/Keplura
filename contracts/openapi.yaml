@@ -2023,6 +2023,9 @@ paths:
     put:
       operationId: putOAuthClient
       summary: TU-06b. Create or change the client; any change removes every connection of this server
+      description: >-
+        All endpoints and the server address must be HTTPS. For an MCP server this also stores the access mode
+        "personal" (it never falls back to the shared admin key by itself).
       parameters: [{ $ref: "#/components/parameters/CsrfHeader" }]
       requestBody:
         required: true
@@ -2035,11 +2038,15 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/OAuthClient" }
-        "400": { description: "Invalid endpoint, client id or scopes; OpenAPI server not in access mode \"oauth\"" }
+        "400": { description: "Invalid endpoint (HTTPS only), client id or scopes; server address not HTTPS; OpenAPI server not in access mode \"oauth\"" }
         "404": { description: "Unknown server" }
     delete:
       operationId: deleteOAuthClient
       summary: TU-06b. Switch personal access off; the client and every connection are removed at once
+      description: >-
+        MCP: back to the shared admin key only through this explicit switch, and the tool approvals and risk
+        classes of the server are cleared (fresh approvals needed). OpenAPI keeps access mode "oauth" and fails
+        closed until the admin chooses another mode.
       parameters: [{ $ref: "#/components/parameters/CsrfHeader" }]
       responses:
         "204": { description: "Removed" }
@@ -2067,7 +2074,9 @@ paths:
       parameters: [{ $ref: "#/components/parameters/CsrfHeader" }]
       responses:
         "200":
-          description: Flow id for status polling and the authorization URL to open in a browser
+          description: >-
+            Flow id and the authorization URL. The app navigates its OWN window there (top-level, like the OIDC
+            login); the callback returns to the fixed app address with a one-time handoff.
           content:
             application/json:
               schema:
@@ -2084,7 +2093,7 @@ paths:
       - { name: flowId, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: personalConnectionStatus
-      summary: TU-06b. Status of a flow for the STARTING session; exchanges a returned code exactly once
+      summary: TU-06b. Read-only status of a flow for the STARTING session (the exchange needs the handoff)
       responses:
         "200":
           description: Flow status
@@ -2096,6 +2105,38 @@ paths:
                 properties:
                   status: { type: string, enum: [PENDING, CONNECTED, FAILED, EXPIRED] }
         "404": { description: "Unknown flow, or another session or person" }
+  /api/v1/orgs/{orgId}/connections/complete:
+    parameters: [{ $ref: "#/components/parameters/OrgIdPath" }]
+    post:
+      operationId: completePersonalConnection
+      summary: TU-06b. Redeem the one-time handoff from the callback; exchanges the code exactly once
+      description: >-
+        Only the person AND session that started the flow can redeem the handoff, once. A forwarded authorization
+        link therefore binds nothing: the handoff lands in the browser that authorized.
+      parameters: [{ $ref: "#/components/parameters/CsrfHeader" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [handoff]
+              properties:
+                handoff: { type: string, pattern: "^[0-9a-f]{64}$" }
+      responses:
+        "200":
+          description: How the flow ended
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, kind, serverId]
+                properties:
+                  status: { type: string, enum: [CONNECTED, FAILED, EXPIRED] }
+                  kind: { type: string, enum: [mcp, openapi] }
+                  serverId: { type: integer, format: int64 }
+        "401": { description: "No valid session" }
+        "404": { description: "Unknown or used handoff, another session or person, or another organization" }
   /api/v1/orgs/{orgId}/connections/{kind}/{serverId}:
     parameters:
       - $ref: "#/components/parameters/OrgIdPath"
@@ -2110,17 +2151,19 @@ paths:
   /api/v1/oauth/connections/callback:
     get:
       operationId: personalConnectionCallback
-      summary: TU-06b. Redirect target of the authorization server; needs no session
+      summary: TU-06b. Redirect target of the authorization server; needs no API session
       description: >-
         Records the code of an open, fresh, unconsumed flow only. A Keplura session of another person ends the
-        flow. Fixed HTML page, no parameter is reflected; strict CSP, no-store, no-referrer.
+        flow. 302 to the fixed app address (keplura.oidc.desktop-redirect-uri) with `#oauth=<handoff>` or
+        `#oauth-error`; no parameter is reflected; no-store, no-referrer. Without a configured app address a fixed
+        HTML failure page.
       parameters:
         - { name: state, in: query, required: false, schema: { type: string } }
         - { name: code, in: query, required: false, schema: { type: string } }
         - { name: error, in: query, required: false, schema: { type: string } }
       responses:
-        "200": { description: "Code accepted", content: { text/html: { schema: { type: string } } } }
-        "400": { description: "Refused (wrong or used state, other person, expired, provider error)", content: { text/html: { schema: { type: string } } } }
+        "302": { description: "Back to the app with the one-time handoff, or with #oauth-error (wrong or used state, other person, expired, provider error)" }
+        "400": { description: "No app address configured", content: { text/html: { schema: { type: string } } } }
   /api/v1/orgs/{orgId}/chat/conversations/{conversationId}/tool-artifacts/{artifactId}:
     parameters:
       - $ref: "#/components/parameters/OrgIdPath"

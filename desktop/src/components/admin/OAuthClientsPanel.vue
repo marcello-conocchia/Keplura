@@ -44,7 +44,13 @@ async function remove(r: OAuthClientView) {
   busy.value = key(r); error.value = "";
   try {
     const res = await deleteOAuthClient(r.kind, r.serverId);
-    if (res.kind === "ok") { note.value = tr("Persönliche Anmeldung ausgeschaltet. Alle Verbindungen dieses Servers wurden gelöscht."); await load(); }
+    if (res.kind === "ok") {
+      // MCP falls back to the shared admin key only with fresh approvals (the server cleared them).
+      note.value = r.kind === "mcp"
+        ? tr("Persönliche Anmeldung ausgeschaltet. Alle Verbindungen wurden gelöscht; die Werkzeugfreigaben dieses MCP-Servers müssen neu erteilt werden.")
+        : tr("Persönliche Anmeldung ausgeschaltet. Alle Verbindungen dieses Servers wurden gelöscht.");
+      await load();
+    }
     else error.value = res.kind === "error" ? res.message : tr("Deine Sitzung ist abgelaufen.");
   } finally { busy.value = null; }
 }

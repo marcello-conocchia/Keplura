@@ -211,9 +211,11 @@ class OpenApiToolTest {
             var out = turn().call(fn("getItem"), "{\"id\":\"" + id + "\"}");
             assertThat(out.invoked()).as(id).isFalse();
         }
+        // Review finding 7: also no value that an upstream could decode (once or twice) into a dot segment.
+        assertThat(turn().call(fn("getItem"), "{\"id\":\"%2e%2e\"}").invoked()).isFalse();
         assertThat(apiRequests).hasValue(0);
-        assertThat(turn().call(fn("getItem"), "{\"id\":\"%2e%2e\"}").invoked()).isTrue();
-        assertThat(received).containsExactly("GET /v1/items/%252e%252e");
+        assertThat(turn().call(fn("getItem"), "{\"id\":\"a%20b\"}").invoked()).isTrue();
+        assertThat(received).containsExactly("GET /v1/items/a%2520b");
     }
 
     @Test void schemaValidationBlocksBeforeAnyRequest() {
@@ -262,7 +264,15 @@ class OpenApiToolTest {
         assertThat(turn().call(fn("getItem"), "{\"id\":\"1\"}").text()).contains("[Datei verworfen:");
         responseBody = ToolArtifactTest.png(3, 3);
         var image = turn().call(fn("getItem"), "{\"id\":\"1\"}");
-        assertThat(image.text()).contains("[Datei-Ergebnis: antwort.png (image/png").doesNotContain("IHDR");
+        assertThat(image.text()).contains("[Datei-Ergebnis: ergebnis-1.png (image/png").doesNotContain("IHDR");
+        // Review finding 5: a binary body that echoes the bearer is never stored or published.
+        responseBody = ("%PDF-1.4 " + TOKEN).getBytes(StandardCharsets.UTF_8);
+        responseType = "application/pdf";
+        var echoed = turn().call(fn("getItem"), "{\"id\":\"1\"}");
+        assertThat(echoed.text()).contains(ToolArtifactStore.CREDENTIAL_REASON).doesNotContain(TOKEN);
+        assertThat(jdbc.queryForObject("select count(*) from tool_artifact where dropped_reason=?", Integer.class,
+                ToolArtifactStore.CREDENTIAL_REASON)).isEqualTo(1);
+        responseType = "image/png";
         responseBody = "<html>x</html>".getBytes(StandardCharsets.UTF_8);
         responseType = "text/html";
         assertThat(turn().call(fn("getItem"), "{\"id\":\"1\"}").text()).contains("Dieser Dateityp ist nicht erlaubt.");

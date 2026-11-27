@@ -2,22 +2,23 @@ package com.keplura.server.openapi;
 
 import com.keplura.server.admin.AdminException;
 import com.keplura.server.admin.SsrfGuard;
-import com.keplura.server.http.BoundedHttpBody;
+import com.keplura.server.http.PinnedHttp;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
- * TU-06a HTTP transport for OpenAPI tool servers. Every dial goes through {@link SsrfGuard#validateForDial}
- * (admin targets, operator CIDR exceptions apply), never follows redirects, ignores proxies from the
- * environment and reads bounded bodies with a hard deadline. Error texts are fixed: no address, header or body.
+ * TU-06a HTTP transport for OpenAPI tool servers. Every dial goes through {@link PinnedHttp}: the host is resolved
+ * once, every answer must pass {@link SsrfGuard#allowsAdminRoute} (admin targets, operator CIDR exceptions apply)
+ * and the socket connects to exactly that checked address. No redirects, no proxy from the environment, bounded
+ * bodies with a hard deadline. Error texts are fixed: no address, header or body.
  */
 @Component
 public class OpenApiClient {
@@ -43,14 +44,16 @@ public class OpenApiClient {
         public boolean started() { return started; }
     }
 
-    private final HttpClient http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10))
-            .followRedirects(HttpClient.Redirect.NEVER).proxy(HttpClient.Builder.NO_PROXY).build();
+    private final PinnedHttp http;
     private final SsrfGuard guard;
 
-    public OpenApiClient(SsrfGuard guard) { this.guard = guard; }
+    @Autowired
+    public OpenApiClient(SsrfGuard guard) { this(guard, new PinnedHttp()); }
 
-    @jakarta.annotation.PreDestroy
-    public void close() { http.close(); }
+    public OpenApiClient(SsrfGuard guard, PinnedHttp http) {
+        this.guard = guard;
+        this.http = http;
+    }
 
     /** Loads the OpenAPI document (JSON, at most 1 MB). */
     public byte[] fetchDocument(String url, String bearer) {
@@ -72,41 +75,34 @@ public class OpenApiClient {
 
     private Response send(String method, String url, String bearer, String jsonBody, String accept, int maxBytes,
                           boolean binaryAllowed) {
-        HttpRequest request;
+        URI uri;
+        Map<String, String> headers = new LinkedHashMap<>();
         try {
-            guard.validateForDial(url);
-            HttpRequest.Builder b = HttpRequest.newBuilder(URI.create(url)).timeout(CALL_TIMEOUT).header("Accept", accept);
-            if (bearer != null && !bearer.isEmpty()) b.header("Authorization", "Bearer " + bearer);
-            if (jsonBody != null) {
-                b.header("Content-Type", "application/json");
-                b.method(method, HttpRequest.BodyPublishers.ofString(jsonBody));
-            } else {
-                b.method(method, HttpRequest.BodyPublishers.noBody());
-            }
-            request = b.build();
-        } catch (AdminException e) {
-            throw new OpenApiException("Dieses Verbindungsziel ist nicht freigegeben. Bitte die Server-Freigabeliste prüfen.", false);
-        } catch (IllegalArgumentException e) {
+            uri = SsrfGuard.parseShape(url);
+            headers.put("Accept", accept);
+            if (bearer != null && !bearer.isEmpty()) headers.put("Authorization", "Bearer " + bearer);
+            if (jsonBody != null) headers.put("Content-Type", "application/json");
+        } catch (AdminException | IllegalArgumentException e) {
             throw new OpenApiException("Die Serveradresse ist ungültig.", false);
         }
+        String[] type = {""};
         try {
-            HttpResponse<java.io.InputStream> r = http.send(request, HttpResponse.BodyHandlers.ofInputStream());
-            String contentType = r.headers().firstValue("Content-Type").orElse("").toLowerCase(Locale.ROOT).strip();
-            int cap = maxBytes;
-            boolean binary = binaryAllowed && !isText(contentType);
-            if (binaryAllowed && !binary) cap = Math.min(maxBytes, MAX_TEXT_BYTES);
-            // A binary body may reach the cap by one byte: then it is dropped and noted instead of failing the call.
-            try (var input = new BoundedHttpBody(r.body(), binary ? cap + 1 : cap, CALL_TIMEOUT)) {
-                if (r.statusCode() / 100 != 2) return new Response(r.statusCode(), contentType, new byte[0]);
-                byte[] body = binary ? input.readNBytes(cap + 1) : input.readAllBytes();
-                if (binary && body.length > cap) return new Response(r.statusCode(), contentType, new byte[0], true);
-                return new Response(r.statusCode(), contentType, body);
-            }
-        } catch (HttpTimeoutException e) {
+            PinnedHttp.Response r = http.send(method, uri, headers,
+                    jsonBody == null ? null : jsonBody.getBytes(StandardCharsets.UTF_8), h -> {
+                        type[0] = h.getOrDefault("content-type", "").toLowerCase(Locale.ROOT).strip();
+                        boolean binary = binaryAllowed && !isText(type[0]);
+                        // A binary body above the cap is dropped and noted instead of failing the call.
+                        return new PinnedHttp.Limit(binary ? maxBytes : Math.min(maxBytes, MAX_TEXT_BYTES), binary);
+                    }, CALL_TIMEOUT, guard::allowsAdminRoute);
+            String contentType = r.header("content-type").toLowerCase(Locale.ROOT).strip();
+            if (r.status() / 100 != 2) return new Response(r.status(), contentType, new byte[0]);
+            return new Response(r.status(), contentType, r.body(), r.truncated());
+        } catch (PinnedHttp.Refused e) {
+            throw new OpenApiException("Dieses Verbindungsziel ist nicht freigegeben. Bitte die Server-Freigabeliste prüfen.", false);
+        } catch (PinnedHttp.Timeout e) {
             throw new OpenApiException("Der Werkzeugserver hat nicht rechtzeitig geantwortet.", true);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new OpenApiException("Die Anfrage wurde unterbrochen.", true);
+        } catch (IllegalArgumentException e) {
+            throw new OpenApiException("Die Serveradresse ist ungültig.", false);
         } catch (IOException e) {
             throw new OpenApiException("Der Werkzeugserver ist nicht erreichbar oder hat keine gültige, begrenzte Antwort gesendet.", true);
         }

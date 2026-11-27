@@ -2,16 +2,14 @@ package com.keplura.server.oauth;
 
 import com.keplura.server.admin.AdminException;
 import com.keplura.server.admin.SsrfGuard;
-import com.keplura.server.http.BoundedHttpBody;
+import com.keplura.server.http.PinnedHttp;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.net.URI;
 import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
@@ -23,7 +21,8 @@ import java.util.stream.Collectors;
 /**
  * TU-06b: talks to an admin-configured OAuth token endpoint (code exchange, refresh, revocation). Same posture as
  * the OIDC token client of ADR-0009: SSRF-guarded admin target, no redirects, no proxy from the environment,
- * bounded body, client secret only as HTTP Basic header. No response text, header or token ever reaches a log,
+ * bounded body, client secret only as HTTP Basic header. HTTPS only ({@link OAuthTransportPolicy}), checked before
+ * anything is sent, and the connection is pinned to the checked address ({@link PinnedHttp}). No response text, header or token ever reaches a log,
  * an exception message or a caller-visible text.
  */
 @Component
@@ -48,14 +47,23 @@ public class OAuthTokenClient {
         public boolean rejected() { return rejected; }
     }
 
-    private final HttpClient http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10))
-            .followRedirects(HttpClient.Redirect.NEVER).proxy(HttpClient.Builder.NO_PROXY).build();
+    private final PinnedHttp http;
     private final SsrfGuard guard;
+    private final OAuthTransportPolicy transport;
 
-    public OAuthTokenClient(SsrfGuard guard) { this.guard = guard; }
+    @Autowired
+    public OAuthTokenClient(SsrfGuard guard, OAuthTransportPolicy transport) { this(guard, transport, new PinnedHttp()); }
 
-    @jakarta.annotation.PreDestroy
-    public void close() { http.close(); }
+    public OAuthTokenClient(SsrfGuard guard, OAuthTransportPolicy transport, PinnedHttp http) {
+        this.guard = guard;
+        this.transport = transport;
+        this.http = http;
+    }
+
+    /** Whether a personal bearer token may be sent to this resource URL (HTTPS only, see {@link OAuthTransportPolicy}). */
+    public boolean allowsCredentialTarget(String url) {
+        return transport.allows(url);
+    }
 
     public Tokens exchange(String tokenUrl, String clientId, String clientSecret, String code, String redirectUri, String verifier) {
         Map<String, String> form = new LinkedHashMap<>();
@@ -90,33 +98,30 @@ public class OAuthTokenClient {
     }
 
     private JsonNode post(String url, String clientId, String clientSecret, Map<String, String> form) {
-        HttpRequest.Builder b;
+        URI uri;
         try {
-            guard.validateForDial(url);
-            b = HttpRequest.newBuilder(URI.create(url));
+            // Plain HTTP never sees a code, verifier, secret or token: refused before anything is sent.
+            if (!transport.allows(url)) throw new TokenException(false);
+            uri = SsrfGuard.parseShape(url);
         } catch (AdminException | IllegalArgumentException e) {
             throw new TokenException(false);
         }
+        Map<String, String> headers = new LinkedHashMap<>();
         if (clientSecret != null && !clientSecret.isEmpty()) {
             String pair = enc(clientId) + ":" + enc(clientSecret);
-            b.header("Authorization", "Basic " + Base64.getEncoder().encodeToString(pair.getBytes(StandardCharsets.UTF_8)));
+            headers.put("Authorization", "Basic " + Base64.getEncoder().encodeToString(pair.getBytes(StandardCharsets.UTF_8)));
         }
+        headers.put("Content-Type", "application/x-www-form-urlencoded");
+        headers.put("Accept", "application/json");
         String body = form.entrySet().stream().map(e -> enc(e.getKey()) + "=" + enc(e.getValue())).collect(Collectors.joining("&"));
-        b.timeout(TIMEOUT).header("Content-Type", "application/x-www-form-urlencoded").header("Accept", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8));
         try {
-            HttpResponse<java.io.InputStream> r = http.send(b.build(), HttpResponse.BodyHandlers.ofInputStream());
-            try (var input = new BoundedHttpBody(r.body(), MAX_BYTES, TIMEOUT)) {
-                byte[] raw = input.readAllBytes();
-                if (r.statusCode() / 100 != 2) throw new TokenException(r.statusCode() / 100 == 4);
-                if (raw.length == 0) return JsonMapper.builder().build().createObjectNode();
-                return JsonMapper.builder().build().readTree(raw);
-            }
+            PinnedHttp.Response r = http.send("POST", uri, headers, body.getBytes(StandardCharsets.UTF_8),
+                    h -> new PinnedHttp.Limit(MAX_BYTES, false), TIMEOUT, guard::allowsAdminRoute);
+            if (r.status() / 100 != 2) throw new TokenException(r.status() / 100 == 4);
+            if (r.body().length == 0) return JsonMapper.builder().build().createObjectNode();
+            return JsonMapper.builder().build().readTree(r.body());
         } catch (TokenException e) {
             throw e;
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new TokenException(false);
         } catch (Exception e) {
             throw new TokenException(false);
         }

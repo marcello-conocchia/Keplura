@@ -153,6 +153,8 @@ export const startConnection = (orgId: number, kind: ConnectionKind, serverId: n
   call<{ flowId: string; authorizationUrl: string }>("POST", `/api/v1/orgs/${orgId}/connections/${kind}/${serverId}/start`);
 export const connectionStatus = (orgId: number, flowId: string) =>
   call<{ status: ConnectionFlowStatus }>("GET", `/api/v1/orgs/${orgId}/connections/flows/${encodeURIComponent(flowId)}`);
+export const completeConnection = (orgId: number, handoff: string) =>
+  call<{ status: ConnectionFlowStatus; kind: ConnectionKind; serverId: number }>("POST", `/api/v1/orgs/${orgId}/connections/complete`, { handoff });
 export const disconnectConnection = (orgId: number, kind: ConnectionKind, serverId: number) =>
   call<void>("DELETE", `/api/v1/orgs/${orgId}/connections/${kind}/${serverId}`);
 export interface OAuthClientView {

@@ -162,7 +162,7 @@ public class OpenApiToolAdapter implements ToolAdapter {
         }
         String url = url(server.baseUrl(), op, arguments);
         String token = connection != null
-                ? oauth.accessToken(context.userId(), context.orgId(), KIND, server.id(), connection.id())
+                ? oauth.accessToken(context.userId(), context.orgId(), KIND, server.id(), connection.id(), url)
                 : bearer(server);
         String body = op.hasBody() && arguments != null && arguments.has("body") ? arguments.get("body").toString() : null;
         OpenApiClient.Response response;
@@ -175,9 +175,11 @@ public class OpenApiToolAdapter implements ToolAdapter {
         int status = response.status();
         if (status / 100 == 2 && (response.tooLarge() || response.body().length > 0) && !OpenApiClient.isText(response.contentType())) {
             var file = response.tooLarge()
-                    ? new Artifact("antwort", response.contentType(), null, "Die Datei ist größer als 5 MB.")
-                    : new Artifact("antwort", response.contentType(), response.body());
-            return new Result("Der Werkzeugserver hat eine Datei geliefert.", List.of(file));
+                    ? new Artifact(null, response.contentType(), null, "Die Datei ist größer als 5 MB.")
+                    : new Artifact(null, response.contentType(), response.body());
+            // Same credential check as the text path: a body that echoes the bearer is never stored.
+            return new Result("Der Werkzeugserver hat eine Datei geliefert.",
+                    com.keplura.server.tool.ToolArtifactStore.withoutCredential(List.of(file), token));
         }
         return new Result(result(response, token));
     }
@@ -244,7 +246,59 @@ public class OpenApiToolAdapter implements ToolAdapter {
         if (path.contains("{") || path.contains("}")) {
             throw new ToolNotStartedException("Ein Pfadparameter fehlt. Das Werkzeug wurde nicht aufgerufen.");
         }
-        return base + path + (query.isEmpty() ? "" : "?" + query);
+        String full = base + path + (query.isEmpty() ? "" : "?" + query);
+        if (!containedIn(base, full)) {
+            throw new ToolNotStartedException("Der Aufruf würde den festen Basis-Pfad verlassen. Das Werkzeug wurde nicht aufgerufen.");
+        }
+        return full;
+    }
+
+    /**
+     * Base-path containment after canonicalization: same scheme/host/port, the normalized path equals the raw path
+     * (no dot segments) and stays below the base path, and no segment turns into ".", ".." or a separator even
+     * after decoding it twice (an upstream that decodes and normalizes again cannot leave the prefix).
+     */
+    static boolean containedIn(String base, String full) {
+        try {
+            java.net.URI b = java.net.URI.create(base);
+            java.net.URI u = java.net.URI.create(full);
+            if (!java.util.Objects.equals(b.getScheme(), u.getScheme()) || !java.util.Objects.equals(b.getRawAuthority(), u.getRawAuthority())) return false;
+            String raw = u.getRawPath() == null ? "" : u.getRawPath();
+            if (!raw.equals(u.normalize().getRawPath())) return false;
+            String prefix = b.getRawPath() == null ? "" : b.getRawPath();
+            if (prefix.endsWith("/")) prefix = prefix.substring(0, prefix.length() - 1);
+            if (!(raw.equals(prefix) || raw.startsWith(prefix + "/"))) return false;
+            for (String segment : raw.substring(prefix.length()).split("/", -1)) {
+                String once = decode(segment);
+                String twice = once == null ? null : decode(once);
+                for (String s : java.util.Arrays.asList(segment, once, twice)) {
+                    if (s == null || s.equals(".") || s.equals("..") || s.contains("/") || s.contains("\\")
+                            || s.chars().anyMatch(c -> c < 0x20 || c == 0x7f)) return false;
+                }
+            }
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    /** Strict single percent-decoding; malformed escapes → null. */
+    private static String decode(String s) {
+        if (s.indexOf('%') < 0) return s;
+        java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '%') {
+                if (i + 2 >= s.length()) return null;
+                int hi = Character.digit(s.charAt(i + 1), 16), lo = Character.digit(s.charAt(i + 2), 16);
+                if (hi < 0 || lo < 0) return null;
+                out.write(hi * 16 + lo);
+                i += 2;
+            } else {
+                out.write(c);
+            }
+        }
+        return out.toString(StandardCharsets.UTF_8);
     }
 
     private static String scalar(JsonNode v) {

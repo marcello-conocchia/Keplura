@@ -89,6 +89,10 @@ public final class OpenApiDocument {
                 if (operationId.isEmpty()) {
                     out.add(new Operation(null, method.toUpperCase(Locale.ROOT), path, description, null, List.of(), false,
                             "Die Operation hat keine operationId und ist nicht nutzbar."));
+                } else if (!safeOperationId(operationId)) {
+                    // Approvals are stored one name per line: a control character could smuggle further names.
+                    out.add(new Operation(null, method.toUpperCase(Locale.ROOT), path, description, null, List.of(), false,
+                            "Die operationId enthält Steuerzeichen. Die Operation ist nicht nutzbar."));
                 } else if (operationId.length() > 128 || !seenIds.add(operationId)) {
                     out.add(new Operation(null, method.toUpperCase(Locale.ROOT), path, description, null, List.of(), false,
                             "Die operationId ist zu lang oder nicht eindeutig. Die Operation ist nicht nutzbar."));
@@ -115,7 +119,7 @@ public final class OpenApiDocument {
         String upper = method.toUpperCase(Locale.ROOT);
         try {
             if (!METHODS.contains(method)) return blocked(operationId, upper, path, description, "Die HTTP-Methode wird nicht unterstützt.");
-            if (!path.startsWith("/") || path.contains("..") || path.contains("?") || path.contains("#") || path.contains("\\")) {
+            if (!safePath(path)) {
                 return blocked(operationId, upper, path, description, "Der Pfad der Operation ist ungültig.");
             }
             Set<String> templated = templateNames(path);
@@ -211,6 +215,28 @@ public final class OpenApiDocument {
     }
 
     /** Names in {@code {...}} segments; {@code null} for malformed templates. */
+    /** No control or line/paragraph separator characters (approvals are newline-delimited). */
+    static boolean safeOperationId(String id) {
+        return id.codePoints().noneMatch(c -> Character.isISOControl(c) || c == 0x2028 || c == 0x2029 || c == 0x85);
+    }
+
+    /**
+     * Literal path template only: starts with "/", plain RFC 3986 path characters, no percent-encoding (an upstream
+     * could decode "%2e%2e" or "%2f" and normalize outside the base path), no ";" path parameters, no empty, "." or
+     * ".." segment, no "?", "#" or "\". Template names are plain identifiers.
+     */
+    static boolean safePath(String path) {
+        if (path == null || path.length() > 2000 || !path.startsWith("/")) return false;
+        if (!path.matches("[A-Za-z0-9._~!$&'()*+,=:@/{}-]+")) return false;
+        String[] segments = path.substring(1).split("/", -1);
+        for (String segment : segments) {
+            if (segment.isEmpty() && segments.length > 1) return false;
+            if (segment.equals(".") || segment.equals("..")) return false;
+        }
+        Set<String> names = templateNames(path);
+        return names != null && names.stream().allMatch(n -> n.matches("[A-Za-z0-9._-]{1,64}"));
+    }
+
     static Set<String> templateNames(String path) {
         Set<String> names = new LinkedHashSet<>();
         int i = 0;

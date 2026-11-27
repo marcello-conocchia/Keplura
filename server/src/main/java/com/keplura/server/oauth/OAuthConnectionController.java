@@ -23,9 +23,11 @@ import java.util.List;
 
 /**
  * Persönliche Verbindungen (TU-06b). {@code /api/v1/orgs/{orgId}/connections/**} läuft hinter Session + CSRF; die
- * Person muss Mitglied der Organisation sein. Der Callback {@value OAuthConnectionService#CALLBACK_PATH} ist bewusst
- * ohne Sitzungspflicht erreichbar (Systembrowser der Desktop-App), nimmt aber nur den Code einer offenen, frischen
- * Anmeldung an und spiegelt nie Parameter zurück. Abgeschlossen wird erst durch die startende Sitzung.
+ * Person muss Mitglied der Organisation sein. Die Anmeldung läuft wie der OIDC-Login (ADR-0009) im App-Fenster selbst:
+ * Der Callback {@value OAuthConnectionService#CALLBACK_PATH} ist ohne API-Sitzung erreichbar (Navigations-Cookies der
+ * Webview), nimmt nur den Code einer offenen, frischen Anmeldung an, spiegelt nie Parameter zurück und leitet mit
+ * einem Einmal-Code im Fragment auf die FESTE App-Adresse zurück. Abgeschlossen wird erst, wenn die startende Sitzung
+ * diesen Code vorlegt ({@code POST .../connections/complete}). Ein weitergegebener Anmeldelink nützt damit niemandem.
  */
 @RestController
 public class OAuthConnectionController {
@@ -35,6 +37,12 @@ public class OAuthConnectionController {
     public record StartView(String flowId, String authorizationUrl) { }
 
     public record StatusView(String status) { }
+
+    public record CompleteInput(String handoff) {
+        @Override public String toString() { return "CompleteInput[redacted]"; }
+    }
+
+    public record CompleteView(String status, String kind, long serverId) { }
 
     private final JdbcTemplate jdbc;
     private final OAuthConnectionService oauth;
@@ -62,7 +70,7 @@ public class OAuthConnectionController {
     private List<Available> available(long orgId) {
         List<Available> out = new ArrayList<>(jdbc.query("""
                 select s.id, s.name, s.url from mcp_server s join tool_oauth_client k on k.kind='mcp' and k.server_id=s.id
-                where s.enabled=true and (s.all_spaces=true or exists(select 1 from mcp_server_space x join space p on p.id=x.space_id
+                where s.enabled=true and s.auth_mode='personal' and (s.all_spaces=true or exists(select 1 from mcp_server_space x join space p on p.id=x.space_id
                   where x.server_id=s.id and p.org_id=?)) order by s.name, s.id""",
                 (rs, n) -> new Available("mcp", rs.getLong(1), rs.getString(2), rs.getString(3)), orgId));
         out.addAll(jdbc.query("""
@@ -112,6 +120,19 @@ public class OAuthConnectionController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /** The app presents the handoff from {@code #oauth=…}; only the starting person + session can redeem it, once. */
+    @PostMapping("/api/v1/orgs/{orgId}/connections/complete")
+    public ResponseEntity<CompleteView> complete(@PathVariable("orgId") long orgId,
+                                                 @org.springframework.web.bind.annotation.RequestBody(required = false) CompleteInput in,
+                                                 HttpServletRequest request) {
+        long user = member(orgId, request);
+        if (in == null || in.handoff() == null) return ResponseEntity.notFound().build();
+        return oauth.complete(user, request.getSession(false).getId(), in.handoff())
+                .filter(c -> c.orgId() == orgId)
+                .map(c -> ResponseEntity.ok(new CompleteView(c.status().name(), c.kind(), c.serverId())))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @DeleteMapping("/api/v1/orgs/{orgId}/connections/{kind}/{serverId}")
     public ResponseEntity<Void> disconnect(@PathVariable("orgId") long orgId, @PathVariable("kind") String kind,
                                            @PathVariable("serverId") long serverId, HttpServletRequest request) {
@@ -120,7 +141,10 @@ public class OAuthConnectionController {
         return ResponseEntity.noContent().build();
     }
 
-    /** Fixed page; no parameter is reflected, nothing is rendered from the authorization server. */
+    /**
+     * 302 to the fixed app address with {@code #oauth=<handoff>} (or {@code #oauth-error}); no parameter is reflected,
+     * nothing is rendered from the authorization server. Without a configured app address: fixed failure page.
+     */
     @GetMapping(OAuthConnectionService.CALLBACK_PATH)
     public ResponseEntity<String> callback(@RequestParam(name = "state", required = false) String state,
                                            @RequestParam(name = "code", required = false) String code,
@@ -129,17 +153,21 @@ public class OAuthConnectionController {
         HttpSession session = request.getSession(false);
         Object principal = session == null ? null : session.getAttribute(AuthService.SESSION_PRINCIPAL_ATTR);
         Long browserUser = principal instanceof AuthPrincipal p ? p.userId() : null;
-        boolean ok;
+        java.util.Optional<String> handoff;
         try {
-            ok = oauth.callback(state, code, error, browserUser);
+            handoff = oauth.callback(state, code, error, browserUser);
         } catch (RuntimeException e) {
-            ok = false;
+            handoff = java.util.Optional.empty();
         }
-        String text = ok ? "Die Anmeldung ist abgeschlossen. Du kannst dieses Fenster schließen und zu Keplura zurückkehren."
-                : "Die Verbindung konnte nicht hergestellt werden. Bitte starte sie in Keplura erneut.";
+        var props = oidcProperties.getIfAvailable();
+        if (props != null && props.desktopRedirectUri() != null) {
+            String target = props.desktopRedirectUri() + handoff.map(h -> "#oauth=" + h).orElse("#oauth-error");
+            return ResponseEntity.status(HttpStatus.FOUND).location(java.net.URI.create(target))
+                    .header("Referrer-Policy", "no-referrer").header("Cache-Control", "no-store").build();
+        }
         String html = "<!doctype html><html lang=\"de\"><head><meta charset=\"utf-8\"><title>Keplura</title></head><body><p>"
-                + text + "</p></body></html>";
-        return ResponseEntity.status(ok ? HttpStatus.OK : HttpStatus.BAD_REQUEST)
+                + "Die Verbindung konnte nicht hergestellt werden. Bitte starte sie in Keplura erneut.</p></body></html>";
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .contentType(new MediaType("text", "html", java.nio.charset.StandardCharsets.UTF_8))
                 .header("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'")
                 .header("X-Content-Type-Options", "nosniff")

@@ -65,7 +65,7 @@ public class McpToolAdapter implements ToolAdapter {
         return jdbc.query("""
                 select s.id, s.name, s.url, s.token_enc, s.tools_json, s.enabled_tools, s.tool_risks,
                        coalesce(b.internal,false),coalesce(b.revision,0),
-                       exists(select 1 from tool_oauth_client k where k.kind='mcp' and k.server_id=s.id) from mcp_server s
+                       s.auth_mode <> 'shared' from mcp_server s
                 left join mcp_org_boundary b on b.server_id=s.id and b.org_id=(select org_id from space where id=?)
                 where s.enabled = true and (s.all_spaces = true
                    or exists (select 1 from mcp_server_space x where x.server_id = s.id and x.space_id = ?))
@@ -142,7 +142,7 @@ public class McpToolAdapter implements ToolAdapter {
     @Override
     public Result invokeWithArtifacts(com.keplura.server.tool.ToolContext context, ToolDefinition tool, JsonNode arguments,
                                       Long promptMessageId) {
-        var rows = jdbc.queryForList("select url, token_enc from mcp_server where id = ? and enabled = true", tool.sourceId());
+        var rows = jdbc.queryForList("select url, token_enc, auth_mode from mcp_server where id = ? and enabled = true", tool.sourceId());
         if (rows.isEmpty()) throw new ToolNotStartedException("Der MCP-Server ist nicht mehr aktiv.");
         Object url = rows.getFirst().get("url");
         Object enc = rows.getFirst().get("token_enc");
@@ -150,8 +150,8 @@ public class McpToolAdapter implements ToolAdapter {
         String encText = enc == null ? null : enc.toString();
         var revisions=jdbc.queryForList("select revision from mcp_org_boundary where server_id=? and org_id=?",Long.class,tool.sourceId(),context.orgId());
         long revision=revisions.isEmpty()?0:revisions.getFirst();
-        boolean personal = jdbc.queryForObject("select count(*) from tool_oauth_client where kind='mcp' and server_id=?",
-                Integer.class, tool.sourceId()) > 0;
+        // Stored auth mode, never inferred from a client row: personal without a client fails closed (no connection).
+        boolean personal = !"shared".equals(String.valueOf(rows.getFirst().get("auth_mode")));
         OAuthConnectionService.Connection connection = null;
         if (personal) {
             connection = oauth == null ? null
@@ -165,7 +165,7 @@ public class McpToolAdapter implements ToolAdapter {
         String token;
         if (connection != null) {
             // The admin key of a personal server is only for loading the tool list, never for a person's call.
-            token = oauth.accessToken(context.userId(), context.orgId(), KIND, tool.sourceId(), connection.id());
+            token = oauth.accessToken(context.userId(), context.orgId(), KIND, tool.sourceId(), connection.id(), urlText);
         } else {
             try {
                 token = encText == null ? "" : cipher.decrypt(encText);

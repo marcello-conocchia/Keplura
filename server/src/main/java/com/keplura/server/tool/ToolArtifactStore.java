@@ -115,18 +115,45 @@ public class ToolArtifactStore {
         jdbc.update("delete from tool_artifact where conversation_id=?", conversationId);
     }
 
-    /** Foreign names are reduced to a short, harmless file name with the extension of the VERIFIED type. */
+    /**
+     * The name is generated HERE with the extension of the VERIFIED type; a foreign name (resource URI, file name)
+     * is never used, since it could echo a token or other data into card metadata, the model placeholder or the
+     * download name. {@code raw} is ignored on purpose.
+     */
     static String name(String raw, String type, int index) {
-        String base = raw == null ? "" : raw;
-        int slash = Math.max(base.lastIndexOf('/'), base.lastIndexOf('\\'));
-        if (slash >= 0) base = base.substring(slash + 1);
-        base = base.replaceAll("[^A-Za-z0-9._ -]", "_").replaceAll("\\.+", ".").strip();
-        int dot = base.lastIndexOf('.');
-        if (dot > 0) base = base.substring(0, dot);
-        if (base.isEmpty() || base.equals(".")) base = "ergebnis-" + index;
-        if (base.length() > 80) base = base.substring(0, 80);
         String ext = type == null ? "bin" : ArtifactInspector.EXTENSIONS.getOrDefault(type, "bin");
-        return base + "." + ext;
+        return "ergebnis-" + index + "." + ext;
+    }
+
+    public static final String CREDENTIAL_REASON = "Die Datei enthielt Zugangsdaten und wurde verworfen.";
+
+    /**
+     * Credential check before storage: a file whose bytes contain the bearer token of the call (as sent, UTF-8) is
+     * never stored or published; it becomes a dropped entry with a fixed reason. Applied by every adapter that
+     * sends a credential (MCP, OpenAPI) before handing artifacts on.
+     */
+    public static List<ToolAdapter.Artifact> withoutCredential(List<ToolAdapter.Artifact> artifacts, String token) {
+        if (artifacts == null) return List.of();
+        if (artifacts.isEmpty() || token == null || token.isEmpty()) return artifacts;
+        byte[] needle = token.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        List<ToolAdapter.Artifact> out = new java.util.ArrayList<>(artifacts.size());
+        for (ToolAdapter.Artifact a : artifacts) {
+            if (a != null && a.data() != null && contains(a.data(), needle)) {
+                out.add(new ToolAdapter.Artifact(null, null, null, CREDENTIAL_REASON));
+            } else {
+                out.add(a);
+            }
+        }
+        return java.util.Collections.unmodifiableList(out);
+    }
+
+    static boolean contains(byte[] haystack, byte[] needle) {
+        outer:
+        for (int i = 0; i <= haystack.length - needle.length; i++) {
+            for (int j = 0; j < needle.length; j++) if (haystack[i + j] != needle[j]) continue outer;
+            return true;
+        }
+        return false;
     }
 
     static String human(long bytes) {

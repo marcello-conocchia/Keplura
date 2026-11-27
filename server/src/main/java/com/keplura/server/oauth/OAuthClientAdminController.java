@@ -39,11 +39,14 @@ public class OAuthClientAdminController {
     private final JdbcTemplate jdbc;
     private final OAuthConnectionService oauth;
     private final SecretCipher cipher;
+    private final OAuthTransportPolicy transport;
 
-    public OAuthClientAdminController(JdbcTemplate jdbc, OAuthConnectionService oauth, SecretCipher cipher) {
+    public OAuthClientAdminController(JdbcTemplate jdbc, OAuthConnectionService oauth, SecretCipher cipher,
+                                      OAuthTransportPolicy transport) {
         this.jdbc = jdbc;
         this.oauth = oauth;
         this.cipher = cipher;
+        this.transport = transport;
     }
 
     /** Every server that may use personal connections: all MCP servers and OpenAPI servers in access mode "oauth". */
@@ -70,7 +73,13 @@ public class OAuthClientAdminController {
         if (kind.equals("openapi") && !"oauth".equals(jdbc.queryForObject("select auth_mode from openapi_server where id=?", String.class, serverId))) {
             return bad("Bitte zuerst beim OpenAPI-Server die Zugangsart „persönlich (OAuth)“ wählen.");
         }
-        String err = validate(in);
+        // Personal bearer tokens travel to the server itself as well: its address must be HTTPS too.
+        String target = jdbc.queryForObject(kind.equals("openapi") ? "select base_url from openapi_server where id=?"
+                : "select url from mcp_server where id=?", String.class, serverId);
+        if (!transport.allows(target)) {
+            return bad("Persönliche Anmeldung braucht eine HTTPS-Adresse des Servers. Bitte zuerst die Serveradresse auf https:// umstellen.");
+        }
+        String err = validate(in, transport);
         if (err != null) return bad(err);
         if (in.clientSecret() != null && !in.clientSecret().isBlank() && !cipher.available()) {
             return bad("Secrets können nicht gespeichert werden: KEPLURA_SECRETS_MASTER_KEY fehlt.");
@@ -79,11 +88,14 @@ public class OAuthClientAdminController {
         return ResponseEntity.ok(list().stream().filter(v -> v.kind().equals(kind) && v.serverId() == serverId).findFirst().orElseThrow());
     }
 
-    /** Switches personal access off: the client and every connection of this server are removed at once. */
+    /**
+     * Switches personal access off: the client and every connection of this server are removed at once. An MCP
+     * server goes back to the shared admin key only with fresh approvals (they are cleared here).
+     */
     @DeleteMapping("/{kind}/{serverId}")
     public ResponseEntity<Void> delete(@PathVariable("kind") String kind, @PathVariable("serverId") long serverId) {
         if (!OAuthConnectionService.KINDS.contains(kind)) return ResponseEntity.notFound().build();
-        oauth.removeClient(kind, serverId);
+        oauth.switchOff(kind, serverId);
         return ResponseEntity.noContent().build();
     }
 
@@ -94,12 +106,12 @@ public class OAuthClientAdminController {
         return n != null && n > 0;
     }
 
-    static String validate(Input in) {
+    static String validate(Input in, OAuthTransportPolicy transport) {
         if (in == null) return "Bitte die Angaben vollständig ausfüllen.";
-        if (!url(in.authorizeUrl())) return "Der Autorisierungs-Endpunkt muss eine gültige http(s)-Adresse ohne Zugangsdaten sein.";
-        if (!url(in.tokenUrl())) return "Der Token-Endpunkt muss eine gültige http(s)-Adresse ohne Zugangsdaten sein.";
-        if (in.revokeUrl() != null && !in.revokeUrl().isBlank() && !url(in.revokeUrl())) {
-            return "Der Widerrufs-Endpunkt muss eine gültige http(s)-Adresse ohne Zugangsdaten sein.";
+        if (!url(in.authorizeUrl(), transport)) return "Der Autorisierungs-Endpunkt muss eine gültige https-Adresse ohne Zugangsdaten sein.";
+        if (!url(in.tokenUrl(), transport)) return "Der Token-Endpunkt muss eine gültige https-Adresse ohne Zugangsdaten sein.";
+        if (in.revokeUrl() != null && !in.revokeUrl().isBlank() && !url(in.revokeUrl(), transport)) {
+            return "Der Widerrufs-Endpunkt muss eine gültige https-Adresse ohne Zugangsdaten sein.";
         }
         if (in.clientId() == null || in.clientId().isBlank() || in.clientId().strip().length() > 300) return "Bitte eine Client-ID angeben (max. 300 Zeichen).";
         if (in.scopes() != null && (in.scopes().length() > 1000 || in.scopes().chars().anyMatch(c -> c < 0x20))) return "Die Scopes sind ungültig.";
@@ -107,10 +119,10 @@ public class OAuthClientAdminController {
         return null;
     }
 
-    private static boolean url(String u) {
+    private static boolean url(String u, OAuthTransportPolicy transport) {
         if (u == null || u.isBlank() || u.strip().length() > 500) return false;
         String s = u.strip();
-        if (!(s.startsWith("https://") || s.startsWith("http://")) || s.contains("#")) return false;
+        if (!transport.allows(s) || s.contains("#")) return false;
         try {
             SsrfGuard.parseShape(s);
             return true;
