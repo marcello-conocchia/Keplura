@@ -94,15 +94,26 @@ class ApiIntegrationTest {
         assertThat(headers.getFirst("Content-Length")).isNotNull();
     }
 
-    /** TU-06b: the OAuth callback is reachable without a session, reflects nothing and sets strict headers. */
+    @org.springframework.boot.test.web.server.LocalServerPort
+    private int port;
+
+    /**
+     * TU-06b: the OAuth callback is reachable without a session, reflects nothing and only redirects to the fixed
+     * app address (review round 1: one-time handoff in the fragment, here the failure marker).
+     */
     @Test
-    void oauthCallbackNeedsNoSessionButConnectionEndpointsDo() {
-        ResponseEntity<String> callback = rest.getForEntity(
-                "/api/v1/oauth/connections/callback?state=<script>x</script>&code=c", String.class);
-        assertThat(callback.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(callback.getBody()).doesNotContain("<script>").doesNotContain("state");
-        assertThat(callback.getHeaders().getFirst("Content-Security-Policy")).isEqualTo("default-src 'none'; frame-ancestors 'none'");
-        assertThat(callback.getHeaders().getFirst("Cache-Control")).isEqualTo("no-store");
+    void oauthCallbackNeedsNoSessionButConnectionEndpointsDo() throws Exception {
+        try (var http = java.net.http.HttpClient.newBuilder().followRedirects(java.net.http.HttpClient.Redirect.NEVER).build()) {
+            var callback = http.send(java.net.http.HttpRequest.newBuilder(java.net.URI.create("http://localhost:" + port
+                    + "/api/v1/oauth/connections/callback?state=%3Cscript%3Ex%3C%2Fscript%3E&code=c")).build(),
+                    java.net.http.HttpResponse.BodyHandlers.ofString());
+            assertThat(callback.statusCode()).isEqualTo(302);
+            assertThat(callback.headers().firstValue("Location").orElseThrow()).endsWith("#oauth-error")
+                    .doesNotContain("script").doesNotContain("state");
+            assertThat(callback.body()).doesNotContain("<script>");
+            assertThat(callback.headers().firstValue("Cache-Control").orElseThrow()).isEqualTo("no-store");
+            assertThat(callback.headers().firstValue("Referrer-Policy").orElseThrow()).isEqualTo("no-referrer");
+        }
         assertThat(rest.getForEntity("/api/v1/orgs/1/connections", String.class).getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
         assertThat(rest.postForEntity("/api/v1/orgs/1/connections/openapi/1/start", null, String.class).getStatusCode())
                 .isEqualTo(HttpStatus.UNAUTHORIZED);
