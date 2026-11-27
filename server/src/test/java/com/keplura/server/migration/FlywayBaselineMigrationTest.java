@@ -82,8 +82,8 @@ class FlywayBaselineMigrationTest {
         // V34 (TU-05c) stores which tools of a sealed question catalog tool_search made visible.
         // V35 (TU-06a) adds the OpenAPI tool server tables (own tables, MCP tables unchanged).
         // V36 (TU-06b) adds OAuth client configuration, personal connections and authorization flows.
-        // V37 (TU-06c) marks MCP entries that point to the isolated stdio bridge (internal by default).
-        // V38 (TU-06d) adds the verified image/file results of tool calls (cascade with the card).
+        // V37 (TU-06d) adds the verified image/file results of tool calls (cascade with the card).
+        // V38 (TU-06 review) stores the MCP auth mode explicitly (personal mode fails closed without a client).
         assertThat(result.migrationsExecuted).isEqualTo(37);
 
         JdbcTemplate jdbc = new JdbcTemplate(ds);

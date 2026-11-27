@@ -46,9 +46,8 @@ public class McpAdminController {
                            String schemaProblem, boolean legacyApproval) {
     }
 
-    /** {@code bridge}: TU-06c — the entry points to the isolated stdio bridge; internal target by default. */
     public record ServerView(Long id, String name, String url, boolean hasToken, boolean enabled, List<ToolView> tools,
-                             Instant lastCheckedAt, String lastError, boolean allSpaces, List<Long> spaceIds, boolean bridge) {
+                             Instant lastCheckedAt, String lastError, boolean allSpaces, List<Long> spaceIds) {
     }
 
     /**
@@ -57,11 +56,7 @@ public class McpAdminController {
      * bisherige Freigabe dieses Werkzeugs auf (nur eine ausdrückliche Freigabe in derselben Anfrage zählt).
      */
     public record Input(String name, String url, String token, Boolean enabled, List<String> enabledTools,
-                        Boolean allSpaces, List<Long> spaceIds, Map<String, String> toolRisks, Boolean bridge) {
-        public Input(String name, String url, String token, Boolean enabled, List<String> enabledTools,
-                     Boolean allSpaces, List<Long> spaceIds, Map<String, String> toolRisks) {
-            this(name, url, token, enabled, enabledTools, allSpaces, spaceIds, toolRisks, null);
-        }
+                        Boolean allSpaces, List<Long> spaceIds, Map<String, String> toolRisks) {
     }
 
     public record ErrorResponse(String error) {
@@ -88,7 +83,7 @@ public class McpAdminController {
 
     @GetMapping
     public List<ServerView> list() {
-        return jdbc.query("select id, name, url, token_enc, enabled, tools_json, enabled_tools, last_checked_at, last_error, all_spaces, tool_risks, bridge from mcp_server order by name",
+        return jdbc.query("select id, name, url, token_enc, enabled, tools_json, enabled_tools, last_checked_at, last_error, all_spaces, tool_risks from mcp_server order by name",
                 (rs, n) -> {
                     Set<String> on = names(rs.getString(7));
                     Map<String, ToolRisk> risks = McpToolAdapter.risks(rs.getString(11));
@@ -109,7 +104,7 @@ public class McpAdminController {
                     return new ServerView(rs.getLong(1), rs.getString(2), rs.getString(3), rs.getString(4) != null,
                             rs.getBoolean(5), tools, ts == null ? null : ts.toInstant(), rs.getString(9), rs.getBoolean(10),
                             jdbc.queryForList("select space_id from mcp_server_space where server_id = ? order by space_id",
-                                    Long.class, rs.getLong(1)), rs.getBoolean(12));
+                                    Long.class, rs.getLong(1)));
                 });
     }
 
@@ -126,13 +121,12 @@ public class McpAdminController {
         var keys = new org.springframework.jdbc.support.GeneratedKeyHolder();
         jdbc.update(connection -> {
             var statement = connection.prepareStatement(
-                    "insert into mcp_server (name, url, token_enc, enabled, created_at, bridge) values (?, ?, ?, ?, ?, ?)", new String[]{"id"});
+                    "insert into mcp_server (name, url, token_enc, enabled, created_at) values (?, ?, ?, ?, ?)", new String[]{"id"});
             statement.setString(1, in.name().strip());
             statement.setString(2, in.url().strip());
             statement.setString(3, encrypted);
             statement.setBoolean(4, in.enabled() == null || in.enabled());
             statement.setTimestamp(5, Timestamp.from(Instant.now()));
-            statement.setBoolean(6, Boolean.TRUE.equals(in.bridge()));
             return statement;
         }, keys);
         Long id = java.util.Objects.requireNonNull(keys.getKey(), "MCP id missing").longValue();
@@ -204,13 +198,6 @@ public class McpAdminController {
                     String.join("\n", approved), McpToolAdapter.risksJson(risks), id);
         }
         if (in.allSpaces() != null) jdbc.update("update mcp_server set all_spaces = ? where id = ?", in.allSpaces(), id);
-        if (in.bridge() != null && in.bridge() != cur.bridge()) {
-            jdbc.update("update mcp_server set bridge = ? where id = ?", in.bridge(), id);
-            // The default boundary changed for every org without own setting: close running questions of this server.
-            jdbc.update("update mcp_org_boundary set revision = revision + 1 where server_id = ?", id);
-            jdbc.update("update tool_call set status='CANCELLED', decided_at=? where adapter='mcp' and source_id=? and status='PENDING'",
-                    Timestamp.from(Instant.now()), id);
-        }
         if (in.spaceIds() != null) {
             jdbc.update("delete from mcp_server_space where server_id = ?", id);
             for (Long sp : in.spaceIds().stream().distinct().toList()) {

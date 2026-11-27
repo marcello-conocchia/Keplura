@@ -145,10 +145,6 @@ services:
       KEPLURA_ADMIN_SSRF_ALLOW_CIDRS: ${KEPLURA_ADMIN_SSRF_ALLOW_CIDRS:-}
     volumes:
       - storage:/var/lib/keplura
-    networks:
-      - default
-      # TU-06c: reaches the optional stdio MCP bridge; this network has no egress.
-      - mcp-bridge
     ports:
       # loopback publish by default; the reverse-proxy host reaches it via the
       # network or an explicit KEPLURA_SERVER_HOST_PORT on a trusted box.
@@ -161,50 +157,6 @@ services:
       timeout: 5s
       retries: 3
       start_period: 60s
-
-  # TU-06c isolated MCP stdio bridge (PO 26.11.2026 "Bridge im Container").
-  # DISABLED by default: starts only with `--profile mcp-bridge`. It runs the
-  # same jar in bridge mode -- no Spring, no database, no Keplura secrets --
-  # and serves the stdio servers declared in mcp-bridge/servers.json as
-  # Streamable HTTP at http://mcp-bridge:8090/mcp/<name>. Keplura's admin
-  # registers that address as an MCP server ("isolierte stdio-Bridge") with
-  # the same KEPLURA_BRIDGE_TOKEN. The image must contain the declared
-  # programs: build your own FROM the server image (see deploy/README.md).
-  # Isolation: non-root user, read-only root FS (only /work writable, /tmp in
-  # RAM), all capabilities dropped, no privilege escalation, CPU/memory/
-  # process limits, and an internal network without any route to the outside.
-  mcp-bridge:
-    image: ${KEPLURA_MCP_BRIDGE_IMAGE:-keplura-server:local}
-    profiles: ["mcp-bridge"]
-    restart: unless-stopped
-    user: "${KEPLURA_MCP_BRIDGE_UID:-65534}:${KEPLURA_MCP_BRIDGE_GID:-65534}"
-    entrypoint: ["/usr/bin/tini", "--", "java", "-Xmx256m", "-jar", "/app/keplura-server.jar", "--mcp-stdio-bridge"]
-    environment:
-      # ONLY the shared random token (openssl rand -hex 32). No database,
-      # master key or provider secret ever enters this container.
-      KEPLURA_BRIDGE_TOKEN: ${KEPLURA_BRIDGE_TOKEN:-}
-      KEPLURA_BRIDGE_CONFIG: /etc/keplura-bridge/servers.json
-      KEPLURA_BRIDGE_BIND: 0.0.0.0:8090
-    volumes:
-      - ./mcp-bridge/servers.json:/etc/keplura-bridge/servers.json:ro
-      - mcpbridgework:/work
-    tmpfs:
-      - /tmp:size=64m,mode=1777
-    read_only: true
-    cap_drop: [ALL]
-    security_opt:
-      - no-new-privileges:true
-    pids_limit: 128
-    mem_limit: 1g
-    cpus: 1.0
-    networks:
-      - mcp-bridge
-    healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8090/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 20s
 
   # Local cross-encoder: question/document pairs stay in the internal network.
   # CPU keeps the shared GPU available for the chat and embedding models.
@@ -284,14 +236,3 @@ volumes:
   storage:
   ollamamodels:
   rerankmodels:
-  mcpbridgework:
-
-networks:
-  # TU-06c: server <-> stdio bridge only. `internal: true` = no route to the
-  # outside. The fixed range is what KEPLURA_ADMIN_SSRF_ALLOW_CIDRS must
-  # contain so the server's SSRF guard may dial the bridge.
-  mcp-bridge:
-    internal: true
-    ipam:
-      config:
-        - subnet: ${KEPLURA_MCP_BRIDGE_SUBNET:-172.31.250.0/24}

@@ -161,20 +161,4 @@ class McpToolAdapterTest {
         String second = McpToolAdapter.functionName(1L, "a".repeat(100) + "y");
         assertThat(first).matches("[a-zA-Z0-9_-]{1,64}").isNotEqualTo(second);
     }
-
-    /** TU-06c: an entry for the stdio bridge is an internal target by default; an org-level setting still wins. */
-    @Test void bridgeEntriesAreInternalByDefaultUntilTheOrgDecidesOtherwise() {
-        assertThat(echo().internal()).isFalse();
-        admin.update(serverId, new McpAdminController.Input(null, null, null, null, null, null, null, null, true));
-        assertThat(admin.list().getFirst().bridge()).isTrue();
-        assertThat(echo().internal()).isTrue();
-        jdbc.update("insert into organization (name, created_at) values ('Org', current_timestamp)");
-        long org = jdbc.queryForObject("select max(id) from organization", Long.class);
-        jdbc.update("insert into space (org_id, name, created_at) values (?, 'Raum', current_timestamp)", org);
-        long space = jdbc.queryForObject("select max(id) from space", Long.class);
-        var inSpace = adapter.definitions(space).stream().filter(d -> d.toolName().equals("echo")).findFirst().orElseThrow();
-        assertThat(inSpace.internal()).isTrue();
-        jdbc.update("insert into mcp_org_boundary(server_id, org_id, internal, revision) values (?, ?, false, 1)", serverId, org);
-        assertThat(adapter.definitions(space).stream().filter(d -> d.toolName().equals("echo")).findFirst().orElseThrow().internal()).isFalse();
-    }
 }

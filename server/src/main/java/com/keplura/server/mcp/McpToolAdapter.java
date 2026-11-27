@@ -64,7 +64,7 @@ public class McpToolAdapter implements ToolAdapter {
     private List<Server> servers(Long spaceId) {
         return jdbc.query("""
                 select s.id, s.name, s.url, s.token_enc, s.tools_json, s.enabled_tools, s.tool_risks,
-                       coalesce(b.internal,s.bridge),coalesce(b.revision,0),
+                       coalesce(b.internal,false),coalesce(b.revision,0),
                        exists(select 1 from tool_oauth_client k where k.kind='mcp' and k.server_id=s.id) from mcp_server s
                 left join mcp_org_boundary b on b.server_id=s.id and b.org_id=(select org_id from space where id=?)
                 where s.enabled = true and (s.all_spaces = true
