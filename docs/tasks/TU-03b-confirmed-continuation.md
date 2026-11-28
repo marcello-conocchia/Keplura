@@ -1,6 +1,6 @@
 # TU-03b — Begrenzte Fortsetzung nach konkreter Bestätigung
 
-Status: **abgeschlossen, auf main** — PR #21, Squash-Merge `b1b9e72` (22.11.2026), Baum identisch mit Head `fe7a4d6`. Linux-CI Exit 0 auf Produktcommit `88c8669`, Evidence `ci/evidence/20261121-205038/`; unabhängige Code-/Security-Freigabe durch Claude auf `31c1849`; minor danach in `fe7a4d6` mit gezielten Tests korrigiert (Review-rounds-Regel). Zweiter Umsetzungsschritt von TU-03 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md); nächster Schritt [TU-03c](TU-03c-dependent-action.md). Klasse A: Modell-/Werkzeugschleife, Bestätigungen, externe Aufrufe und Rechte.
+Status: **abgeschlossen, auf main** — PR #21, Squash-Merge `b1b9e72` (22.11.2026), Baum identisch mit Head `fe7a4d6`. Linux-CI Exit 0 auf Produktcommit `88c8669`, Evidence `ci/evidence/20261121-205038/`; unabhängige Code-/Security-Freigabe auf `31c1849`; minor danach in `fe7a4d6` mit gezielten Tests korrigiert (Review-rounds-Regel). Zweiter Umsetzungsschritt von TU-03 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md); nächster Schritt [TU-03c](TU-03c-dependent-action.md). Klasse A: Modell-/Werkzeugschleife, Bestätigungen, externe Aufrufe und Rechte.
 
 ## Ziel
 
@@ -40,7 +40,7 @@ Geskriptetes Gateway und Fake-Adapter mit Aufrufzähler über den echten zentral
 
 ## Workspace
 
-Eigener Worktree auf Branch `feat/tool-use-confirmed-continuation` ab aktuellem main. Implementierung und unabhängige Prüfung nach PO-Zuweisung (bei TU-03a: Codex implementiert, Claude prüft). Genau eine Implementierungsaufgabe. Draft-PR, kein Merge durch den Entwickler; Provider-/Budgetregeln aus AGENTS.md gelten.
+Eigener Worktree auf Branch `feat/tool-use-confirmed-continuation` ab aktuellem main. Implementierung und unabhängige Prüfung nach PO-Zuweisung (bei TU-03a: Implementierung und unabhängige Prüfung durch getrennte Agenten). Genau eine Implementierungsaufgabe. Draft-PR, kein Merge durch den Entwickler; Provider-/Budgetregeln aus AGENTS.md gelten.
 
 ## Umsetzung und Nachweise
 
@@ -51,7 +51,7 @@ Eigener Worktree auf Branch `feat/tool-use-confirmed-continuation` ab aktuellem 
 - Werkzeugfähige Anfragen sehen ausschließlich Frage, eigene Schleifenergebnisse und die Entscheidung. Private Quellen werden für die Abschlussantwort erneut über aktuelle Rechte geladen; kein gespeicherter privater Retrieval-Snapshot. Ursprüngliche öffentliche Webtreffer bleiben ausschließlich Abschlusskontext.
 - Ausführungs-Guard serialisiert externe Aufrufe derselben Frage prozessübergreifend, einschließlich Bestätigungen. RUNNING-Karte und Pflicht-Audit sind vor dem externen Aufruf dauerhaft gespeichert; keine DB-Transaktion oder Pool-Verbindung über den Netzwerkaufruf offen. Budget, Generation und Definition werden nach dem Warten erneut geprüft.
 - Gezielte Prüfung: ChatToolLoopTest 39, ChatApiIntegrationTest 32, ToolConfirmationTest 24 und ToolExecutionServiceTest 17 sowie FlywayBaselineMigrationTest 4 grün (116 Tests). Desktop-Build mit Übersetzungsprüfung grün. Kein echtes Modell, keine Browser-/Feldtests.
-- Verbindliche lokale Linux-CI auf 88c8669 Exit 0: Nicht-root ci (UID 1500) mit acl, Linux-Dateisystem; 85 Klassen genau einmal, 701 Tests, 0 Fehler, 1 übersprungen. Rechte-Helfer, Desktop-Build und cargo check PASS. Evidence ci/evidence/20261121-205038/. Vorher ein abgebrochener CI-Versuch für Randfallkorrekturen sowie ein roter Lauf wegen veralteter Erwartungen im Migrationstest (Anzahl/Tabellen/Versionen); Test angepasst und gezielt grün. Nach diesem grünen Stand nur Nachweise/Dokumentation. Unabhängige Code-/Security-Freigabe durch Claude auf 31c1849 liegt vor; technische Review-Art COMMENT wegen identischem GitHub-Konto. Minor nach Freigabe gezielt korrigiert, ohne erneute volle CI oder Prüfrunde gemäß AGENTS.md. Autoritatives Hermes-Kanban von diesem Windows-Host nicht erreichbar; kein Ersatzboard angelegt. Genau eine Implementierungsaufgabe.
+- Verbindliche lokale Linux-CI auf 88c8669 Exit 0: Nicht-root ci (UID 1500) mit acl, Linux-Dateisystem; 85 Klassen genau einmal, 701 Tests, 0 Fehler, 1 übersprungen. Rechte-Helfer, Desktop-Build und cargo check PASS. Evidence ci/evidence/20261121-205038/. Vorher ein abgebrochener CI-Versuch für Randfallkorrekturen sowie ein roter Lauf wegen veralteter Erwartungen im Migrationstest (Anzahl/Tabellen/Versionen); Test angepasst und gezielt grün. Nach diesem grünen Stand nur Nachweise/Dokumentation. Unabhängige Code-/Security-Freigabe auf 31c1849 liegt vor; technische Review-Art COMMENT wegen identischem GitHub-Konto. Minor nach Freigabe gezielt korrigiert, ohne erneute volle CI oder Prüfrunde gemäß AGENTS.md. Autoritatives Kanban von diesem Windows-Host nicht erreichbar; kein Ersatzboard angelegt. Genau eine Implementierungsaufgabe.
 
 ## Grenzen
 
@@ -63,7 +63,7 @@ Eigener Worktree auf Branch `feat/tool-use-confirmed-continuation` ab aktuellem 
 
 ## Review-Abschluss und Minor-Korrektur (22.11.2026)
 
-- [Unabhängiges Review](https://github.com/marcello-conocchia/Keplura/pull/21#pullrequestreview-6008738703) durch Claude: Freigabe auf 31c1849, kein blocker/major. Zusätzlich PostgreSQL 16 einschließlich V27 und neuer Speicherabfragen von Claude geprüft; keine eigene Wiederholung behauptet.
+- [Unabhängiges Review](https://github.com/marcello-conocchia/Keplura/pull/21#pullrequestreview-6008738703) durch die unabhängige Prüfung: Freigabe auf 31c1849, kein blocker/major. Zusätzlich PostgreSQL 16 einschließlich V27 und neuer Speicherabfragen im Review geprüft; keine eigene Wiederholung behauptet.
 - Minor Guard-Timeout/Interrupt: Noch nicht gestartete Aufrufe werden als BLOCKED mit verständlichem Hinweis abgeschlossen, auch bei Bestätigungen. Kein Fehler 500 aus diesem Wartepfad, kein späteres UNKNOWN für diesen Fall; kein Aufruf/Audit gestartet, fremde Lease unverändert, keine Übernahme verwaister Guards. Die Warteobergrenze von 120 s bleibt bestehen.
 - Vier deterministische Regressionen (Timeout/Interrupt, jeweils Bestätigung und READ) ohne echte 120-s-Wartezeit. Gezielte 84 Server-Tests sowie neun Übersetzungstests und Übersetzungsprüfung grün. Vorhandene volle Linux-CI auf 88c8669 und Freigabe bleiben gemäß Review-rounds-Regel gültig.
 - Info/Folgepunkt Aufbewahrung: tool_question enthält Fragetext, dialogue_json mit eigenen Ergebnissen und web_context bis zur Chatlöschung. In einer späteren Aufbewahrungsaufgabe Löschung/Leerung nach Fortsetzungsfenster oder Verbrauch prüfen; keine Löschrichtlinie in diesem PR eingeführt.

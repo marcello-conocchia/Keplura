@@ -105,7 +105,7 @@ class InternalTargetProvenanceTest {
     }
 
     /**
-     * Re-review PR #26 (Codex, major): Unicode separators between otherwise public words encoded a private
+     * Re-review PR #26 (major): Unicode separators between otherwise public words encoded a private
      * number (codepoint − U+2000 = digit) and the call ran automatically. Through the real central service:
      * a card instead of an external call, and the exact text stays on the card.
      */

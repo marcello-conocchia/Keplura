@@ -1,6 +1,6 @@
 # Security-Nachreview PR #72 – finaler Produktstand
 
-**Geprüfter SHA: `9feb4e28283c5f637886faae10db950257cbb26f`**, Branch `codex/security-fixes`, Basis `530a3a5edb2e3b777e6c64cef14709d3e85b2f2d`. Datum: 16.11.2026.
+**Geprüfter SHA: `9feb4e28283c5f637886faae10db950257cbb26f`**, Branch `feat/security-fixes`, Basis `530a3a5edb2e3b777e6c64cef14709d3e85b2f2d`. Datum: 16.11.2026.
 
 **Status: SECURITY APPROVED für diesen SHA durch den unabhängigen Security-Review-Agenten. Keine offenen Security-Befunde im beauftragten Prüfumfang. R-1 ist geschlossen.** Dies ist eine Agentenprüfung und keine menschliche GitHub-Freigabe des Repository-Inhabers. Andere Merge-Gates, insbesondere finales vollständiges lokales CI und QA, werden hierdurch nicht ersetzt.
 

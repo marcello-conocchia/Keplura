@@ -1,6 +1,6 @@
 # Wissen – Layout nach Browser-Rückmeldung
 
-Beauftragt 15.11.2026: gedrängte Wissensansicht übersichtlich strukturieren und den neuen Designkatalog anwenden. Branch `codex/ui-knowledge`, gestapelt auf `codex/ui-chat-layout@df8e8ab`. Genau diese Oberfläche ist die aktive Implementierung.
+Beauftragt 15.11.2026: gedrängte Wissensansicht übersichtlich strukturieren und den neuen Designkatalog anwenden. Branch `feat/ui-knowledge`, gestapelt auf `feat/ui-chat-layout@df8e8ab`. Genau diese Oberfläche ist die aktive Implementierung.
 
 ## Scope
 

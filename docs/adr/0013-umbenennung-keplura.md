@@ -34,7 +34,7 @@ Bewusst unverändert:
 | Compose-Projekte `intracore-prod` / `intracore-dev` | bestimmen die Volume-Namen; neuer Name = leere Datenbank und leerer Dokumentenspeicher |
 | Bestehende DB-Namen/-Benutzer in `.env.production` | werden nicht angefasst; nur neue Vorlagen nutzen `keplura` |
 | Angewandte Flyway-Migrationen | Prüfsummen; Änderung bricht `validate` beim Start |
-| Kanban-Board `intracore`, Image `intracore-dev:latest`, Host-Pfad `/home/hermes/workspaces/IntraCore` | liegen außerhalb des Repositorys, Umbenennung ist ein eigener Verwaltungsschritt (das GitHub-Repo heißt bereits `marcello-conocchia/Keplura`) |
+| Kanban-Board `intracore`, Image `intracore-dev:latest`, Host-Pfad des Repository-Checkouts | liegen außerhalb des Repositorys, Umbenennung ist ein eigener Verwaltungsschritt (das GitHub-Repo heißt bereits `marcello-conocchia/Keplura`) |
 | `ci/evidence/**`, `desktop/e2e/evidence/**`, `docs/HANDOFF-*`, Verlauf in PROJECT_STATE | historische Nachweise |
 
 Übergang für bestehende Installationen:

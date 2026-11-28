@@ -1,8 +1,8 @@
-# Übergabe an Codex — 14.11.2026 (Abend)
+# Übergabe — 14.11.2026 (Abend)
 
-**Branch:** `codex/chat-productivity` (von `main`, enthält `codex/ds-datasources` = Schritt 5).
-**Ursprünglicher Claude-Stand:** nur `mvn compile test-compile` + `vue-tsc --noEmit` geprüft.
-**Aktueller Codex-Stand:** `docs/HANDOFF-CODEX-2026-11-15.md` und Draft-PR #53.
+**Branch:** `feat/chat-productivity` (von `main`, enthält `feat/ds-datasources` = Schritt 5).
+**Ursprünglicher Stand:** nur `mvn compile test-compile` + `vue-tsc --noEmit` geprüft.
+**Aktueller Stand:** `docs/HANDOFF-2026-11-15.md` und Draft-PR #53.
 Der Pausenstand unten ist historisch; der Inhaber hat am 15.11. ausdrücklich fortgesetzt.
 Migrationen neu: V16–V23 (Datenquellen, Qualität, SharePoint, Vorlagen, Chat-Kontext, Websuche, MCP).
 
@@ -17,7 +17,7 @@ Migrationen neu: V16–V23 (Datenquellen, Qualität, SharePoint, Vorlagen, Chat-
    die Befehlspalette).
 4. Ergebnisse (bestanden / rot / nicht prüfbar + Grund) je Prüfliste in die jeweilige Datei schreiben.
 
-## Stellen, die ich (Claude) selbst für riskant halte
+## Stellen, die ich  selbst für riskant halte
 
 - `ChatService.toolTurn`: Modelle ohne Tool-Calling → Gateway-Fehler; sauber auf normalen Stream zurückfallen.
   Werkzeuge greifen nicht, wenn eine Wissensbasis gewählt ist und keine Treffer hat (NO_EVIDENCE kommt vorher).
@@ -34,11 +34,11 @@ Kein Merge nach `main`, kein Force-Push, keine Veröffentlichung. Nur tatsächli
 bestanden melden. Bestehende Funktionen und Daten erhalten, keine Secrets committen. Kleine Commits unter der
 Git-Identität Marcello Conocchia. Sichtbare Texte auf Deutsch.
 
-## Prompt für Codex (zum Kopieren)
+## Prompt (zum Kopieren)
 
 ```
-Arbeite lokal im IntraCore-Repo auf Branch codex/chat-productivity (git fetch; git checkout codex/chat-productivity;
-git pull). Lies zuerst docs/HANDOFF-CODEX-2026-11-14.md und arbeite die Reihenfolge dort ab: ci-local vollständig,
+Arbeite lokal im IntraCore-Repo auf Branch feat/chat-productivity (git fetch; git checkout feat/chat-productivity;
+git pull). Lies zuerst docs/HANDOFF-2026-11-14-pilot.md und arbeite die Reihenfolge dort ab: ci-local vollständig,
 dann die Prüflisten DS-01, CHAT-01 und MCP-01 im laufenden Programm (lokaler Server + Browser; für Websuche einen
 SearXNG-Container, für MCP einen Beispiel-MCP-Server im Streamable-HTTP-Modus, für Tool-Calling ein passendes
 lokales Modell). Behebe gefundene Fehler mit kleinen, sinnvollen Commits unter Marcello Conocchia und trage die
@@ -48,7 +48,7 @@ durchgeführte Prüfungen als bestanden melden. Keine Secrets committen. Alle si
 
 ## Nächste 10 Schritte (Vorschlag, mit PO abzustimmen)
 
-1. **Abnahme dieses Branches durch Codex** (oben) — Fehler beheben, Prüflisten grün.
+1. **Abnahme dieses Branches durch die unabhängige Prüfung** (oben) — Fehler beheben, Prüflisten grün.
 2. **Security-Review + Merge nach main**: Upload, Export, Websuche, MCP, Datenquellen; danach PROJECT_STATE.
 3. **Pilot beim ersten Kunden**: Installation (4a), echtes AD/LDAP, Fileserver/SharePoint, Testfragen-Set.
 4. **MCP robuster**: Rückfall ohne Tool-Calling, Streaming der Werkzeug-Antworten, Werkzeug-Anzeige als Chip.
@@ -59,11 +59,11 @@ durchgeführte Prüfungen als bestanden melden. Keine Secrets committen. Alle si
 9. **Sprache**: Spracheingabe und Vorlesen lokal (Whisper/Piper), ohne Cloud.
 10. **Updates beim Kunden**: Update mit einem Befehl, Wiederherstellung aus Backup getestet, Beta-Gate Windows/macOS.
 
-## Codex-Zwischenstand und Pause — 14.11.2026
+## Zwischenstand und Pause — 14.11.2026
 
 Der Inhaber hat ausdrücklich um Pause bis morgen gebeten. Nicht selbstständig
 weiterarbeiten oder eine geplante automatische Fortsetzung annehmen.
-Branch bleibt `codex/chat-productivity`, Haupt-Checkout ist das ursprüngliche
+Branch bleibt `feat/chat-productivity`, Haupt-Checkout ist das ursprüngliche
 lokale IntraCore-Repository. Keine Änderung an main, kein Merge/Force-Push.
 
 ### Gesichert und geprüft

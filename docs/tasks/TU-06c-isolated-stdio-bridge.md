@@ -1,6 +1,6 @@
 # TU-06c — Isolierter MCP-stdio-Adapter (Neubau mit stärkerer Isolation)
 
-Status: **spezifiziert, nicht gestartet.** Aus TU-06 (PR #39) herausgenommen (PO-Entscheidung 27.11.2026 im Chat: „Aus #39 herausnehmen“ auf Review-Befund 8, Major). TU-06 ist seit 28.11.2026 auf main (9364c77); diese Aufgabe ist die nächste. Rollen (PO 27.11.2026): **Codex implementiert, Claude prüft unabhängig** (Code + Security). Die erste Fassung steckt in Commit 19d01fa (zurückgenommen in b1206e0). Die Probe mit einem echten stdio-Server unter `ci/evidence/20261127-bridge-smoke/` bleibt als Nachweis der ersten Fassung erhalten.
+Status: **spezifiziert, nicht gestartet.** Aus TU-06 (PR #39) herausgenommen (PO-Entscheidung 27.11.2026 im Chat: „Aus #39 herausnehmen“ auf Review-Befund 8, Major). TU-06 ist seit 28.11.2026 auf main (9364c77); diese Aufgabe ist die nächste. Rollen (PO 27.11.2026): **Implementierung und unabhängige Prüfung (Code + Security) durch getrennte Agenten** (Code + Security). Die erste Fassung steckt in Commit 19d01fa (zurückgenommen in b1206e0). Die Probe mit einem echten stdio-Server unter `ci/evidence/20261127-bridge-smoke/` bleibt als Nachweis der ersten Fassung erhalten.
 
 Klasse A: Prozessisolation, Zugangsdaten, Netzgrenzen, neue Deploy-Dienste.
 
@@ -8,7 +8,7 @@ Klasse A: Prozessisolation, Zugangsdaten, Netzgrenzen, neue Deploy-Dienste.
 
 stdio-MCP-Server laufen wie in TU-06 festgelegt nie im Keplura-Serverprozess und werden nie über die Web-Oberfläche als Befehl eingetragen (PO 26.11.2026: „Bridge im Container“). Neu ist, dass ein Kindprozess weder das Bridge-Token noch andere Kindprozesse, noch den Keplura-Server oder Dienste des Hosts erreicht.
 
-## Befund aus dem Review (Codex, 27.11.2026)
+## Befund aus dem Review (27.11.2026)
 
 - Das Bridge-Token stand in der Umgebung des Elternprozesses. Kindprozesse liefen mit derselben UID im selben PID-Namensraum und konnten es unter `/proc/<pid>/environ` lesen.
 - Alle Kindprozesse teilten `/work` und das Bridge-Netz. Darüber war der Keplura-Dienst erreichbar, je nach Docker-Gateway-Modus auch Dienste des Hosts.
@@ -52,8 +52,8 @@ Lehre aus TU-06: Die Angriffe werden **vor** dem Code festgelegt. Jede Zeile bra
 | B17 | Keplura-Geheimnisse im Bridge-Container: Datenbank-Zugang, Master-Key, Provider-Schlüssel | Container bekommt nur Token-Datei und Deklaration | Test der Compose-Konfiguration: keine solchen Variablen oder Mounts |
 
 **Ablauf:**
-1. Codex legt zu Beginn die Bauweise mit einer kurzen Abwägung fest, entlang dieser Tabelle: Container je Server oder Sandbox je Sitzung.
-2. Claude prüft die Abwägung und die geplanten Tests kurz, bevor der Hauptteil gebaut wird.
+1. Der Entwickler legt zu Beginn die Bauweise mit einer kurzen Abwägung fest, entlang dieser Tabelle: Container je Server oder Sandbox je Sitzung.
+2. Der Prüfer sieht sich die Abwägung und die geplanten Tests kurz, bevor der Hauptteil gebaut wird.
 3. Was eine Bauweise nicht abwehren kann (z. B. B5 bei geteiltem Netz), geht mit Optionen an den PO.
 
 ## Acceptance Criteria
@@ -62,7 +62,7 @@ Lehre aus TU-06: Die Angriffe werden **vor** dem Code festgelegt. Jede Zeile bra
 2. Im **echten Container** nachgewiesen (Docker oder Podman, Nicht-root): Ein Kindprozess liest das Token weder aus Datei, Umgebung noch `/proc`, sieht keine anderen Kindprozesse und deren Dateien und erreicht weder den Keplura-Dienst noch den Host noch das Internet, solange nichts freigegeben ist.
 3. Ein freigegebenes Ziel ist erreichbar, ein nicht freigegebenes nicht.
 4. Alle Kriterien aus TU-06c der TU-06-Spezifikation bleiben erfüllt (nur deklarierte Befehle, Nicht-root, Zeitlimit, nur mit Token erreichbar, kein Prozessstart im Keplura-Server).
-5. Einmal lokale Linux-CI am Ende als Nicht-root mit acl. Unabhängiges Code- und Security-Review durch Claude gemäß AGENTS.md.
+5. Einmal lokale Linux-CI am Ende als Nicht-root mit acl. Unabhängiges Code- und Security-Review gemäß AGENTS.md.
 
 ## Workspace
 

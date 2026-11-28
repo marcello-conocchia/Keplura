@@ -3,8 +3,8 @@
 # work tree dist — raw + gzip per asset, plus totals. Output suitable for
 # pasting into the PR body.
 set -euo pipefail
-BASE="/home/hermes/workspaces/IntraCore/.baseline/t_ui11f53ad9-main/desktop/dist/assets"
-NEW="/home/hermes/workspaces/IntraCore/.worktrees/t_11f53ad9/desktop/dist/assets"
+BASE="${KEPLURA_REPO:-$(git rev-parse --show-toplevel)}/.baseline/t_ui11f53ad9-main/desktop/dist/assets"
+NEW="${KEPLURA_REPO:-$(git rev-parse --show-toplevel)}/.worktrees/t_11f53ad9/desktop/dist/assets"
 sum() { # dir -> total raw, total gz for index-*.js + index-*.css
   local d="$1" raw=0 gz=0
   for f in "$d"/index-*.js "$d"/index-*.css; do

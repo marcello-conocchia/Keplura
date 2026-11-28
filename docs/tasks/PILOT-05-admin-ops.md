@@ -1,10 +1,10 @@
 # PILOT-05 — Schritt 4e: Erst-Admin-Onboarding, Konten, Datensicherung, Bewertung
 
-Branch `codex/pilot-admin-ops` von `main@43302d3`; übernimmt `codex/pilot-interface` (4d,
+Branch `feat/pilot-admin-ops` von `main@43302d3`; übernimmt `feat/pilot-interface` (4d,
 inkl. 4b/4c) per Merge-Commit als Voraussetzung. Kein Merge nach main.
-Die Installer-Änderungen aus `codex/pilot-installation` (4a) sind weiterhin NICHT enthalten.
+Die Installer-Änderungen aus `feat/pilot-installation` (4a) sind weiterhin NICHT enthalten.
 
-## Umgesetzt (Claude, Cloud, 14.11.2026)
+## Umgesetzt (14.11.2026)
 
 | Funktion | Server | Oberfläche |
 |---|---|---|
@@ -17,7 +17,7 @@ Die Installer-Änderungen aus `codex/pilot-installation` (4a) sind weiterhin NIC
 Geprüft in der Cloud: `mvn compile`, `mvn test-compile`, `vue-tsc --noEmit`, `bash -n scripts/backup.sh`.
 **Nicht** geprüft: Server-Tests, Build, laufende App, Browser, echtes Backup.
 
-## Abnahme-Checkliste für Codex (lokal)
+## Abnahme-Checkliste (lokal)
 
 1. Server-Tests komplett (`FlywayBaselineMigrationTest` kennt V14/V15). Neue Tests ergänzen:
    Bewertung (fremder Chat → 404, Benutzer-Nachricht → 404, ungültiger Wert → 400, Zurücknehmen),

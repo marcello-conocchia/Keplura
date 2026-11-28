@@ -1,7 +1,7 @@
 # ACCESS-01 — Rechte-Nachweis („Warum sieht Anna diese Datei?“)
 
 PO 16.11.2026 („ja mach weiter“) auf Basis der Produktstrategie: zweites Alleinstellungsmerkmal.
-Branch `claude/access-explain` von `origin/main`. **Klasse A** (Admin-Sicht auf Dokumentrechte).
+Branch `feat/access-explain` von `origin/main`. **Klasse A** (Admin-Sicht auf Dokumentrechte).
 
 ## Ziel
 

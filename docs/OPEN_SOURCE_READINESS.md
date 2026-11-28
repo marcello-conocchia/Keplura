@@ -22,7 +22,7 @@ Bereinigungsschritten in Abschnitt 5 ist das Repository bereit.
 | Nr. | Blocker | Warum | Lösung | Wer |
 |---|---|---|---|---|
 | B1 | ~~Keine Lizenz~~ **erledigt** | PO-Entscheidung 20.11.2026 (Chat: „Apache-2.0“). | `LICENSE` (ASF-Originaltext), `NOTICE`, Lizenzfelder in `server/pom.xml`, `desktop/package.json`/`package-lock.json`, beiden `Cargo.toml`; README/CONTRIBUTING/CHANGELOG angepasst (dieser PR). | — |
-| B2 | **entschieden 20.11.2026** (neues Repo mit sauberem Start, §8/§9) — ursprünglich: **Private E-Mail-Adresse in GitHub-PR-Referenzen** | 197 Commits in `refs/pull/*/head` (PR-Köpfe der Feature-Branches) tragen die private Absenderadresse des Inhabers als Autor, 2 weitere eine `@intracore.io`-Adresse im Co-Author-Trailer. Auf `main` sind alle Autor-/Committer-Adressen noreply; **eine** Commit-Nachricht (`6b6407c`, 07.09.2026) enthält im Co-Author-Trailer die `@intracore.io`-Adresse. Bei öffentlichem Repo sind alle PR-Köpfe für jeden abrufbar; GitHub lässt `refs/pull/*` nicht löschen. Der Remote-Branch `codex/remember-login` enthält ebenfalls 2 solche Commits. | Siehe Abschnitt 5, Option A/B/C. | PO |
+| B2 | **entschieden 20.11.2026** (neues Repo mit sauberem Start, §8/§9) — ursprünglich: **Private E-Mail-Adresse in GitHub-PR-Referenzen** | 197 Commits in `refs/pull/*/head` (PR-Köpfe der Feature-Branches) tragen die private Absenderadresse des Inhabers als Autor, 2 weitere eine `@intracore.io`-Adresse im Co-Author-Trailer. Auf `main` sind alle Autor-/Committer-Adressen noreply; **eine** Commit-Nachricht (`6b6407c`, 07.09.2026) enthält im Co-Author-Trailer die `@intracore.io`-Adresse. Bei öffentlichem Repo sind alle PR-Köpfe für jeden abrufbar; GitHub lässt `refs/pull/*` nicht löschen. Der Remote-Branch `feat/remember-login` enthält ebenfalls 2 solche Commits. | Siehe Abschnitt 5, Option A/B/C. | PO |
 | B3 | **erledigt 20.11.2026** (Name frei laut PO, Icon von der Website, siehe §8) — ursprünglich: **Rechte an Name und App-Icon ungeklärt** | Das App-Icon (`desktop/src-tauri/icons/`) stammt aus dem Gerüst vom 03.09.2026, die Herkunft ist nicht dokumentiert. Für den Namen „Keplura“ liegt im Repo keine Marken-/Kollisionsprüfung vor. Ein Open-Source-Produkt mit Dienstleistungsmodell lebt vom geschützten Namen. | Urheberschaft des Icons bestätigen oder Icon ersetzen; Markenrecherche/-anmeldung „Keplura“ prüfen; kurze Markenrichtlinie (Name darf für unveränderte Weitergabe, nicht für Forks/eigene Angebote genutzt werden). | PO |
 | B4 | **entschieden 20.11.2026** (nur GitHub-Meldeweg; Einschalten beim Veröffentlichen, §9) — ursprünglich: **Meldeweg für Sicherheitslücken nicht aktiv** | `SECURITY.md` verweist auf GitHubs „Private vulnerability reporting“. Das muss in den Repo-Einstellungen eingeschaltet werden (geht erst sinnvoll beim Veröffentlichen); eine Rollen-Adresse (z. B. security@…) fehlt. | Beim Veröffentlichen aktivieren; optional Rollen-Postfach in `SECURITY.md` eintragen. | PO |
 
@@ -109,12 +109,11 @@ Keine Abhängigkeit steht nur unter GPL/AGPL, keine ist proprietär, kein Eintra
 
 ### 2.4 KI-generierter und übernommener Code
 
-- Ein großer Teil des Codes entstand mit KI-Agenten (Claude, Codex, Hermes mit
-  Qwen); auf `main` tragen 24 Commits einen Claude-, 17 einen
-  Hermes-/Entwickler-Agent-Co-Author-Trailer; alle Commits sind unter dem
+- Ein großer Teil des Codes entstand mit KI-Agenten; auf `main` tragen 41 Commits einen
+  Co-Author-Trailer eines Agenten; alle Commits sind unter dem
   Inhaber gemergt.
 - Die Nutzungsbedingungen der kommerziellen Anbieter (Anthropic, OpenAI)
-  übertragen Rechte an den Ausgaben auf den Nutzer; für den Hermes-Betrieb über
+  übertragen Rechte an den Ausgaben auf den Nutzer; für den Agentenbetrieb über
   Nous Portal und das offene Qwen-Modell sollte der PO das kurz bestätigen
   (Qwen-Lizenzen erheben keine Rechte an Ausgaben).
 - Rechtlich offen (je nach Land): Rein maschinell erzeugte Teile sind ggf.
@@ -157,11 +156,11 @@ Werte wurden dabei nie ausgegeben, nur maskiert (erste 4 Zeichen + Länge).
 | Nr. | Befund | Schwere | Ort | Empfehlung |
 |---|---|---|---|---|
 | S1 | **Keine echten Zugangsdaten gefunden.** Alle Treffer sind Platzhalter (`change-me-before-use`, `replace…`), Test-Fixtures (`sekret…` gegen Mock-Server) oder Variablennamen. Nie eingecheckt: `.env`, `.env.production`, Schlüssel, Zertifikate, Datenbanken. `desktop/.env` enthält nur `VITE_SERVER_URL=http://localhost:8080`. | — | — | Keine Rotation nötig. Vorsorglich gilt: Sollte je ein Schlüssel außerhalb von Git (z. B. Chat, Discord, Agent-Logs) geteilt worden sein, diesen rotieren. |
-| S2 | Private E-Mail-Adresse des Inhabers als Commit-Autor (197×) und eine `@intracore.io`-Adresse als Co-Author (2×) | mittel (Datenschutz) | Autor: nur `refs/pull/*`, Remote-Branch `codex/remember-login`, lokale Feature-Branches. Co-Author: auch 1 Commit-Nachricht auf `main` (`6b6407c`) | siehe B2 / Abschnitt 5 (Option A entfernt beides) |
-| S3 | Interne Infrastrukturdetails: absoluter Host-Pfad des Agenten-Servers (`/home/<agent-user>/workspaces/…`), Agenten-Setup (Hermes, Nous-Modell, Discord, Kanban-Board) | niedrig | `AGENTS.md`, `docs/adr/0013…`, 9 Dateien in `desktop/e2e/`, ~400 Logdateien in `ci/evidence/` | Kein Geheimnis, aber Angriffsfläche-Information und unprofessionell; Pfade in Skripten durch Variablen ersetzen, AGENTS.md für die Öffentlichkeit neutralisieren (Abschnitt 5). |
+| S2 | Private E-Mail-Adresse des Inhabers als Commit-Autor (197×) und eine `@intracore.io`-Adresse als Co-Author (2×) | mittel (Datenschutz) | Autor: nur `refs/pull/*`, Remote-Branch `feat/remember-login`, lokale Feature-Branches. Co-Author: auch 1 Commit-Nachricht auf `main` (`6b6407c`) | siehe B2 / Abschnitt 5 (Option A entfernt beides) |
+| S3 | Interne Infrastrukturdetails: absoluter Host-Pfad des Agenten-Servers (`/home/<agent-user>/workspaces/…`), Agenten-Setup (Nous-Modell, Discord, Kanban-Board) | niedrig | `AGENTS.md`, `docs/adr/0013…`, 9 Dateien in `desktop/e2e/`, ~400 Logdateien in `ci/evidence/` | Kein Geheimnis, aber Angriffsfläche-Information und unprofessionell; Pfade in Skripten durch Variablen ersetzen, AGENTS.md für die Öffentlichkeit neutralisieren (Abschnitt 5). |
 | S4 | Name des Inhabers in internen Dokumenten (Handoffs, ADR-0002, `docs/design/apple-refined.html` mit Beispieladresse `marcello@acme.de`) | niedrig | `docs/HANDOFF-*.md`, `docs/design/` | Vertretbar (Projektinhaber); Mock-Adresse auf `@example.com` ändern. |
 | S5 | Test-Fixtures mit echten Domains statt reservierter: `ilkay@istanbul.com` (Locale-Test), `acme.de` | niedrig | `UserRepositoryTest`, `apple-refined.html` | Auf `example.com`/`.test` umstellen (Folgeaufgabe, Testcode → eigener PR). |
-| S6 | Lokale, nicht ignorierte Ordner `.claude/`, `.playwright-mcp/`, `.worktrees/` mit Agenten-Zustand und Browser-Mitschnitten | mittel (Risiko versehentlicher Commit) | Arbeitskopie | **behoben in diesem PR**: in `.gitignore` aufgenommen. |
+| S6 | Lokale, nicht ignorierte Ordner `.feat/`, `.playwright-mcp/`, `.worktrees/` mit Agenten-Zustand und Browser-Mitschnitten | mittel (Risiko versehentlicher Commit) | Arbeitskopie | **behoben in diesem PR**: in `.gitignore` aufgenommen. |
 | S7 | GitHub-Actions-Workflow ohne explizite Token-Rechte | niedrig | `.github/workflows/ci.yml` | **behoben in diesem PR**: `permissions: contents: read`. Trigger ist `pull_request` (nicht `pull_request_target`), Fork-PRs bekommen also keine Secrets — passt für ein öffentliches Repo. |
 | S8 | Web-Oberfläche ohne globale Content-Security-Policy, Desktop-CSP `null` | mittel (Produkt) | ADR-0011-Folgepunkt | Bekannt; als offene Grenze in `docs/OPERATIONS.md` und README dokumentiert. Eigene Klasse-A-Aufgabe vor einer Beta. |
 | S9 | Dev-Profil (H2): Wissen an Chat anhängen schlägt fehl (`BadSqlGrammarException`, HTTP 500) — beim Erstellen der Screenshots beobachtet; mit PostgreSQL funktioniert es | niedrig (nur Entwicklung) | `/api/v1/orgs/*/chat/conversations/*/context` | Externe Entwickler stoßen beim Ausprobieren darauf → eigene Aufgabe; bis dahin in `docs/OPERATIONS.md` dokumentiert. |
@@ -216,7 +215,7 @@ Nachweise verändert. Reihenfolge = Empfehlung.
 3. **Marke und Icon klären** (B3).
 4. **Interne Agenten-Dokumentation trennen.** `AGENTS.md`, `docs/HANDOFF-*.md`,
    `docs/tasks/`, `docs/reviews/` und `docs/PROJECT_STATE.md` beschreiben den
-   internen Agentenbetrieb (Hermes, Discord, Kanban, PO-Entscheidungen).
+   internen Agentenbetrieb (Discord, Kanban, PO-Entscheidungen).
    Empfehlung: im öffentlichen Repo eine neutrale `AGENTS.md` (Regeln für
    Beitragende/Coding-Agenten ohne Host-Pfade, Modell- und Discord-Angaben);
    Handoffs und Agenten-Betriebsregeln im privaten Repo belassen. Reviews und
@@ -303,12 +302,12 @@ Deutsch) ist in README genannt.
 
 | Schritt | Wer | Status |
 |---|---|---|
-| App-Icon ersetzen, Entscheidungen dokumentieren (PR im privaten Repo) | Claude | erledigt (Archiv #95, `0c6e1c4`) |
-| Hermes-Agenten pausieren | PO | erledigt (PO-Bestätigung 20.11.2026) |
-| Privates Repo in `Keplura-intern` umbenennen | Claude nach PO-Go | erledigt 20.11.2026 |
-| Neues Repo `Keplura` **privat** anlegen, bereinigten Stand von `main` als ersten Commit pushen (Autor und Committer: Inhaber, noreply-Adresse) | Claude | erledigt: ein Commit, Inhalt und Dateirechte identisch mit Archiv-`main` ohne `ci/evidence/` und `desktop/e2e/evidence/` |
-| Lokaler Klon des Windows-Rechners auf `Keplura-intern` umgestellt; neue Arbeit in frischem Klon des neuen Repos | Claude | erledigt |
-| Hermes-Host: alten Arbeitsordner beiseitelegen und das neue Repo **frisch klonen** (nicht nur Remote ändern — ein alter Klon würde beim Push die alte Historie ins neue Repo laden); danach Agenten fortsetzen | PO / Plattform | erledigt (PO-Bestätigung 20.11.2026) |
-| Offener Archiv-PR #92 übertragen | Claude | erledigt: neuer Draft-PR #1, Archiv-#92 geschlossen |
-| Sichtbarkeit auf **öffentlich**; Private vulnerability reporting, Secret Scanning mit Push Protection, Dependabot-Warnungen und -Sicherheitsupdates einschalten | Claude nach PO-Go („Yes, go public“) | erledigt 20.11.2026: vorher alle Referenzen erneut geprüft (5 Commits, nur Inhaber/noreply, keine Zugangsdaten); ohne Login erreichbar, GitHub erkennt Apache-2.0; Archiv bleibt privat |
+| App-Icon ersetzen, Entscheidungen dokumentieren (PR im privaten Repo) | Agent | erledigt (Archiv #95, `0c6e1c4`) |
+| Agenten pausieren | PO | erledigt (PO-Bestätigung 20.11.2026) |
+| Privates Repo in `Keplura-intern` umbenennen | Agent nach PO-Go | erledigt 20.11.2026 |
+| Neues Repo `Keplura` **privat** anlegen, bereinigten Stand von `main` als ersten Commit pushen (Autor und Committer: Inhaber, noreply-Adresse) | Agent | erledigt: ein Commit, Inhalt und Dateirechte identisch mit Archiv-`main` ohne `ci/evidence/` und `desktop/e2e/evidence/` |
+| Lokaler Klon des Windows-Rechners auf `Keplura-intern` umgestellt; neue Arbeit in frischem Klon des neuen Repos | Agent | erledigt |
+| Agenten-Host: alten Arbeitsordner beiseitelegen und das neue Repo **frisch klonen** (nicht nur Remote ändern — ein alter Klon würde beim Push die alte Historie ins neue Repo laden); danach Agenten fortsetzen | PO / Plattform | erledigt (PO-Bestätigung 20.11.2026) |
+| Offener Archiv-PR #92 übertragen | Agent | erledigt: neuer Draft-PR #1, Archiv-#92 geschlossen |
+| Sichtbarkeit auf **öffentlich**; Private vulnerability reporting, Secret Scanning mit Push Protection, Dependabot-Warnungen und -Sicherheitsupdates einschalten | Agent nach PO-Go („Yes, go public“) | erledigt 20.11.2026: vorher alle Referenzen erneut geprüft (5 Commits, nur Inhaber/noreply, keine Zugangsdaten); ohne Login erreichbar, GitHub erkennt Apache-2.0; Archiv bleibt privat |
 | Branch-Schutz für `main` | PO (AGENTS.md: Agenten schalten keinen Branch-Schutz) | offen — Empfehlung: nur per PR, kein Force-Push, kein Löschen; keine Pflicht-Freigabe (Inhaber kann eigene PRs nicht freigeben) |

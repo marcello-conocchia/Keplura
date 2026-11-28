@@ -1,6 +1,6 @@
 # PILOT-02 — bessere belegte Antworten
 
-In Arbeit auf `codex/pilot-answer-quality`, eigener Worktree ab `main@43302d3`.
+In Arbeit auf `feat/pilot-answer-quality`, eigener Worktree ab `main@43302d3`.
 Die Build-Kontext- und Zeilenenden-Korrekturen aus PILOT-01 sind als technische
 Voraussetzung übernommen. Die installierte PILOT-01-Instanz bleibt erreichbar.
 

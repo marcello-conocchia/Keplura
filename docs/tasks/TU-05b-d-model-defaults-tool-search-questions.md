@@ -1,6 +1,6 @@
 # TU-05b–d — Modellvorgaben, Tool-Suche und strukturierte Rückfragen
 
-Status: **abgeschlossen mit PR #37 (26.11.2026).** Codex: APPROVED (Code + Security) auf 94ebf13 nach einer Prüfrunde mit zwei behobenen Major-Befunden. Restumfang von TU-05 nach TU-05a (PR #36, Merge 3019e81), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). PO-Entscheidung vom 25.11.2026 im Chat: Option 1, alle drei Teile in **einem PR mit getrennten Commits**, ein CI-Lauf und eine Review-Runde am Ende. Claude implementiert, Codex prüft unabhängig (Code + Security).
+Status: **abgeschlossen mit PR #37 (26.11.2026).** Unabhängiges Review: APPROVED (Code + Security) auf 94ebf13 nach einer Prüfrunde mit zwei behobenen Major-Befunden. Restumfang von TU-05 nach TU-05a (PR #36, Merge 3019e81), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). PO-Entscheidung vom 25.11.2026 im Chat: Option 1, alle drei Teile in **einem PR mit getrennten Commits**, ein CI-Lauf und eine Review-Runde am Ende. Implementierung und unabhängige Prüfung (Code + Security) durch getrennte Agenten.
 
 Klasse A: Admin-Einstellung am Modell, autorisierter Werkzeugkatalog, Unterbrechung und Fortsetzung der Werkzeugschleife.
 
@@ -63,7 +63,7 @@ Keine Stufe erweitert Rechte. Reihenfolge der Einschränkungen: Serverfreigabe �
 3. **Rückfragen:** Eine Rückfrage unterbricht die Frage und erzeugt eine Karte. Antwort mit gültiger Option oder freiem Text setzt den Ablauf genau einmal fort, und das Modell erhält die Antwort. Eine ungültige Option wird abgelehnt. Fremde Personen oder Chats können nicht antworten. Eine zweite Rückfrage und Rückfragen in Fortsetzungen werden blockiert.
 4. Nach einer Antwort ist höchstens eine Schreib-/kritische Folgeaktion möglich, und nur nach eigener Bestätigung.
 5. Budgets, Karten, Herkunftsprüfung, Abbruch, Chat-Auswahl und alle TU-02 bis TU-05a-Abläufe bleiben unverändert grün.
-6. Gezielte Tests während der Arbeit, einmal lokale Linux-CI am Ende als Nicht-root mit acl. Unabhängiges Code- und Security-Review durch Codex.
+6. Gezielte Tests während der Arbeit, einmal lokale Linux-CI am Ende als Nicht-root mit acl. Unabhängiges Code- und Security-Review.
 7. Nach Merge PROJECT_STATE.md und TOOL_USE_PLAN.md aktualisieren: TU-05 abgeschlossen, nächster Schritt TU-06.
 
 ## Tests

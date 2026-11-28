@@ -1,10 +1,10 @@
 # DS-01 — Schritt 5, erste Ausbaustufe: Verzeichnis + Fileserver mit Rechte-Spiegelung
 
-Branch `codex/ds-datasources` von `main@43302d3`; übernimmt `codex/pilot-admin-ops` (4b–4e) per
+Branch `feat/ds-datasources` von `main@43302d3`; übernimmt `feat/pilot-admin-ops` (4b–4e) per
 Merge-Commit als Voraussetzung (Suche, Administration). Kein Merge nach main.
 Spec: `docs/adr/0012-datenquellen-und-rechte-spiegelung.md`.
 
-## Umgesetzt (Claude, Cloud, 14.11.2026) — nur Kompilieren/Typecheck geprüft
+## Umgesetzt (14.11.2026) — nur Kompilieren/Typecheck geprüft
 
 | Etappe | Inhalt |
 |---|---|
@@ -21,7 +21,7 @@ Spec: `docs/adr/0012-datenquellen-und-rechte-spiegelung.md`.
   Elternordner geht konservativ verloren (fail-closed).
 - SharePoint (DS-4) folgt (Entscheidungen offen, siehe unten).
 
-## Abnahme-Checkliste für Codex (lokal)
+## Abnahme-Checkliste (lokal)
 
 1. `mvn verify`; neue Unit-Tests: `LdapDirectoryClient.sidToString/escapeFilter`, `SmbSourceConnector.principal`,
    `DataSourceSyncService.fingerprint/Filter`, `LocalSourceConnector.acl` (Tempdir mit chmod: privater Elternordner,
@@ -46,7 +46,7 @@ Spec: `docs/adr/0012-datenquellen-und-rechte-spiegelung.md`.
 - **Gruppen-Auffrischung alle 15 min** (`96fd5e2`): nicht gefunden/deaktiviert → Prinzipale entfernt; AD-, OpenLDAP-,
   389-DS-Sperrmerkmale; deaktivierte Konten können sich nicht mehr per Verzeichnis anmelden.
 
-Zusätzliche Prüfpunkte für Codex: Prüflauf mit echten Fragen (Trefferquote plausibel, Rechte des Prüfenden wirken),
+Zusätzliche Prüfpunkte: Prüflauf mit echten Fragen (Trefferquote plausibel, Rechte des Prüfenden wirken),
 CSV mit Semikolon und Tab, Daumen-Statistik nach Bewertungen; Auffrischung: Benutzer aus AD-Gruppe entfernen →
 nach ≤ 15 min verschwindet die Datei aus seiner Suche; Konto deaktivieren → keine Anmeldung, keine Quelldokumente.
 
@@ -67,13 +67,13 @@ nach ≤ 15 min verschwindet die Datei aus seiner Suche; Konto deaktivieren → 
 - `SharePointSourceConnector` (Graph, Sites.Selected, Download ohne Bearer, Drosselung), V18.
 - Assistent: dritte Wahl „SharePoint Online“ mit Einrichtungshilfe; Anleitung `docs/howto/sharepoint.md`.
 
-Prüfpunkte für Codex (braucht einen Microsoft-365-Testtenant): App mit Sites.Selected, eine Site freigegeben,
+Prüfpunkte (braucht einen Microsoft-365-Testtenant): App mit Sites.Selected, eine Site freigegeben,
 eine nicht → nur die freigegebene ist erreichbar; Datei nur für Gruppe A → Person in A sieht sie, Person in B nicht;
 „Besucher“-Recht → nicht sichtbar; Organisationslink → alle des Tenants; OIDC-Login mit groups-Claim und mit
 Überlauf; Token eines fremden IdP mit gefälschter oid → keine Entra-Prinzipale.
 Grenze: Entra-Gruppen werden nur bei der Anmeldung aktualisiert (kein Graph-Recht GroupMember.Read.All).
 
-## Abnahme-Zwischenstand Codex — 14.11.2026, auf Wunsch pausiert
+## Abnahme-Zwischenstand — 14.11.2026, auf Wunsch pausiert
 
 | Prüfpunkt | Ergebnis | Beleg / Rest |
 |---|---|---|

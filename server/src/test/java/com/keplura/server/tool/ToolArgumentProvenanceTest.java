@@ -74,7 +74,7 @@ class ToolArgumentProvenanceTest {
         assertThat(allowed("{\"ids\":[\"alpha\",\"beta\",\"gamma\",\"delta\",\"epsilon\",\"zeta\",\"theta\",\"iota\",\"kappa\"]}",s)).isFalse();
     }
 
-    /** Re-review PR #26 (Codex, minor): structured schema values must not bypass the canonical-text check. */
+    /** Re-review PR #26 (minor): structured schema values must not bypass the canonical-text check. */
     @ParameterizedTest
     @ValueSource(strings={
             "{\"type\":\"object\",\"default\":{\"q\":\"public\\u2009ticket\"}}",

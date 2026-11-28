@@ -2,7 +2,7 @@
 
 Klasse A: Anmeldung, Sitzungslaufzeit und Cookie-Persistenz.
 PO-Auftrag vom 18.11.2026: „Angemeldet bleiben“ beim Login ergänzen und die
-Abmeldung nach 30 Minuten entfernen; Codex-Nutzung ausdrücklich bestätigt.
+Abmeldung nach 30 Minuten entfernen; Agenten-Nutzung ausdrücklich bestätigt.
 
 ## Ziel
 
@@ -51,7 +51,7 @@ am finalen Produktstand. Ergebnisse werden erst nach Ausführung berichtet.
 
 ## Workspace
 
-Eigener Worktree `Keplura-remember-login`, Branch `codex/remember-login`,
+Eigener Worktree `Keplura-remember-login`, Branch `feat/remember-login`,
 Ausgangspunkt `main@9535c93`. Der ältere Worktree `Keplura-persist-login`
 enthält separate uncommittete Arbeit und wird nicht verändert.
 

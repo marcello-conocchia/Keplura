@@ -1,6 +1,6 @@
 # Quellen-Frische im Zitat
 
-PO-Auftrag 15.11.2026, Klasse B gemäß ausdrücklich beauftragter risikobasierter Prüftiefe (PR #66): additive Quellenmetadaten und UI, keine neuen Rechte/externen Aufrufe/Abhängigkeiten. Branch `codex/source-freshness` von `origin/main@ff18bd9`, eigener Worktree `source-freshness`.
+PO-Auftrag 15.11.2026, Klasse B gemäß ausdrücklich beauftragter risikobasierter Prüftiefe (PR #66): additive Quellenmetadaten und UI, keine neuen Rechte/externen Aufrufe/Abhängigkeiten. Branch `feat/source-freshness` von `origin/main@ff18bd9`, eigener Worktree `source-freshness`.
 
 Ziel: Chat-Zitat, Wissenssuchtreffer und Textvorschau zeigen „Stand: <Datum>“. `sourceUpdatedAt` verwendet die Original-Änderungszeit einer importierten Datei, sonst das Upload-Datum. Datum kommt mit den bestehenden tenant-/ACL-gefilterten Abfragen; keine Migration/Tabelle. Älter als drei Kalenderjahre: neutraler Zusatz „älteres Dokument“, Tooltip „Stand vom …, bitte prüfen, ob es aktuell ist“. Historische Zitate ohne Metadaten zeigen ehrlich „Stand: unbekannt“; keine Datenerfindung oder Umschreibung alter Antworten.
 

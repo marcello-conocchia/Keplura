@@ -1,6 +1,6 @@
 # UI-11 — KI-Verwaltung und Systemstatus im Katalogstil
 
-PO-Auftrag 19.11.2026 („fang mit 3 an“ → „Mach was am besten ist“): die restlichen UI-Bereiche schrittweise in den Stil von Wissen/Datenquellen/Verbindungen bringen. Erstes Paket: die vier Bereiche, die noch direkt in `AdminPanel.vue` im alten Kartenstil stehen. Branch `claude/ui-ai-admin` von `main@ea45a79`.
+PO-Auftrag 19.11.2026 („fang mit 3 an“ → „Mach was am besten ist“): die restlichen UI-Bereiche schrittweise in den Stil von Wissen/Datenquellen/Verbindungen bringen. Erstes Paket: die vier Bereiche, die noch direkt in `AdminPanel.vue` im alten Kartenstil stehen. Branch `feat/ui-ai-admin` von `main@ea45a79`.
 
 ## Ziel
 

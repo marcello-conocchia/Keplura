@@ -38,7 +38,7 @@ Gezielte Server-Tests des Zustands-/Entscheidungswegs einschließlich paralleler
 
 ## Workspace
 
-Eigener Worktree auf Branch `feat/tool-use-confirmations` ab aktuellem main. Vor Start aktive Aufgaben im autoritativen Kanban prüfen; genau eine Implementierung. Entwickler öffnet Draft-PR, Codex prüft unabhängig. Kein Merge durch den Entwickler. Provider-/Budgetregeln aus AGENTS.md gelten.
+Eigener Worktree auf Branch `feat/tool-use-confirmations` ab aktuellem main. Vor Start aktive Aufgaben im autoritativen Kanban prüfen; genau eine Implementierung. Entwickler öffnet Draft-PR, ein anderer Agent prüft unabhängig. Kein Merge durch den Entwickler. Provider-/Budgetregeln aus AGENTS.md gelten.
 
 ## Bestehende Folgepunkte
 
@@ -54,7 +54,7 @@ Die MCP-Werkzeug-Häkchen tragen laut TU-01-QA im Accessibility-Baum den Namen �
 - **Admin:** CRITICAL ist freigebbar; Hinweis in der Oberfläche. Häkchen tragen jetzt den Namen „<Werkzeug> freigeben“ (Folgepunkt aus TU-01-QA behoben).
 - **Desktop:** `ToolCallCard.vue` unter der Antwort, Deutsch/Englisch, Ergebnis nur als Text, Bestätigen/Ablehnen mit Busy-Sperre, bei unklarer Antwort kein Wiederholen, sondern Neuladen des Stands. Logik in `tool-cards.ts`, getestet mit `e2e/tool_cards.test.cjs`.
 
-## Korrekturen nach Review-Runde 1 (Codex, PR #17)
+## Korrekturen nach Review-Runde 1 (PR #17)
 
 - **[major / Security medium] Vollständige Eingaben vor der Bestätigung:** Karten liefern `argumentsText` (exakt der gespeicherte JSON-Text, der bei Bestätigung ausgeführt wird) und `argumentFields` (je Feld verlustfrei als Text vom Server; kein `JSON.parse` im Client, also keine Rundung über 2^53). Bei offenen Karten ist der vollständige Text immer sichtbar („genau so wird ausgeführt“); die Übersicht kennzeichnet Kürzungen und weitere Felder.
 - **[major / Security medium] Kein stiller Ersatz durch `{}`:** Die kanonische Form wird vor dem Speichern geprüft; zu groß → gesperrt (Karte ohne gespeicherte Eingaben, `arguments_json` NULL). Ausgeführt wird immer der gespeicherte kanonische Text, auch bei READ/WRITE (Karte = Adapter-Eingabe).

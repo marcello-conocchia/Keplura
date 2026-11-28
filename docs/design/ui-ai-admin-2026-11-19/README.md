@@ -1,6 +1,6 @@
 # UI-11 Nachweise — KI-Verwaltung und Systemstatus
 
-Stand 19.11.2026, Branch `claude/ui-ai-admin`. Vite-Dev-Server mit **vollständig simulierten** Server-Antworten (Playwright-Route), kein echter Server, kein Modell- oder Verbindungsaufruf.
+Stand 19.11.2026, Branch `feat/ui-ai-admin`. Vite-Dev-Server mit **vollständig simulierten** Server-Antworten (Playwright-Route), kein echter Server, kein Modell- oder Verbindungsaufruf.
 
 Gezielt geprüft und bestanden:
 

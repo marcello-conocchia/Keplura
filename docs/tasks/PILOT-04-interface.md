@@ -1,6 +1,6 @@
 # PILOT-04 — Oberfläche für den Hand-Upload-Pilot fertigstellen
 
-Branch `codex/pilot-interface` ab main; Antwortqualität und Vorschau als
+Branch `feat/pilot-interface` ab main; Antwortqualität und Vorschau als
 Voraussetzungen integriert, ohne Merge nach main.
 
 Umfang: Team-, Administration- und Login-Seite im bestehenden ruhigen
@@ -20,7 +20,7 @@ Backend aus PILOT-03 unverändert; dessen 412 erfolgreiche Server-Tests bleiben
 der Backend-Nachweis. Merge-Gates aus AGENTS.md sind weiterhin offen.
 
 
-## Stand 14.11.2026 (Claude, Cloud) — Code fertig, Abnahme durch Codex lokal
+## Stand 14.11.2026  — Code fertig, Abnahme lokal
 
 Umgesetzt: Team-Seite im Listenstil (Organisationen mit „Auswählen“, Umbenennen, Löschen;
 Mitglieder mit Avatar/Rolle/Entfernen; offene Einladungen mit Code-Anzeige und „Zurückziehen“;
@@ -29,7 +29,7 @@ Composer-Auswahl, mobile Sidebar, Login und Admin stammen aus dem WIP-Commit e5d
 
 Geprüft in der Cloud: nur `vue-tsc --noEmit` (grün). **Nicht** geprüft: Build, laufende App, Browser.
 
-Abnahme-Checkliste für Codex (lokal, Image `keplura-server:pilot-interface`):
+Abnahme-Checkliste (lokal, Image `keplura-server:pilot-interface`):
 1. Team: Org anlegen/auswählen/umbenennen/löschen, Einladung erstellen → Code kopieren →
    zweites Konto löst ein → Mitglied erscheint → entfernen; Zurückziehen; leere Zustände.
 2. Chat-Eingabe: erste Frage ohne offenen Chat; „Ohne Wissensbasis“; Wechsel zwischen zwei

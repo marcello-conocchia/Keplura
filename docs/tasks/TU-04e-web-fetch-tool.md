@@ -1,6 +1,6 @@
 # TU-04e — Webseitenabruf als Werkzeug
 
-Status: **abgeschlossen auf main, PR #34, Squash-Merge 36014ca (25.11.2026).** Fünfte und letzte Aufgabe von TU-04; damit TU-04 vollständig abgeschlossen. Claude: APPROVED (Code + Security) auf 8387fc3; lokale Linux-CI Exit 0. Nach Fetch Dateibaum identisch mit freigegebenem PR-Head 12c2151. Kein Release/Deployment.
+Status: **abgeschlossen auf main, PR #34, Squash-Merge 36014ca (25.11.2026).** Fünfte und letzte Aufgabe von TU-04; damit TU-04 vollständig abgeschlossen. Unabhängiges Review: APPROVED (Code + Security) auf 8387fc3; lokale Linux-CI Exit 0. Nach Fetch Dateibaum identisch mit freigegebenem PR-Head 12c2151. Kein Release/Deployment.
 
 ## Ziel
 
@@ -68,9 +68,9 @@ Lokaler HTTP-Testserver und ein einstellbarer DNS-Resolver im Abrufer, damit Reb
 
 ## Workspace
 
-Eigener Worktree auf Branch `feat/tool-use-web-fetch` ab aktuellem main. Implementierung und unabhängige Prüfung nach PO-Zuweisung (TU-04c/d: Claude implementiert, Codex prüft). Genau eine Implementierungsaufgabe. Draft-PR, kein Merge durch den Entwickler.
+Eigener Worktree auf Branch `feat/tool-use-web-fetch` ab aktuellem main. Implementierung und unabhängige Prüfung nach PO-Zuweisung (TU-04c/d: Implementierung und unabhängige Prüfung durch getrennte Agenten). Genau eine Implementierungsaufgabe. Draft-PR, kein Merge durch den Entwickler.
 
 
-Historischer Nachweis vor Claudes Review: lokale Linux-CI auf Produktstand d64ec60 als uid 1500 mit acl, Exit 0 (92 Klassen, 936 Tests, 4 übersprungen; Desktop und Tauri grün), [MATRIX](../../ci/evidence/20261125-185440/MATRIX.md). Unabhängige Code-/Security-Freigabe auf 325ae46; beide Minor-Hinweise mit Regressionen in d64ec60 behoben, keine neue Prüfrunde gemäß AGENTS.md. Nur lokale Fixtures und geskriptetes Gateway, kein echter Modell-/Internetlauf oder Browser-/Feldtest. Details und Grenzen in PR #34.
+Historischer Nachweis vor dem Review: lokale Linux-CI auf Produktstand d64ec60 als uid 1500 mit acl, Exit 0 (92 Klassen, 936 Tests, 4 übersprungen; Desktop und Tauri grün), [MATRIX](../../ci/evidence/20261125-185440/MATRIX.md). Unabhängige Code-/Security-Freigabe auf 325ae46; beide Minor-Hinweise mit Regressionen in d64ec60 behoben, keine neue Prüfrunde gemäß AGENTS.md. Nur lokale Fixtures und geskriptetes Gateway, kein echter Modell-/Internetlauf oder Browser-/Feldtest. Details und Grenzen in PR #34.
 
-Aktueller Nachweis nach Claudes Review: Produktkorrektur 8387fc3 (Befunde 1–3); neue vollständige lokale Linux-CI Exit 0, uid 1500 mit acl, 92 Klassen, 990 Tests, 4 übersprungen, Desktop/Tauri grün. [MATRIX](../../ci/evidence/20261125-191631/MATRIX.md). Literal- und DNS-Regressionen mit Verbindungszähler, SOCKS-Regression und öffentliche Gegenbeispiele. 64:ff9b:1::/48 wird als lokales Übersetzungspräfix vollständig gesperrt; seine Abbildung ist netzspezifisch. Claude: APPROVED (Code + Security) auf 8387fc3. Vom PO am 25.11.2026 im Chat übermittelt; keine offenen Blocker/Major-Befunde. Der PO beauftragt den Merge ausdrücklich.
+Aktueller Nachweis nach dem Review: Produktkorrektur 8387fc3 (Befunde 1–3); neue vollständige lokale Linux-CI Exit 0, uid 1500 mit acl, 92 Klassen, 990 Tests, 4 übersprungen, Desktop/Tauri grün. [MATRIX](../../ci/evidence/20261125-191631/MATRIX.md). Literal- und DNS-Regressionen mit Verbindungszähler, SOCKS-Regression und öffentliche Gegenbeispiele. 64:ff9b:1::/48 wird als lokales Übersetzungspräfix vollständig gesperrt; seine Abbildung ist netzspezifisch. Unabhängiges Review: APPROVED (Code + Security) auf 8387fc3. Vom PO am 25.11.2026 im Chat übermittelt; keine offenen Blocker/Major-Befunde. Der PO beauftragt den Merge ausdrücklich.
