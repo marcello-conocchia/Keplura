@@ -1,6 +1,6 @@
 # TU-06c — Isolierter MCP-stdio-Adapter (Neubau mit stärkerer Isolation)
 
-Status: **spezifiziert, nicht gestartet.** Aus TU-06 (PR #39) herausgenommen (PO-Entscheidung 27.11.2026 im Chat: „Aus #39 herausnehmen“ auf Review-Befund 8, Major). Start erst, wenn TU-06 auf main ist (genau eine aktive Implementierung). Die erste Fassung steckt in Commit 19d01fa (zurückgenommen in b1206e0). Die Probe mit einem echten stdio-Server unter `ci/evidence/20261127-bridge-smoke/` bleibt als Nachweis der ersten Fassung erhalten.
+Status: **spezifiziert, nicht gestartet.** Aus TU-06 (PR #39) herausgenommen (PO-Entscheidung 27.11.2026 im Chat: „Aus #39 herausnehmen“ auf Review-Befund 8, Major). TU-06 ist seit 28.11.2026 auf main (9364c77); diese Aufgabe ist die nächste. Rollen (PO 27.11.2026): **Codex implementiert, Claude prüft unabhängig** (Code + Security). Die erste Fassung steckt in Commit 19d01fa (zurückgenommen in b1206e0). Die Probe mit einem echten stdio-Server unter `ci/evidence/20261127-bridge-smoke/` bleibt als Nachweis der ersten Fassung erhalten.
 
 Klasse A: Prozessisolation, Zugangsdaten, Netzgrenzen, neue Deploy-Dienste.
 
@@ -22,12 +22,47 @@ stdio-MCP-Server laufen wie in TU-06 festgelegt nie im Keplura-Serverprozess und
 - **Bauweise:** Bevorzugt wird ein Container je deklariertem stdio-Server, oder je Sitzung ein Sandbox-Werkzeug im Bridge-Container (z. B. bubblewrap mit eigenen Namensräumen). Der Weg wird zu Beginn der Aufgabe mit einer kurzen Abwägung festgelegt. Eine Sicherheitsabwägung mit Produktwirkung geht an den PO.
 - Ansonsten gilt der Umfang aus TU-06c der TU-06-Spezifikation: Deklaration nur im Deployment, keine Shell, Zeitlimits, begrenzte Ausgabe, Anbindung über den vorhandenen MCP-HTTP-Adapter, standardmäßig deaktivierter Dienst.
 
+## Bedrohungen und Pflichttests
+
+Lehre aus TU-06: Die Angriffe werden **vor** dem Code festgelegt. Jede Zeile braucht mindestens einen Test, der ohne die Abwehr rot wäre und mit ihr grün ist. Die Tests mit „Container“ laufen im echten Container (Docker oder Podman, Nicht-root, Produktions-Compose bzw. dessen Härtung). Unit-Tests ersetzen sie nicht. Neue Angriffe, die beim Bauen auffallen, kommen in diese Tabelle, statt als Restrisiko im PR zu landen. Ein Restrisiko mit Produktwirkung entscheidet der PO.
+
+**Angreifer, von denen wir ausgehen:**
+- ein bösartiges oder kompromittiertes stdio-Programm, z. B. ein npm-Paket mit Schadcode oder ein Server, der über Werkzeug-Argumente aus einer Prompt-Injection gesteuert wird;
+- eine Person, die bei einem freigegebenen Server Werkzeug-Argumente vorgibt;
+- jemand im internen Netz ohne Bridge-Token.
+
+| # | Angriff | Erwartete Abwehr | Pflichttest |
+|---|---|---|---|
+| B1 | Kindprozess liest das Bridge-Token: Umgebung, `/proc/<ppid>/environ`, `/proc/<ppid>/mem` oder `cmdline`, Token-Datei, Kommandozeile | Token nie in Umgebung oder Argumenten. Datei nur für den Token-Halter lesbar. Kind unter anderer Identität, ohne Zugriff auf `/proc` des Elternprozesses (eigener PID-Namensraum oder `hidepid`) | Container: Testprogramm versucht alle Wege, Ergebnis enthält das Token nie |
+| B2 | Kindprozess ruft die Bridge selbst auf (Loopback oder Bridge-Adresse), mit oder ohne gestohlenes Token, und startet weitere Server | Das Kind erreicht den Listener der Bridge nicht | Container: Verbindung zu Bridge-Port und Bridge-IP aus dem Kind scheitert |
+| B3 | Kindprozess erreicht den Keplura-Server, die Datenbank, das Docker-Gateway, `host.docker.internal`, die Metadatenadresse `169.254.169.254` oder das Internet | Standardmäßig kein Netz im Kind, technisch durchgesetzt | Container: jedes Ziel einzeln scheitert, solange nichts freigegeben ist |
+| B4 | Daten fließen über DNS ab | Ohne Freigabe kein DNS im Kind | Container: Auflösung eines externen Namens scheitert |
+| B5 | Freigegebenes Ziel als Sprungbrett: Weiterleitung oder zweite Adresse hinter einem freigegebenen Namen | Freigabe nur für das deklarierte Ziel (Host und Port). Durchsetzung außerhalb des Kindes | Container: freigegebenes Ziel erreichbar, ein anderer Port oder Host desselben Netzes nicht |
+| B6 | Sitzung A liest, schreibt oder signalisiert Sitzung B: Dateien, `/proc`, `kill` | Eigene Identität oder eigener Namensraum je Sitzung, privates Arbeitsverzeichnis | Container: zwei gleichzeitige Sitzungen, A sieht weder Prozesse noch Dateien von B und kann B nicht beenden |
+| B7 | Zurückgelassene Daten: Sitzung 1 legt Dateien ab, die Sitzung 2 (andere Person) liest | Arbeitsverzeichnis je Sitzung, am Ende gelöscht | Container: Datei aus Sitzung 1 fehlt in Sitzung 2 |
+| B8 | Prozess überlebt das Sitzungsende: Doppel-Fork, `setsid`, Daemon | Ganzer Prozessbaum bzw. Namensraum wird beendet | Container: Testprogramm forkt einen Daemon; nach `DELETE` oder Zeitlimit läuft kein Prozess der Sitzung mehr |
+| B9 | Rechteausweitung: setuid-Programme, Capabilities, Wechsel auf root | `no-new-privileges`, keine Capabilities im Kind, kein root | Container: `NoNewPrivs=1`, `CapEff=0` im Kind; ein setuid-Versuch scheitert |
+| B10 | Ausbruch ins Dateisystem: Schreiben außerhalb des Arbeitsverzeichnisses, Lesen von Host-Mounts, Docker-Socket | Root-Dateisystem nur lesbar, keine Host-Mounts außer der Deklaration, nie der Docker-Socket | Container: Schreibversuche scheitern; Test der Compose-Konfiguration auf verbotene Mounts |
+| B11 | Ressourcen erschöpfen: Fork-Bombe, Speicher, `/tmp` füllen, endlose Ausgabe, Hänger | Grenzen je Sitzung (Prozesse, Speicher, Dateigröße, Ausgabe, Zeit). Andere Sitzungen und die Bridge laufen weiter | Container: je ein Testprogramm pro Fall; danach antwortet eine zweite Sitzung normal |
+| B12 | Befehlsinjektion: Werkzeug-Argumente landen in `argv`, Umgebung oder Shell | Argumente gehen nur als JSON-RPC über stdin. `argv` und Umgebung kommen nur aus der Deklaration, keine Shell | Unit und Container: Argumente mit `;`, `$( )`, Zeilenumbruch und `--flag` verändern den gestarteten Befehl nicht |
+| B13 | Zugriff ohne oder mit falschem Token, Raten des Tokens | 401 ohne Prozessstart; zeitkonstanter Vergleich; Mindestlänge | Unit und Container: kein Kindprozess bei falschem Token |
+| B14 | Fremde Sitzung übernehmen: `Mcp-Session-Id` einer anderen Sitzung raten oder wiederverwenden | Sitzungs-IDs zufällig und an die Verbindung gebunden. Unbekannte ID ergibt einen Fehler, keinen neuen Prozess | Unit: fremde und erfundene IDs werden abgelehnt |
+| B15 | Missbrauch des Protokolls Richtung Keplura: übergroße oder kaputte Antworten, Antworten zu fremden Anfragen | Ausgabegrenze in der Bridge, bestehende Grenzen des Keplura-MCP-Clients | Unit: übergroße und kaputte Antworten enden mit fester Fehlermeldung |
+| B16 | Geheimnisse in Logs oder Fehlertexten: Token, Umgebung, Pfade, Ausgabe des Kindes | Feste Fehlertexte, keine Ausgabe des Kindes im Log | Unit und Container: Logs und Antworten enthalten das Token nie |
+| B17 | Keplura-Geheimnisse im Bridge-Container: Datenbank-Zugang, Master-Key, Provider-Schlüssel | Container bekommt nur Token-Datei und Deklaration | Test der Compose-Konfiguration: keine solchen Variablen oder Mounts |
+
+**Ablauf:**
+1. Codex legt zu Beginn die Bauweise mit einer kurzen Abwägung fest, entlang dieser Tabelle: Container je Server oder Sandbox je Sitzung.
+2. Claude prüft die Abwägung und die geplanten Tests kurz, bevor der Hauptteil gebaut wird.
+3. Was eine Bauweise nicht abwehren kann (z. B. B5 bei geteiltem Netz), geht mit Optionen an den PO.
+
 ## Acceptance Criteria
 
-1. Im **echten Container** nachgewiesen (Docker oder Podman, Nicht-root): Ein Kindprozess liest das Token weder aus Datei, Umgebung noch `/proc`, sieht keine anderen Kindprozesse und deren Dateien und erreicht weder den Keplura-Dienst noch den Host noch das Internet, solange nichts freigegeben ist.
-2. Ein freigegebenes Ziel ist erreichbar, ein nicht freigegebenes nicht.
-3. Alle Kriterien aus TU-06c der TU-06-Spezifikation bleiben erfüllt (nur deklarierte Befehle, Nicht-root, Zeitlimit, nur mit Token erreichbar, kein Prozessstart im Keplura-Server).
-4. Einmal lokale Linux-CI am Ende als Nicht-root mit acl. Unabhängiges Code- und Security-Review gemäß AGENTS.md.
+1. Jede Zeile von B1–B17 hat einen grünen Pflichttest. Die Container-Tests haben einen Nachweis unter `ci/evidence/<datum>-tu06c-container/`, mit Befehlen, Ausgaben und Image-Version.
+2. Im **echten Container** nachgewiesen (Docker oder Podman, Nicht-root): Ein Kindprozess liest das Token weder aus Datei, Umgebung noch `/proc`, sieht keine anderen Kindprozesse und deren Dateien und erreicht weder den Keplura-Dienst noch den Host noch das Internet, solange nichts freigegeben ist.
+3. Ein freigegebenes Ziel ist erreichbar, ein nicht freigegebenes nicht.
+4. Alle Kriterien aus TU-06c der TU-06-Spezifikation bleiben erfüllt (nur deklarierte Befehle, Nicht-root, Zeitlimit, nur mit Token erreichbar, kein Prozessstart im Keplura-Server).
+5. Einmal lokale Linux-CI am Ende als Nicht-root mit acl. Unabhängiges Code- und Security-Review durch Claude gemäß AGENTS.md.
 
 ## Workspace
 
