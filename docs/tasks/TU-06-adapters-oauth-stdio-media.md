@@ -1,6 +1,6 @@
 # TU-06 — OpenAPI-Adapter, persönliche OAuth-Verbindungen, isolierter MCP-stdio-Adapter, Bild- und Dateiergebnisse
 
-Status: **abgeschlossen auf main, PR #39, Squash-Merge 9364c77 (28.11.2026)**, ohne TU-06c (zurückgenommen, eigene Aufgabe [TU-06c](TU-06c-isolated-stdio-bridge.md)). Claude implementiert, Codex prüft unabhängig (Code + Security). Abweichungen, Review-Korrekturen und offene Punkte stehen unten unter „Umsetzung“. Ursprünglicher Status: spezifiziert, nicht gestartet. Nächster Schritt nach TU-05 (PR #37, Merge 88e3e60), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). PO-Entscheidung vom 26.11.2026 im Chat: „ja spezifiziere TU-06 alles in einem PR“. Umsetzung als **ein PR mit einem Commit je Teilschritt** (Regel aus TU-05b–d): eine Spec, ein CI-Lauf am Ende, eine Review-Runde. Implementierung und unabhängige Prüfung nach PO-Zuweisung.
+Status: **abgeschlossen auf main, PR #39, Squash-Merge 9364c77 (28.11.2026)**, ohne TU-06c (zurückgenommen, eigene Aufgabe [TU-06c](TU-06c-isolated-stdio-bridge.md)). Implementierung und unabhängige Prüfung (Code + Security) durch getrennte Agenten. Abweichungen, Review-Korrekturen und offene Punkte stehen unten unter „Umsetzung“. Ursprünglicher Status: spezifiziert, nicht gestartet. Nächster Schritt nach TU-05 (PR #37, Merge 88e3e60), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). PO-Entscheidung vom 26.11.2026 im Chat: „ja spezifiziere TU-06 alles in einem PR“. Umsetzung als **ein PR mit einem Commit je Teilschritt** (Regel aus TU-05b–d): eine Spec, ein CI-Lauf am Ende, eine Review-Runde. Implementierung und unabhängige Prüfung nach PO-Zuweisung.
 
 Klasse A in jedem Teilschritt: neue externe Ziele (SSRF-Fläche), Zugangsdaten und Tokens, Prozessisolation, Verarbeitung und Auslieferung fremder Binärdaten.
 
@@ -105,7 +105,7 @@ Neue Anbindungen laufen über den vorhandenen kontrollierten Weg von `ToolExecut
 - **API-Vertrag:** `contracts/openapi.yaml` um die neuen Endpunkte und `ChatToolSelection.connectionsRequired` ergänzt (validiert als OpenAPI 3.1).
 - **TU-06d:** Tabelle `tool_artifact` (V37, nach Rücknahme von TU-06c von V38 verschoben), Prüfung nach Magic Bytes, Download `GET /api/v1/orgs/{org}/chat/conversations/{chat}/tool-artifacts/{id}`. Die Antwortobergrenze für MCP-`tools/call` steigt dafür von 2 MB auf 16 MB.
 
-## Review-Runde 1 (Codex, 27.11.2026: REQUEST CHANGES) und Korrekturen
+## Review-Runde 1 (27.11.2026: REQUEST CHANGES) und Korrekturen
 
 | Befund | Schwere | Korrektur |
 |---|---|---|

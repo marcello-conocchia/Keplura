@@ -1,6 +1,6 @@
 # TU-04a — Interne Wissenssuche als Werkzeug
 
-Status: **abgeschlossen, auf main** — PR #26, Squash-Merge `841ae00` (22.11.2026), Baum identisch mit Head `e191bf3`. Linux-CI Exit 0 auf Produktcommit `b4fe684`, Evidence `ci/evidence/20261122-184320/`; danach nur die minor-Korrektur `599043d` mit gezielten Tests (Review rounds). Reviews: Claude für die Implementierung, Codex für Claudes Korrekturen. Erste Aufgabe von TU-04 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md); nächster Schritt [TU-04b](TU-04b-document-read-tool.md). Klasse A: Datenquellen und Dokumentrechte, Modell-/Werkzeugschleife.
+Status: **abgeschlossen, auf main** — PR #26, Squash-Merge `841ae00` (22.11.2026), Baum identisch mit Head `e191bf3`. Linux-CI Exit 0 auf Produktcommit `b4fe684`, Evidence `ci/evidence/20261122-184320/`; danach nur die minor-Korrektur `599043d` mit gezielten Tests (Review rounds). Reviews: ein Agent für die Implementierung, ein anderer für die Korrekturen. Erste Aufgabe von TU-04 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md); nächster Schritt [TU-04b](TU-04b-document-read-tool.md). Klasse A: Datenquellen und Dokumentrechte, Modell-/Werkzeugschleife.
 
 ## Ziel
 
@@ -51,7 +51,7 @@ Geskriptetes Gateway vor dem echten zentralen Dienst mit H2, echter `SearchServi
 
 ## Workspace
 
-Eigener Worktree auf Branch `feat/tool-use-knowledge-search` ab aktuellem main. Implementierung und unabhängige Prüfung nach PO-Zuweisung (bei TU-03: Codex implementiert, Claude prüft). Genau eine Implementierungsaufgabe. Draft-PR, kein Merge durch den Entwickler; Provider-/Budgetregeln aus AGENTS.md gelten.
+Eigener Worktree auf Branch `feat/tool-use-knowledge-search` ab aktuellem main. Implementierung und unabhängige Prüfung nach PO-Zuweisung (bei TU-03: Implementierung und unabhängige Prüfung durch getrennte Agenten). Genau eine Implementierungsaufgabe. Draft-PR, kein Merge durch den Entwickler; Provider-/Budgetregeln aus AGENTS.md gelten.
 
 ## Implementierungsstand (22.11.2026, noch nicht freigegeben)
 
@@ -69,22 +69,22 @@ Die vereinbarte Grenze bleibt: Auswahl/Reihenfolge öffentlich erlaubter Tokens 
 ## Review-Korrektur (22.11.2026)
 
 - Review Runde 1 auf `96e9fd4` ohne Freigabe: **major / Security medium** — die Herkunftsprüfung verglich nur die Wortmenge. Ein privater Wert wie `9100` ließ sich aus einzeln öffentlichen Ziffern zusammensetzen (`9 1 0 0`, `9-1-0-0`, `["9","1","0","0"]`) und lief automatisch nach außen. Dazu **minor / Security low**: Ergebnisse eines als intern markierten MCP-Ziels markierten die Frage nicht.
-- Korrektur auf PO-Auftrag („kannst du es fixen“) durch Claude, damit nicht mehr unabhängig: `ToolArgumentProvenance` prüft zusammenhängende Tokenfolgen je Wert gegen genau eine Quelle; kurze Werte nur aus der Frage, höchstens 8 freie Werte je Aufruf, ungewöhnlicher Leerraum → Karte. Externe Ergebnisse werden als getrennte Quelltexte gespeichert (Spalte `public_tokens`, Name aus V29 beibehalten, höchstens 16 Quellen). Ergebnisse interner Ziele setzen `internal_seen`.
+- Korrektur auf PO-Auftrag („kannst du es fixen“) durch die unabhängige Prüfung, damit nicht mehr unabhängig: `ToolArgumentProvenance` prüft zusammenhängende Tokenfolgen je Wert gegen genau eine Quelle; kurze Werte nur aus der Frage, höchstens 8 freie Werte je Aufruf, ungewöhnlicher Leerraum → Karte. Externe Ergebnisse werden als getrennte Quelltexte gespeichert (Spalte `public_tokens`, Name aus V29 beibehalten, höchstens 16 Quellen). Ergebnisse interner Ziele setzen `internal_seen`.
 - Regressionen: `ToolArgumentProvenanceTest` (buchstabierte, zerlegte, umgestellte und kurze Werte; Leerraum; Wertgrenze; eine Quelle je Wert) und `InternalTargetProvenanceTest` (internes Ziel → externes READ → Karte; Frage-Text weiter automatisch; leeres internes Ergebnis markiert nicht; externe Ergebnisse als getrennte Quellen).
 - Verbindliche Linux-CI auf Produktcommit `97ede97`: Exit 0, Nicht-root (runuser ci, uid 1500) mit acl, frischer Klon; 87 Klassen genau einmal, 782 Tests, 0 Fehler, 1 übersprungen; Rechte-Helfer, Desktop-Build und cargo check PASS; E2E nicht ausgewählt. Evidence `ci/evidence/20261122-124236/` (Runner-Skript beigelegt; die `id`-Ausgabe des Containers wurde nicht gesichert, siehe environment.txt).
-- **Die unabhängige Re-Review dieser Korrektur muss ein anderer Agent übernehmen (Codex),** weil Claude den Fix geschrieben hat (AGENTS.md, Klasse A).
+- **Die unabhängige Re-Review dieser Korrektur muss ein anderer Agent übernehmen ,** weil der Fix vom Prüfer der ersten Runde stammt (AGENTS.md, Klasse A).
 
 ## Re-Review-Korrektur (22.11.2026)
 
-- Codex-Re-Review auf `294f88d`: **major / Security medium** — die Leerraumsperre nutzte ASCII-`\s`, der Tokenizer Unicode-White_Space. Unicode-Trennzeichen (z. B. U+2009/U+2001/U+2000) verschwanden bei der Herkunftsprüfung, kamen aber unverändert beim externen Werkzeug an und konnten eine private Zahl codieren; über den zentralen Dienst reproduziert.
-- Korrektur `b4fe684` (Claude, auf PO-Auftrag): eine gemeinsame Unicode-Leerraumdefinition für Tokenizer und Kanonikprüfung; automatisch nur NFC und einzelne U+0020 zwischen Tokens, auch für Schemawerte.
-- Regression über den echten `ToolExecutionService` (`InternalTargetProvenanceTest`): Codex' Fall und weitere Schreibweisen (U+00A0, U+202F, U+3000, U+1680, U+205F, U+2028, U+0085, Tab, doppelt/angehängt/führend, NFD) ergeben eine Karte mit exaktem Wert statt eines externen Aufrufs; kanonische öffentliche Schreibweise bleibt automatisch. Ohne die Korrektur schlagen 9 dieser Fälle fehl.
+- Re-Review auf `294f88d`: **major / Security medium** — die Leerraumsperre nutzte ASCII-`\s`, der Tokenizer Unicode-White_Space. Unicode-Trennzeichen (z. B. U+2009/U+2001/U+2000) verschwanden bei der Herkunftsprüfung, kamen aber unverändert beim externen Werkzeug an und konnten eine private Zahl codieren; über den zentralen Dienst reproduziert.
+- Korrektur `b4fe684` (auf PO-Auftrag): eine gemeinsame Unicode-Leerraumdefinition für Tokenizer und Kanonikprüfung; automatisch nur NFC und einzelne U+0020 zwischen Tokens, auch für Schemawerte.
+- Regression über den echten `ToolExecutionService` (`InternalTargetProvenanceTest`): der Fall aus dem Re-Review und weitere Schreibweisen (U+00A0, U+202F, U+3000, U+1680, U+205F, U+2028, U+0085, Tab, doppelt/angehängt/führend, NFD) ergeben eine Karte mit exaktem Wert statt eines externen Aufrufs; kanonische öffentliche Schreibweise bleibt automatisch. Ohne die Korrektur schlagen 9 dieser Fälle fehl.
 - Finale Linux-CI auf `b4fe684`: Exit 0, `uid=1500(ci)`, `setfacl 2.3.2` (gesichert in environment.txt), frischer Klon; 87 Klassen genau einmal, 796 Tests, 0 Fehler, 1 übersprungen; Rechte-Helfer, Desktop-Build und cargo check PASS. Evidence `ci/evidence/20261122-184320/` mit Runner-Skript. Danach nur Doku/Nachweise.
-- **Gezielte unabhängige Re-Review dieser Korrektur durch Codex offen.**
+- **Gezielte unabhängige Re-Review dieser Korrektur durch die unabhängige Prüfung offen.**
 
-## Minor aus Codex' Re-Review (22.11.2026)
+## Minor aus dem Re-Review (22.11.2026)
 
-- Codex-Re-Review auf `483d1de`: Freigabe der Unicode-Korrektur; ein **minor / Security low** — bei strukturierten `enum`-/`const`-/`default`-Werten (Objekt/Liste) prüfte der Gleichheitszweig enthaltene Strings nicht auf Kanonik.
-- Behoben (Claude): Schemawerte werden rekursiv geprüft, einschließlich Objektschlüsseln; erst danach greift die Gleichheit. Gezielte Regression in `ToolArgumentProvenanceTest` (7 strukturierte Fälle mit U+2009, doppeltem Leerraum, NFD und Schlüssel; ohne die Korrektur schlagen alle 7 fehl) sowie ein kanonischer strukturierter Wert bleibt automatisch.
+- Re-Review auf `483d1de`: Freigabe der Unicode-Korrektur; ein **minor / Security low** — bei strukturierten `enum`-/`const`-/`default`-Werten (Objekt/Liste) prüfte der Gleichheitszweig enthaltene Strings nicht auf Kanonik.
+- Behoben : Schemawerte werden rekursiv geprüft, einschließlich Objektschlüsseln; erst danach greift die Gleichheit. Gezielte Regression in `ToolArgumentProvenanceTest` (7 strukturierte Fälle mit U+2009, doppeltem Leerraum, NFD und Schlüssel; ohne die Korrektur schlagen alle 7 fehl) sowie ein kanonischer strukturierter Wert bleibt automatisch.
 - Gezielt grün: ToolArgumentProvenanceTest 40, InternalTargetProvenanceTest 18, ToolExecutionServiceTest 23, ChatApiIntegrationTest 45. Gemäß AGENTS.md / Review rounds für diesen minor keine neue volle CI und keine Review-Runde; maßgeblicher CI-Nachweis bleibt `ci/evidence/20261122-184320/` auf `b4fe684`.
 - Folgepunkt unverändert (info): `view()` bricht offene Karten auch bei vorübergehenden Lesefehlern ab, Fundstellen werden je Karte/Nachricht neu aufgelöst. Aufbewahrung von `tool_question` sowie die 5 Dependabot-Warnungen bleiben separate Folgeaufgaben.

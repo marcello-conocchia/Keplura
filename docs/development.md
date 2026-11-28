@@ -933,7 +933,7 @@ docs/       this guide
 
 ## Security-Review-Fixes (16.11.2026)
 
-Der separate Branch `codex/security-fixes` adressiert S-1–S-7 des Reviews von
+Der separate Branch `feat/security-fixes` adressiert S-1–S-7 des Reviews von
 `main@530a3a5` (Spec `docs/tasks/SEC-REVIEW-FIXES.md`). Lokaler/LDAP- und OIDC-Login
 verwenden denselben Sessionaufbau. Die Pflicht zum Passwortwechsel wird zusätzlich
 bei jedem schreibenden API-Aufruf aus dem aktuellen Konto gelesen. Die Oberfläche

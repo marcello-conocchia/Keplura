@@ -1,6 +1,6 @@
 # Verbindungen im Designsystem 1.0
 
-Produktstand `d8cc94d`, Branch `codex/ui-connections`, Reviewbase `codex/ui-datasources@875c83d` (PR #62). Expliziter PO-Auftrag: Websuche, MCP-Server und Verzeichnis im selben Stil wie die vorherigen Bereiche. Änderungen betreffen ausschließlich Frontend, Browserprüfungen und Dokumentation. Keine neue Abhängigkeit, kein geändertes Backend oder Rechtekonzept.
+Produktstand `d8cc94d`, Branch `feat/ui-connections`, Reviewbase `feat/ui-datasources@875c83d` (PR #62). Expliziter PO-Auftrag: Websuche, MCP-Server und Verzeichnis im selben Stil wie die vorherigen Bereiche. Änderungen betreffen ausschließlich Frontend, Browserprüfungen und Dokumentation. Keine neue Abhängigkeit, kein geändertes Backend oder Rechtekonzept.
 
 ## Sichtbare Änderungen
 

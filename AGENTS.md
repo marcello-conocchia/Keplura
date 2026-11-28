@@ -10,13 +10,13 @@ Tool Use ist das Arbeitsziel für die nächsten Tage: mindestens der dokumentier
 Funktionsumfang von Open WebUI. Vor jeder nächsten Aufgabenwahl
 `docs/PROJECT_STATE.md` und `docs/TOOL_USE_PLAN.md` lesen. TU-01 bis TU-06 sind auf
 main (TU-06 mit PR #39, ohne TU-06c); nächste Aufgabe: `docs/tasks/TU-06c-isolated-stdio-bridge.md`
-(PO 27.11.2026: Codex implementiert, Claude prüft unabhängig).
+(PO 27.11.2026: Implementierung und unabhängige Prüfung (Code + Security) durch getrennte Agenten).
 Genau eine Implementierung gleichzeitig.
 Die Reihenfolge ersetzt ältere allgemeine Folgeaufgaben, nicht offene
 Sicherheitsverpflichtungen. Bestehende Gate-, Provider-/Budget-, Release- und
 Deployregeln bleiben verbindlich. Der Plan ist kein Nachweis fertiger Funktionen.
 
-## Roles (Hermes profiles)
+## Roles (agent profiles)
 
 - **default** — Product Lead / Architect / Orchestrator. Plans, creates exactly one
   next implementation task at a time, routes quality gates, reports to Discord.
@@ -82,8 +82,8 @@ Deployregeln bleiben verbindlich. Der Plan ist kein Nachweis fertiger Funktionen
     and one review round (Class A still independently reviewed). Without
     such an instruction, small PRs remain the rule. First used for TU-05b–d.
 - Lean verification (PO decision 2026-11-16, Chat: „wir testen einfach zu
-  viel“ → „Ja mache das und veranker das im Projekt das Codex auch weis“).
-  Binding for every agent (Claude, Codex, Hermes profiles):
+  viel“ → „Ja mache das und veranker das im Projekt“).
+  Binding for every agent and profile:
   1. **One CI run per PR, at the end.** Run `scripts/ci-local.sh` once on
      the final product commit, right before asking for merge. Do NOT re-run
      it after a conflict-free merge of `main` into the branch, after
@@ -183,15 +183,15 @@ OpenAI-compatible model gateway (vLLM/Ollama), OIDC (auth code + PKCE).
 
 ## Environment (this host)
 
-- Repo: `/home/hermes/workspaces/IntraCore` (GitHub `marcello-conocchia/Keplura`, private).
+- Repo: the host repository checkout (GitHub `marcello-conocchia/Keplura`, private).
 - Kanban board: `intracore`. Dispatcher runs inside the gateway (`dispatch_in_gateway`).
 - Agent toolchains run in rootless **podman** containers (image `intracore-dev:latest`)
-  via the profiles' `terminal.backend: docker` + `HERMES_DOCKER_BINARY=/usr/bin/podman`.
-  Mounts: workspaces → same path, `/home/hermes/agent-cache` → `/cache`
+  via the profiles' `terminal.backend: docker` + the runner's docker binary set to `/usr/bin/podman`.
+  Mounts: workspaces → same path, `<agent-cache>` → `/cache`
   (cargo/npm/m2 caches + read-only gh/git config under `/cache/home`).
 - Model for all autonomous agents: Nous `qwen/qwen3.8-flash`. If unavailable:
   block and report — do not silently switch to a paid provider (never use
-  owner's OpenAI/Codex quota without instruction).
+  owner's OpenAI quota without instruction).
 
 ## Git workflow
 

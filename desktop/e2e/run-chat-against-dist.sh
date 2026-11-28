@@ -7,7 +7,7 @@ set -uo pipefail
 DESKTOP_DIR="$1"; OUT="$2"
 SELF="$(cd "$(dirname "$0")" && pwd)"
 mkdir -p "$OUT"
-JAR=/home/hermes/workspaces/IntraCore/server/target/keplura-server-0.1.0.jar
+JAR=${KEPLURA_REPO:-$(git rev-parse --show-toplevel)}/server/target/keplura-server-0.1.0.jar
 [ -f "$JAR" ] || { echo "jar missing"; exit 2; }
 export HOME=/cache/home
 export NODE_PATH="$HOME/.cache/keplura-e2e/node_modules"

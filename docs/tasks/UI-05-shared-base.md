@@ -15,7 +15,7 @@ F06, F08, F09 (Rückmeldung in migrierten Stellen), F11 (Icongrößen), Z01.
 Nicht-Ziele: Neugestaltung einzelner Fachseiten (P06–P12), Shell/Navigation, neue Funktionen, Backend-/API-/Rechte-
 änderungen, Befund S-1 (Server-CORS), Merge/Release/Deployment. Handler, Testids, Rechte und Benutzerwege bleiben.
 
-Workspace `.worktrees/ui-base`, Branch `codex/ui-base`, gestapelt auf `codex/ui-validation@c1d2332` (Reviewbase).
+Workspace `.worktrees/ui-base`, Branch `feat/ui-base`, gestapelt auf `feat/ui-validation@c1d2332` (Reviewbase).
 
 ## Abnahmekriterien
 
@@ -38,9 +38,9 @@ Build mit Tokencheck/vue-tsc, echte QA-App, vorhandene E2E (`invite`, `admin`, `
 Phase-4-Läufe als Regression, gezielte Prüfung der neuen Bestätigungen und Feldfehler. Simulierte Fehler werden
 gekennzeichnet. Unabhängige Reviewer-/QA-/Security-Gates sind durch eigene Tests nicht ersetzt.
 
-## Übergabe 15.11.2026 (Claude Code → Codex)
+## Übergabe 15.11.2026
 
-Auf Wunsch des Inhabers gestoppt („stoppe“, dann „ich lass codex weiter machen, pushe alles“). Stand:
+Auf Wunsch des Inhabers gestoppt („stoppe“, dann Übergabe: „pushe alles“). Stand:
 
 - Erledigt, nur gebaut (vue-tsc/Vite grün), **noch nicht im Browser oder per E2E geprüft**: W01 AppButton→Button entfernt; W02 Input nach FO-Vertrag neu, TextField migriert/entfernt; W03 Label-Wrapper entfernt. Commit `ad96f26`.
 - Risiko für die Prüfung: Admin-Felder erhalten weiterhin Radius/Höhe aus `#app .admin-content input` in `workspace.css` (höhere Spezifität) – unter W07 auflösen. Compact-Buttons in Admin/Team/Mitglieder visuell gegen vorher prüfen.

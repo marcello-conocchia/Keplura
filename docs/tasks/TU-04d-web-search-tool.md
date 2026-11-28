@@ -1,6 +1,6 @@
 # TU-04d — Websuche als Werkzeug
 
-Status: **abgeschlossen** — PR #32, Squash-Merge `ddc05a9` (24.11.2026); Claude implementiert, Codex-Freigabe Code/Security auf `2fffa59`. Zusätzlich aus der Prüfung: Ausführung an den geprüften Anbieter-Snapshot gebunden, Anfragen über 400 UTF-16-Einheiten abgelehnt. Vierte Aufgabe von TU-04 nach TU-04c (PR #30, Merge `35fa2d2`), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Anfragen an externe Hosts (Suchanbieter), Modell-/Werkzeugschleife. Der Webseitenabruf mit SSRF-Schutz folgt als eigener letzter Schritt (TU-04e), nicht hier.
+Status: **abgeschlossen** — PR #32, Squash-Merge `ddc05a9` (24.11.2026); unabhängige Freigabe Code/Security auf `2fffa59`. Zusätzlich aus der Prüfung: Ausführung an den geprüften Anbieter-Snapshot gebunden, Anfragen über 400 UTF-16-Einheiten abgelehnt. Vierte Aufgabe von TU-04 nach TU-04c (PR #30, Merge `35fa2d2`), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: Anfragen an externe Hosts (Suchanbieter), Modell-/Werkzeugschleife. Der Webseitenabruf mit SSRF-Schutz folgt als eigener letzter Schritt (TU-04e), nicht hier.
 
 ## Ziel
 
@@ -53,4 +53,4 @@ PostgreSQL-Probe für die Migration. Volle CI einmal am Ende.
 
 ## Workspace
 
-Eigener Worktree auf Branch `feat/tool-use-web-search` ab aktuellem main. Implementierung und unabhängige Prüfung nach PO-Zuweisung (TU-04c: Claude implementiert, Codex prüft). Genau eine Implementierungsaufgabe. Draft-PR, kein Merge durch den Entwickler; Provider-/Budgetregeln aus AGENTS.md gelten.
+Eigener Worktree auf Branch `feat/tool-use-web-search` ab aktuellem main. Implementierung und unabhängige Prüfung nach PO-Zuweisung (TU-04c: Implementierung und unabhängige Prüfung durch getrennte Agenten). Genau eine Implementierungsaufgabe. Draft-PR, kein Merge durch den Entwickler; Provider-/Budgetregeln aus AGENTS.md gelten.

@@ -4,7 +4,7 @@ Stand 15.11.2026. **Migrationsspezifikation, noch keine Produktmigration.** Grun
 
 ## Arbeitsauftrag und Grenzen
 
-Ziel von P03: ein eindeutiges Soll für Farben/Maße, Varianten, Zustände, Interaktionen und Altbestand festlegen. Workspace `.worktrees/ui-system`, Branch `codex/ui-system`, von main angelegt und per Fast-forward bis zur noch ungemergten Recherche `3a8f398` fortgeführt. Der eigene Review-Diff gegen `codex/ui-research` umfasst nur Dokumentation und einen isolierten Referenzkatalog. Kein Produktimport, Serverzugriff, neues Feature, Merge, Release oder Deployment. Produktbasis bleibt `2de0a8a`.
+Ziel von P03: ein eindeutiges Soll für Farben/Maße, Varianten, Zustände, Interaktionen und Altbestand festlegen. Workspace `.worktrees/ui-system`, Branch `feat/ui-system`, von main angelegt und per Fast-forward bis zur noch ungemergten Recherche `3a8f398` fortgeführt. Der eigene Review-Diff gegen `feat/ui-research` umfasst nur Dokumentation und einen isolierten Referenzkatalog. Kein Produktimport, Serverzugriff, neues Feature, Merge, Release oder Deployment. Produktbasis bleibt `2de0a8a`.
 
 Abnahme dieser Spezifikation: gleiche Hell-/Dunkelrollen, berechnete erlaubte Kontrastpaare, vollständige Zuweisung der 36 Vue-Dateien und 109 IDs, konkrete State-/API-/Responsiveverträge, reproduzierbarer Katalog und überprüfbare nächste Arbeit. Reale Produkt-/Accessibility-Abnahmen sowie unabhängige Reviews bleiben späteren Gates vorbehalten. Nachweise: [Prüfprotokoll](system-v1/README.md).
 

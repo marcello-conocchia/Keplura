@@ -1,6 +1,6 @@
 # TU-03c — Abhängige Folgeaktion mit konkreter Bestätigung
 
-Status: **abgeschlossen, auf main** — PR #23, Squash-Merge `37362d7` (22.11.2026), Baum identisch mit freigegebenem Head `74ec292`. Linux-CI Exit 0 auf Produktcommit `7e05e92`, Evidence `ci/evidence/20261122-105648/`; unabhängige Code-/Security-Freigabe durch Claude auf `74ec292`. Dritter und letzter Umsetzungsschritt von TU-03 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md); TU-03 damit abgeschlossen, nächster Schritt [TU-04a](TU-04a-knowledge-search-tool.md). Klasse A: Schreibaktionen, Bestätigungen, externe Aufrufe und Rechte.
+Status: **abgeschlossen, auf main** — PR #23, Squash-Merge `37362d7` (22.11.2026), Baum identisch mit freigegebenem Head `74ec292`. Linux-CI Exit 0 auf Produktcommit `7e05e92`, Evidence `ci/evidence/20261122-105648/`; unabhängige Code-/Security-Freigabe auf `74ec292`. Dritter und letzter Umsetzungsschritt von TU-03 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md); TU-03 damit abgeschlossen, nächster Schritt [TU-04a](TU-04a-knowledge-search-tool.md). Klasse A: Schreibaktionen, Bestätigungen, externe Aufrufe und Rechte.
 
 ## Ziel
 
@@ -40,7 +40,7 @@ Geskriptetes Gateway und Fake-Adapter mit Aufrufzähler über den echten zentral
 
 ## Workspace
 
-Eigener Worktree auf Branch `feat/tool-use-dependent-action` ab aktuellem main. Implementierung und unabhängige Prüfung nach PO-Zuweisung (bei TU-03a/b: Codex implementiert, Claude prüft). Genau eine Implementierungsaufgabe. Draft-PR, kein Merge durch den Entwickler; Provider-/Budgetregeln aus AGENTS.md gelten.
+Eigener Worktree auf Branch `feat/tool-use-dependent-action` ab aktuellem main. Implementierung und unabhängige Prüfung nach PO-Zuweisung (bei TU-03a/b: Implementierung und unabhängige Prüfung durch getrennte Agenten). Genau eine Implementierungsaufgabe. Draft-PR, kein Merge durch den Entwickler; Provider-/Budgetregeln aus AGENTS.md gelten.
 
 ## Umsetzung und Nachweise (22.11.2026)
 
@@ -52,7 +52,7 @@ Eigener Worktree auf Branch `feat/tool-use-dependent-action` ab aktuellem main. 
 - Gemeinsame Budgets, serialisierte Ausführung und Kontexttrennung unverändert. Auch Anfragen mit einem WRITE-/CRITICAL-Angebot erhalten keine privaten Belege; diese kommen erst in die werkzeuglose Abschlussanfrage. Kein neuer Adapter oder neue Abhängigkeit.
 - Gezielte Tests grün: ChatToolLoopTest 61, ChatApiIntegrationTest 34, ToolConfirmationTest 28, ToolExecutionServiceTest 17, FlywayBaselineMigrationTest 4 (144 insgesamt); 14 Node-Karten-/Übersetzungstests und Desktop-Build mit Übersetzungsprüfung.
 - PostgreSQL 16: portable Migrationen V1–V28 per psql mit ON_ERROR_STOP angewendet; zusätzlicher transaktionaler Upgrade-Probe prüft bestehende Daten, nullable Herkunft, Default false, falschen Elternaufruf, ersten/zweiten Vorschlags-Claim und exakte Argumente. H2 wird über die Flyway-Tests geprüft. Kein pgvector-/Release-Nachweis daraus abgeleitet.
-- Verbindliche lokale Linux-CI auf 7e05e92 Exit 0: Nicht-root ci (UID 1500) mit acl, Linux-Dateisystem; 85 Klassen genau einmal, 729 Tests, 0 Fehler, 1 übersprungen. Rechte-Helfer, Desktop-Build und cargo check PASS. Evidence ci/evidence/20261122-105648/ einschließlich PostgreSQL-Probe/Log. Danach nur Nachweise/Dokumentationsstatus ergänzt. Unabhängiges Code-/Security-Review durch Claude noch offen. Keine Browser-/Feldtests oder echtes Modell verwendet. Autoritatives Hermes-Kanban von diesem Windows-Host nicht erreichbar; kein Ersatzboard angelegt.
+- Verbindliche lokale Linux-CI auf 7e05e92 Exit 0: Nicht-root ci (UID 1500) mit acl, Linux-Dateisystem; 85 Klassen genau einmal, 729 Tests, 0 Fehler, 1 übersprungen. Rechte-Helfer, Desktop-Build und cargo check PASS. Evidence ci/evidence/20261122-105648/ einschließlich PostgreSQL-Probe/Log. Danach nur Nachweise/Dokumentationsstatus ergänzt. Unabhängiges Code-/Security-Review noch offen. Keine Browser-/Feldtests oder echtes Modell verwendet. Autoritatives Kanban von diesem Windows-Host nicht erreichbar; kein Ersatzboard angelegt.
 
 ## Grenzen
 

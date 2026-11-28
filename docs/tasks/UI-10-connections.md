@@ -1,6 +1,6 @@
 # Verbindungen – Websuche, MCP und Verzeichnis
 
-Expliziter PO-Auftrag 15.11.2026: alle drei Ansichten im selben Stil wie Wissen/Datenquellen gestalten. Aktiver Branch `codex/ui-connections`, Reviewbase `codex/ui-datasources@875c83d`, bestehender UI-Worktree. Vorige Pakete sind gesichert; unabhängige Gates weiterhin offen.
+Expliziter PO-Auftrag 15.11.2026: alle drei Ansichten im selben Stil wie Wissen/Datenquellen gestalten. Aktiver Branch `feat/ui-connections`, Reviewbase `feat/ui-datasources@875c83d`, bestehender UI-Worktree. Vorige Pakete sind gesichert; unabhängige Gates weiterhin offen.
 
 ## Ziel / Scope / Grenzen
 

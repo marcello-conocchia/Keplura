@@ -54,4 +54,4 @@ Behauptungen über Browser-/native QA oder unabhängige Security-Freigaben.
 
 ## Workspace
 
-/workspace/Keplura, Branch codex/office-formats von origin/main@530a3a5.
+/workspace/Keplura, Branch feat/office-formats von origin/main@530a3a5.

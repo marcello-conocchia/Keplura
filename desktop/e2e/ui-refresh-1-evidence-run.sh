@@ -8,7 +8,7 @@ SELF="$(cd "$(dirname "$0")" && pwd)"
 WORK="/tmp/ui1-jar-$TAG"
 mkdir -p "$WORK" "$OUT"
 
-JAR=/home/hermes/workspaces/IntraCore/.worktrees/ui-refresh-1/server/target/keplura-server-0.1.0.jar
+JAR=${KEPLURA_REPO:-$(git rev-parse --show-toplevel)}/.worktrees/ui-refresh-1/server/target/keplura-server-0.1.0.jar
 nohup java -jar "$JAR" \
   --server.port=8080 \
   --spring.profiles.active=dev \

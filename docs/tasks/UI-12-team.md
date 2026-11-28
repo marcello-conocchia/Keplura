@@ -1,6 +1,6 @@
 # UI-12 — Team im Katalogstil
 
-PO-Auftrag 19.11.2026 („Ja, Team als Nächstes“), Folgepaket zu UI-11. Branch `claude/ui-team` von `main@a9ace2c`. Inventar T01–T10 in `docs/design/UI-INVENTORY-2026-11-15.md`.
+PO-Auftrag 19.11.2026 („Ja, Team als Nächstes“), Folgepaket zu UI-11. Branch `feat/ui-team` von `main@a9ace2c`. Inventar T01–T10 in `docs/design/UI-INVENTORY-2026-11-15.md`.
 
 ## Ziel
 

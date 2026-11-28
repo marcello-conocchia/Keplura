@@ -1,6 +1,6 @@
 # TU-03a — Begrenzte mehrstufige Lesezugriffe
 
-Status: **abgeschlossen, auf main** — PR #19, Squash-Merge `5c25bfa` (21.11.2026), Baum identisch mit freigegebenem Head `e4f5555`. Linux-CI Exit 0 auf Produktcommit `15e3b63`, Evidence `ci/evidence/20261121-200201/`; unabhängige Code-/Security-Freigabe durch Claude auf `e4f5555`. Erster Umsetzungsschritt von TU-03 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md); nächster Schritt [TU-03b](TU-03b-confirmed-continuation.md). Klasse A: Modell-/Werkzeugschleife, externe Aufrufe und Rechte.
+Status: **abgeschlossen, auf main** — PR #19, Squash-Merge `5c25bfa` (21.11.2026), Baum identisch mit freigegebenem Head `e4f5555`. Linux-CI Exit 0 auf Produktcommit `15e3b63`, Evidence `ci/evidence/20261121-200201/`; unabhängige Code-/Security-Freigabe auf `e4f5555`. Erster Umsetzungsschritt von TU-03 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md); nächster Schritt [TU-03b](TU-03b-confirmed-continuation.md). Klasse A: Modell-/Werkzeugschleife, externe Aufrufe und Rechte.
 
 ## Ziel
 
@@ -38,7 +38,7 @@ Geskriptetes Gateway und lokaler Fake-Adapter/MCP-Server mit Aufrufzähler für 
 
 ## Workspace
 
-Eigener Worktree auf Branch `feat/tool-use-read-loop` ab main `b1c4b08`. PO-Rollentausch vom 21.11.2026: Codex implementiert, Claude prüft unabhängig Code und Sicherheit. Kein bestehender TU-03a-Branch oder Implementierungs-PR beim Start gefunden. Autoritatives Hermes-Kanban von diesem Windows-Host nicht erreichbar (lokales Board `intracore` existiert nicht); kein Ersatzboard angelegt. Genau eine Implementierungsaufgabe. Draft-PR, kein Merge durch den Entwickler; Provider-/Budgetregeln aus AGENTS.md gelten.
+Eigener Worktree auf Branch `feat/tool-use-read-loop` ab main `b1c4b08`. PO-Rollentausch vom 21.11.2026: Implementierung und unabhängige Prüfung getauscht Code und Sicherheit. Kein bestehender TU-03a-Branch oder Implementierungs-PR beim Start gefunden. Autoritatives Kanban von diesem Windows-Host nicht erreichbar (lokales Board `intracore` existiert nicht); kein Ersatzboard angelegt. Genau eine Implementierungsaufgabe. Draft-PR, kein Merge durch den Entwickler; Provider-/Budgetregeln aus AGENTS.md gelten.
 
 ## Umsetzung und Nachweise (21.11.2026)
 

@@ -97,7 +97,7 @@ Trefferquote für Admins.
 4. SharePoint/Entra.
 5. Test-Fragen-Set + Qualitätsanzeige.
 
-## Umsetzungsstand 14.11.2026 (Branch `codex/ds-datasources`, nicht gemergt)
+## Umsetzungsstand 14.11.2026 (Branch `feat/ds-datasources`, nicht gemergt)
 
 Erste Ausbaustufe programmiert (Details und Prüfliste: `docs/tasks/DS-01-datasources.md`):
 Rechte-Filter in allen Lesepfaden, AD/LDAP-Anbindung mit Login und Gruppenauflösung, Windows-Freigaben

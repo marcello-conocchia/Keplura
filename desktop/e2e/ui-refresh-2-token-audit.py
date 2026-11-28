@@ -4,10 +4,13 @@ Phase-2-@source-Dateien NEU generiert wird (im baseline-Bundle noch fehlt),
 darf in KEINEM class-Attribut einer gefrorenen Datei vorkommen — sonst wuerde
 die neue globale Utility-Regel ploetzlich gefrorenes DOM restylen.
 Exit 0 + "NONE" = sauber."""
-import re, glob, sys
+import os, re, glob, subprocess, sys
+
+REPO = os.environ.get("KEPLURA_REPO") or subprocess.run(
+    ["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
 
 BASE = open(glob.glob(
-    "/home/hermes/workspaces/IntraCore/.baseline/t_ui11f53ad9-main/desktop/dist/assets/index-*.css"
+    REPO + "/.baseline/t_ui11f53ad9-main/desktop/dist/assets/index-*.css"
 )[0]).read()
 
 def unesc(s):

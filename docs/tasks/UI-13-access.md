@@ -1,6 +1,6 @@
 # UI-13 — Zugang und Ersteinrichtung im Katalogstil
 
-PO-Auftrag 19.11.2026 („Ja, weitermachen“ nach UI-12): letztes offenes UI-Paket des Inventars (A01–A06 in `docs/design/UI-INVENTORY-2026-11-15.md`). Branch `claude/ui-access` von `main@7c7eff4`.
+PO-Auftrag 19.11.2026 („Ja, weitermachen“ nach UI-12): letztes offenes UI-Paket des Inventars (A01–A06 in `docs/design/UI-INVENTORY-2026-11-15.md`). Branch `feat/ui-access` von `main@7c7eff4`.
 
 ## Ziel
 

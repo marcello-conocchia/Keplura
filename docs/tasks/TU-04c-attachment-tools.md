@@ -1,6 +1,6 @@
 # TU-04c — Anhänge auflisten, durchsuchen und lesen
 
-Status: **abgeschlossen** — PR #30, Squash-Merge `35fa2d2` (23.11.2026); Claude implementiert, Codex-Freigabe Code/Security auf `3d3a2fb`. Zusätzlich aus der Prüfung: private Folgeargumente (V30) mit atomarem Löschen und Bereinigung. Dritte Aufgabe von TU-04 nach TU-04b (PR #28, Merge `8e88e8d`), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: private Chat-Inhalte, Modell-/Werkzeugschleife.
+Status: **abgeschlossen** — PR #30, Squash-Merge `35fa2d2` (23.11.2026); unabhängige Freigabe Code/Security auf `3d3a2fb`. Zusätzlich aus der Prüfung: private Folgeargumente (V30) mit atomarem Löschen und Bereinigung. Dritte Aufgabe von TU-04 nach TU-04b (PR #28, Merge `8e88e8d`), gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md). Klasse A: private Chat-Inhalte, Modell-/Werkzeugschleife.
 
 ## Ziel
 
@@ -42,4 +42,4 @@ Geskriptetes Gateway vor dem echten zentralen Dienst mit H2 und echten `chat_att
 
 ## Workspace
 
-Eigener Worktree auf Branch `feat/tool-use-attachments` ab aktuellem main. Implementierung und unabhängige Prüfung nach PO-Zuweisung (bisher: Codex implementiert, Claude prüft). Genau eine Implementierungsaufgabe. Draft-PR, kein Merge durch den Entwickler; Provider-/Budgetregeln aus AGENTS.md gelten.
+Eigener Worktree auf Branch `feat/tool-use-attachments` ab aktuellem main. Implementierung und unabhängige Prüfung nach PO-Zuweisung (bisher: Implementierung und unabhängige Prüfung durch getrennte Agenten). Genau eine Implementierungsaufgabe. Draft-PR, kein Merge durch den Entwickler; Provider-/Budgetregeln aus AGENTS.md gelten.

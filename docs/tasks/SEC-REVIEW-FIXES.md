@@ -2,7 +2,7 @@
 
 PO-Auftrag 16.11.2026: „Löse diese Probleme“. Klasse A (Auth, Rechte, Parser,
 Netzwerk und MCP). Basis origin/main@530a3a5, separater Worktree und Branch
-codex/security-fixes. Draft-PR; kein Merge, kein Push auf main, kein Release.
+feat/security-fixes. Draft-PR; kein Merge, kein Push auf main, kein Release.
 
 ## Ziel / Scope
 
