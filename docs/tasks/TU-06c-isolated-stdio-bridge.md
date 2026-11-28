@@ -18,7 +18,7 @@ stdio-MCP-Server laufen wie in TU-06 festgelegt nie im Keplura-Serverprozess und
 
 - **Token nicht lesbar für Kindprozesse:** Das Token kommt nur aus einer Datei, nie aus der Umgebung. Kindprozesse laufen unter einer anderen Identität als der Token-Halter und können weder die Datei noch Speicher oder Umgebung des Elternprozesses lesen.
 - **Kindprozesse getrennt voneinander:** eigene Identität oder eigener Namensraum je Sitzung, privates beschreibbares Verzeichnis je Sitzung (wird am Sitzungsende gelöscht), kein gemeinsames `/work`.
-- **Netz:** standardmäßig kein Netz für Kindprozesse. Ausgehende Ziele nur, wenn der Betreiber sie je Server ausdrücklich freigibt, und technisch durchgesetzt (nicht nur dokumentiert). Der Keplura-Server und der Host sind aus dem Kindprozess nie erreichbar.
+- **Netz:** Kindprozesse haben in TU-06c **gar kein Netz** (`network=none`, PO 28.11.2026). Eine Deklaration mit Netzziel wird beim Start abgelehnt. Der Keplura-Server, der Host und andere Worker sind aus dem Kindprozess nie erreichbar. Ausgehende Ziele über ein Relay (B5) folgen als eigene Klasse-A-Aufgabe nach TU-06c.
 - **Bauweise:** Bevorzugt wird ein Container je deklariertem stdio-Server, oder je Sitzung ein Sandbox-Werkzeug im Bridge-Container (z. B. bubblewrap mit eigenen Namensräumen). Der Weg wird zu Beginn der Aufgabe mit einer kurzen Abwägung festgelegt. Eine Sicherheitsabwägung mit Produktwirkung geht an den PO.
 - Ansonsten gilt der Umfang aus TU-06c der TU-06-Spezifikation: Deklaration nur im Deployment, keine Shell, Zeitlimits, begrenzte Ausgabe, Anbindung über den vorhandenen MCP-HTTP-Adapter, standardmäßig deaktivierter Dienst.
 
@@ -37,7 +37,7 @@ Lehre aus TU-06: Die Angriffe werden **vor** dem Code festgelegt. Jede Zeile bra
 | B2 | Kindprozess ruft die Bridge selbst auf (Loopback oder Bridge-Adresse), mit oder ohne gestohlenes Token, und startet weitere Server | Das Kind erreicht den Listener der Bridge nicht | Container: Verbindung zu Bridge-Port und Bridge-IP aus dem Kind scheitert |
 | B3 | Kindprozess erreicht den Keplura-Server, die Datenbank, das Docker-Gateway, `host.docker.internal`, die Metadatenadresse `169.254.169.254` oder das Internet | Standardmäßig kein Netz im Kind, technisch durchgesetzt | Container: jedes Ziel einzeln scheitert, solange nichts freigegeben ist |
 | B4 | Daten fließen über DNS ab | Ohne Freigabe kein DNS im Kind | Container: Auflösung eines externen Namens scheitert |
-| B5 | Freigegebenes Ziel als Sprungbrett: Weiterleitung oder zweite Adresse hinter einem freigegebenen Namen | Freigabe nur für das deklarierte Ziel (Host und Port). Durchsetzung außerhalb des Kindes | Container: freigegebenes Ziel erreichbar, ein anderer Port oder Host desselben Netzes nicht |
+| B5 | Freigegebenes Ziel als Sprungbrett: Weiterleitung oder zweite Adresse hinter einem freigegebenen Namen | **Nicht Teil von TU-06c** (PO 28.11.2026: erst ohne Netz). In TU-06c gilt: keine Freigabe möglich | Unit und Container: Eine Deklaration mit Netzziel startet keinen Worker. Relay und Pflichttests zu B5 in der Folgeaufgabe |
 | B6 | Sitzung A liest, schreibt oder signalisiert Sitzung B: Dateien, `/proc`, `kill` | Eigene Identität oder eigener Namensraum je Sitzung, privates Arbeitsverzeichnis | Container: zwei gleichzeitige Sitzungen, A sieht weder Prozesse noch Dateien von B und kann B nicht beenden |
 | B7 | Zurückgelassene Daten: Sitzung 1 legt Dateien ab, die Sitzung 2 (andere Person) liest | Arbeitsverzeichnis je Sitzung, am Ende gelöscht | Container: Datei aus Sitzung 1 fehlt in Sitzung 2 |
 | B8 | Prozess überlebt das Sitzungsende: Doppel-Fork, `setsid`, Daemon | Ganzer Prozessbaum bzw. Namensraum wird beendet | Container: Testprogramm forkt einen Daemon; nach `DELETE` oder Zeitlimit läuft kein Prozess der Sitzung mehr |
@@ -46,7 +46,7 @@ Lehre aus TU-06: Die Angriffe werden **vor** dem Code festgelegt. Jede Zeile bra
 | B11 | Ressourcen erschöpfen: Fork-Bombe, Speicher, `/tmp` füllen, endlose Ausgabe, Hänger | Grenzen je Sitzung (Prozesse, Speicher, Dateigröße, Ausgabe, Zeit). Andere Sitzungen und die Bridge laufen weiter | Container: je ein Testprogramm pro Fall; danach antwortet eine zweite Sitzung normal |
 | B12 | Befehlsinjektion: Werkzeug-Argumente landen in `argv`, Umgebung oder Shell | Argumente gehen nur als JSON-RPC über stdin. `argv` und Umgebung kommen nur aus der Deklaration, keine Shell | Unit und Container: Argumente mit `;`, `$( )`, Zeilenumbruch und `--flag` verändern den gestarteten Befehl nicht |
 | B13 | Zugriff ohne oder mit falschem Token, Raten des Tokens | 401 ohne Prozessstart; zeitkonstanter Vergleich; Mindestlänge | Unit und Container: kein Kindprozess bei falschem Token |
-| B14 | Fremde Sitzung übernehmen: `Mcp-Session-Id` einer anderen Sitzung raten oder wiederverwenden | Sitzungs-IDs zufällig und an die Verbindung gebunden. Unbekannte ID ergibt einen Fehler, keinen neuen Prozess | Unit: fremde und erfundene IDs werden abgelehnt |
+| B14 | Fremde Sitzung übernehmen: `Mcp-Session-Id` einer anderen Sitzung raten oder wiederverwenden, auch zusammen mit einem gültigen Bridge-Token | Sitzungs-IDs zufällig (mindestens 128 Bit). Unbekannte ID ergibt einen Fehler, keinen neuen Prozess. **Schutzziel vor der Umsetzung festlegen (PO 28.11.2026):** Soll auch eine kopierte Sitzungs-ID mit gültigem Bridge-Token abgewiesen werden, braucht es eine zusätzliche Bindung an die Verbindung, die die Sitzung geöffnet hat; eine zufällige ID allein verhindert nur das Erraten. Der Entwurf nennt das gewählte Schutzziel, den Angreifer und die Bindung | Unit: fremde und erfundene IDs werden abgelehnt; je nach Schutzziel auch eine kopierte ID mit gültigem Token ohne die zusätzliche Bindung |
 | B15 | Missbrauch des Protokolls Richtung Keplura: übergroße oder kaputte Antworten, Antworten zu fremden Anfragen | Ausgabegrenze in der Bridge, bestehende Grenzen des Keplura-MCP-Clients | Unit: übergroße und kaputte Antworten enden mit fester Fehlermeldung |
 | B16 | Geheimnisse in Logs oder Fehlertexten: Token, Umgebung, Pfade, Ausgabe des Kindes | Feste Fehlertexte, keine Ausgabe des Kindes im Log | Unit und Container: Logs und Antworten enthalten das Token nie |
 | B17 | Keplura-Geheimnisse im Bridge-Container: Datenbank-Zugang, Master-Key, Provider-Schlüssel | Container bekommt nur Token-Datei und Deklaration | Test der Compose-Konfiguration: keine solchen Variablen oder Mounts |
@@ -54,13 +54,18 @@ Lehre aus TU-06: Die Angriffe werden **vor** dem Code festgelegt. Jede Zeile bra
 **Ablauf:**
 1. Der Entwickler legt zu Beginn die Bauweise mit einer kurzen Abwägung fest, entlang dieser Tabelle: Container je Server oder Sandbox je Sitzung.
 2. Der Prüfer sieht sich die Abwägung und die geplanten Tests kurz, bevor der Hauptteil gebaut wird.
-3. Was eine Bauweise nicht abwehren kann (z. B. B5 bei geteiltem Netz), geht mit Optionen an den PO.
+3. Was eine Bauweise nicht abwehren kann, geht mit Optionen an den PO.
+
+## Non-Goals
+
+- keine Netzfreigabe für Worker, kein Relay (B5): eigene Klasse-A-Aufgabe nach TU-06c (PO 28.11.2026);
+- kein Release/Deployment.
 
 ## Acceptance Criteria
 
 1. Jede Zeile von B1–B17 hat einen grünen Pflichttest. Die Container-Tests haben einen Nachweis unter `ci/evidence/<datum>-tu06c-container/`, mit Befehlen, Ausgaben und Image-Version.
 2. Im **echten Container** nachgewiesen (Docker oder Podman, Nicht-root): Ein Kindprozess liest das Token weder aus Datei, Umgebung noch `/proc`, sieht keine anderen Kindprozesse und deren Dateien und erreicht weder den Keplura-Dienst noch den Host noch das Internet, solange nichts freigegeben ist.
-3. Ein freigegebenes Ziel ist erreichbar, ein nicht freigegebenes nicht.
+3. Es gibt keine Netzfreigabe: Der Worker hat nur `network=none`, und eine Deklaration mit Netzziel startet keinen Worker (fail closed). B5 ist ausdrücklich nicht abgenommen und folgt als eigene Aufgabe.
 4. Alle Kriterien aus TU-06c der TU-06-Spezifikation bleiben erfüllt (nur deklarierte Befehle, Nicht-root, Zeitlimit, nur mit Token erreichbar, kein Prozessstart im Keplura-Server).
 5. Einmal lokale Linux-CI am Ende als Nicht-root mit acl. Unabhängiges Code- und Security-Review gemäß AGENTS.md.
 
