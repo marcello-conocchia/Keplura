@@ -57,6 +57,30 @@ class McpToolAdapterTest {
         admin.update(serverId, new McpAdminController.Input(null, null, null, null, enabled, null, null, risks));
     }
 
+    @Test void bridgeModeComesFromSavedAdminConfigurationAndDefaultsToInternal() {
+        var cipher = new com.keplura.server.admin.SecretCipher("mcp-test-master-key");
+        var controller = new McpAdminController(jdbc, cipher, client, new DataSourceTransactionManager(jdbc.getDataSource()));
+        assertThat(controller.list().getFirst().bridge()).isFalse();
+        String token = "b".repeat(40);
+        String url = "https://bridge.example.test/mcp/files";
+        var schema = tools.jackson.databind.json.JsonMapper.builder().build().readTree("{\"type\":\"object\"}");
+        when(client.listTools(url, token, true)).thenReturn(List.of(new McpClient.Tool("echo", "Echo", schema)));
+        var created = controller.create(new McpAdminController.Input("Bridge", url, token, true, null, null, null, null, true));
+        assertThat(created.getStatusCode().value()).isEqualTo(201);
+        var added = (McpAdminController.ServerView) created.getBody();
+        assertThat(added.bridge()).isTrue();
+        assertThat(added.tools()).hasSize(1);
+        assertThat(added.toString()).doesNotContain(token);
+        org.mockito.Mockito.verify(client).listTools(url, token, true);
+        org.mockito.Mockito.verify(client, org.mockito.Mockito.never()).listTools(url, token);
+        jdbc.update("update mcp_server set all_spaces=true where id=?", added.id());
+        assertThat(adapter.definitions(1L)).filteredOn(tool -> tool.sourceId().equals(added.id())).singleElement()
+                .satisfies(tool -> {
+                    assertThat(tool.internal()).isTrue();
+                    assertThat(tool.fingerprint()).contains(":bridge").doesNotContain(token);
+                });
+    }
+
     @Test void legacyApprovalWithoutRiskClassStaysBlocked() {
         ToolDefinition d = echo();
         assertThat(d.id()).isEqualTo("mcp:" + serverId + ":echo");

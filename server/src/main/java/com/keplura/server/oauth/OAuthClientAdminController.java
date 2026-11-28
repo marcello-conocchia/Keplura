@@ -54,7 +54,7 @@ public class OAuthClientAdminController {
     public List<ClientView> list() {
         List<ClientView> out = new ArrayList<>();
         record Row(String kind, long id, String name) { }
-        List<Row> rows = new ArrayList<>(jdbc.query("select id, name from mcp_server order by name, id",
+        List<Row> rows = new ArrayList<>(jdbc.query("select id, name from mcp_server where bridge=false order by name, id",
                 (rs, n) -> new Row("mcp", rs.getLong(1), rs.getString(2))));
         rows.addAll(jdbc.query("select id, name from openapi_server where auth_mode='oauth' order by name, id",
                 (rs, n) -> new Row("openapi", rs.getLong(1), rs.getString(2))));
@@ -84,7 +84,11 @@ public class OAuthClientAdminController {
         if (in.clientSecret() != null && !in.clientSecret().isBlank() && !cipher.available()) {
             return bad("Secrets können nicht gespeichert werden: KEPLURA_SECRETS_MASTER_KEY fehlt.");
         }
-        oauth.putClient(kind, serverId, in.authorizeUrl(), in.tokenUrl(), in.revokeUrl(), in.clientId(), in.clientSecret(), in.scopes());
+        try {
+            oauth.putClient(kind, serverId, in.authorizeUrl(), in.tokenUrl(), in.revokeUrl(), in.clientId(), in.clientSecret(), in.scopes());
+        } catch (OAuthConnectionService.OAuthException e) {
+            return bad(e.getMessage());
+        }
         return ResponseEntity.ok(list().stream().filter(v -> v.kind().equals(kind) && v.serverId() == serverId).findFirst().orElseThrow());
     }
 

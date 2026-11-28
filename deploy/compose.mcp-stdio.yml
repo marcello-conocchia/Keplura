@@ -1,0 +1,47 @@
+# Optional overlay for compose.prod.yml. Add it only when enabling the stdio bridge.
+services:
+  server:
+    networks:
+      - default
+      - mcp-stdio
+
+  mcp-stdio-bridge:
+    image: ${KEPLURA_SERVER_IMAGE:-keplura-server:local}
+    profiles: ["mcp-stdio"]
+    restart: unless-stopped
+    user: "65532:${KEPLURA_STDIO_SHARED_GID:-65532}"
+    entrypoint: ["/usr/bin/tini", "--", "java", "-Xmx384m", "-Dsun.net.httpserver.maxReqTime=20", "-Dsun.net.httpserver.maxRspTime=20", "-jar", "/app/keplura-server.jar", "--mcp-stdio-bridge"]
+    read_only: true
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 96
+    mem_limit: 640m
+    cpus: 1
+    tmpfs:
+      - /tmp:rw,nodev,nosuid,noexec,size=16m,mode=1777
+    volumes:
+      - type: bind
+        source: ${KEPLURA_STDIO_BRIDGE_SECRETS_DIR:-/etc/keplura-stdio/bridge}
+        target: /run/keplura-secrets
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${KEPLURA_STDIO_SOCKET_DIR:-/run/keplura-stdio}
+        target: /run/keplura-stdio
+        read_only: true
+        bind:
+          create_host_path: false
+    networks: [mcp-stdio]
+    healthcheck:
+      test: ["CMD", "curl", "-kfsS", "https://127.0.0.1:8090/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+networks:
+  mcp-stdio:
+    internal: true
+    ipam:
+      config:
+        - subnet: ${KEPLURA_STDIO_SUBNET:-172.31.249.0/24}

@@ -1,0 +1,13 @@
+{
+  "instance": "keplura",
+  "probeImage": "registry.example.test/approved/probe@sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "maxWorkers": 8,
+  "maxPerServer": 2,
+  "servers": {
+    "files": {
+      "image": "registry.example.test/approved/files@sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "program": "/usr/bin/node",
+      "arguments": ["/opt/mcp/filesystem/dist/index.js", "/work"]
+    }
+  }
+}

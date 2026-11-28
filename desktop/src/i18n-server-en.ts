@@ -154,6 +154,11 @@ export const SERVER_EN: Record<string, string> = {
   "Auf dem Server fehlt der Master-Key (KEPLURA_SECRETS_MASTER_KEY); das Passwort des Dienstkontos kann nicht sicher gespeichert werden.":
     "The server is missing the master key (KEPLURA_SECRETS_MASTER_KEY); the service account password cannot be stored safely.",
   // MCP
+  "Die stdio-Bridge benötigt HTTPS und einen Zugangsschlüssel.": "The stdio bridge requires HTTPS and an access token.",
+  "Die stdio-Bridge benötigt einen gemeinsamen Zugangsschlüssel.": "The stdio bridge requires a shared access token.",
+  "Die stdio-Bridge kann derzeit keine weitere Sitzung starten.": "The stdio bridge cannot start another session right now.",
+  "Die stdio-Bridge hat die Anfrage abgelehnt.": "The stdio bridge rejected the request.",
+  "Die stdio-Bridge hat keine gültige Antwort gesendet.": "The stdio bridge did not return a valid response.",
   "Die MCP-Initialisierung wurde abgelehnt oder die Protokollversion wird nicht unterstützt.": "MCP initialization was refused or the protocol version is not supported.",
   "Der MCP-Server hat die Anfrage abgelehnt.": "The MCP server refused the request.",
   "Das Werkzeug konnte die Anfrage nicht ausführen.": "The tool could not run the request.",
