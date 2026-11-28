@@ -16,10 +16,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/orgs/{orgId}/tools/settings")
 public class ToolSettingsController {
-    public record Boundary(long serverId,String name,boolean internal) { }
+    /** {@code kind}: {@code mcp} or {@code openapi} (TU-06a); server ids are only unique within one kind. */
+    public record Boundary(long serverId,String name,boolean internal,String kind) { }
     /** {@code webSearchAvailable}: a search provider is configured by the platform admin (TU-04d). */
     public record Settings(boolean knowledgeEnabled,boolean webSearchEnabled,boolean webSearchAvailable,List<Boundary> servers) { }
-    public record Input(Boolean knowledgeEnabled,Boolean webSearchEnabled,Long serverId,Boolean internal) { }
+    public record Input(Boolean knowledgeEnabled,Boolean webSearchEnabled,Long serverId,Boolean internal,String kind) {
+        public Input(Boolean knowledgeEnabled,Boolean webSearchEnabled,Long serverId,Boolean internal) {
+            this(knowledgeEnabled,webSearchEnabled,serverId,internal,null);
+        }
+    }
     private final JdbcTemplate jdbc;
     private com.keplura.server.websearch.WebSearchService webSearch;
     public ToolSettingsController(JdbcTemplate jdbc) { this.jdbc=jdbc; }
@@ -35,12 +40,21 @@ public class ToolSettingsController {
         return p.userId();
     }
     private List<Boundary> boundaries(long orgId) {
-        return jdbc.query("""
-            select s.id,s.name,coalesce(b.internal,false) from mcp_server s
-            left join mcp_org_boundary b on b.server_id=s.id and b.org_id=?
-            where s.all_spaces=true or exists(select 1 from mcp_server_space x join space p on p.id=x.space_id where x.server_id=s.id and p.org_id=?)
-            order by s.id""",(rs,n)->new Boundary(rs.getLong(1),rs.getString(2),rs.getBoolean(3)),orgId,orgId);
+        var out=new java.util.ArrayList<>(boundaries(orgId,"mcp"));
+        out.addAll(boundaries(orgId,"openapi"));
+        return out;
     }
+    /** Table names come only from this fixed switch, never from input. */
+    private List<Boundary> boundaries(long orgId,String kind) {
+        String server=kind.equals("openapi")?"openapi_server":"mcp_server";
+        return jdbc.query("""
+            select s.id,s.name,coalesce(b.internal,false) from %1$s s
+            left join %2$s b on b.server_id=s.id and b.org_id=?
+            where s.all_spaces=true or exists(select 1 from %3$s x join space p on p.id=x.space_id where x.server_id=s.id and p.org_id=?)
+            order by s.id""".formatted(server,boundaryTable(kind),server+"_space"),
+            (rs,n)->new Boundary(rs.getLong(1),rs.getString(2),rs.getBoolean(3),kind),orgId,orgId);
+    }
+    private static String boundaryTable(String kind) { return kind.equals("openapi")?"openapi_org_boundary":"mcp_org_boundary"; }
     @GetMapping
     public Settings get(@PathVariable long orgId,HttpServletRequest request) {
         owner(orgId,request);
@@ -73,14 +87,17 @@ public class ToolSettingsController {
             if(changed>0) audit(orgId,userId,null,"web_search",input.webSearchEnabled());
         }
         if(input.serverId()!=null && input.internal()!=null) {
-            if(boundaries(orgId).stream().noneMatch(b -> b.serverId()==input.serverId())) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-            int changed=jdbc.update("update mcp_org_boundary set internal=?,revision=revision+1 where org_id=? and server_id=? and internal<>?",input.internal(),orgId,input.serverId(),input.internal());
-            if(jdbc.queryForObject("select count(*) from mcp_org_boundary where org_id=? and server_id=?",Integer.class,orgId,input.serverId())==0) {
-                jdbc.update("insert into mcp_org_boundary(org_id,server_id,internal,revision) values(?,?,?,1)",orgId,input.serverId(),input.internal()); changed=1;
+            String kind=input.kind()==null?"mcp":input.kind();
+            if(!kind.equals("mcp") && !kind.equals("openapi")) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            String table=boundaryTable(kind);
+            if(boundaries(orgId,kind).stream().noneMatch(b -> b.serverId()==input.serverId())) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            int changed=jdbc.update("update "+table+" set internal=?,revision=revision+1 where org_id=? and server_id=? and internal<>?",input.internal(),orgId,input.serverId(),input.internal());
+            if(jdbc.queryForObject("select count(*) from "+table+" where org_id=? and server_id=?",Integer.class,orgId,input.serverId())==0) {
+                jdbc.update("insert into "+table+"(org_id,server_id,internal,revision) values(?,?,?,1)",orgId,input.serverId(),input.internal()); changed=1;
             }
             if(changed>0) {
-                audit(orgId,userId,input.serverId(),"mcp_boundary",input.internal());
-                jdbc.update("update tool_call set status='CANCELLED',decided_at=? where org_id=? and adapter='mcp' and source_id=? and status='PENDING'",Timestamp.from(Instant.now()),orgId,input.serverId());
+                audit(orgId,userId,input.serverId(),kind+"_boundary",input.internal());
+                jdbc.update("update tool_call set status='CANCELLED',decided_at=? where org_id=? and adapter=? and source_id=? and status='PENDING'",Timestamp.from(Instant.now()),orgId,kind,input.serverId());
             }
         }
         return get(orgId,request);

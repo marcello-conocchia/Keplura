@@ -7,12 +7,13 @@
 import { computed, ref } from "vue";
 import Button from "../ui/Button.vue";
 import StatusPill from "../ui/StatusPill.vue";
+import ToolArtifacts from "./ToolArtifacts.vue";
 import { tr, serverText, dateLocale } from "../../i18n";
 import {
   argumentEntries, canDecide, hiddenArgumentCount, riskLabel, statusMeta, summaryIsPartial, type ToolCallCard,
 } from "../../tool-cards";
 
-const props = defineProps<{ card: ToolCallCard; busy: boolean; error?: string | null }>();
+const props = defineProps<{ card: ToolCallCard; busy: boolean; error?: string | null; orgId?: number | null; conversationId?: number | null }>();
 const emit = defineEmits<{ decide: [decision: "confirm" | "reject", answer?: string] }>();
 
 const meta = computed(() => statusMeta(props.card.status));
@@ -128,6 +129,7 @@ const deadline = computed(() =>
       <p class="tool-card-kicker">{{ $t("Ergebnis (Fremdinhalt)") }}</p>
       <pre data-testid="chat-tool-call-result">{{ card.result }}</pre>
     </div>
+    <ToolArtifacts v-if="card.artifacts?.length" :artifacts="card.artifacts" :org-id="orgId ?? null" :conversation-id="conversationId ?? null" />
     </template>
   </section>
 </template>

@@ -12,6 +12,29 @@ the first tagged release (planned `0.1.0`, see [docs/RELEASING.md](docs/RELEASIN
 
 ### Added
 
+- OpenAPI tool servers (TU-06a): admins connect REST interfaces through an
+  OpenAPI 3.0/3.1 JSON document (at most 1 MB, local references only). Only
+  operations with an `operationId` become tools; path and query parameters and a
+  JSON body are merged into one input schema, unsupported parameter kinds block
+  the operation visibly. Calls go only to the admin's fixed base URL (the
+  document's `servers` are ignored), through the SSRF guard, without redirects.
+
+- Personal OAuth connections (TU-06b): for MCP (HTTP) and OpenAPI servers each
+  person can connect their own account (Authorization Code + PKCE S256). Tokens
+  are stored encrypted per person, organization and server, renewed by the
+  server and never reach the model, cards, audit, logs or API responses. Without
+  an own connection the tool is not offered; the tool menu shows "connection
+  needed". Disconnecting, admin changes, deleting the server or leaving the
+  organization take effect immediately. The sign-in runs in the app window like
+  the OIDC login and returns with a one-time code that only the starting session
+  can redeem. OAuth endpoints and personal servers are HTTPS-only, and OpenAPI
+  and token requests connect to the checked IP address only.
+
+- Image and file results (TU-06d): images and files from MCP and OpenAPI results
+  become verified artifacts of the tool call card (allowlist by magic bytes, no
+  SVG/HTML, size, count and pixel limits). They are downloaded only by the
+  chat's owner with fixed safe headers; the model only gets a text placeholder.
+
 - Model tool defaults (TU-05b): admins decide per chat model whether it gets
   tools at all (`AUTO`/`OFF`) and which tool kinds it offers by default while a
   chat has no own selection. `OFF` also blocks already planned calls.

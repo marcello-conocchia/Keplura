@@ -131,7 +131,7 @@ class McpToolAdapterTest {
     }
 
     @Test void invokeMapsClientErrorsToSafeMessages() {
-        when(client.callTool(anyString(), anyString(), anyString(), any())).thenThrow(new McpClient.McpException("Zugriff abgelehnt."));
+        when(client.callToolWithContent(anyString(), anyString(), anyString(), any())).thenThrow(new McpClient.McpException("Zugriff abgelehnt."));
         assertThatThrownBy(() -> adapter.invoke(new com.keplura.server.tool.ToolContext(1L,1L,1L,1L),echo(), null)).isInstanceOf(ToolAdapter.ToolInvocationException.class)
                 .isNotInstanceOf(ToolAdapter.ToolNotStartedException.class).hasMessage("Zugriff abgelehnt.");
     }

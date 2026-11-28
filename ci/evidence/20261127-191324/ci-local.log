@@ -1,0 +1,40 @@
+ci-local gate — run 20261127-191324  (repo: /w)
+head: 991d3e3 | suites: none
+[native reader] 19:13:24: cargo build + cargo test --locked
+[1/4] server  19:13:26: mvn package (skipTests) + chunked surefire, forkCount=1, chunk=12
+  manifest: 102 test classes -> chunks of 12
+  chunk 1 (12 classes) 19:13:40
+  chunk 2 (12 classes) 19:14:43
+  chunk 3 (12 classes) 19:15:19
+  chunk 4 (12 classes) 19:15:58
+  chunk 5 (12 classes) 19:16:36
+  chunk 6 (12 classes) 19:16:52
+  chunk 7 (12 classes) 19:17:39
+  chunk 8 (12 classes) 19:18:15
+  chunk 9 (6 classes) 19:18:51
+[2/4] desktop 19:19:15: npm ci + npm run build (vue-tsc typecheck)
+[3/4] tauri   19:19:35: cargo check --all-targets (src-tauri, Linux)
+all selected stages green — evidence: /w/ci/evidence/20261127-191324
+
+================= RESULT MATRIX =================
+STAGE                        RESULT NOTE
+server:local-reader          PASS   locked Rust build and FD snapshot regressions
+server:package               PASS   compile + fat jar
+server:chunk-1               PASS   12 classes — [INFO] Tests run: 213, Failures: 0, Errors: 0, Skipped: 4
+server:chunk-2               PASS   12 classes — [INFO] Tests run: 93, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-3               PASS   12 classes — [INFO] Tests run: 140, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-4               PASS   12 classes — [INFO] Tests run: 82, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-5               PASS   12 classes — [INFO] Tests run: 71, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-6               PASS   12 classes — [INFO] Tests run: 109, Failures: 0, Errors: 0, Skipped: 1
+server:chunk-7               PASS   12 classes — [INFO] Tests run: 72, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-8               PASS   12 classes — [INFO] Tests run: 158, Failures: 0, Errors: 0, Skipped: 1
+server:chunk-9               PASS   6 classes — [INFO] Tests run: 121, Failures: 0, Errors: 0, Skipped: 0
+server:manifest-audit        PASS   102 classes, each exactly once in 9 chunks
+desktop:build                PASS   npm ci + vue-tsc + vite build
+desktop:cargo-check          PASS   cargo check --all-targets
+e2e                          SKIP   no suite selected (--suite/--with-e2e)
+-------------------------------------------------
+failed stages : 0
+exit code     : 0  (0 green / 1 test-fail / 2 gate-integrity / 3 resource-infra)
+evidence      : /w/ci/evidence/20261127-191324
+=================================================

@@ -1,0 +1,40 @@
+ci-local gate — run 20261126-205059  (repo: /home/ci/Keplura)
+head: 37ea701 | suites: none
+[native reader] 20:50:59: cargo build + cargo test --locked
+[1/4] server  20:50:59: mvn package (skipTests) + chunked surefire, forkCount=1, chunk=12
+  manifest: 100 test classes -> chunks of 12
+  chunk 1 (12 classes) 20:51:02
+  chunk 2 (12 classes) 20:51:56
+  chunk 3 (12 classes) 20:52:25
+  chunk 4 (12 classes) 20:52:58
+  chunk 5 (12 classes) 20:53:34
+  chunk 6 (12 classes) 20:53:50
+  chunk 7 (12 classes) 20:54:33
+  chunk 8 (12 classes) 20:55:00
+  chunk 9 (4 classes) 20:55:26
+[2/4] desktop 20:55:36: npm ci + npm run build (vue-tsc typecheck)
+[3/4] tauri   20:55:49: cargo check --all-targets (src-tauri, Linux)
+all selected stages green — evidence: /home/ci/Keplura/ci/evidence/20261126-205059
+
+================= RESULT MATRIX =================
+STAGE                        RESULT NOTE
+server:local-reader          PASS   locked Rust build and FD snapshot regressions
+server:package               PASS   compile + fat jar
+server:chunk-1               PASS   12 classes — [INFO] Tests run: 213, Failures: 0, Errors: 0, Skipped: 4
+server:chunk-2               PASS   12 classes — [INFO] Tests run: 93, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-3               PASS   12 classes — [INFO] Tests run: 140, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-4               PASS   12 classes — [INFO] Tests run: 82, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-5               PASS   12 classes — [INFO] Tests run: 77, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-6               PASS   12 classes — [INFO] Tests run: 103, Failures: 0, Errors: 0, Skipped: 1
+server:chunk-7               PASS   12 classes — [INFO] Tests run: 73, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-8               PASS   12 classes — [INFO] Tests run: 164, Failures: 0, Errors: 0, Skipped: 1
+server:chunk-9               PASS   4 classes — [INFO] Tests run: 108, Failures: 0, Errors: 0, Skipped: 0
+server:manifest-audit        PASS   100 classes, each exactly once in 9 chunks
+desktop:build                PASS   npm ci + vue-tsc + vite build
+desktop:cargo-check          PASS   cargo check --all-targets
+e2e                          SKIP   no suite selected (--suite/--with-e2e)
+-------------------------------------------------
+failed stages : 0
+exit code     : 0  (0 green / 1 test-fail / 2 gate-integrity / 3 resource-infra)
+evidence      : /home/ci/Keplura/ci/evidence/20261126-205059
+=================================================

@@ -1,0 +1,56 @@
+ci-local gate — run 20261127-211721  (repo: /work/keplura)
+head: 96567ab | suites: none
+[native reader] 21:17:21: cargo build + cargo test --locked
+[1/4] server  21:17:23: mvn package (skipTests) + chunked surefire, forkCount=1, chunk=12
+  manifest: 102 test classes -> chunks of 12
+  chunk 1 (12 classes) 21:17:38
+  chunk 2 (12 classes) 21:18:42
+  chunk 3 (12 classes) 21:19:13
+  chunk 4 (12 classes) 21:19:51
+  chunk 5 (12 classes) 21:20:29
+  chunk 6 (12 classes) 21:20:43
+  chunk 7 (12 classes) 21:21:27
+  chunk 8 (12 classes) 21:21:55
+  chunk 9 (6 classes) 21:22:25
+[2/4] desktop 21:22:44: npm ci + npm run build (vue-tsc typecheck)
+npm warn cleanup     }
+npm warn cleanup   ]
+npm warn cleanup ]
+npm error code EACCES
+npm error syscall mkdir
+npm error path /home/ci/.npm
+npm error errno -13
+npm error
+npm error Your cache folder contains root-owned files, due to a bug in
+npm error previous versions of npm which has since been addressed.
+npm error
+npm error To permanently fix this problem, please run:
+npm error   sudo chown -R 1500:1500 "/home/ci/.npm"
+npm notice
+npm notice New major version of npm available! 10.9.9 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice
+npm error Log files were not written due to an error writing to the directory: /home/ci/.npm/_logs
+npm error You can rerun the command with `--loglevel=verbose` to see the logs in your terminal
+
+================= RESULT MATRIX =================
+STAGE                        RESULT NOTE
+server:local-reader          PASS   locked Rust build and FD snapshot regressions
+server:package               PASS   compile + fat jar
+server:chunk-1               PASS   12 classes — [INFO] Tests run: 213, Failures: 0, Errors: 0, Skipped: 4
+server:chunk-2               PASS   12 classes — [INFO] Tests run: 93, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-3               PASS   12 classes — [INFO] Tests run: 140, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-4               PASS   12 classes — [INFO] Tests run: 82, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-5               PASS   12 classes — [INFO] Tests run: 71, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-6               PASS   12 classes — [INFO] Tests run: 113, Failures: 0, Errors: 0, Skipped: 1
+server:chunk-7               PASS   12 classes — [INFO] Tests run: 72, Failures: 0, Errors: 0, Skipped: 0
+server:chunk-8               PASS   12 classes — [INFO] Tests run: 158, Failures: 0, Errors: 0, Skipped: 1
+server:chunk-9               PASS   6 classes — [INFO] Tests run: 121, Failures: 0, Errors: 0, Skipped: 0
+server:manifest-audit        PASS   102 classes, each exactly once in 9 chunks
+desktop:build                FAIL   see desktop-build.log
+-------------------------------------------------
+failed stages : 1
+exit code     : 1  (0 green / 1 test-fail / 2 gate-integrity / 3 resource-infra)
+evidence      : /work/keplura/ci/evidence/20261127-211721
+=================================================

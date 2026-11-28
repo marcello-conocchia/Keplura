@@ -16,7 +16,7 @@ async function loadOrgTools() {
   if(result.kind==="ok") orgTools.value=result.value;
   else orgToolsError.value=tr("Werkzeugeinstellungen benötigen die Organisationsverwaltung.");
 }
-async function setOrgTools(input:{knowledgeEnabled?:boolean;webSearchEnabled?:boolean;serverId?:number;internal?:boolean}) {
+async function setOrgTools(input:{knowledgeEnabled?:boolean;webSearchEnabled?:boolean;serverId?:number;internal?:boolean;kind?:"mcp"|"openapi"}) {
   const orgId=auth.selectedOrgId;
   if(orgId===null || orgToolsBusy.value) return;
   orgToolsBusy.value=true;
@@ -34,8 +34,8 @@ watch(()=>[auth.selectedOrgId,isOwner.value],loadOrgTools,{immediate:true});
   <section v-if="isOwner" class="connection-note" data-testid="org-tool-settings">
     <label v-if="orgTools" class="connection-check"><input type="checkbox" :checked="orgTools.knowledgeEnabled" :disabled="orgToolsBusy" @change="setOrgTools({knowledgeEnabled:!orgTools.knowledgeEnabled})" />{{ $t("Wissenssuche, Dokumentstellen und Chat-Anhänge als Werkzeuge für diese Organisation freigeben") }}</label>
     <label v-if="orgTools" class="connection-check"><input type="checkbox" :checked="orgTools.webSearchEnabled" :disabled="orgToolsBusy || (!orgTools.webSearchAvailable && !orgTools.webSearchEnabled)" @change="setOrgTools({webSearchEnabled:!orgTools.webSearchEnabled})" />{{ $t("Websuche und Webseitenabruf als Werkzeuge freigeben – nur bei Fragen mit „Im Web suchen“") }}<span v-if="!orgTools.webSearchAvailable"> ({{ $t("keine Websuche eingerichtet") }})</span></label>
-    <label v-for="server in orgTools?.servers??[]" :key="server.serverId" class="connection-check">
-      <input type="checkbox" :checked="server.internal" :disabled="orgToolsBusy" @change="setOrgTools({serverId:server.serverId,internal:!server.internal})" />
+    <label v-for="server in orgTools?.servers??[]" :key="`${server.kind}-${server.serverId}`" class="connection-check">
+      <input type="checkbox" :checked="server.internal" :disabled="orgToolsBusy" @change="setOrgTools({serverId:server.serverId,internal:!server.internal,kind:server.kind})" />
       {{ server.name }}: {{ $t("Internes Ziel für diese Organisation – Daten bleiben im Haus") }}
     </label>
     <p v-if="orgToolsError" role="alert">{{orgToolsError}}</p>

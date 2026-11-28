@@ -120,6 +120,11 @@ public class SsrfGuard {
         return uri;
     }
 
+    /** Route policy for admin targets, for transports that resolve once and dial the checked address. */
+    public boolean allowsAdminRoute(InetAddress addr) {
+        return routeAllowed(addr);
+    }
+
     /** Route policy for one resolved address (package-visible for unit tests). */
     boolean routeAllowed(InetAddress addr) {
         if (explicitlyAllowed(addr)) {

@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onBeforeUnmount, ref, watch } from "vue";
+import { computed, nextTick, onMounted, onBeforeUnmount, provide, ref, watch } from "vue";
 import LoginView from "./components/LoginView.vue";
 import AccessShell from "./components/layout/AccessShell.vue";
 import KnowledgeView from "./components/KnowledgeView.vue";
 import TeamView from "./components/TeamView.vue";
+import ConnectionsView from "./components/ConnectionsView.vue";
 import ChatView from "./components/ChatView.vue";
 import ChangePasswordView from "./components/ChangePasswordView.vue";
 import OnboardingView from "./components/OnboardingView.vue";
@@ -11,13 +12,15 @@ import AdminPanel from "./components/AdminPanel.vue";
 import AppSidebar from "./components/AppSidebar.vue";
 import CommandPalette from "./components/CommandPalette.vue";
 import AppIcon from "./components/ui/AppIcon.vue";
-import type { AppView } from "./navigation";
+import { NAVIGATE_KEY, type AppView } from "./navigation";
 import { useAuthStore } from "./auth-store";
 import { useThemeStore } from "./theme-store";
 import { initFullscreenState, toggleFullscreen, useFullscreen } from "./fullscreen";
 import { inTauri } from "./transport";
 import { serverUrl } from "./api";
 import { readOidcErrorFragment, readOidcFragment, stripOidcFragment } from "./oidc";
+import { connectionNotice, readConnectionFragment, stripConnectionFragment, takePendingConnectionOrg } from "./connection-return";
+import { completeConnection } from "./productivity-api";
 import { tr } from "./i18n";
 
 /** M4b: the signed-in content area has two views; ADMIN-KI adds the admin
@@ -48,11 +51,12 @@ const menuOpen = ref(false);
 const menuPanel = ref<HTMLElement | null>(null);
 const menuButton = ref<HTMLButtonElement | null>(null);
 const menuMedia = window.matchMedia("(max-width: 760px)");
-const viewTitle = computed(() => ({chat:tr("Chat"),wissen:tr("Wissen"),team:tr("Team"),admin:tr("Administration")})[activeView.value]);
+const viewTitle = computed(() => ({chat:tr("Chat"),wissen:tr("Wissen"),team:tr("Team"),admin:tr("Administration"),verbindungen:tr("Persönliche Verbindungen")})[activeView.value]);
 function resizeMenu() { mobile.value = menuMedia.matches; if (!mobile.value) menuOpen.value = false; }
 async function closeMenu() { menuOpen.value = false; await nextTick(); menuButton.value?.focus(); }
 async function openMenu() { menuOpen.value = true; await nextTick(); menuPanel.value?.querySelector<HTMLElement>("button")?.focus(); }
 function navigate(view: ActiveView) { activeView.value = view; if (mobile.value) void closeMenu(); }
+provide(NAVIGATE_KEY, navigate);
 function menuKeys(event: KeyboardEvent) {
   if (!mobile.value || !menuOpen.value) return;
   // Portal menus own Escape first; their selection remains a normal UI action.
@@ -186,10 +190,25 @@ onMounted(async () => {
     stripOidcFragment();
     auth.oidcFailed = true; // coarse failure line on the login card
   }
+  // TU-06b: return from a personal-connection sign-in (#oauth=<handoff> or
+  // #oauth-error). Wiped at once; redeemed only by the session that started it.
+  const connectionReturn = readConnectionFragment();
+  if (connectionReturn) stripConnectionFragment();
   // Probe a possibly-surviving session cookie first (app restart), then the
   // open connectivity check. Order matters only for a quiet first paint.
   await auth.restoreSession();
   await checkServer();
+  if (connectionReturn) {
+    const org = takePendingConnectionOrg();
+    let ok = false;
+    if (connectionReturn.kind === "handoff" && org !== null && auth.loggedIn) {
+      const r = await completeConnection(org, connectionReturn.handoff);
+      ok = r.kind === "ok" && r.value.status === "CONNECTED";
+      if (auth.orgs.some((o) => o.id === org) && auth.selectedOrgId !== org) await auth.selectOrg(org);
+    }
+    connectionNotice.value = { ok };
+    if (auth.loggedIn) activeView.value = "verbindungen";
+  }
 });
 // PILOT 4e: Erste Schritte, solange Organisation, Arbeitsbereich oder Wissensbasis fehlen.
 const showOnboarding = computed(
@@ -236,6 +255,7 @@ const mustChangePassword = computed(() => auth.user?.mustChangePassword === true
       />
       <ChatView v-else-if="activeView === 'chat'" />
       <TeamView v-else-if="activeView === 'team'" />
+      <ConnectionsView v-else-if="activeView === 'verbindungen'" />
       <KnowledgeView v-else />
     </template>
     <LoginView v-else :status="status" @retry="checkServer" />

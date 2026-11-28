@@ -1100,6 +1100,8 @@ onUnmounted(() => {
                 v-for="c in cardsAt(mi)"
                 :key="c.id"
                 :card="c"
+                :org-id="auth.selectedOrgId"
+                :conversation-id="activeId"
                 :busy="decidingCard === c.id || toolSelectionSaving"
                 :error="cardError?.id === c.id ? cardError.message : null"
                 @decide="(d, answer) => decideCard(c, d, answer)"

@@ -1,0 +1,5 @@
+acl	2.3.2-1build1.1
+/usr/bin/setfacl
+UTF-8
+user:ubuntu:r--
+CI environment: uid=1500, commit=96567abc523c2889044f5aec912ac4efbb81d1a4, LANG=C.UTF-8

@@ -76,6 +76,11 @@ public class McpAdminController {
         this.tx = new org.springframework.transaction.support.TransactionTemplate(transactionManager);
     }
 
+    private com.keplura.server.oauth.OAuthConnectionService oauth;
+
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    void setOauth(com.keplura.server.oauth.OAuthConnectionService oauth) { this.oauth = oauth; }
+
     @GetMapping
     public List<ServerView> list() {
         return jdbc.query("select id, name, url, token_enc, enabled, tools_json, enabled_tools, last_checked_at, last_error, all_spaces, tool_risks from mcp_server order by name",
@@ -162,6 +167,8 @@ public class McpAdminController {
             // A changed endpoint/token is a new trust boundary: never carry
             // old approvals to another server or identity.
             jdbc.update("update mcp_server set tools_json = null, enabled_tools = null, tool_risks = null, last_checked_at = null, last_error = null where id = ?", id);
+            // TU-06b: personal tokens of the old target must never reach a new address.
+            if (!url.strip().equals(cur.url()) && oauth != null) oauth.invalidate("mcp", id);
         }
         if (!changedTarget && (in.enabledTools() != null || in.toolRisks() != null)) {
             Map<String, ToolView> known = new java.util.LinkedHashMap<>();
@@ -237,6 +244,8 @@ public class McpAdminController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         jdbc.update("delete from mcp_server where id = ?", id);
+        if (oauth != null) oauth.removeClient("mcp", id);
+        else jdbc.update("delete from tool_oauth_client where kind='mcp' and server_id=?", id);
         return ResponseEntity.noContent().build();
     }
 
