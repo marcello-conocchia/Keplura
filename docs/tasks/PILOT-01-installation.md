@@ -1,6 +1,6 @@
 # PILOT-01 — Echte Installation und Hand-Upload
 
-Status: in Arbeit, Branch `codex/pilot-installation`, Basis `main@43302d3`.
+Status: in Arbeit, Branch `feat/pilot-installation`, Basis `main@43302d3`.
 
 ## Ziel
 

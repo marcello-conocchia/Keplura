@@ -1,7 +1,7 @@
 # RISK-01 — Oversharing-Check vor der KI-Freigabe
 
 PO-Freigabe 15.11.2026 („was sind die nächsten schritte du kannst dran arbeiten …“) auf Basis der
-Produktstrategie: erstes Alleinstellungsmerkmal. Branch `claude/oversharing-check` von `origin/main`.
+Produktstrategie: erstes Alleinstellungsmerkmal. Branch `feat/oversharing-check` von `origin/main`.
 
 ## Ziel
 

@@ -1,10 +1,10 @@
 # Übergabe – Phase 4 unterbrochen, 15.11.2026
 
-Der Inhaber hat wegen Nutzungslimit ausdrücklich „stoppe beim nächsten punkt“ angeordnet. Nach dem erfolgreichen Frontend-Build angehalten. **Phase 4 ist nicht abgeschlossen, keine finale Design-/Merge-Freigabe.** Claude Code kann auf diesem Branch fortsetzen. Diese Übergabe ersetzt keine unabhängige Review.
+Der Inhaber hat wegen Nutzungslimit ausdrücklich „stoppe beim nächsten punkt“ angeordnet. Nach dem erfolgreichen Frontend-Build angehalten. **Phase 4 ist nicht abgeschlossen, keine finale Design-/Merge-Freigabe.** Die Arbeit kann auf diesem Branch fortgesetzt werden. Diese Übergabe ersetzt keine unabhängige Review.
 
 ## Einstieg / Git
 
-Branch `codex/ui-validation`, Worktree `.worktrees/ui-validation`. Bestehende Arbeit behalten. Basis `codex/ui-system@7a9f104`, gestapelt auf PR #57; davor Recherche #56, Inventar #55, UI-Entwurf #54 und Funktionsabnahme #53. Noch nicht main. Reviewbase für diesen Auftrag: `codex/ui-system`.
+Branch `feat/ui-validation`, Worktree `.worktrees/ui-validation`. Bestehende Arbeit behalten. Basis `feat/ui-system@7a9f104`, gestapelt auf PR #57; davor Recherche #56, Inventar #55, UI-Entwurf #54 und Funktionsabnahme #53. Noch nicht main. Reviewbase für diesen Auftrag: `feat/ui-system`.
 
 Zwischencommits: `055ce3d` Spezifikation, `68dc7da` erste Produktintegration; nachfolgender Sicherungscommit enthält Nachbesserungen und diese Übergabe. Aktuellen Head aus Git bestimmen. Unter Marcello Conocchia committen/pushen, kein main-Merge, Force-Push, Release/Deployment oder Discordversand. Keine Secrets/persönlichen absoluten Pfade committen.
 
@@ -52,7 +52,7 @@ Zuerst lesen: `docs/tasks/UI-04-design-validation.md`, `docs/design/UI-DESIGN-SY
 6. Bestehende E2Es ausführen/anpassen. Nach letztem Produktfix vollständiges `bash scripts/ci-local.sh` auf echtem finalem Produkt-SHA. Matrix/Log unter ci/evidence im PR referenzieren. Frühere449-Tests oder Phase-3-Palette sind keine aktuelle Freigabe.
 7. V01–V15 mit Ergebnis/Grund/Beleg pflegen, PROJECT_STATE aktualisieren, Systemkorrekturen zentral nachführen. Unabhängige Gates offen benennen. Phase4 erst nach tatsächlicher Validierung vorlegen; P05 nicht automatisch beginnen.
 
-## Fortsetzung 15.11.2026 (Claude Code) – Ergebnis
+## Fortsetzung 15.11.2026 – Ergebnis
 
 Übergabe in Reihenfolge abgearbeitet. Ergebnisse und Belege: `docs/design/ui-validation-2026-11-15/README.md`, Prüfliste in `docs/tasks/UI-04-design-validation.md`.
 

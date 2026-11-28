@@ -1,6 +1,6 @@
 # PILOT-03 — Dokumentvorschau rechts an der Quelle
 
-Branch `codex/pilot-source-preview`, von `main@43302d3` angelegt; die fertige
+Branch `feat/pilot-source-preview`, von `main@43302d3` angelegt; die fertige
 lokale Antwortqualität ist als ausdrückliche technische Voraussetzung auf
 diesem Feature-Branch integriert, ohne Merge nach main.
 

@@ -6,7 +6,7 @@ hochladen: „Fasse diese Datei zusammen" oder „Vergleiche mit unserer Richtli
 Fragen pro Abteilung, z. B. „Angebot prüfen" oder „E-Mail an Kunden formulieren". Antwort exportieren als
 Word, PDF oder zum Kopieren in E-Mails."
 
-Branch: `codex/chat-productivity` (von main, enthält `codex/ds-datasources`). Migrationen **V19, V20**.
+Branch: `feat/chat-productivity` (von main, enthält `feat/ds-datasources`). Migrationen **V19, V20**.
 Stand: nur `mvn compile test-compile` und `vue-tsc --noEmit` gelaufen — **keine Tests, kein Build, keine Abnahme**.
 
 ## Was neu ist
@@ -19,7 +19,7 @@ Stand: nur `mvn compile test-compile` und `vue-tsc --noEmit` gelaufen — **kein
 | Mehrere Wissensbasen | V20 `chat_conversation_kb`; `PUT …/conversations/{c}/knowledge-bases`; Retrieval je Basis, nach Score gemischt, Top-K | „+ Wissensbasis" in der Chat-Eingabe, Chips zum Entfernen (max. 5 zusätzliche) |
 | Datei im Chat | V20 `chat_attachment` (nur extrahierter Text, max. 30 000 Zeichen je Datei, 40 000 im Prompt, max. 5 Dateien, 10 MB); `POST/DELETE …/attachments`, `GET …/context` | „Datei" in der Chat-Eingabe (PDF, Word, TXT, MD, CSV), Chips mit „(gekürzt)" |
 
-## Prüfliste für Codex (lokal)
+## Prüfliste (lokal)
 
 1. `bash scripts/ci-local.sh` vollständig — insbesondere `FlywayBaselineMigrationTest` (erwartet 19 Migrationen bis V20).
 2. Export: Antwort mit Tabelle/Liste/Code → Word und PDF öffnen sich, Quellen stehen unten; Umlaute korrekt;
@@ -72,7 +72,7 @@ Websuche je Arbeitsbereich freigeben, Seiten abrufen mit SSRF-Schutz (nur öffen
 Web-Quellen als eigene Quellen-Chips, weitere Anbieter (Google PSE, Bing, Kagi, Exa), Werkzeuge/Tool-Calling,
 Bilderzeugung, Sprache (STT/TTS), Modell-Auswahl je Chat, Prompt-Bibliothek für alle, Chat teilen/Archiv.
 
-## Abnahme-Zwischenstand Codex — Pause 14.11.2026
+## Abnahme-Zwischenstand — Pause 14.11.2026
 
 - Standard-CI auf `9a28e01` bestanden: 416 Server-Tests, Frontend und Tauri.
   Aktuelle portable Migrationserwartung: **22 Migrationen bis V23**.
@@ -82,7 +82,7 @@ Bilderzeugung, Sprache (STT/TTS), Modell-Auswahl je Chat, Prompt-Bibliothek für
 - SearXNG-Container mit HTML/JSON eingerichtet und echte JSON-Suchergebnisse
   erhalten. Dies allein ist keine bestandene Keplura-Websuche-Abnahme.
 - Nach Produktfixes sind finale CI und E2E erneut erforderlich. Einstieg:
-  `docs/HANDOFF-CODEX-2026-11-14.md`, „Codex-Zwischenstand und Pause“.
+  `docs/HANDOFF-2026-11-14-pilot.md`, „Zwischenstand und Pause“.
 
 ### Abnahme-Fortsetzung 15.11.2026
 

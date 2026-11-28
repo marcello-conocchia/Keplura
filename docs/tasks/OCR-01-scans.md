@@ -1,9 +1,8 @@
 # OCR-01 — Texterkennung für gescannte Dokumente
 
-Ursprünglich für Codex vorgesehen; PO 15.11.2026: „codex läuft nicht du musst ocr auch mit übernehmen“ → von Claude umgesetzt.
+Ursprünglich für eine parallele Bearbeitung vorgesehen; PO 15.11.2026: OCR mit übernehmen → umgesetzt.
 
-PO-Freigabe 15.11.2026: „was sind die nächsten schritte du kannst dran arbeiten und parallel kann ich
-codex auch arbeiten lassen“ — auf Basis der Produktstrategie (Must-have „OCR für Scans“).
+PO-Freigabe 15.11.2026: (PO-Auftrag) — auf Basis der Produktstrategie (Must-have „OCR für Scans“).
 
 ## Ziel
 
@@ -27,16 +26,16 @@ lokal per Texterkennung indexiert, mit Seitenangabe zitierbar und in der Quellen
 ## Non-Goals
 
 - Keine Handschrifterkennung, keine Layout-/Tabellenrekonstruktion, kein Cloud-OCR, kein GPU-Zwang.
-- Keine Änderungen an Datenquellen-, Rechte- oder Admin-Datenquellen-Code (dort arbeitet Claude, s. u.).
+- Keine Änderungen an Datenquellen-, Rechte- oder Admin-Datenquellen-Code (dort läuft eine andere Aufgabe, s. u.).
 
 ## Dateigrenzen (wichtig, paralleles Arbeiten)
 
-Codex darf ändern: `server/src/main/java/com/keplura/server/search/TikaDocumentTextExtractor.java`,
+Die parallele Aufgabe darf ändern: `server/src/main/java/com/keplura/server/search/TikaDocumentTextExtractor.java`,
 `search/DocumentIndexingService.java`, `knowledge/DocumentUploadPolicy.java` (nur neue Bildtypen),
 neue Klassen unter `search/ocr/`, `deploy/Dockerfile.server`, `deploy/README.md`, `docs/development.md`
 (Abschnitt OCR), zugehörige Tests, Desktop nur Statustexte in `desktop/src/components/knowledge/*`.
 
-Codex ändert NICHT: `server/.../datasource/**`, `server/.../access/**`, `desktop/src/components/admin/DataSourcesPanel.vue`,
+Die parallele Aufgabe ändert NICHT: `server/.../datasource/**`, `server/.../access/**`, `desktop/src/components/admin/DataSourcesPanel.vue`,
 `desktop/src/datasource-api.ts`. Falls eine Flyway-Migration nötig ist: **V25** verwenden (V24 ist für RISK-01 reserviert,
 auch wenn RISK-01 sie voraussichtlich nicht braucht). `docs/PROJECT_STATE.md` nur mit einem eigenen Absatz ergänzen.
 
@@ -57,7 +56,7 @@ Scan-PDF (nur synthetischer Text, keine echten Daten); `bash scripts/ci-local.sh
 
 ## Workspace
 
-Eigener Worktree + Branch `claude/ocr-scans` von `origin/main`. Draft-PR, kein Merge ohne Gates (AGENTS.md).
+Eigener Worktree + Branch `feat/ocr-scans` von `origin/main`. Draft-PR, kein Merge ohne Gates (AGENTS.md).
 
 ## Umsetzung und Prüfstand (ehrlich)
 

@@ -35,7 +35,7 @@ Gezielt bestehende MCP-/Chat-Tests sowie Negativfälle für Schemafehler, fremde
 
 ## Workspace
 
-Neuer eigener Worktree auf Branch `feat/tool-use-foundation` (PO 21.11.2026: Branch nicht „codex“ nennen) ab dem dann aktuellen `main`. Vor Start laufende Implementierungen im autoritativen Kanban prüfen; maximal eine aktive Aufgabe. Dieser Dokumentationsbranch ist kein Implementierungsworkspace. Modell-/Provider-Vorgaben aus AGENTS.md beachten.
+Neuer eigener Worktree auf Branch `feat/tool-use-foundation` (PO 21.11.2026: neutraler Branch-Name) ab dem dann aktuellen `main`. Vor Start laufende Implementierungen im autoritativen Kanban prüfen; maximal eine aktive Aufgabe. Dieser Dokumentationsbranch ist kein Implementierungsworkspace. Modell-/Provider-Vorgaben aus AGENTS.md beachten.
 
 ## Umsetzung (Draft-PR, 21.11.2026)
 
@@ -48,7 +48,7 @@ Neuer eigener Worktree auf Branch `feat/tool-use-foundation` (PO 21.11.2026: Bra
 
 Auslegung „WRITE standardmäßig aus“: WRITE-Werkzeuge sind wie alle Werkzeuge erst nach eigener ausdrücklicher Adminfreigabe ausführbar; es gibt keinen zusätzlichen globalen Schalter. Bei abweichender PO-Absicht (z. B. globaler Betriebsschalter) nachziehen.
 
-## Korrekturen nach Review-Runde 1 (Codex, PR #15)
+## Korrekturen nach Review-Runde 1 (PR #15)
 
 - **[major / Security medium] Ungültige Schemas:** `inputSchema` wird nicht mehr zu „kein Schema“ normalisiert. MCP-Client, Refresh, Adminliste und Adapter übernehmen jeden gesendeten Wert; nur ein fehlender Schlüssel heißt „keine Argumente“ (nur `{}` erlaubt). `false`, `true`, JSON-`null`, Liste, Text oder `{}` ohne `"type":"object"` sperren das Werkzeug.
 - **[major / Security medium] Große Zahlen:** Grenzen werden ohne Konvertierungs-Exception geprüft (ganzzahlig im `long`-Bereich bzw. endliche Dezimalzahl); sonst gesperrt. Validator-Methoden werfen nie (fail closed). Adminliste und Refresh bleiben bei solchen Schemas nutzbar. Argumente mit nicht endlichen Zahlen (z. B. `1e400`) oder Verschachtelung über 64 Ebenen werden abgewiesen.
@@ -66,4 +66,4 @@ Echter Keplura-Server aus dem PR-Stand (Dev-Profil, eigene H2), echte Desktop-Ob
 | Klassenwechsel Lesen → Schreiben | bestanden: Freigabe aufgehoben (0 von 3), nächste Chatantwort ohne angebotenes Werkzeug, kein weiterer Aufruf |
 | `delete_all_tickets` → Kritisch | bestanden: Häkchen gesperrt mit Hinweis; direkte Freigabe per Admin-API (`PATCH enabledTools`) bleibt wirkungslos, kein Aufruf |
 
-Grenzen: kein echtes Modell (Gateway geskriptet), nicht der offizielle MCP-Beispielserver (kein Download), nur deutsche Oberfläche, kein Dunkelmodus, H2 statt PostgreSQL (V25 auf PostgreSQL hat Codex separat geprüft).
+Grenzen: kein echtes Modell (Gateway geskriptet), nicht der offizielle MCP-Beispielserver (kein Download), nur deutsche Oberfläche, kein Dunkelmodus, H2 statt PostgreSQL (V25 auf PostgreSQL separat geprüft).

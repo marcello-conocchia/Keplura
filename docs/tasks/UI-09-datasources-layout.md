@@ -1,6 +1,6 @@
 # Datenquellen – Übersicht nach Designkatalog
 
-PO-Auftrag 15.11.2026: nach gemeinsamer Browserbesichtigung die Datenquellenübersicht übersichtlich gestalten. Aktiv auf `codex/ui-datasources`, Reviewbase `codex/ui-knowledge@60eff80`, bestehender UI-Worktree. Gestapelter Featurebranch; kein Eingriff in main.
+PO-Auftrag 15.11.2026: nach gemeinsamer Browserbesichtigung die Datenquellenübersicht übersichtlich gestalten. Aktiv auf `feat/ui-datasources`, Reviewbase `feat/ui-knowledge@60eff80`, bestehender UI-Worktree. Gestapelter Featurebranch; kein Eingriff in main.
 
 ## Ziel / Scope
 

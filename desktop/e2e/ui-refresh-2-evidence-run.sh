@@ -6,9 +6,9 @@
 set -uo pipefail
 OUT_ROOT="${1:-/tmp/ui2-evidence}"
 SELF="$(cd "$(dirname "$0")" && pwd)"   # desktop/e2e
-BASE_TREE="/home/hermes/workspaces/IntraCore/.baseline/t_ui11f53ad9-main/desktop"
+BASE_TREE="${KEPLURA_REPO:-$(git rev-parse --show-toplevel)}/.baseline/t_ui11f53ad9-main/desktop"
 NEW_TREE="$(cd "$SELF/.." && pwd)"
-JAR=/home/hermes/workspaces/IntraCore/server/target/keplura-server-0.1.0.jar
+JAR=${KEPLURA_REPO:-$(git rev-parse --show-toplevel)}/server/target/keplura-server-0.1.0.jar
 export HOME=/cache/home
 export NODE_PATH="$HOME/.cache/keplura-e2e/node_modules"
 [ -f "$JAR" ] || { echo "jar missing"; exit 2; }

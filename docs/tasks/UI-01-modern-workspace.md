@@ -31,9 +31,9 @@ kein Frameworkwechsel, kein Merge/Release/Deployment.
 
 ## Workspace
 
-Eigenes Worktree `.worktrees/ui-modern`, Branch `codex/ui-modern` von main,
+Eigenes Worktree `.worktrees/ui-modern`, Branch `feat/ui-modern` von main,
 mit dem geprüften Funktionsstand `d541ce1` als Fast-forward-Voraussetzung.
-Der UI-Diff wird getrennt gegenüber `codex/chat-productivity` geprüft;
+Der UI-Diff wird getrennt gegenüber `feat/chat-productivity` geprüft;
 PR #53 und main werden nicht verändert.
 
 ## Stand

@@ -54,7 +54,7 @@ const generated=cp.spawnSync(process.execPath,[path.join(__dirname,'build-catalo
 add('Katalog/CSS entsprechen der Tokenquelle',generated.status===0,{exitcode:generated.status});
 const whitespace=cp.spawnSync('git',['diff','--check',base],{encoding:'utf8'});
 add('git diff --check',whitespace.status===0,{exitcode:whitespace.status});
-const suspicious=changedFiles.filter(f=>/\.(md|json|html|css)$/.test(f)).filter(f=>/(?:gh[pousr]_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9]{20,}|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|C:[\\/]Users[\\/]|\/Users\/|\/home\/(?:hermes|conoc)\/)/.test(fs.readFileSync(f,'utf8')));
+const suspicious=changedFiles.filter(f=>/\.(md|json|html|css)$/.test(f)).filter(f=>/(?:gh[pousr]_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9]{20,}|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|C:[\\/]Users[\\/]|\/Users\/|\/home\/[^\/]+\/)/.test(fs.readFileSync(f,'utf8')));
 add('Keine offensichtlichen Secrets/persönlichen Pfade in neuen Referenztexten',suspicious.length===0,{auffaelligeDateien:suspicious});
 const report={zeitpunktUtc:new Date().toISOString(),vergleichsbasis:base,produktbasis:index.sourceCommit,art:'Spezifikations-/Tokenprüfung; keine App-/CI-/A11y-Abnahme',ergebnis:checks.every(p=>p.status==='bestanden')?'bestanden':'rot',pruefungen:checks};
 fs.writeFileSync(path.join(__dirname,'checks.json'),JSON.stringify(report,null,2)+'\n');

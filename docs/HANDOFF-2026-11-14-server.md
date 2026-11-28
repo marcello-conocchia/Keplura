@@ -1,4 +1,4 @@
-# Übergabe an Claude Code — IntraCore, 14.11.2026
+# Übergabe Code — IntraCore, 14.11.2026
 
 ## Auftrag und Stopp
 
@@ -14,10 +14,10 @@ Commits verwenden die vorhandene Git-Identität **Marcello Conocchia**.
 
 | Branch | Stand | Letzter geprüfter Feature-Commit |
 |---|---|---|
-| `codex/pilot-installation` | 4a lokal abgenommen | `c55e9fe` |
-| `codex/pilot-answer-quality` | 4b lokal abgenommen | `e8efb24` |
-| `codex/pilot-source-preview` | 4c lokal abgenommen | `fce09e3` |
-| `codex/pilot-interface` | **4d begonnen, WIP; nur Typecheck/Build geprüft** | siehe Branch-Head |
+| `feat/pilot-installation` | 4a lokal abgenommen | `c55e9fe` |
+| `feat/pilot-answer-quality` | 4b lokal abgenommen | `e8efb24` |
+| `feat/pilot-source-preview` | 4c lokal abgenommen | `fce09e3` |
+| `feat/pilot-interface` | **4d begonnen, WIP; nur Typecheck/Build geprüft** | siehe Branch-Head |
 
 Jeder Branch wurde von main angelegt. B übernimmt zwei technische Fixes aus A
 per Cherry-pick (`.dockerignore`, Shell-Zeilenenden). C integriert B als

@@ -1,6 +1,6 @@
 # TU-04b — Dokumentstellen lesen
 
-Status: **abgeschlossen, auf main** — PR #28, Squash-Merge `8e88e8d` (22.11.2026), Baum identisch mit freigegebenem Head `909ede8`. Linux-CI Exit 0 auf Produktcommit `8665d0d`, Evidence `ci/evidence/20261122-195911/`; unabhängige Code-/Security-Freigabe durch Claude auf `909ede8` (zwei info-Folgepunkte, siehe PROJECT_STATE). Zweite Aufgabe von TU-04 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md); nächster Schritt [TU-04c](TU-04c-attachment-tools.md). Klasse A: Dokumentrechte, Datenquellen, Modell-/Werkzeugschleife.
+Status: **abgeschlossen, auf main** — PR #28, Squash-Merge `8e88e8d` (22.11.2026), Baum identisch mit freigegebenem Head `909ede8`. Linux-CI Exit 0 auf Produktcommit `8665d0d`, Evidence `ci/evidence/20261122-195911/`; unabhängige Code-/Security-Freigabe auf `909ede8` (zwei info-Folgepunkte, siehe PROJECT_STATE). Zweite Aufgabe von TU-04 gemäß [Tool-Use-Plan](../TOOL_USE_PLAN.md); nächster Schritt [TU-04c](TU-04c-attachment-tools.md). Klasse A: Dokumentrechte, Datenquellen, Modell-/Werkzeugschleife.
 
 ## Ziel
 
@@ -38,7 +38,7 @@ Geskriptetes Gateway vor dem echten zentralen Dienst mit H2, echtem `SearchServi
 
 ## Workspace
 
-Eigener Worktree auf Branch `feat/tool-use-document-read` ab aktuellem main. Implementierung und unabhängige Prüfung nach PO-Zuweisung (bisher: Codex implementiert, Claude prüft). Genau eine Implementierungsaufgabe. Draft-PR, kein Merge durch den Entwickler; Provider-/Budgetregeln aus AGENTS.md gelten.
+Eigener Worktree auf Branch `feat/tool-use-document-read` ab aktuellem main. Implementierung und unabhängige Prüfung nach PO-Zuweisung (bisher: Implementierung und unabhängige Prüfung durch getrennte Agenten). Genau eine Implementierungsaufgabe. Draft-PR, kein Merge durch den Entwickler; Provider-/Budgetregeln aus AGENTS.md gelten.
 
 ## Implementierungsstand (22.11.2026, noch nicht freigegeben)
 
@@ -55,6 +55,6 @@ Der Aufbewahrungs-Folgepunkt und die bekannten Abhängigkeitswarnungen bleiben e
 
 ## Validierung und Übergabe
 
-Verbindliche Linux-CI Exit 0 auf Produktcommit `8665d0d655740ecaca3840a912024c93ad35110f` (`uid=1500(ci)`, `setfacl 2.3.2` gesichert): 88 Klassen, 832 Tests, 0 Fehler, 1 übersprungen; Rechte-Helfer, Desktop-Build und cargo check PASS. Nachweise `ci/evidence/20261122-195911/` (`MATRIX.md`, `ci-local.log`, `environment.txt`, `runner.sh`). Danach nur Dokumentation/Nachweise. Unabhängiges Review durch Claude ausstehend; kein Merge, keine Browser-QA, kein Release/Deployment.
+Verbindliche Linux-CI Exit 0 auf Produktcommit `8665d0d655740ecaca3840a912024c93ad35110f` (`uid=1500(ci)`, `setfacl 2.3.2` gesichert): 88 Klassen, 832 Tests, 0 Fehler, 1 übersprungen; Rechte-Helfer, Desktop-Build und cargo check PASS. Nachweise `ci/evidence/20261122-195911/` (`MATRIX.md`, `ci-local.log`, `environment.txt`, `runner.sh`). Danach nur Dokumentation/Nachweise. Unabhängiges Review ausstehend; kein Merge, keine Browser-QA, kein Release/Deployment.
 
 Gezielte Entwicklungstests: 197 Tests im Chat-/Tool-/Suchbereich grün, danach 6 gezielte HTTP-Fälle für den letzten Stand einschließlich Fortsetzung/Rechteentzug grün. Desktop-Build und Übersetzungsprüfung grün; 6 Kartentests und 4 Servertext-Übersetzungstests grün. Ein vorher begonnener CI-Lauf auf `b1b14e9` wurde vor Abschluss angehalten, um den neuen englischen Fehlertext aufzunehmen; maßgeblich ist ausschließlich der vollständige grüne Lauf auf `8665d0d`. Kein Testnachweis mit echtem Modell oder Browser.

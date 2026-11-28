@@ -298,7 +298,7 @@ class WebSearchToolTest {
         assertThat(card("web_search").status()).isEqualTo("FAILED");
     }
 
-    /** Codex review TU-04d (major): a provider change after the central check never redirects the bound card. */
+    /** Review TU-04d (major): a provider change after the central check never redirects the bound card. */
     @Test void providerChangedAfterTheCheckSendsNothingToTheNewTarget() throws Exception {
         var other = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
         var otherQueries = new CopyOnWriteArrayList<String>();
@@ -333,7 +333,7 @@ class WebSearchToolTest {
         } finally { other.stop(0); }
     }
 
-    /** Codex review TU-04d (minor): a query the service would cut at 400 UTF-16 units is rejected, never sent altered. */
+    /** Review TU-04d (minor): a query the service would cut at 400 UTF-16 units is rejected, never sent altered. */
     @Test void queryLongerThan400Utf16UnitsIsRejectedNotShortened() {
         var turn = turn(true);
         String rocket = new String(Character.toChars(0x1F680));

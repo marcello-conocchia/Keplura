@@ -1,6 +1,6 @@
 # Chat und Navigation – Rückmeldung des Inhabers 15.11.2026
 
-Aktive Implementierung auf `codex/ui-chat-layout`, Reviewbase `codex/ui-base@7e29b00`.
+Aktive Implementierung auf `feat/ui-chat-layout`, Reviewbase `feat/ui-base@7e29b00`.
 Der Inhaber priorisiert diese sichtbaren Änderungen vor dem weiteren Gesamtlauf.
 UI-05 ist implementiert, seine noch offenen Gates werden dadurch nicht als bestanden gewertet.
 

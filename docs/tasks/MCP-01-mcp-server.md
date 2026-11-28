@@ -5,7 +5,7 @@ deine ausdrückliche Freigabe") antwortete der PO wörtlich: „mcp". Damit ist 
 (Ausnahme zu „Agents/MCP" in AGENTS.md / M5–M9 der ROADMAP). Leitplanken aus ROADMAP gelten: MCP ist Adapter,
 nie Kern-Abhängigkeit; ein MCP-Server entscheidet nie selbst über Rechte; jeder Aufruf auditierbar.
 
-Branch `codex/chat-productivity`, Migration **V22** `mcp_server`. Nur kompiliert/typgeprüft.
+Branch `feat/chat-productivity`, Migration **V22** `mcp_server`. Nur kompiliert/typgeprüft.
 
 ## Stufe 1 (umgesetzt)
 
@@ -16,7 +16,7 @@ Branch `codex/chat-productivity`, Migration **V22** `mcp_server`. Nur kompiliert
   standardmäßig gesperrt; Freigaben verschwundener Werkzeuge entfallen beim Neu-Laden.
 - Oberfläche: Administration → „MCP-Server": eintragen, Status/Fehler, Werkzeuge einzeln anhaken.
 
-Prüfen (Codex): Beispiel-MCP-Server (z. B. `@modelcontextprotocol/server-everything` im Streamable-HTTP-Modus)
+Prüfen : Beispiel-MCP-Server (z. B. `@modelcontextprotocol/server-everything` im Streamable-HTTP-Modus)
 starten, eintragen → Werkzeugliste erscheint; falsches Token → „access denied"; Server aus → Fehlermeldung;
 Nicht-Admin → 403; Token in keiner Antwort/keinem Log; `FlywayBaselineMigrationTest` erwartet 21 Migrationen bis V22.
 
@@ -36,13 +36,13 @@ Migration **V23**: `mcp_server.all_spaces`, `mcp_server_space`, `mcp_call_log` (
 Bekannte Grenzen: Antworten mit Werkzeugen kommen am Stück statt gestreamt; Werkzeug-Rechte sind je Bereich, nicht je
 Benutzer (der MCP-Server sieht das Dienst-Token, nicht den Benutzer); Schema-Validierung der Argumente macht der MCP-Server.
 
-Prüfen (Codex): Modell mit Tool-Calling (z. B. Ollama `qwen2.5`/`llama3.1`, vLLM mit `--enable-auto-tool-choice`);
+Prüfen : Modell mit Tool-Calling (z. B. Ollama `qwen2.5`/`llama3.1`, vLLM mit `--enable-auto-tool-choice`);
 Werkzeug freigeben + Bereich freigeben → Frage, die das Werkzeug braucht → Hinweis „Werkzeuge verwendet" und Eintrag
 im Protokoll; anderer Bereich → kein Werkzeug; Werkzeug wieder sperren → wird nicht mehr angeboten; Modell ohne
 Tool-Calling → Fehlermeldung des Gateways prüfen und ggf. abfangen; `FlywayBaselineMigrationTest`: 22 Migrationen bis V23.
 Security-Gate vor Merge: Token, SSRF durch Admin-URL, Prompt-Injection über Werkzeug-Ergebnisse.
 
-## Abnahme-Zwischenstand Codex — Pause 14.11.2026
+## Abnahme-Zwischenstand — Pause 14.11.2026
 
 Stufe-1- und Stufe-2-Prüfpunkte **noch nicht geprüft**. Offizieller Beispielserver
 `@modelcontextprotocol/server-everything` 1.0.0 im Streamable-HTTP-Modus gestartet;

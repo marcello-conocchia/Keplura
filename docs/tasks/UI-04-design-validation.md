@@ -8,7 +8,7 @@ System 1.0 an einer echten Chat-Unterhaltung und am komplexen Datenquellen-Assis
 
 Nicht-Ziele: vollständige Migration aller Fachseiten, Frameworkwechsel, neue Backend-/Router-/Persistenzfunktionen, Merge/Release/Deployment. Gemeinsame Basisänderungen können bisherige Ansichten optisch beeinflussen; diese erhalten Regressionstests, keine pauschale neue Designabnahme.
 
-Workspace `.worktrees/ui-validation`, Branch `codex/ui-validation`, von main angelegt und per Fast-forward bis `codex/ui-system@7a9f104` fortgeführt. Reviewbase `codex/ui-system`, bisherige Abhängigkeiten bleiben ungemergt. Kleine Commits unter Marcello Conocchia, Push ohne Force. Bestehende Pilotdaten/-instanz erhalten; Tests ausschließlich an eigenen QA-Daten.
+Workspace `.worktrees/ui-validation`, Branch `feat/ui-validation`, von main angelegt und per Fast-forward bis `feat/ui-system@7a9f104` fortgeführt. Reviewbase `feat/ui-system`, bisherige Abhängigkeiten bleiben ungemergt. Kleine Commits unter Marcello Conocchia, Push ohne Force. Bestehende Pilotdaten/-instanz erhalten; Tests ausschließlich an eigenen QA-Daten.
 
 ## Abnahmekriterien / Prüfliste
 
