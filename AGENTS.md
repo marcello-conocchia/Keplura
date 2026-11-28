@@ -8,9 +8,9 @@ Asking the owner is the exception, not the rule.
 
 Tool Use ist das Arbeitsziel für die nächsten Tage: mindestens der dokumentierte
 Funktionsumfang von Open WebUI. Vor jeder nächsten Aufgabenwahl
-`docs/PROJECT_STATE.md` und `docs/TOOL_USE_PLAN.md` lesen. TU-01 bis TU-05 sind auf
-main (bis PR #37); nächste Aufgabe: `docs/tasks/TU-06-adapters-oauth-stdio-media.md`
-(PO 26.11.2026: alle vier Teilschritte in einem PR mit getrennten Commits).
+`docs/PROJECT_STATE.md` und `docs/TOOL_USE_PLAN.md` lesen. TU-01 bis TU-06 sind auf
+main (TU-06 mit PR #39, ohne TU-06c); nächste Aufgabe: `docs/tasks/TU-06c-isolated-stdio-bridge.md`
+(PO 27.11.2026: Codex implementiert, Claude prüft unabhängig).
 Genau eine Implementierung gleichzeitig.
 Die Reihenfolge ersetzt ältere allgemeine Folgeaufgaben, nicht offene
 Sicherheitsverpflichtungen. Bestehende Gate-, Provider-/Budget-, Release- und
