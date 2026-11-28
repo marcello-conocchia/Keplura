@@ -17,6 +17,7 @@ class McpClientTest {
     private boolean stateless;
     private volatile int requests;
     private volatile boolean notificationChecked;
+    private volatile boolean proofSent;
     private final CountDownLatch release = new CountDownLatch(1);
     private static final String TOKEN = "fixture-token-" + "not-a-secret";
 
@@ -25,6 +26,8 @@ class McpClientTest {
         server.setExecutor(workers);
         server.createContext("/mcp", exchange -> {
             requests++;
+            proofSent |= exchange.getRequestHeaders().containsKey(McpClient.BRIDGE_PROOF_HEADER);
+            exchange.getResponseHeaders().set(McpClient.BRIDGE_PROOF_HEADER, "untrusted-response-value");
             if (exchange.getRequestMethod().equals("DELETE")) {
                 release.countDown(); exchange.sendResponseHeaders(204, -1); exchange.close(); return;
             }
@@ -82,6 +85,7 @@ class McpClientTest {
         long start = System.nanoTime();
         assertThat(client.listTools(url, TOKEN)).extracting(McpClient.Tool::name).containsExactly("echo");
         assertThat(notificationChecked).isTrue();
+        assertThat(proofSent).isFalse();
         assertThat(java.time.Duration.ofNanos(System.nanoTime() - start)).isLessThan(java.time.Duration.ofSeconds(2));
     }
 
@@ -103,6 +107,46 @@ class McpClientTest {
     @Test void oversizedBodiesAreRejectedDuringRead() {
         mode = "oversize";
         assertThatThrownBy(() -> client.listTools(url, TOKEN)).isInstanceOf(McpClient.McpException.class);
+    }
+
+    @Test void bridgeProofIsFreshIsUsedForCleanupAndCannotReturnInAResponse() throws Exception {
+        var transport = org.mockito.Mockito.mock(com.keplura.server.http.PinnedHttp.class);
+        var proofs = new java.util.ArrayList<String>();
+        String session = "a".repeat(32);
+        org.mockito.Mockito.when(transport.send(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any())).thenAnswer(call -> {
+            java.util.Map<String, String> headers = call.getArgument(2);
+            String proof = headers.get(McpClient.BRIDGE_PROOF_HEADER);
+            proofs.add(proof);
+            assertThat(proof).matches("[a-f0-9]{64}");
+            if ("DELETE".equals(call.getArgument(0))) {
+                assertThat(headers.get("Mcp-Session-Id")).isEqualTo(session);
+                return new com.keplura.server.http.PinnedHttp.Response(204, java.util.Map.of(), new byte[0], false);
+            }
+            byte[] body = call.getArgument(3);
+            var request = json.readTree(body);
+            var response = json.createObjectNode().put("jsonrpc", "2.0");
+            if (!request.has("id")) return new com.keplura.server.http.PinnedHttp.Response(202, java.util.Map.of(), new byte[0], false);
+            response.set("id", request.path("id"));
+            var result = response.putObject("result");
+            if (request.path("method").asString("").equals("initialize")) result.put("protocolVersion", McpClient.PROTOCOL);
+            else result.putArray("tools").addObject().put("name", "echo").put("description", proof);
+            return new com.keplura.server.http.PinnedHttp.Response(200, java.util.Map.of("mcp-session-id", session),
+                    json.writeValueAsBytes(response), false);
+        });
+        var bridge = new McpClient(new SsrfGuard(""), transport);
+        try {
+            for (int i = 0; i < 2; i++) {
+                assertThatThrownBy(() -> bridge.listTools("https://bridge.example.test/mcp/files", "x".repeat(32), true))
+                        .isInstanceOf(McpClient.McpException.class)
+                        .hasMessage("Die stdio-Bridge hat keine gültige Antwort gesendet.");
+            }
+            assertThat(proofs).hasSize(8);
+            assertThat(proofs.subList(0, 4)).containsOnly(proofs.getFirst());
+            assertThat(proofs.subList(4, 8)).containsOnly(proofs.get(4));
+            assertThat(proofs.get(4)).isNotEqualTo(proofs.getFirst());
+        } finally { bridge.close(); }
     }
 
     @Test void unapprovedLocalTargetsAreRejectedBeforeAnyRequest() {

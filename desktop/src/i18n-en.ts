@@ -31,6 +31,7 @@ export const EN: Record<string, string> = {
   "Verbindungen": "Connections",
   "Datenquellen": "Data sources",
   "Websuche": "Web search",
+  "Isolierte stdio-Bridge": "Isolated stdio bridge",
   "MCP-Server": "MCP servers",
   "Verzeichnis": "Directory",
   "Zugriff prüfen": "Check access",

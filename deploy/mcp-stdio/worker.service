@@ -1,0 +1,16 @@
+[Unit]
+Description=Keplura stdio worker service
+
+[Service]
+Type=simple
+Environment=KEPLURA_STDIO_SOCKET=/run/keplura-stdio/worker.sock
+Environment=KEPLURA_STDIO_WORKERS_FILE=/etc/keplura-stdio/workers.json
+Environment=KEPLURA_STDIO_RUNNER_KEY_FILE=/etc/keplura-stdio/runner.key
+ExecStart=/usr/bin/java -Xmx384m -jar /opt/keplura/keplura-server.jar --mcp-stdio-worker-service
+Restart=on-failure
+RestartSec=5
+Delegate=yes
+UMask=0027
+
+[Install]
+WantedBy=default.target

@@ -23,6 +23,10 @@ import java.util.List;
 @Component
 public class McpClient {
 
+    public static final String BRIDGE_PROOF_HEADER = "X-Keplura-Mcp-Session-Proof";
+    private final java.security.SecureRandom random = new java.security.SecureRandom();
+    private final com.keplura.server.http.PinnedHttp bridgeHttp;
+
     public static final String PROTOCOL = "2025-06-18";
     static final int MAX_BYTES = 2_000_000;
     /** TU-06d: a tools/call response may carry up to four base64 files of 5 MB each (10 MB per question). */
@@ -42,33 +46,45 @@ public class McpClient {
     private final ObjectMapper mapper = JsonMapper.builder().build();
     private final com.keplura.server.admin.SsrfGuard guard;
 
-    public McpClient(com.keplura.server.admin.SsrfGuard guard) { this.guard = guard; }
+    @org.springframework.beans.factory.annotation.Autowired
+    public McpClient(com.keplura.server.admin.SsrfGuard guard) {
+        this(guard, new com.keplura.server.http.PinnedHttp());
+    }
+
+    McpClient(com.keplura.server.admin.SsrfGuard guard, com.keplura.server.http.PinnedHttp bridgeHttp) {
+        this.guard = guard;
+        this.bridgeHttp = bridgeHttp;
+    }
 
     @jakarta.annotation.PreDestroy
     public void close() { http.close(); }
 
     /** Eine Sitzung: initialisieren, dann {@code action} ausführen. */
-    private JsonNode session(String url, String token, String method, ObjectNode params) {
+    private JsonNode session(String url, String token, String method, ObjectNode params, String proof) {
         ObjectNode init = mapper.createObjectNode();
         init.put("protocolVersion", PROTOCOL);
         init.putObject("capabilities");
         init.putObject("clientInfo").put("name", "Keplura").put("version", "1");
-        Exchange first = post(url, token, null, rpc(1, "initialize", init));
+        Exchange first = post(url, token, null, rpc(1, "initialize", init), MAX_BYTES, proof);
         try {
             if (first.body.has("error") || !PROTOCOL.equals(first.body.path("result").path("protocolVersion").asString(""))) {
                 throw new McpException("Die MCP-Initialisierung wurde abgelehnt oder die Protokollversion wird nicht unterstützt.");
             }
-            post(url, token, first.sessionId, notification("notifications/initialized"));
-            Exchange r = post(url, token, first.sessionId, rpc(2, method, params), "tools/call".equals(method) ? MAX_CALL_BYTES : MAX_BYTES);
+            post(url, token, first.sessionId, notification("notifications/initialized"), MAX_BYTES, proof);
+            Exchange r = post(url, token, first.sessionId, rpc(2, method, params), "tools/call".equals(method) ? MAX_CALL_BYTES : MAX_BYTES, proof);
             if (r.body.has("error")) throw new McpException("Der MCP-Server hat die Anfrage abgelehnt.");
             return r.body.path("result");
         } finally {
-            terminate(url, token, first.sessionId);
+            terminate(url, token, first.sessionId, proof);
         }
     }
 
     public List<Tool> listTools(String url, String token) {
-        JsonNode result = session(url, token, "tools/list", mapper.createObjectNode());
+        return listTools(url, token, false);
+    }
+
+    public List<Tool> listTools(String url, String token, boolean bridge) {
+        JsonNode result = session(url, token, "tools/list", mapper.createObjectNode(), bridge ? newProof() : null);
         List<Tool> out = new ArrayList<>();
         for (JsonNode t : result.path("tools")) {
             String name = t.path("name").asString("");
@@ -97,10 +113,15 @@ public class McpClient {
     public record CallResult(String text, List<com.keplura.server.tool.ToolAdapter.Artifact> artifacts) { }
 
     public CallResult callToolWithContent(String url, String token, String name, JsonNode arguments) {
+        return callToolWithContent(url, token, name, arguments, false);
+    }
+
+    public CallResult callToolWithContent(String url, String token, String name, JsonNode arguments, boolean bridge) {
+        String proof = bridge ? newProof() : null;
         ObjectNode p = mapper.createObjectNode();
         p.put("name", name);
         p.set("arguments", arguments == null ? mapper.createObjectNode() : arguments);
-        JsonNode result = session(url, token, "tools/call", p);
+        JsonNode result = session(url, token, "tools/call", p, proof);
         if (result.path("isError").asBoolean(false)) throw new McpException("Das Werkzeug konnte die Anfrage nicht ausführen.");
         StringBuilder sb = new StringBuilder();
         List<com.keplura.server.tool.ToolAdapter.Artifact> files = new ArrayList<>();
@@ -117,8 +138,9 @@ public class McpClient {
             }
             if (files.size() > 64) break;
         }
+        var checked = com.keplura.server.tool.ToolArtifactStore.withoutCredential(List.copyOf(files), token);
         return new CallResult(safe(sb.toString().strip(), token),
-                com.keplura.server.tool.ToolArtifactStore.withoutCredential(List.copyOf(files), token));
+                com.keplura.server.tool.ToolArtifactStore.withoutCredential(checked, proof));
     }
 
     private static com.keplura.server.tool.ToolAdapter.Artifact artifact(String name, String mimeType, JsonNode data) {
@@ -140,12 +162,27 @@ public class McpClient {
     private record Exchange(String sessionId, JsonNode body) {
     }
 
-    private Exchange post(String url, String token, String sessionId, ObjectNode payload) {
-        return post(url, token, sessionId, payload, MAX_BYTES);
+    private String newProof() {
+        byte[] value = new byte[32];
+        random.nextBytes(value);
+        return java.util.HexFormat.of().formatHex(value);
     }
 
-    private Exchange post(String url, String token, String sessionId, ObjectNode payload, int maxBytes) {
+    private Exchange post(String url, String token, String sessionId, ObjectNode payload, int maxBytes, String proof) {
         try {
+            if (proof != null) {
+                var response = bridgeRequest(url, token, sessionId, "POST", mapper.writeValueAsBytes(payload), proof, maxBytes);
+                if (response.status() == 202 && !payload.has("id")) return new Exchange(sessionId, mapper.createObjectNode());
+                if (response.status() == 503) throw new McpException("Die stdio-Bridge kann derzeit keine weitere Sitzung starten.");
+                if (response.status() / 100 != 2) throw new McpException("Die stdio-Bridge hat die Anfrage abgelehnt.");
+                JsonNode result = mapper.readTree(response.body());
+                String sid = response.header("mcp-session-id");
+                if (!sid.matches("[0-9a-f]{32}") || sessionId != null && !sessionId.equals(sid)
+                        || !matches(result, payload.path("id")) || result.toString().contains(proof)) {
+                    throw new McpException("Die stdio-Bridge hat keine gültige Antwort gesendet.");
+                }
+                return new Exchange(sid, result);
+            }
             guard.validateForDial(url);
             HttpRequest.Builder b = HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofSeconds(20))
                     .header("Content-Type", "application/json")
@@ -208,9 +245,30 @@ public class McpClient {
         throw new McpException("Der MCP-Server hat keine passende Antwort gesendet.");
     }
 
-    private void terminate(String url, String token, String sessionId) {
+    private com.keplura.server.http.PinnedHttp.Response bridgeRequest(String url, String token, String sessionId,
+            String method, byte[] payload, String proof, int maxBytes) throws java.io.IOException {
+        URI target = com.keplura.server.admin.SsrfGuard.parseShape(url);
+        if (!"https".equals(target.getScheme()) || token == null || !token.matches("[!-~]{32,512}")) {
+            throw new McpException("Die stdio-Bridge benötigt HTTPS und einen Zugangsschlüssel.");
+        }
+        var headers = new java.util.HashMap<String, String>();
+        headers.put("Authorization", "Bearer " + token);
+        headers.put(BRIDGE_PROOF_HEADER, proof);
+        headers.put("Content-Type", "application/json");
+        headers.put("Accept", "application/json");
+        headers.put("Mcp-Protocol-Version", PROTOCOL);
+        if (sessionId != null) headers.put("Mcp-Session-Id", sessionId);
+        return bridgeHttp.send(method, target, headers, payload, ignored -> new com.keplura.server.http.PinnedHttp.Limit(maxBytes, false),
+                Duration.ofSeconds(payload == null ? 3 : 20), guard::allowsAdminRoute);
+    }
+
+    private void terminate(String url, String token, String sessionId, String proof) {
         if (sessionId == null) return;
         try {
+            if (proof != null) {
+                bridgeRequest(url, token, sessionId, "DELETE", null, proof, 0);
+                return;
+            }
             guard.validateForDial(url);
             var request = HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofSeconds(3))
                     .header("Mcp-Session-Id", sessionId).header("MCP-Protocol-Version", PROTOCOL).DELETE();

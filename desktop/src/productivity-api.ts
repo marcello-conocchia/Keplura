@@ -118,8 +118,8 @@ export interface OrgToolSettings { knowledgeEnabled: boolean; webSearchEnabled: 
 export const getOrgToolSettings = (orgId: number) => call<OrgToolSettings>("GET", `/api/v1/orgs/${orgId}/tools/settings`);
 export const updateOrgToolSettings = (orgId: number,input: {knowledgeEnabled?: boolean; webSearchEnabled?: boolean; serverId?: number; internal?: boolean; kind?: "mcp" | "openapi"}) =>
   call<OrgToolSettings>("PUT", `/api/v1/orgs/${orgId}/tools/settings`, input);
-export const createMcpServer = (input: { name: string; url: string; token: string | null }) => call<McpServer>("POST", MCP, input, 60000);
-export const updateMcpServer = (id: number, input: { name?: string; url?: string; token?: string | null; enabled?: boolean; enabledTools?: string[]; allSpaces?: boolean; spaceIds?: number[]; toolRisks?: Record<string, ToolRisk | ""> }) =>
+export const createMcpServer = (input: { name: string; url: string; token: string | null; bridge?: boolean }) => call<McpServer>("POST", MCP, input, 60000);
+export const updateMcpServer = (id: number, input: { name?: string; url?: string; token?: string | null; bridge?: boolean; enabled?: boolean; enabledTools?: string[]; allSpaces?: boolean; spaceIds?: number[]; toolRisks?: Record<string, ToolRisk | ""> }) =>
   call<McpServer>("PATCH", `${MCP}/${id}`, input);
 export const refreshMcpServer = (id: number) => call<McpServer>("POST", `${MCP}/${id}/refresh`, undefined, 60000);
 export const deleteMcpServer = (id: number) => call<void>("DELETE", `${MCP}/${id}`);

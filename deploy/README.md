@@ -355,3 +355,77 @@ Java-Klasse starten (nicht im Java-Source-Launcher, dessen eigener Classloader
 den paketinternen Store-Konstruktor nicht verwenden kann). Zugangsdaten kommen
 aus der lokalen ENV-Datei; Argumente sind nur Organisations-, Arbeitsbereichs-
 und Wissensbasis-ID aus dem Qualitätsprotokoll. Das Werkzeug schreibt keine Daten.
+
+## Isolierte MCP-stdio-Bridge
+
+Das optionale Compose-Profil `mcp-stdio` verbindet Keplura Ã¼ber HTTPS mit
+der Bridge. Die Runtime fÃ¼r die Worker lÃ¤uft getrennt vom Compose-Daemon.
+
+1. Ein dediziertes Linux-Dienstkonto fÃ¼r den Startdienst einrichten. Das
+   Konto braucht Rootless-Podman, eigene Sub-UIDs und Sub-GIDs sowie Cgroup-v2-
+   Delegation fÃ¼r CPU, Speicher und PID-Limits. Das Konto erhÃ¤lt weder
+   Haupt-Daemon-Zugang noch Keplura-Datenbank- oder Provider-Zugangsdaten.
+   Den Startdienst als User-Service mit lokaler Podman-Runtime betreiben.
+   FÃ¼r einen dauerhaft aktiven User-Service den Betrieb des User-Managers
+   nach Abmeldung am Host entsprechend einrichten.
+2. `deploy/mcp-stdio/workers.example.json` als Vorlage fÃ¼r
+   `/etc/keplura-stdio/workers.json` verwenden. Probe und Worker als
+   geprÃ¼fte Images mit vollstÃ¤ndigem Digest unter dem Dienstkonto
+   vorinstallieren. Die Probe benÃ¶tigt eine BusyBox-Shell mit `ulimit -f`
+   in 512-Byte-BlÃ¶cken und liest die effektiven Cgroup-Limits.
+   Der Startdienst verweigert bei abweichenden Werten seinen Start. Ein
+   Worker-Image enthÃ¤lt das deklarierte Programm und sein Arbeitsverzeichnis
+   `/work`. Der Worker ist netzlos und hat keine Host-Mounts.
+3. Ein gemeinsames Verzeichnis fÃ¼r den Unix-Socket anlegen
+   (`/run/keplura-stdio` bzw. `KEPLURA_STDIO_SOCKET_DIR`). EigentÃ¼mer
+   ist das Startdienstkonto. Die Bridge benÃ¶tigt Ã¼ber eine eigene gemeinsame
+   Gruppe nur Zugriff auf den Socket, keine Schreibrechte im Verzeichnis.
+   Beispiel fÃ¼r das Verzeichnis ist Modus `2750`, fÃ¼r den Socket setzt der
+   Dienst `0660`. Das Host-Verzeichnis bei jedem Neustart anlegen.
+   `KEPLURA_STDIO_SHARED_GID` ist die numerische GID dieser Gruppe.
+4. Zwei unabhÃ¤ngige zufÃ¤llige SchlÃ¼ssel mit je mindestens 32 druckbaren
+   ASCII-Zeichen bereitstellen. Der Startdienst liest `runner.key` aus
+   `/etc/keplura-stdio/runner.key` oder aus
+   `KEPLURA_STDIO_RUNNER_KEY_FILE`. In das eigene Bridge-Secrets-Verzeichnis
+   (`/etc/keplura-stdio/bridge` bzw. `KEPLURA_STDIO_BRIDGE_SECRETS_DIR`)
+   gehÃ¶ren eine Kopie von `runner.key`, das getrennte `bridge.key`,
+   `bridge.p12` und dessen Passwort in `tls.key`. Die SchlÃ¼sseldateien
+   sind nur fÃ¼r die jeweiligen Dienstkonten oder deren Gruppen lesbar
+   (Modus `0400` oder `0440`). Bridge-Secrets-Verzeichnis und Socket-
+   Verzeichnis sind die einzigen Bind-Mounts der Bridge. Beide sind read-only.
+5. Startdienst unter dem dedizierten Konto starten. Der Java-Startbefehl ist
+   `java -jar keplura-server.jar --mcp-stdio-worker-service`. Die Beispielunit
+   `deploy/mcp-stdio/worker.service` dokumentiert den Produktionsstart.
+   Danach aus `deploy/` mit der zusätzlichen Compose-Datei starten.
+
+   ```sh
+   docker compose --env-file .env.production -f compose.prod.yml -f compose.mcp-stdio.yml --profile mcp-stdio up -d server mcp-stdio-bridge
+   ```
+ Das Zertifikat im
+   PKCS#12-Store muss fÃ¼r `mcp-stdio-bridge` gÃ¼ltig und im Java-Truststore
+   von Keplura vertrauenswÃ¼rdig sein. `KEPLURA_ADMIN_SSRF_ALLOW_CIDRS`
+   um den dedizierten Bridge-Subnetzbereich ergÃ¤nzen, standardmÃ¤ÃŸig
+   `172.31.249.0/24`. Keine Bridge-Ports auf dem Host verÃ¶ffentlichen.
+6. Unter **Administration â†’ MCP-Server** die Adresse
+   `https://mcp-stdio-bridge:8090/mcp/<servername>` eintragen, **Isolierte
+   stdio-Bridge** auswÃ¤hlen und den Inhalt von `bridge.key` als
+   gemeinsamen ZugangsschlÃ¼ssel hinterlegen. Die Freigabe und Risikoklasse
+   jedes Werkzeugs werden wie bei anderen MCP-Servern gesetzt.
+
+Die Bridge und der Startdienst tauschen begrenzte, sitzungsgebundene
+stdio-Frames Ã¼ber den Unix-Socket aus. Der Startdienst vermittelt die Daten
+Ã¼ber Podman an den Worker. Das Sitzungsende entfernt den Worker. Beim
+Neustart entfernt der Startdienst verwaiste Worker seiner Instanz, bevor er
+neue Verbindungen annimmt. Die globalen und serverbezogenen Obergrenzen sind
+in der Runtime-Deklaration gesetzt.
+
+FÃ¼r B10 und B17 `deploy/mcp-stdio/check-bridge-container.py <Container-ID>`
+auf die laufende Bridge anwenden. Der Test prÃ¼ft Mounts und Umgebung per
+Runtime-Inspect und gibt keine Umgebungswerte aus.
+
+Die separate Worker-Probe ist auf Linux unter dem rootless Dienstkonto verfügbar.
+Dazu `KEPLURA_TEST_STDIO_PROBE_IMAGE` auf den Namen des vorinstallierten
+BusyBox-Images mit Digest setzen und im Server-Verzeichnis
+`mvn -Dtest=RootlessWorkerProbeTest test` ausführen. Der Test prüft den
+Limits-Check und zwei frische Worker-Container. Für die vollständige Abnahme
+gelten die Pflichttests in der TU-06c-Spezifikation.

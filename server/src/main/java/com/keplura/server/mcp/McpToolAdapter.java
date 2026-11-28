@@ -59,18 +59,18 @@ public class McpToolAdapter implements ToolAdapter {
     }
 
     private record Server(long id, String name, String url, String tokenEnc, String toolsJson, String enabledTools,
-                          String toolRisks, boolean internal, long revision, boolean personal) { }
+                          String toolRisks, boolean internal, long revision, boolean personal, boolean bridge) { }
 
     private List<Server> servers(Long spaceId) {
         return jdbc.query("""
                 select s.id, s.name, s.url, s.token_enc, s.tools_json, s.enabled_tools, s.tool_risks,
-                       coalesce(b.internal,false),coalesce(b.revision,0),
-                       s.auth_mode <> 'shared' from mcp_server s
+                       coalesce(b.internal,s.bridge),coalesce(b.revision,0),
+                       s.auth_mode <> 'shared', s.bridge from mcp_server s
                 left join mcp_org_boundary b on b.server_id=s.id and b.org_id=(select org_id from space where id=?)
                 where s.enabled = true and (s.all_spaces = true
                    or exists (select 1 from mcp_server_space x where x.server_id = s.id and x.space_id = ?))
                 order by s.id""", (rs, n) -> new Server(rs.getLong(1), rs.getString(2), rs.getString(3), rs.getString(4),
-                rs.getString(5), rs.getString(6), rs.getString(7), rs.getBoolean(8), rs.getLong(9), rs.getBoolean(10)),
+                rs.getString(5), rs.getString(6), rs.getString(7), rs.getBoolean(8), rs.getLong(9), rs.getBoolean(10), rs.getBoolean(11)),
                 spaceId, spaceId);
     }
 
@@ -100,7 +100,7 @@ public class McpToolAdapter implements ToolAdapter {
             }
             Set<String> approved = approvals(s.enabledTools());
             Map<String, ToolRisk> risks = risks(s.toolRisks());
-            String fingerprint = fingerprint(s.id(), s.url(), s.tokenEnc()) + access + ":boundary:" + s.revision();
+            String fingerprint = fingerprint(s.id(), s.url(), s.tokenEnc()) + (s.bridge() ? ":bridge" : "") + access + ":boundary:" + s.revision();
             for (JsonNode t : mapper.readTree(s.toolsJson())) {
                 String name = t.path("name").asString("");
                 if (name.isEmpty()) continue;
@@ -142,7 +142,7 @@ public class McpToolAdapter implements ToolAdapter {
     @Override
     public Result invokeWithArtifacts(com.keplura.server.tool.ToolContext context, ToolDefinition tool, JsonNode arguments,
                                       Long promptMessageId) {
-        var rows = jdbc.queryForList("select url, token_enc, auth_mode from mcp_server where id = ? and enabled = true", tool.sourceId());
+        var rows = jdbc.queryForList("select url, token_enc, auth_mode, bridge from mcp_server where id = ? and enabled = true", tool.sourceId());
         if (rows.isEmpty()) throw new ToolNotStartedException("Der MCP-Server ist nicht mehr aktiv.");
         Object url = rows.getFirst().get("url");
         Object enc = rows.getFirst().get("token_enc");
@@ -152,6 +152,8 @@ public class McpToolAdapter implements ToolAdapter {
         long revision=revisions.isEmpty()?0:revisions.getFirst();
         // Stored auth mode, never inferred from a client row: personal without a client fails closed (no connection).
         boolean personal = !"shared".equals(String.valueOf(rows.getFirst().get("auth_mode")));
+        boolean bridge = Boolean.TRUE.equals(rows.getFirst().get("bridge"));
+        if (bridge && personal) throw new ToolNotStartedException(OAuthConnectionService.MISSING);
         OAuthConnectionService.Connection connection = null;
         if (personal) {
             connection = oauth == null ? null
@@ -159,7 +161,7 @@ public class McpToolAdapter implements ToolAdapter {
             if (connection == null) throw new ToolNotStartedException(OAuthConnectionService.MISSING);
         }
         String access = connection == null ? "" : OAuthConnectionService.fingerprintPart(connection);
-        if (!(fingerprint(tool.sourceId(), urlText, encText)+access+":boundary:"+revision).equals(tool.fingerprint())) {
+        if (!(fingerprint(tool.sourceId(), urlText, encText)+(bridge ? ":bridge" : "")+access+":boundary:"+revision).equals(tool.fingerprint())) {
             throw new ToolNotStartedException("Das Verbindungsziel hat sich geändert. Das Werkzeug wurde nicht aufgerufen.");
         }
         String token;
@@ -174,7 +176,8 @@ public class McpToolAdapter implements ToolAdapter {
             }
         }
         try {
-            var result = client.callToolWithContent(urlText, token, tool.toolName(), arguments);
+            var result = bridge ? client.callToolWithContent(urlText, token, tool.toolName(), arguments, true)
+                    : client.callToolWithContent(urlText, token, tool.toolName(), arguments);
             if (result == null) throw new ToolInvocationException("Der Werkzeug-Aufruf ist fehlgeschlagen.");
             return new Result(result.text(), result.artifacts());
         } catch (McpClient.McpException e) {

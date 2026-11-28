@@ -144,7 +144,9 @@ public class OAuthConnectionService {
     public Client putClient(String kind, long serverId, String authorizeUrl, String tokenUrl, String revokeUrl,
                             String clientId, String clientSecret, String scopes) {
         return tx.execute(st -> {
-            if (kind.equals("mcp")) jdbc.update("update mcp_server set auth_mode='personal' where id=?", serverId);
+            if (kind.equals("mcp") && jdbc.update("update mcp_server set auth_mode='personal' where id=? and bridge=false", serverId) != 1) {
+                throw new OAuthException("Die stdio-Bridge benötigt einen gemeinsamen Zugangsschlüssel.");
+            }
             return putClientInTx(kind, serverId, authorizeUrl, tokenUrl, revokeUrl, clientId, clientSecret, scopes);
         });
     }

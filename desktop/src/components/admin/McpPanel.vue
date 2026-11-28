@@ -19,6 +19,7 @@ const servers = ref<McpServer[]>([]);
 const name = ref("");
 const url = ref("");
 const token = ref("");
+const bridge = ref(false);
 const message = ref("");
 const busy = ref(false);
 const expandedId = ref<number | null>(null);
@@ -28,7 +29,7 @@ const connectOpen=ref(false),connectError=ref(""),loading=ref(true),loaded=ref(f
 const working=ref(new Set<number>());
 let disposed=false;
 onBeforeUnmount(()=>{disposed=true;token.value="";});
-function openConnect(){name.value=url.value=token.value="";connectError.value="";connectOpen.value=true;}
+function openConnect(){name.value=url.value=token.value="";bridge.value=false;connectError.value="";connectOpen.value=true;}
 function closeConnect(){connectOpen.value=false;token.value="";}
 
 
@@ -72,7 +73,7 @@ async function add() {
   message.value = "";
   connectError.value="";
   try {
-    const r = await createMcpServer({ name: name.value, url: url.value, token: token.value.trim() || null });
+    const r = await createMcpServer({ name: name.value, url: url.value, token: token.value.trim() || null, bridge: bridge.value });
     if (r.kind !== "ok") { connectError.value=r.kind === "error" ? r.message : tr("Deine Sitzung ist abgelaufen.");return; }
     expandedId.value = r.value.id;
     name.value = url.value = token.value = "";
@@ -161,7 +162,7 @@ async function confirmRemove() {
     <details class="connection-details log"><summary>{{ $t("Letzte Werkzeugaufrufe") }}<span v-if="calls.length"> · {{calls.length}}</span></summary><p v-if="callsError" class="connection-note error">{{callsError}}</p><p v-else-if="!calls.length" class="connection-hint">{{ $t("Noch keine Aufrufe protokolliert.") }}</p><div v-else class="connection-table-wrap" tabindex="0" role="region" :aria-label="$t('Protokoll der Werkzeugaufrufe')"><table class="connection-table"><thead><tr><th>{{ $t("Zeitpunkt") }}</th><th>{{ $t("Verbindung / Werkzeug") }}</th><th>{{ $t("Person") }}</th><th>{{ $t("Klasse") }}</th><th>{{ $t("Dauer") }}</th><th>{{ $t("Ergebnis") }}</th></tr></thead><tbody><tr v-for="(c,i) in calls" :key="i"><td>{{new Date(c.called_at).toLocaleString($dateLocale())}}</td><td>{{c.server_name}}<br /><code>{{c.tool_name}}</code></td><td>{{ $t("Benutzer {0}", c.user_id) }}</td><td>{{c.risk?riskLabel(c.risk):'–'}}</td><td>{{ $t("{0} ms", c.duration_ms) }}</td><td>{{c.ok?$t("Erfolgreich"):c.error||$t("Fehlgeschlagen")}}</td></tr></tbody></table></div></details>
     <details class="connection-details"><summary>{{ $t("Hinweise zur Einrichtung") }}</summary><p>{{ $t("Verbindungen ins Firmennetz müssen vom Betrieb erlaubt sein. Neue Werkzeuge sind zunächst gesperrt und nicht klassifiziert. Wähle je Werkzeug eine Risikoklasse (Lesen, Schreiben, Kritisch) und gib es danach einzeln frei; eine geänderte Klasse oder ein geändertes Werkzeug hebt die Freigabe auf. Kritische Werkzeuge bleiben gesperrt, bis Bestätigungen je Aufruf verfügbar sind. Je Antwort gibt es eine Aufrufrunde mit höchstens acht Aufrufen. Neue Verbindungen und geänderte Zugangsdaten benötigen eine erneute Werkzeugfreigabe. Das verwendete Modell muss Werkzeugaufrufe unterstützen.") }}</p></details>
     <AppDialog ref="connectDialog" :open="connectOpen" :title="$t('MCP-Server verbinden')" size="md" :busy="busy" :dirty="!!name||!!url||!!token" :error="connectError" @close="closeConnect">
-      <form class="connection-form" @submit.prevent="add"><Input id="mcp-name" v-model="name" :label="$t('Name der Verbindung')" required maxlength="120" :placeholder="$t('z. B. Ticketsystem')" :disabled="busy" data-testid="admin-mcp-name" /><Input id="mcp-url" v-model="url" :label="$t('Server-Adresse')" type="url" required maxlength="500" :placeholder="$t('https://mcp.firma.local/mcp')" :disabled="busy" data-testid="admin-mcp-url" /><Input id="mcp-token" v-model="token" :label="$t('Zugangsschlüssel (optional)')" type="password" autocomplete="off" :hint="$t('Nur falls der Server einen Schlüssel benötigt.')" :disabled="busy" data-testid="admin-mcp-token" /><div class="connection-submit"><Button :disabled="busy" @click="connectDialog?.requestClose()">{{ $t("Abbrechen") }}</Button><Button variant="primary" type="submit" :disabled="busy" :busy="busy" data-testid="admin-mcp-add">{{busy?$t("Verbindung wird geprüft …"):$t("Verbinden")}}</Button></div></form>
+      <form class="connection-form" @submit.prevent="add"><Input id="mcp-name" v-model="name" :label="$t('Name der Verbindung')" required maxlength="120" :placeholder="$t('z. B. Ticketsystem')" :disabled="busy" data-testid="admin-mcp-name" /><Input id="mcp-url" v-model="url" :label="$t('Server-Adresse')" type="url" required maxlength="500" :placeholder="$t('https://mcp.firma.local/mcp')" :disabled="busy" data-testid="admin-mcp-url" /><Input id="mcp-token" v-model="token" :label="$t('Zugangsschlüssel (optional)')" type="password" autocomplete="off" :hint="$t('Nur falls der Server einen Schlüssel benötigt.')" :disabled="busy" data-testid="admin-mcp-token" /><label class="connection-check"><input v-model="bridge" type="checkbox" :disabled="busy" />{{ $t("Isolierte stdio-Bridge") }}</label><div class="connection-submit"><Button :disabled="busy" @click="connectDialog?.requestClose()">{{ $t("Abbrechen") }}</Button><Button variant="primary" type="submit" :disabled="busy" :busy="busy" data-testid="admin-mcp-add">{{busy?$t("Verbindung wird geprüft …"):$t("Verbinden")}}</Button></div></form>
     </AppDialog>
     <ConfirmDialog :open="removeTarget!==null" :title="$t('MCP-Verbindung entfernen?')" :message="$t('Die Verbindung „{0}“ und ihre Werkzeugfreigaben werden entfernt.', removeTarget?.name??'')" :confirm-label="$t('Entfernen')" :busy="removing" :error="removeError" @confirm="confirmRemove" @close="removeTarget=null" />
   </section>

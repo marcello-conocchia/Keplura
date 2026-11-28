@@ -47,7 +47,7 @@ public class McpAdminController {
     }
 
     public record ServerView(Long id, String name, String url, boolean hasToken, boolean enabled, List<ToolView> tools,
-                             Instant lastCheckedAt, String lastError, boolean allSpaces, List<Long> spaceIds) {
+                             Instant lastCheckedAt, String lastError, boolean allSpaces, List<Long> spaceIds, boolean bridge) {
     }
 
     /**
@@ -56,7 +56,13 @@ public class McpAdminController {
      * bisherige Freigabe dieses Werkzeugs auf (nur eine ausdrückliche Freigabe in derselben Anfrage zählt).
      */
     public record Input(String name, String url, String token, Boolean enabled, List<String> enabledTools,
-                        Boolean allSpaces, List<Long> spaceIds, Map<String, String> toolRisks) {
+                        Boolean allSpaces, List<Long> spaceIds, Map<String, String> toolRisks, Boolean bridge) {
+        public Input(String name, String url, String token, Boolean enabled, List<String> enabledTools, Boolean allSpaces,
+                     List<Long> spaceIds, Map<String, String> toolRisks) {
+            this(name, url, token, enabled, enabledTools, allSpaces, spaceIds, toolRisks, null);
+        }
+
+        @Override public String toString() { return "McpServerInput[redacted]"; }
     }
 
     public record ErrorResponse(String error) {
@@ -83,7 +89,7 @@ public class McpAdminController {
 
     @GetMapping
     public List<ServerView> list() {
-        return jdbc.query("select id, name, url, token_enc, enabled, tools_json, enabled_tools, last_checked_at, last_error, all_spaces, tool_risks from mcp_server order by name",
+        return jdbc.query("select id, name, url, token_enc, enabled, tools_json, enabled_tools, last_checked_at, last_error, all_spaces, tool_risks, bridge from mcp_server order by name",
                 (rs, n) -> {
                     Set<String> on = names(rs.getString(7));
                     Map<String, ToolRisk> risks = McpToolAdapter.risks(rs.getString(11));
@@ -104,7 +110,7 @@ public class McpAdminController {
                     return new ServerView(rs.getLong(1), rs.getString(2), rs.getString(3), rs.getString(4) != null,
                             rs.getBoolean(5), tools, ts == null ? null : ts.toInstant(), rs.getString(9), rs.getBoolean(10),
                             jdbc.queryForList("select space_id from mcp_server_space where server_id = ? order by space_id",
-                                    Long.class, rs.getLong(1)));
+                                    Long.class, rs.getLong(1)), rs.getBoolean(12));
                 });
     }
 
@@ -117,16 +123,21 @@ public class McpAdminController {
             if (!cipher.available()) return bad("Tokens können nicht gespeichert werden: KEPLURA_SECRETS_MASTER_KEY fehlt.");
             enc = cipher.encrypt(in.token().strip());
         }
+        boolean bridge = Boolean.TRUE.equals(in.bridge());
+        if (bridge && (!in.url().strip().startsWith("https://") || !validBridgeToken(in.token()))) {
+            return bad("Die stdio-Bridge benötigt HTTPS und einen Zugangsschlüssel.");
+        }
         String encrypted = enc;
         var keys = new org.springframework.jdbc.support.GeneratedKeyHolder();
         jdbc.update(connection -> {
             var statement = connection.prepareStatement(
-                    "insert into mcp_server (name, url, token_enc, enabled, created_at) values (?, ?, ?, ?, ?)", new String[]{"id"});
+                    "insert into mcp_server (name, url, token_enc, enabled, created_at, bridge) values (?, ?, ?, ?, ?, ?)", new String[]{"id"});
             statement.setString(1, in.name().strip());
             statement.setString(2, in.url().strip());
             statement.setString(3, encrypted);
             statement.setBoolean(4, in.enabled() == null || in.enabled());
             statement.setTimestamp(5, Timestamp.from(Instant.now()));
+            statement.setBoolean(6, bridge);
             return statement;
         }, keys);
         Long id = java.util.Objects.requireNonNull(keys.getKey(), "MCP id missing").longValue();
@@ -145,6 +156,14 @@ public class McpAdminController {
         String url = in.url() == null ? cur.url() : in.url();
         String err = validate(name, url);
         if (err != null) return bad(err);
+        boolean bridge = in.bridge() == null ? cur.bridge() : in.bridge();
+        if (bridge && (!url.strip().startsWith("https://")
+                || (in.token() == null ? !cur.hasToken() || !cur.bridge() : !validBridgeToken(in.token())))) {
+            return bad("Die stdio-Bridge benötigt HTTPS und einen Zugangsschlüssel.");
+        }
+        if (bridge && !"shared".equals(jdbc.queryForObject("select auth_mode from mcp_server where id=?", String.class, id))) {
+            return bad("Die stdio-Bridge benötigt einen gemeinsamen Zugangsschlüssel.");
+        }
         if (in.toolRisks() != null) {
             for (String v : in.toolRisks().values()) {
                 if (v != null && !v.isBlank() && ToolRisk.parse(v) == null) {
@@ -160,9 +179,9 @@ public class McpAdminController {
             }
             jdbc.update("update mcp_server set token_enc = ? where id = ?", enc, id);
         }
-        jdbc.update("update mcp_server set name = ?, url = ?, enabled = ? where id = ?", name.strip(), url.strip(),
-                in.enabled() == null ? cur.enabled() : in.enabled(), id);
-        boolean changedTarget = !url.strip().equals(cur.url()) || in.token() != null;
+        jdbc.update("update mcp_server set name = ?, url = ?, enabled = ?, bridge = ? where id = ?", name.strip(), url.strip(),
+                in.enabled() == null ? cur.enabled() : in.enabled(), bridge, id);
+        boolean changedTarget = !url.strip().equals(cur.url()) || in.token() != null || bridge != cur.bridge();
         if (changedTarget) {
             // A changed endpoint/token is a new trust boundary: never carry
             // old approvals to another server or identity.
@@ -258,13 +277,14 @@ public class McpAdminController {
     }
 
     private void refresh(Long id) {
-        var row = jdbc.queryForMap("select url, token_enc, enabled_tools from mcp_server where id = ?", id);
+        var row = jdbc.queryForMap("select url, token_enc, enabled_tools, bridge from mcp_server where id = ?", id);
         String token = "";
         Object enc = row.get("token_enc");
         Timestamp now = Timestamp.from(Instant.now());
         try {
             if (enc != null) token = cipher.decrypt(enc.toString());
-            List<McpClient.Tool> tools = client.listTools(row.get("url").toString(), token);
+            List<McpClient.Tool> tools = Boolean.TRUE.equals(row.get("bridge"))
+                    ? client.listTools(row.get("url").toString(), token, true) : client.listTools(row.get("url").toString(), token);
             String json = mapper.writeValueAsString(tools.stream()
                     .map(t -> {
                         java.util.Map<String, Object> m = new java.util.LinkedHashMap<>();
@@ -276,9 +296,10 @@ public class McpAdminController {
                     }).toList());
             if (json.length() > 32000) throw new McpClient.McpException("Der Server bietet zu viele Werkzeuge an.");
             tx.executeWithoutResult(status -> {
-                var current = jdbc.queryForList("select url, token_enc, enabled_tools, tools_json, tool_risks from mcp_server where id = ? for update", id);
+                var current = jdbc.queryForList("select url, token_enc, enabled_tools, tools_json, tool_risks, bridge from mcp_server where id = ? for update", id);
                 if (current.isEmpty() || !java.util.Objects.equals(current.getFirst().get("url"), row.get("url"))
-                        || !java.util.Objects.equals(current.getFirst().get("token_enc"), enc)) return;
+                        || !java.util.Objects.equals(current.getFirst().get("token_enc"), enc)
+                        || !java.util.Objects.equals(current.getFirst().get("bridge"), row.get("bridge"))) return;
                 // A tool keeps class and approval only if it still exists with the SAME
                 // description and input schema; a changed definition is a new decision.
                 Map<String, JsonNode> before = new java.util.HashMap<>();
@@ -311,6 +332,10 @@ public class McpAdminController {
 
     private static Set<String> names(String s) {
         return s == null || s.isBlank() ? Set.of() : new LinkedHashSet<>(Arrays.asList(s.split("\n")));
+    }
+
+    private static boolean validBridgeToken(String token) {
+        return token != null && token.strip().matches("[!-~]{32,512}");
     }
 
     private static String validate(String name, String url) {

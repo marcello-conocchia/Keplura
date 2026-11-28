@@ -85,7 +85,7 @@ class FlywayBaselineMigrationTest {
         // V36 also stores the MCP auth mode explicitly (personal mode fails closed without a client).
         // V37 (TU-06d) adds the verified image/file results of tool calls (cascade with the card).
         // V38 binds the OAuth return address to its flow.
-        assertThat(result.migrationsExecuted).isEqualTo(37);
+        assertThat(result.migrationsExecuted).isEqualTo(38);
 
         JdbcTemplate jdbc = new JdbcTemplate(ds);
         assertThat(jdbc.queryForList("SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name <> 'flyway_schema_history'", String.class))
@@ -185,7 +185,7 @@ class FlywayBaselineMigrationTest {
         assertThat(jdbc.queryForList(
                 "SELECT version FROM flyway_schema_history WHERE version IS NOT NULL ORDER BY installed_rank",
                 String.class))
-                .containsExactly("1", "2", "3", "4", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38");
+                .containsExactly("1", "2", "3", "4", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39");
         // M4b: both chat tables have identity PKs, the citation blob and status
         // are NOT NULL (an assistant row without an honest end state must be
         // impossible at the schema level), and the list-read index exists.
